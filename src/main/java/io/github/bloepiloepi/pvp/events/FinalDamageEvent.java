@@ -6,6 +6,10 @@ import net.minestom.server.event.trait.CancellableEvent;
 import net.minestom.server.event.trait.EntityEvent;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * The damage event containing the final damage, calculation of armor and effects included.
+ * This event should be used, unless you want to detect how much damage was originally dealt.
+ */
 public class FinalDamageEvent implements EntityEvent, CancellableEvent {
 	
 	private final LivingEntity entity;

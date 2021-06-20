@@ -6,6 +6,7 @@ import io.github.bloepiloepi.pvp.damage.CustomEntityProjectileDamage;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
+import io.github.bloepiloepi.pvp.events.DamageBlockEvent;
 import io.github.bloepiloepi.pvp.events.FinalDamageEvent;
 import io.github.bloepiloepi.pvp.utils.DamageUtils;
 import net.minestom.server.attribute.Attribute;
@@ -58,15 +59,20 @@ public class DamageListener {
 			
 			boolean shield = false;
 			if (amount > 0.0F && EntityUtils.blockedByShield(entity, type)) {
-				amount = 0.0F;
+				DamageBlockEvent damageBlockEvent = new DamageBlockEvent(entity);
+				EventDispatcher.call(damageBlockEvent);
 				
-				if (!(type instanceof CustomEntityProjectileDamage)) {
-					if (attacker instanceof LivingEntity) {
-						EntityUtils.takeShieldHit(entity, (LivingEntity) attacker);
+				if (!damageBlockEvent.isCancelled()) {
+					amount = 0.0F;
+					
+					if (!(type instanceof CustomEntityProjectileDamage)) {
+						if (attacker instanceof LivingEntity) {
+							EntityUtils.takeShieldHit(entity, (LivingEntity) attacker);
+						}
 					}
+					
+					shield = true;
 				}
-				
-				shield = true;
 			}
 			
 			boolean hurtSoundAndAnimation = true;
