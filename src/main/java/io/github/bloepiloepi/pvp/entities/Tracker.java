@@ -3,11 +3,12 @@ package io.github.bloepiloepi.pvp.entities;
 import io.github.bloepiloepi.pvp.food.HungerManager;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
-import net.minestom.server.event.GlobalEventHandler;
+import net.minestom.server.event.*;
 import net.minestom.server.event.entity.EntityTickEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerLoginEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
+import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.play.SetCooldownPacket;
 
@@ -80,9 +81,11 @@ public class Tracker {
 		player.getPlayerConnection().sendPacket(packet);
 	}
 	
-	public static void register(GlobalEventHandler eventHandler) {
-		//TODO new event api
-		eventHandler.addEventCallback(PlayerLoginEvent.class, event -> {
+	public static void register(EventNode<EntityEvent> eventNode) {
+		EventNode<EntityEvent> node = EventNode.type("tracker-events", EventFilter.ENTITY);
+		eventNode.addChild(node);
+		
+		node.addListener(PlayerLoginEvent.class, event -> {
 			UUID uuid = event.getPlayer().getUuid();
 			
 			Tracker.lastAttackedTicks.put(uuid, 0);
@@ -93,7 +96,7 @@ public class Tracker {
 			Tracker.falling.put(uuid, false);
 		});
 		
-		eventHandler.addEventCallback(PlayerDisconnectEvent.class, event -> {
+		node.addListener(PlayerDisconnectEvent.class, event -> {
 			UUID uuid = event.getPlayer().getUuid();
 			
 			Tracker.lastAttackedTicks.remove(uuid);
@@ -104,14 +107,14 @@ public class Tracker {
 			Tracker.falling.remove(uuid);
 		});
 		
-		eventHandler.addEventCallback(PlayerTickEvent.class, event -> {
+		node.addListener(PlayerTickEvent.class, event -> {
 			if (event.getPlayer().isOnline()) {
 				Tracker.increaseInt(Tracker.lastAttackedTicks, event.getPlayer().getUuid(), 1);
 				Tracker.hungerManager.get(event.getPlayer().getUuid()).update();
 			}
 		});
 		
-		eventHandler.addEventCallback(EntityTickEvent.class, event -> {
+		node.addListener(EntityTickEvent.class, event -> {
 			if (Tracker.timeUntilRegen.getOrDefault(event.getEntity().getUuid(), 0) > 0) {
 				Tracker.decreaseInt(Tracker.timeUntilRegen, event.getEntity().getUuid(), 1);
 			}

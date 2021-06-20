@@ -7,9 +7,11 @@ import net.minestom.server.attribute.AttributeInstance;
 import net.minestom.server.attribute.AttributeModifier;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
-import net.minestom.server.event.GlobalEventHandler;
+import net.minestom.server.event.EventFilter;
+import net.minestom.server.event.EventNode;
 import net.minestom.server.event.item.EntityEquipEvent;
 import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
+import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.item.ItemStack;
 
 import java.util.ArrayList;
@@ -18,8 +20,11 @@ import java.util.Map;
 
 public class ArmorToolListener {
 	
-	public static void register(GlobalEventHandler eventHandler) {
-		eventHandler.addEventCallback(EntityEquipEvent.class, event -> {
+	public static void register(EventNode<EntityEvent> eventNode) {
+		EventNode<EntityEvent> node = EventNode.type("armor-tool-events", EventFilter.ENTITY);
+		eventNode.addChild(node);
+		
+		node.addListener(EntityEquipEvent.class, event -> {
 			if (!(event.getEntity() instanceof LivingEntity)) return;
 			LivingEntity livingEntity = (LivingEntity) event.getEntity();
 			
@@ -30,7 +35,7 @@ public class ArmorToolListener {
 			}
 		});
 		
-		eventHandler.addEventCallback(PlayerChangeHeldSlotEvent.class, event ->
+		node.addListener(PlayerChangeHeldSlotEvent.class, event ->
 				changeHandModifiers(event.getPlayer(), EquipmentSlot.MAIN_HAND, event.getPlayer().getInventory().getItemStack(event.getSlot())));
 	}
 	

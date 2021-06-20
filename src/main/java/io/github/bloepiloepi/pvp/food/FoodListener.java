@@ -4,8 +4,10 @@ import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
 import it.unimi.dsi.fastutil.Pair;
 import net.minestom.server.entity.Player;
-import net.minestom.server.event.GlobalEventHandler;
+import net.minestom.server.event.*;
 import net.minestom.server.event.player.*;
+import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.event.trait.PlayerEvent;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.potion.Potion;
 
@@ -15,11 +17,11 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class FoodListener {
 	
-	public static void register(GlobalEventHandler eventHandler) {
-		//TODO new event api
+	public static void register(EventNode<EntityEvent> eventNode) {
+		EventNode<PlayerEvent> node = EventNode.type("food-events", EventFilter.PLAYER);
+		eventNode.addChild(node);
 		
-		eventHandler.addEventCallback(PlayerPreEatEvent.class, event -> {
-			if (!event.getFoodItem().getMaterial().isFood()) return; //May also be a potion
+		node.addListener(EventListener.builder(PlayerPreEatEvent.class).handler(event -> {
 			FoodComponent foodComponent = FoodComponents.fromMaterial(event.getFoodItem().getMaterial());
 			
 			//If no food, or if the players hunger is full and the food is not always edible, cancel
@@ -29,10 +31,9 @@ public class FoodListener {
 			}
 			
 			event.setEatingTime(foodComponent.isSnack() ? (long) ((16 / 20F) * 1000) : (long) ((32 / 20F) * 1000));
-		});
+		}).filter(event -> event.getFoodItem().getMaterial().isFood()).build()); //May also be a potion
 		
-		eventHandler.addEventCallback(PlayerEatEvent.class, event -> {
-			if (!event.getFoodItem().getMaterial().isFood()) return; //May also be a potion
+		node.addListener(EventListener.builder(PlayerEatEvent.class).handler(event -> {
 			Tracker.hungerManager.get(event.getPlayer().getUuid()).eat(event.getFoodItem().getMaterial());
 			
 			FoodComponent component = FoodComponents.fromMaterial(event.getFoodItem().getMaterial());
@@ -50,12 +51,12 @@ public class FoodListener {
 			if (!event.getPlayer().isCreative()) {
 				event.getPlayer().setItemInHand(event.getHand(), event.getFoodItem().withAmount((i) -> i - 1));
 			}
-		});
+		}).filter(event -> event.getFoodItem().getMaterial().isFood()).build()); //May also be a potion
 		
-		eventHandler.addEventCallback(PlayerBlockBreakEvent.class, event ->
+		node.addListener(PlayerBlockBreakEvent.class, event ->
 				EntityUtils.addExhaustion(event.getPlayer(), 0.005F));
 		
-		eventHandler.addEventCallback(PlayerMoveEvent.class, event -> {
+		node.addListener(PlayerMoveEvent.class, event -> {
 			Player player = event.getPlayer();
 			
 			double xDiff = event.getNewPosition().getX() - player.getPosition().getX();

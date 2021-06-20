@@ -1,23 +1,22 @@
 package io.github.bloepiloepi.pvp.listeners;
 
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
-import io.github.bloepiloepi.pvp.enchantment.CustomEnchantments;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entities.EntityGroup;
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
-import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffects;
-import io.github.bloepiloepi.pvp.potion.item.CustomPotionTypes;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.entity.*;
-import net.minestom.server.event.GlobalEventHandler;
+import net.minestom.server.event.EventFilter;
+import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
 import net.minestom.server.event.player.PlayerHandAnimationEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
+import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.network.packet.server.play.EntityAnimationPacket;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
@@ -33,28 +32,25 @@ import org.slf4j.LoggerFactory;
 public class AttackManager {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AttackManager.class);
 	
-	public static void register(GlobalEventHandler eventHandler) {
-		//TODO new event api
+	public static void register(EventNode<EntityEvent> eventNode) {
+		EventNode<EntityEvent> node = EventNode.type("attack-events", EventFilter.ENTITY);
+		eventNode.addChild(node);
 		
-		CustomEnchantments.registerAll();
-		CustomPotionEffects.registerAll();
-		CustomPotionTypes.registerAll();
-		
-		eventHandler.addEventCallback(EntityAttackEvent.class, event -> {
+		node.addListener(EntityAttackEvent.class, event -> {
 			if (event.getEntity() instanceof Player) {
 				onEntityHit((Player) event.getEntity(), event.getTarget());
 			}
 		});
 		
-		eventHandler.addEventCallback(PlayerHandAnimationEvent.class, event -> resetLastAttackedTicks(event.getPlayer()));
+		node.addListener(PlayerHandAnimationEvent.class, event -> resetLastAttackedTicks(event.getPlayer()));
 		
-		eventHandler.addEventCallback(PlayerChangeHeldSlotEvent.class, event -> {
+		node.addListener(PlayerChangeHeldSlotEvent.class, event -> {
 			if (!event.getPlayer().getItemInMainHand().isSimilar(event.getPlayer().getInventory().getItemStack(event.getSlot()))) {
 				resetLastAttackedTicks(event.getPlayer());
 			}
 		});
 		
-		eventHandler.addEventCallback(PlayerUseItemEvent.class, event -> {
+		node.addListener(PlayerUseItemEvent.class, event -> {
 			if (Tracker.hasCooldown(event.getPlayer(), event.getItemStack().getMaterial())) {
 				event.setCancelled(true);
 			}

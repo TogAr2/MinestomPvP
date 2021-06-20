@@ -15,17 +15,18 @@ import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
-import net.minestom.server.event.EventDispatcher;
-import net.minestom.server.event.GlobalEventHandler;
+import net.minestom.server.event.*;
 import net.minestom.server.event.entity.EntityDamageEvent;
+import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.potion.PotionEffect;
 
 public class DamageListener {
 	
-	public static void register(GlobalEventHandler eventHandler) {
-		//TODO new event api
+	public static void register(EventNode<EntityEvent> eventNode) {
+		EventNode<EntityEvent> node = EventNode.type("damage-events", EventFilter.ENTITY);
+		eventNode.addChild(node);
 		
-		eventHandler.addEventCallback(EntityDamageEvent.class, event -> {
+		node.addListener(EntityDamageEvent.class, event -> {
 			if (event.isCancelled()) return;
 			float amount = event.getDamage();
 			

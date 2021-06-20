@@ -10,13 +10,15 @@ import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
-import net.minestom.server.event.GlobalEventHandler;
+import net.minestom.server.event.*;
+import net.minestom.server.event.EventListener;
 import net.minestom.server.event.entity.EntityDeathEvent;
 import net.minestom.server.event.entity.EntityPotionAddEvent;
 import net.minestom.server.event.entity.EntityPotionRemoveEvent;
 import net.minestom.server.event.entity.EntityTickEvent;
 import net.minestom.server.event.player.PlayerEatEvent;
 import net.minestom.server.event.player.PlayerPreEatEvent;
+import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.item.metadata.PotionMeta;
@@ -25,10 +27,7 @@ import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.TimedPotion;
 import net.minestom.server.utils.time.TimeUnit;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -37,8 +36,11 @@ public class PotionListener {
 	
 	private static final Map<TimedPotion, Integer> durationLeftMap = new ConcurrentHashMap<>();
 	
-	public static void register(GlobalEventHandler eventHandler) {
-		eventHandler.addEventCallback(EntityTickEvent.class, event -> {
+	public static void register(EventNode<EntityEvent> eventNode) {
+		EventNode<EntityEvent> node = EventNode.type("potion-events", EventFilter.ENTITY);
+		eventNode.addChild(node);
+		
+		node.addListener(EntityTickEvent.class, event -> {
 			if (!(event.getEntity() instanceof LivingEntity)) return;
 			
 			Entity entity = event.getEntity();
@@ -63,7 +65,7 @@ public class PotionListener {
 			durationLeftMap.keySet().removeIf(potion -> !entity.getActiveEffects().contains(potion));
 		});
 		
-		eventHandler.addEventCallback(EntityPotionAddEvent.class, event -> {
+		node.addListener(EntityPotionAddEvent.class, event -> {
 			if (!(event.getEntity() instanceof LivingEntity)) return;
 			
 			CustomPotionEffect customPotionEffect = CustomPotionEffects.get(event.getPotion().getEffect());
@@ -72,7 +74,7 @@ public class PotionListener {
 			updatePotionVisibility((LivingEntity) event.getEntity());
 		});
 		
-		eventHandler.addEventCallback(EntityPotionRemoveEvent.class, event -> {
+		node.addListener(EntityPotionRemoveEvent.class, event -> {
 			if (!(event.getEntity() instanceof LivingEntity)) return;
 			
 			CustomPotionEffect customPotionEffect = CustomPotionEffects.get(event.getPotion().getEffect());
@@ -84,17 +86,14 @@ public class PotionListener {
 			).delay(1, TimeUnit.TICK).schedule();
 		});
 		
-		eventHandler.addEventCallback(EntityDeathEvent.class, event ->
+		node.addListener(EntityDeathEvent.class, event ->
 				event.getEntity().clearEffects());
 		
-		eventHandler.addEventCallback(PlayerPreEatEvent.class, event -> {
-			if (event.getFoodItem().getMaterial() != Material.POTION) return;
+		node.addListener(EventListener.builder(PlayerPreEatEvent.class).handler(event -> {
 			event.setEatingTime(32L * MinecraftServer.TICK_MS); //Potion use time is always 32 ticks
-		});
+		}).filter(event -> event.getFoodItem().getMaterial() == Material.POTION).build());
 		
-		eventHandler.addEventCallback(PlayerEatEvent.class, event -> {
-			if (event.getFoodItem().getMaterial() != Material.POTION) return;
-			
+		node.addListener(EventListener.builder(PlayerEatEvent.class).handler(event -> {
 			Player player = event.getPlayer();
 			ItemStack stack = event.getFoodItem();
 			PotionMeta meta = (PotionMeta) stack.getMeta();
@@ -103,9 +102,10 @@ public class PotionListener {
 			List<Potion> potions = new ArrayList<>();
 			potions.addAll(CustomPotionTypes.get(meta.getPotionType()).getEffects());
 			potions.addAll(meta.getCustomPotionEffects().stream().map((customPotion) ->
-					new Potion(PotionEffect.fromId(customPotion.getId()), customPotion.getAmplifier(),
-							customPotion.getDuration(), customPotion.showParticles(),
-							customPotion.showIcon(), customPotion.isAmbient()))
+					new Potion(Objects.requireNonNull(PotionEffect.fromId(customPotion.getId())),
+							customPotion.getAmplifier(), customPotion.getDuration(),
+							customPotion.showParticles(), customPotion.showIcon(),
+							customPotion.isAmbient()))
 					.collect(Collectors.toList()));
 			
 			//Apply the potions
@@ -127,7 +127,7 @@ public class PotionListener {
 					player.getInventory().addItemStack(GLASS_BOTTLE);
 				}
 			}
-		});
+		}).filter(event -> event.getFoodItem().getMaterial() == Material.POTION).build());
 	}
 	
 	private static void updatePotionVisibility(LivingEntity entity) {
