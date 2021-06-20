@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "io.github.bloepiloepi.pvp.mixins",
+  "minVersion": "0.8",
+  "target": "@env(DEFAULT)",
+  "compatibilityLevel": "JAVA_11",
+  "mixins": [
+    "LivingEntityMixin",
+    "PlayerInventoryMixin",
+    "PlayerMixin",
+    "UseItemListenerMixin"
+  ]
+}

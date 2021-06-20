@@ -1,0 +1,11 @@
+# Project exclude paths
+/.idea/
+/.gradle/
+/build/
+/build/classes/java/main/
+/build/classes/java/test/
+
+# Minestom
+/.minestom_tmp/
+/.mixin.out/
+/minecraft_data/
