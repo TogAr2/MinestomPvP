@@ -6,6 +6,7 @@ import io.github.bloepiloepi.pvp.damage.CustomEntityProjectileDamage;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
+import io.github.bloepiloepi.pvp.events.FinalDamageEvent;
 import io.github.bloepiloepi.pvp.utils.DamageUtils;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.entity.Entity;
@@ -13,6 +14,7 @@ import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
+import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.entity.EntityDamageEvent;
 import net.minestom.server.potion.PotionEffect;
@@ -121,11 +123,14 @@ public class DamageListener {
 				}
 			}
 			
-			if (!shield) {
-				event.setDamage(amount);
+			if (shield) {
+				event.setCancelled(true);
+				return;
 			}
 			
-			if (amount <= 0.0F) {
+			FinalDamageEvent finalDamageEvent = new FinalDamageEvent(entity, type, amount);
+			EventDispatcher.call(finalDamageEvent);
+			if (finalDamageEvent.isCancelled() || finalDamageEvent.getDamage() <= 0.0F) {
 				event.setCancelled(true);
 			}
 		});
