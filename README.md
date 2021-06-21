@@ -9,13 +9,33 @@ Currently, almost all vanilla PvP features are supported except for a few.
 ## Table of Contents
 
 - [Future Plans](#plans)
+- [Usage](#usage)
+- [Events](#events)
 - [Contributing](#contributing)
 
 ## Plans
 
+- **Applying 1.17 changes**
 - Bow and arrows
 - Totem of undying
 - Splash potions
+- Proper death messages
+
+## Usage
+
+To integrate this extension in your minestom server, you may have to tweak a little bit to make sure everything works correctly.
+You can get an `EventNode` with all PvP related events listening using `PvpExtension.events()`.
+You can add this node as a child to any other node and the pvp will work in the scope.
+
+When applying damage to an entity, use `CustomDamageType` instead of `DamageType` (except if you the a default ones: `GRAVITY`, `ON_FIRE` and `VOID`).
+If you have your own damage type, also extend `CustomDamageType` instead of `DamageType`.
+
+## Events
+
+This extension provides several events:
+
+- `DamageBlockEvent`: cancellable, called when an entity blocks damage using a shield.
+- `FinalDamageEvent`: cancellable, called when the final damage calculation (including armor and effects) is completed. This event should be used instead of `EntityDamageEvent`, unless you want to detect how much damage was originally dealt.
 
 ## Contributing
 
