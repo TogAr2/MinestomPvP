@@ -21,17 +21,22 @@ public class CustomDamageType extends DamageType {
 	public static final CustomDamageType DROWN = (new CustomDamageType("drown")).setBypassesArmor();
 	public static final CustomDamageType STARVE = (new CustomDamageType("starve")).setBypassesArmor().setUnblockable();
 	public static final CustomDamageType CACTUS = new CustomDamageType("cactus");
-	public static final CustomDamageType FALL = (new CustomDamageType("fall")).setBypassesArmor();
+	public static final CustomDamageType FALL = (new CustomDamageType("fall")).setBypassesArmor().setFall();
 	public static final CustomDamageType FLY_INTO_WALL = (new CustomDamageType("flyIntoWall")).setBypassesArmor();
 	public static final CustomDamageType OUT_OF_WORLD = (new CustomDamageType("outOfWorld")).setBypassesArmor().setOutOfWorld();
 	public static final CustomDamageType GENERIC = (new CustomDamageType("generic")).setBypassesArmor();
-	public static final CustomDamageType MAGIC = (new CustomDamageType("magic")).setBypassesArmor().setUsesMagic();
+	public static final CustomDamageType MAGIC = (new CustomDamageType("magic")).setBypassesArmor().setMagic();
 	public static final CustomDamageType WITHER = (new CustomDamageType("wither")).setBypassesArmor();
-	public static final CustomDamageType ANVIL = new CustomDamageType("anvil");
-	public static final CustomDamageType FALLING_BLOCK = new CustomDamageType("fallingBlock");
+	public static final CustomDamageType ANVIL = new CustomDamageType("anvil").setDamagesHelmet();
+	public static final CustomDamageType FALLING_BLOCK = new CustomDamageType("fallingBlock").setDamagesHelmet();
 	public static final CustomDamageType DRAGON_BREATH = (new CustomDamageType("dragonBreath")).setBypassesArmor();
 	public static final CustomDamageType DRYOUT = new CustomDamageType("dryout");
 	public static final CustomDamageType SWEET_BERRY_BUSH = new CustomDamageType("sweetBerryBush");
+	public static final CustomDamageType FREEZE = new CustomDamageType("freeze").setBypassesArmor();
+	public static final CustomDamageType FALLING_STALACTITE = new CustomDamageType("fallingStalactite").setDamagesHelmet();
+	public static final CustomDamageType STALAGMITE = new CustomDamageType("stalagmite").setBypassesArmor().setFall();
+	
+	private boolean damagesHelmet;
 	private boolean bypassesArmor;
 	private boolean outOfWorld;
 	private boolean unblockable;
@@ -41,6 +46,7 @@ public class CustomDamageType extends DamageType {
 	private boolean scaleWithDifficulty;
 	private boolean magic;
 	private boolean explosive;
+	private boolean fall;
 	public final String name;
 	
 	protected CustomDamageType(String name) {
@@ -48,28 +54,64 @@ public class CustomDamageType extends DamageType {
 		this.name = name;
 	}
 	
-	public static CustomDamageType entity(LivingEntity attacker) {
-		return new CustomEntityDamage(attacker);
+	public static CustomDamageType sting(LivingEntity attacker) {
+		return new CustomEntityDamage("sting", attacker);
 	}
 	
-	public static CustomDamageType projectile(Entity projectile, Entity attacker) {
-		return (new CustomEntityProjectileDamage(attacker, projectile));
+	public static CustomDamageType mob(LivingEntity attacker) {
+		return new CustomEntityDamage("mob", attacker);
 	}
 	
-	public static CustomDamageType magic(Entity magic, @Nullable Entity attacker) {
-		return (new CustomEntityProjectileDamage(attacker, magic)).setBypassesArmor().setUsesMagic();
+	public static CustomDamageType indirectMob(Entity projectile, Entity attacker) {
+		return new CustomIndirectEntityDamage("mob", attacker, projectile);
 	}
 	
-	public static CustomDamageType thorns(Entity attacker) {
-		return (new CustomEntityDamage(attacker)).setThorns().setUsesMagic();
+	public static CustomDamageType player(Player player) {
+		return new CustomEntityDamage("player", player);
+	}
+	
+	public static CustomDamageType arrow(Entity arrow, @Nullable Entity shooter) {
+		return new CustomIndirectEntityDamage("arrow", arrow, shooter).setProjectile();
+	}
+	
+	public static CustomDamageType trident(Entity trident, @Nullable Entity thrower) {
+		return new CustomIndirectEntityDamage("trident", trident, thrower);
+	}
+	
+	public static CustomDamageType fireworks(Entity rocket, @Nullable Entity owner) {
+		return new CustomIndirectEntityDamage("fireworks", rocket, owner);
+	}
+	
+	public static CustomDamageType fireball(Entity fireball, @Nullable Entity shooter) {
+		return (shooter == null ? new CustomIndirectEntityDamage("onFire", fireball, fireball) : new CustomIndirectEntityDamage("fireball", fireball, shooter)).setFire().setProjectile();
+	}
+	
+	public static CustomDamageType witherSkull(Entity witherSkull, Entity shooter) {
+		return new CustomIndirectEntityDamage("witherSkull", witherSkull, shooter).setProjectile();
+	}
+	
+	public static CustomDamageType thrown(Entity thrown, @Nullable Entity thrower) {
+		return new CustomIndirectEntityDamage("thrown", thrown, thrower).setProjectile();
+	}
+	
+	public static CustomDamageType indirectMagic(Entity magic, @Nullable Entity owner) {
+		return new CustomIndirectEntityDamage("indirectMagic", magic, owner).setBypassesArmor().setMagic();
+	}
+	
+	public static CustomDamageType thorns(Entity wearer) {
+		return new CustomEntityDamage("thorns", wearer).setThorns().setMagic();
 	}
 	
 	public static CustomDamageType explosion(@Nullable Explosion explosion, @Nullable LivingEntity causingEntity) {
 		return explosion(explosion != null ? causingEntity : null);
 	}
 	
-	public static CustomDamageType explosion(@Nullable LivingEntity attacker) {
-		return attacker != null ? (new CustomEntityDamage(attacker)).setScaledWithDifficulty().setExplosive() : (new CustomDamageType("explosion")).setScaledWithDifficulty().setExplosive();
+	public static CustomDamageType explosion(@Nullable LivingEntity causingEntity) {
+		return (causingEntity != null ? new CustomEntityDamage("explosion.player", causingEntity) : new CustomDamageType("explosion")).setScaledWithDifficulty().setExplosive();
+	}
+	
+	public static CustomDamageType invalidRespawnPointExplosion() {
+		return new InvalidRespawnPointDamageType();
 	}
 	
 	public boolean isProjectile() {
@@ -94,6 +136,10 @@ public class CustomDamageType extends DamageType {
 		return this.bypassesArmor;
 	}
 	
+	public boolean damagesHelmet() {
+		return this.damagesHelmet;
+	}
+	
 	public float getExhaustion() {
 		return this.exhaustion;
 	}
@@ -107,18 +153,23 @@ public class CustomDamageType extends DamageType {
 	}
 	
 	@Nullable
-	public Entity getSource() {
-		return this.getAttacker();
+	public Entity getDirectEntity() {
+		return this.getEntity();
 	}
 	
 	@Nullable
-	public Entity getAttacker() {
+	public Entity getEntity() {
 		return null;
 	}
 	
 	protected CustomDamageType setBypassesArmor() {
 		this.bypassesArmor = true;
 		this.exhaustion = 0.0F;
+		return this;
+	}
+	
+	protected CustomDamageType setDamagesHelmet() {
+		this.damagesHelmet = true;
 		return this;
 	}
 	
@@ -161,13 +212,22 @@ public class CustomDamageType extends DamageType {
 		return this.magic;
 	}
 	
-	public CustomDamageType setUsesMagic() {
+	public CustomDamageType setMagic() {
 		this.magic = true;
 		return this;
 	}
 	
-	public boolean isSourceCreativePlayer() {
-		Entity entity = this.getAttacker();
+	public boolean isFall() {
+		return this.fall;
+	}
+	
+	public CustomDamageType setFall() {
+		this.fall = true;
+		return this;
+	}
+	
+	public boolean isCreative() {
+		Entity entity = this.getEntity();
 		return entity instanceof Player && !((Player) entity).getGameMode().canTakeDamage();
 	}
 	

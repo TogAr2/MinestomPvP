@@ -17,7 +17,7 @@ import net.minestom.server.extensions.Extension;
 
 public class PvpExtension extends Extension {
 	
-	public static EventNode<EntityEvent> newEventNode() {
+	public static EventNode<EntityEvent> events() {
 		EventNode<EntityEvent> eventNode = EventNode.type("pvp-events", EventFilter.ENTITY);
 		
 		Tracker.register(eventNode);

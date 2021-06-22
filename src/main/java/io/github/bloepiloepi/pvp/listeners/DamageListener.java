@@ -2,7 +2,7 @@ package io.github.bloepiloepi.pvp.listeners;
 
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.damage.CustomEntityDamage;
-import io.github.bloepiloepi.pvp.damage.CustomEntityProjectileDamage;
+import io.github.bloepiloepi.pvp.damage.CustomIndirectEntityDamage;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
@@ -55,7 +55,7 @@ public class DamageListener {
 			
 			Entity attacker = null;
 			if (type instanceof CustomEntityDamage) {
-				attacker = type.getSource();
+				attacker = type.getDirectEntity();
 			}
 			
 			boolean shield = false;
@@ -66,7 +66,7 @@ public class DamageListener {
 				if (!damageBlockEvent.isCancelled()) {
 					amount = 0.0F;
 					
-					if (!(type instanceof CustomEntityProjectileDamage)) {
+					if (!(type instanceof CustomIndirectEntityDamage)) {
 						if (attacker instanceof LivingEntity) {
 							EntityUtils.takeShieldHit(entity, (LivingEntity) attacker);
 						}

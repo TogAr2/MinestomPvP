@@ -77,7 +77,7 @@ public enum Tool {
 			}
 		}
 		
-		//Weapon attributes (attack damage, etc) do not newEventNode in offhand
+		//Weapon attributes (attack damage, etc) do not apply in offhand
 		if (slot == EquipmentSlot.MAIN_HAND) {
 			modifiers.putAll(this.attributeModifiers);
 		}

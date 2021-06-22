@@ -101,7 +101,7 @@ public class CustomPotionEffect {
 			if (source == null) {
 				target.damage(CustomDamageType.MAGIC, (float) amount);
 			} else {
-				target.damage(CustomDamageType.magic(source, attacker), (float) amount);
+				target.damage(CustomDamageType.indirectMagic(source, attacker), (float) amount);
 			}
 		}
 	}

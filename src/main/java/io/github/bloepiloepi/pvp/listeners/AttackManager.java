@@ -76,7 +76,7 @@ public class AttackManager {
 		
 		if (target instanceof ItemEntity || target instanceof ExperienceOrb || target instanceof EntityProjectile || target == player) {
 			player.kick(Component.translatable("multiplayer.disconnect.invalid_entity_attacked"));
-			LOGGER.error("Player " + player.getUsername() + " tried to attack invalid entity");
+			LOGGER.error("Player " + player.getUsername() + " tried to attack invalid mob");
 			return;
 		}
 		
@@ -132,7 +132,7 @@ public class AttackManager {
 		}
 		
 		Vector vec3d = target.getVelocity();
-		boolean damageSucceeded = EntityUtils.damage(target, CustomDamageType.entity(player), damage);
+		boolean damageSucceeded = EntityUtils.damage(target, CustomDamageType.mob(player), damage);
 		
 		if (!damageSucceeded) {
 			SoundManager.sendToAround(player, SoundEvent.PLAYER_ATTACK_NODAMAGE, Sound.Source.PLAYER, 1.0F, 1.0F);
@@ -191,7 +191,7 @@ public class AttackManager {
 		}
 		
 		EnchantmentUtils.onTargetDamaged(player, target);
-		//TODO target and user damaged should also work when non-player entity attacks (mobs, arrows, trident)
+		//TODO target and user damaged should also work when non-player mob attacks (mobs, arrows, trident)
 		//TODO damage itemstack
 		
 		if (target instanceof LivingEntity) {

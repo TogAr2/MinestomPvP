@@ -8,12 +8,16 @@ import org.jetbrains.annotations.Nullable;
 
 public class CustomEntityDamage extends CustomDamageType {
 	@Nullable
-	protected final Entity source;
+	protected final Entity entity;
 	private boolean thorns;
 	
-	public CustomEntityDamage(@Nullable Entity source) {
-		super("entity_source");
-		this.source = source;
+	public CustomEntityDamage(String name, @Nullable Entity entity) {
+		super(name);
+		this.entity = entity;
+	}
+	
+	public CustomEntityDamage(@Nullable Entity entity) {
+		this("entity_source", entity);
 	}
 	
 	public CustomEntityDamage setThorns() {
@@ -25,19 +29,22 @@ public class CustomEntityDamage extends CustomDamageType {
 		return this.thorns;
 	}
 	
+	@Override
 	@Nullable
-	public Entity getAttacker() {
-		return this.source;
+	public Entity getEntity() {
+		return this.entity;
 	}
 	
 	//TODO death message
 	
+	@Override
 	public boolean isScaledWithDifficulty() {
-		return this.source != null && this.source instanceof LivingEntity && !(this.source instanceof Player);
+		return this.entity != null && this.entity instanceof LivingEntity && !(this.entity instanceof Player);
 	}
 	
+	@Override
 	@Nullable
 	public Position getPosition() {
-		return this.source != null ? this.source.getPosition() : null;
+		return this.entity != null ? this.entity.getPosition() : null;
 	}
 }

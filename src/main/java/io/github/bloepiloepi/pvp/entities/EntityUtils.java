@@ -8,7 +8,6 @@ import net.minestom.server.attribute.Attribute;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
-import net.minestom.server.entity.metadata.PlayerMeta;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.play.EntityVelocityPacket;
@@ -56,10 +55,10 @@ public class EntityUtils {
 	}
 	
 	public static boolean blockedByShield(LivingEntity entity, CustomDamageType type) {
-		Entity attacker = type.getAttacker();
+		Entity damager = type.getEntity();
 		boolean piercing = false;
-		if (attacker instanceof EntityProjectile) {
-			if (attacker.getData().<Byte>get("pierceLevel") > 0) {
+		if (damager instanceof EntityProjectile) {
+			if (damager.getData().<Byte>get("pierceLevel") > 0) {
 				piercing = true;
 			}
 		}

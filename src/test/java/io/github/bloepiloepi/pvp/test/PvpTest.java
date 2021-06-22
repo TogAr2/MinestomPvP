@@ -28,7 +28,7 @@ public class PvpTest {
 				event.getPlayer().setGameMode(GameMode.CREATIVE));
 		
 		GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-		eventHandler.addChild(PvpExtension.newEventNode());
+		eventHandler.addChild(PvpExtension.events());
 		
 		Commands.init();
 		
