@@ -27,7 +27,7 @@ To integrate this extension in your minestom server, you may have to tweak a lit
 You can get an `EventNode` with all PvP related events listening using `PvpExtension.events()`.
 You can add this node as a child to any other node and the pvp will work in the scope.
 
-When applying damage to an entity, use `CustomDamageType` instead of `DamageType` (except if you the the default ones: `GRAVITY`, `ON_FIRE` and `VOID`).
+When applying damage to an entity, use `CustomDamageType` instead of `DamageType` (except if you the default ones: `GRAVITY`, `ON_FIRE` and `VOID`).
 If you have your own damage type, also extend `CustomDamageType` instead of `DamageType`.
 
 ## Events
