@@ -136,7 +136,7 @@ public class EnchantmentUtils {
 		return getEquipmentLevel(CustomEnchantments.get(Enchantment.FIRE_ASPECT), entity);
 	}
 	
-	public static short getEfficiency(LivingEntity entity) {
+	public static short getBlockEfficiency(LivingEntity entity) {
 		return getEquipmentLevel(CustomEnchantments.get(Enchantment.BLOCK_EFFICIENCY), entity);
 	}
 }

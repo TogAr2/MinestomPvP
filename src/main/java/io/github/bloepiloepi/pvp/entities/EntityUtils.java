@@ -104,7 +104,7 @@ public class EntityUtils {
 	}
 	
 	public static void disableShield(Player player, boolean sprinting) {
-		float chance = 0.25F + (float) EnchantmentUtils.getEfficiency(player) * 0.05F;
+		float chance = 0.25F + (float) EnchantmentUtils.getBlockEfficiency(player) * 0.05F;
 		if (sprinting) {
 			chance += 0.75F;
 		}
@@ -121,16 +121,16 @@ public class EntityUtils {
 		}
 	}
 	
-	public static void takeKnockback(LivingEntity entity, float f, double d, double e) {
+	public static void takeKnockback(LivingEntity entity, double strength, double d, double e) {
 		if (entity instanceof Player && (!((Player) entity).getGameMode().canTakeDamage() || ((Player) entity).isFlying())) {
 			return;
 		}
 		
-		f = (float) ((double) f * (1.0D - entity.getAttributeValue(Attribute.KNOCKBACK_RESISTANCE)));
-		if (f > 0.0F) {
+		strength *= 1.0D - entity.getAttributeValue(Attribute.KNOCKBACK_RESISTANCE);
+		if (strength > 0.0F) {
 			Vector vel = entity.getVelocity();
-			Vector vector = (new Vector(d, 0.0D, e)).normalize().multiply((double) f);
-			Vector newVel = new Vector(vel.getX() / 2.0D - vector.getX(), entity.isOnGround() ? Math.min(0.4D, vel.getY() / 2.0D + (double) f) : vel.getY(), vel.getZ() / 2.0D - vector.getZ());
+			Vector vector = (new Vector(d, 0.0D, e)).normalize().multiply(strength);
+			Vector newVel = new Vector(vel.getX() / 2.0D - vector.getX(), entity.isOnGround() ? Math.min(0.4D, vel.getY() / 2.0D + strength) : vel.getY(), vel.getZ() / 2.0D - vector.getZ());
 			
 			if (entity instanceof Player) {
 				EntityVelocityPacket packet = new EntityVelocityPacket();

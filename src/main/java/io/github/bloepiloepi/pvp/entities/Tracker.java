@@ -20,7 +20,7 @@ import java.util.UUID;
 //TODO move to Data class
 public class Tracker {
 	public static final Map<UUID, Integer> lastAttackedTicks = new HashMap<>();
-	public static final Map<UUID, Integer> timeUntilRegen = new HashMap<>();
+	public static final Map<UUID, Integer> invulnerableTime = new HashMap<>();
 	public static final Map<UUID, Float> lastDamageTaken = new HashMap<>();
 	public static final Map<UUID, HungerManager> hungerManager = new HashMap<>();
 	public static final Map<UUID, Map<Material, Long>> cooldownEnd = new HashMap<>();
@@ -89,7 +89,7 @@ public class Tracker {
 			UUID uuid = event.getPlayer().getUuid();
 			
 			Tracker.lastAttackedTicks.put(uuid, 0);
-			Tracker.timeUntilRegen.put(uuid, 0);
+			Tracker.invulnerableTime.put(uuid, 0);
 			Tracker.lastDamageTaken.put(uuid, 0F);
 			Tracker.hungerManager.put(uuid, new HungerManager(event.getPlayer()));
 			Tracker.cooldownEnd.put(uuid, new HashMap<>());
@@ -100,7 +100,7 @@ public class Tracker {
 			UUID uuid = event.getPlayer().getUuid();
 			
 			Tracker.lastAttackedTicks.remove(uuid);
-			Tracker.timeUntilRegen.remove(uuid);
+			Tracker.invulnerableTime.remove(uuid);
 			Tracker.lastDamageTaken.remove(uuid);
 			Tracker.hungerManager.remove(uuid);
 			Tracker.cooldownEnd.remove(uuid);
@@ -115,8 +115,8 @@ public class Tracker {
 		});
 		
 		node.addListener(EntityTickEvent.class, event -> {
-			if (Tracker.timeUntilRegen.getOrDefault(event.getEntity().getUuid(), 0) > 0) {
-				Tracker.decreaseInt(Tracker.timeUntilRegen, event.getEntity().getUuid(), 1);
+			if (Tracker.invulnerableTime.getOrDefault(event.getEntity().getUuid(), 0) > 0) {
+				Tracker.decreaseInt(Tracker.invulnerableTime, event.getEntity().getUuid(), 1);
 			}
 		});
 		

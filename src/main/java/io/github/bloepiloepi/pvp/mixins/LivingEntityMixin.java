@@ -1,5 +1,6 @@
 package io.github.bloepiloepi.pvp.mixins;
 
+import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
@@ -29,6 +30,8 @@ public abstract class LivingEntityMixin extends Entity {
 	@Shadow public abstract boolean isInvulnerable();
 	@Shadow public abstract boolean isImmune(@NotNull DamageType type);
 	
+	@Shadow protected boolean invulnerable;
+	
 	/**
 	 * @author me
 	 */
@@ -37,7 +40,14 @@ public abstract class LivingEntityMixin extends Entity {
 	public boolean damage(DamageType type, float value) {
 		if (isDead())
 			return false;
-		if (isInvulnerable() || isImmune(type)) {
+		if (isInvulnerable()) {
+			if (type instanceof CustomDamageType) {
+				if (!((CustomDamageType) type).isOutOfWorld()) return false;
+			} else if (type != DamageType.VOID) {
+				return false;
+			}
+		}
+		if (isImmune(type)) {
 			return false;
 		}
 		
@@ -47,6 +57,10 @@ public abstract class LivingEntityMixin extends Entity {
 			this.lastDamageSource = entityDamageEvent.getDamageType();
 			
 			float remainingDamage = entityDamageEvent.getDamage();
+			
+			//TODO damage animation is removed since it is done using statuses,
+			// but when the pvp listeners are not applied it should appear.
+			// Same for the sound
 			
 			// Additional hearts support
 			if ((Entity) this instanceof Player) {

@@ -2,7 +2,6 @@ package io.github.bloepiloepi.pvp.listeners;
 
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.damage.CustomEntityDamage;
-import io.github.bloepiloepi.pvp.damage.CustomIndirectEntityDamage;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
@@ -49,7 +48,8 @@ public class DamageListener {
 				return;
 			}
 			
-			if ((type == CustomDamageType.FALLING_BLOCK || type == CustomDamageType.ANVIL) && !entity.getEquipment(EquipmentSlot.HELMET).isAir()) {
+			if (type.damagesHelmet() && !entity.getEquipment(EquipmentSlot.HELMET).isAir()) {
+				//TODO damage helmet item
 				amount *= 0.75F;
 			}
 			
@@ -63,10 +63,12 @@ public class DamageListener {
 				DamageBlockEvent damageBlockEvent = new DamageBlockEvent(entity);
 				EventDispatcher.call(damageBlockEvent);
 				
+				//TODO damage shield item
+				
 				if (!damageBlockEvent.isCancelled()) {
 					amount = 0.0F;
 					
-					if (!(type instanceof CustomIndirectEntityDamage)) {
+					if (!type.isProjectile()) {
 						if (attacker instanceof LivingEntity) {
 							EntityUtils.takeShieldHit(entity, (LivingEntity) attacker);
 						}
@@ -77,7 +79,7 @@ public class DamageListener {
 			}
 			
 			boolean hurtSoundAndAnimation = true;
-			if (Tracker.timeUntilRegen.getOrDefault(entity.getUuid(), 0) > 10.0F) {
+			if (Tracker.invulnerableTime.getOrDefault(entity.getUuid(), 0) > 10.0F) {
 				float lastDamage = Tracker.lastDamageTaken.get(entity.getUuid());
 				
 				if (amount <= lastDamage) {
@@ -90,8 +92,14 @@ public class DamageListener {
 				hurtSoundAndAnimation = false;
 			} else {
 				Tracker.lastDamageTaken.put(entity.getUuid(), amount);
-				Tracker.timeUntilRegen.put(entity.getUuid(), 20);
+				Tracker.invulnerableTime.put(entity.getUuid(), 20);
 				amount = applyDamage(entity, type, amount);
+			}
+			
+			FinalDamageEvent finalDamageEvent = new FinalDamageEvent(entity, type, amount);
+			EventDispatcher.call(finalDamageEvent);
+			if (finalDamageEvent.isCancelled() || finalDamageEvent.getDamage() <= 0.0F) {
+				event.setCancelled(true);
 			}
 			
 			if (hurtSoundAndAnimation) {
@@ -100,22 +108,25 @@ public class DamageListener {
 				} else if (type instanceof CustomEntityDamage && ((CustomEntityDamage) type).isThorns()) {
 					entity.triggerStatus((byte) 33);
 				} else {
-					byte e;
+					byte status;
 					if (type == CustomDamageType.DROWN) {
 						//Drown sound and animation
-						e = 36;
+						status = 36;
 					} else if (type.isFire()) {
 						//Burn sound and animation
-						e = 37;
+						status = 37;
 					} else if (type == CustomDamageType.SWEET_BERRY_BUSH) {
 						//Sweet berry bush sound and animation
-						e = 44;
+						status = 44;
+					} else if (type == CustomDamageType.FREEZE) {
+						//Freeze sound and animation
+						status = 57;
 					} else {
 						//Damage sound and animation
-						e = 2;
+						status = 2;
 					}
 					
-					entity.triggerStatus(e);
+					entity.triggerStatus(status);
 				}
 				
 				if (attacker != null && !shield) {
@@ -126,7 +137,7 @@ public class DamageListener {
 						h = (Math.random() - Math.random()) * 0.01D;
 					}
 					
-					EntityUtils.takeKnockback(entity, 0.4F, h, i);
+					EntityUtils.takeKnockback(entity, 0.4000000059604645D, h, i);
 				}
 			}
 			
@@ -135,11 +146,8 @@ public class DamageListener {
 				return;
 			}
 			
-			FinalDamageEvent finalDamageEvent = new FinalDamageEvent(entity, type, amount);
-			EventDispatcher.call(finalDamageEvent);
-			if (finalDamageEvent.isCancelled() || finalDamageEvent.getDamage() <= 0.0F) {
-				event.setCancelled(true);
-			}
+			//TODO totem of undying
+			//TODO death sound (or client side?)
 		});
 	}
 	
