@@ -93,7 +93,7 @@ public class EntityUtils {
 	public static void takeShieldHit(LivingEntity entity, LivingEntity attacker) {
 		Position entityPos = entity.getPosition();
 		Position attackerPos = attacker.getPosition();
-		takeKnockback(entity, 0.5F, attackerPos.getX() - entityPos.getX(), attackerPos.getZ() - entityPos.getZ());
+		entity.takeKnockback(0.5F, attackerPos.getX() - entityPos.getX(), attackerPos.getZ() - entityPos.getZ());
 		
 		if (!(entity instanceof Player)) return;
 		
@@ -118,30 +118,6 @@ public class EntityUtils {
 			
 			Player.Hand hand = player.getEntityMeta().getActiveHand();
 			player.refreshActiveHand(false, hand == Player.Hand.OFF, false);
-		}
-	}
-	
-	public static void takeKnockback(LivingEntity entity, double strength, double d, double e) {
-		if (entity instanceof Player && (!((Player) entity).getGameMode().canTakeDamage() || ((Player) entity).isFlying())) {
-			return;
-		}
-		
-		strength *= 1.0D - entity.getAttributeValue(Attribute.KNOCKBACK_RESISTANCE);
-		if (strength > 0.0F) {
-			Vector vel = entity.getVelocity();
-			Vector vector = (new Vector(d, 0.0D, e)).normalize().multiply(strength);
-			Vector newVel = new Vector(vel.getX() / 2.0D - vector.getX(), entity.isOnGround() ? Math.min(0.4D, vel.getY() / 2.0D + strength) : vel.getY(), vel.getZ() / 2.0D - vector.getZ());
-			
-			if (entity instanceof Player) {
-				EntityVelocityPacket packet = new EntityVelocityPacket();
-				packet.entityId = entity.getEntityId();
-				packet.velocityX = (short) (newVel.getX() * 8000);
-				packet.velocityY = (short) (newVel.getY() * 8000);
-				packet.velocityZ = (short) (newVel.getZ() * 8000);
-				entity.sendPacketToViewersAndSelf(packet);
-			} else {
-				entity.setVelocity(newVel);
-			}
 		}
 	}
 	

@@ -62,7 +62,7 @@ public class AttackManager {
 	}
 	
 	public static float getAttackCooldownProgress(Player player, float baseTime) {
-		return MathUtils.clampFloat(((float) Tracker.lastAttackedTicks.get(player.getUuid()) + baseTime) / getAttackCooldownProgressPerTick(player), 0.0F, 1.0F);
+		return MathUtils.clamp(((float) Tracker.lastAttackedTicks.get(player.getUuid()) + baseTime) / getAttackCooldownProgressPerTick(player), 0.0F, 1.0F);
 	}
 	
 	public static void resetLastAttackedTicks(Player player) {
@@ -144,12 +144,12 @@ public class AttackManager {
 		
 		if (knockback > 0) {
 			if (target instanceof LivingEntity) {
-				EntityUtils.takeKnockback((LivingEntity) target, (float) knockback * 0.5F, Math.sin(player.getPosition().getYaw() * 0.017453292F), -Math.cos(player.getPosition().getYaw() * 0.017453292F));
+				target.takeKnockback(knockback * 0.5F, Math.sin(player.getPosition().getYaw() * 0.017453292F), -Math.cos(player.getPosition().getYaw() * 0.017453292F));
 			} else {
 				target.setVelocity(target.getVelocity().add(-Math.sin(player.getPosition().getYaw() * 0.017453292F), 0.1D, Math.cos(player.getPosition().getYaw() * 0.017453292F) * (float) knockback * 0.5F));
 			}
 			
-			//player.setVelocity(player.getVelocity().multiply(new Vector(0.6D, 1.0D, 0.6D))); TODO Is this necessary?
+			player.setVelocity(player.getVelocity().multiply(new Vector(0.6D, 1.0D, 0.6D))); //TODO Is this necessary?
 			player.setSprinting(false);
 		}
 		

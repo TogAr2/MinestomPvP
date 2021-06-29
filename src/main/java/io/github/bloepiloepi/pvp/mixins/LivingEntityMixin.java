@@ -1,6 +1,8 @@
 package io.github.bloepiloepi.pvp.mixins;
 
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
+import io.github.bloepiloepi.pvp.entities.EntityGroup;
+import net.kyori.adventure.sound.Sound;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
@@ -8,6 +10,9 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.entity.EntityDamageEvent;
+import net.minestom.server.network.packet.server.play.SoundEffectPacket;
+import net.minestom.server.sound.SoundEvent;
+import net.minestom.server.utils.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -31,6 +36,8 @@ public abstract class LivingEntityMixin extends Entity {
 	@Shadow public abstract boolean isImmune(@NotNull DamageType type);
 	
 	@Shadow protected boolean invulnerable;
+	
+	@Shadow protected boolean isDead;
 	
 	/**
 	 * @author me
@@ -78,7 +85,8 @@ public abstract class LivingEntityMixin extends Entity {
 			}
 			
 			// Set the final entity health
-			setHealth(getHealth() - remainingDamage);
+			float finalHealth = getHealth() - remainingDamage;
+			setHealth(finalHealth);
 		});
 		
 		return !entityDamageEvent.isCancelled();

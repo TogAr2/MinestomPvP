@@ -7,7 +7,9 @@ import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
 import io.github.bloepiloepi.pvp.events.DamageBlockEvent;
 import io.github.bloepiloepi.pvp.events.FinalDamageEvent;
+import io.github.bloepiloepi.pvp.events.TotemUseEvent;
 import io.github.bloepiloepi.pvp.utils.DamageUtils;
+import net.kyori.adventure.sound.Sound;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
@@ -17,7 +19,12 @@ import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.*;
 import net.minestom.server.event.entity.EntityDamageEvent;
 import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.item.ItemStack;
+import net.minestom.server.item.Material;
+import net.minestom.server.network.packet.server.play.SoundEffectPacket;
+import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
+import net.minestom.server.sound.SoundEvent;
 
 public class DamageListener {
 	
@@ -26,6 +33,8 @@ public class DamageListener {
 		eventNode.addChild(node);
 		
 		node.addListener(EntityDamageEvent.class, event -> {
+			//TODO player has extra calculations based on difficulty
+			
 			if (event.isCancelled()) return;
 			float amount = event.getDamage();
 			
@@ -137,7 +146,7 @@ public class DamageListener {
 						h = (Math.random() - Math.random()) * 0.01D;
 					}
 					
-					EntityUtils.takeKnockback(entity, 0.4000000059604645D, h, i);
+					entity.takeKnockback(0.4F, h, i);
 				}
 			}
 			
@@ -146,9 +155,73 @@ public class DamageListener {
 				return;
 			}
 			
-			//TODO totem of undying
-			//TODO death sound (or client side?)
+			SoundEvent sound = null;
+			
+			float totalHealth = entity.getHealth() + (entity instanceof Player ? ((Player) entity).getAdditionalHearts() : 0);
+			if (totalHealth - amount <= 0) {
+				boolean totem = totemProtection(entity, type);
+				
+				if (totem) {
+					event.setCancelled(true);
+				} else if (hurtSoundAndAnimation) {
+					//Death sound
+					sound = type.getDeathSound(entity);
+				}
+			} else if (hurtSoundAndAnimation) {
+				//Damage sound
+				sound = type.getSound(entity);
+			}
+			
+			//Play sound
+			if (sound != null) {
+				Sound.Source soundCategory;
+				if (entity instanceof Player) {
+					soundCategory = Sound.Source.PLAYER;
+				} else {
+					// TODO: separate living entity categories
+					soundCategory = Sound.Source.HOSTILE;
+				}
+				
+				SoundEffectPacket damageSoundPacket =
+						SoundEffectPacket.create(soundCategory, sound,
+								entity.getPosition(),
+								1.0f, 1.0f);
+				entity.sendPacketToViewersAndSelf(damageSoundPacket);
+			}
 		});
+	}
+	
+	public static boolean totemProtection(LivingEntity entity, CustomDamageType type) {
+		if (type.isOutOfWorld()) return false;
+		
+		boolean hasTotem = false;
+		
+		for (Player.Hand hand : Player.Hand.values()) {
+			ItemStack stack = entity.getItemInHand(hand);
+			if (stack.getMaterial() == Material.TOTEM_OF_UNDYING) {
+				TotemUseEvent totemUseEvent = new TotemUseEvent(entity, hand);
+				EventDispatcher.call(totemUseEvent);
+				
+				if (totemUseEvent.isCancelled()) continue;
+				
+				hasTotem = true;
+				entity.setItemInHand(hand, stack.withAmount(stack.getAmount() - 1));
+				break;
+			}
+		}
+		
+		if (hasTotem) {
+			entity.setHealth(1.0F);
+			entity.clearEffects();
+			entity.addEffect(new Potion(PotionEffect.REGENERATION, (byte) 1, 900));
+			entity.addEffect(new Potion(PotionEffect.ABSORPTION, (byte) 1, 100));
+			entity.addEffect(new Potion(PotionEffect.FIRE_RESISTANCE, (byte) 0, 800));
+			
+			//Totem particles
+			entity.triggerStatus((byte) 35);
+		}
+		
+		return hasTotem;
 	}
 	
 	public static float applyDamage(LivingEntity entity, CustomDamageType type, float amount) {

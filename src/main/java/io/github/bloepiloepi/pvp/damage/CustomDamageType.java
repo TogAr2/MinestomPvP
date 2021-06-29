@@ -239,10 +239,21 @@ public class CustomDamageType extends DamageType {
 	@Nullable
 	@Override
 	public SoundEvent getSound(@NotNull LivingEntity entity) {
+		//TODO
 		if (this.isFire() && entity instanceof Player) {
 			return SoundEvent.PLAYER_HURT_ON_FIRE;
 		} else {
 			return super.getSound(entity);
+		}
+	}
+	
+	@Nullable
+	public SoundEvent getDeathSound(@NotNull LivingEntity entity) {
+		//TODO
+		if (entity instanceof Player) {
+			return SoundEvent.PLAYER_DEATH;
+		} else {
+			return SoundEvent.GENERIC_DEATH;
 		}
 	}
 }
