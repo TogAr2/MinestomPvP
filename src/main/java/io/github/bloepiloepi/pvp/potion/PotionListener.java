@@ -5,10 +5,7 @@ import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffect;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffects;
 import io.github.bloepiloepi.pvp.potion.item.CustomPotionTypes;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.entity.Entity;
-import net.minestom.server.entity.GameMode;
-import net.minestom.server.entity.LivingEntity;
-import net.minestom.server.entity.Player;
+import net.minestom.server.entity.*;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
 import net.minestom.server.event.*;
 import net.minestom.server.event.EventListener;
@@ -18,12 +15,15 @@ import net.minestom.server.event.entity.EntityPotionRemoveEvent;
 import net.minestom.server.event.entity.EntityTickEvent;
 import net.minestom.server.event.player.PlayerEatEvent;
 import net.minestom.server.event.player.PlayerPreEatEvent;
+import net.minestom.server.event.player.PlayerUseItemEvent;
+import net.minestom.server.event.player.PlayerUseItemOnBlockEvent;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.item.metadata.PotionMeta;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
+import net.minestom.server.potion.PotionType;
 import net.minestom.server.potion.TimedPotion;
 import net.minestom.server.utils.time.TimeUnit;
 
@@ -96,17 +96,8 @@ public class PotionListener {
 		node.addListener(EventListener.builder(PlayerEatEvent.class).handler(event -> {
 			Player player = event.getPlayer();
 			ItemStack stack = event.getFoodItem();
-			PotionMeta meta = (PotionMeta) stack.getMeta();
 			
-			//PotionType effects plus custom effects
-			List<Potion> potions = new ArrayList<>();
-			potions.addAll(CustomPotionTypes.get(meta.getPotionType()).getEffects());
-			potions.addAll(meta.getCustomPotionEffects().stream().map((customPotion) ->
-					new Potion(Objects.requireNonNull(PotionEffect.fromId(customPotion.getId())),
-							customPotion.getAmplifier(), customPotion.getDuration(),
-							customPotion.showParticles(), customPotion.showIcon(),
-							customPotion.isAmbient()))
-					.collect(Collectors.toList()));
+			List<Potion> potions = getAllPotions((PotionMeta) stack.getMeta());
 			
 			//Apply the potions
 			for (Potion potion : potions) {
@@ -128,6 +119,15 @@ public class PotionListener {
 				}
 			}
 		}).filter(event -> event.getFoodItem().getMaterial() == Material.POTION).build());
+		
+		eventNode.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
+			ItemStack stack = event.getItemStack();
+			
+		}).filter(event -> event.getItemStack().getMaterial() == Material.SPLASH_POTION).build());
+	}
+	
+	private static void throwPotion(Player player, ItemStack stack) {
+	
 	}
 	
 	private static void updatePotionVisibility(LivingEntity entity) {
@@ -150,7 +150,7 @@ public class PotionListener {
 			meta.setInvisible(false);
 		} else {
 			meta.setPotionEffectAmbient(containsOnlyAmbientEffects(effects));
-			meta.setPotionEffectColor(getPotionColor(effects));
+			meta.setPotionEffectColor(getPotionColor(effects.stream().map(TimedPotion::getPotion).collect(Collectors.toList())));
 			meta.setInvisible(EntityUtils.hasPotionEffect(entity, PotionEffect.INVISIBILITY));
 		}
 	}
@@ -168,7 +168,16 @@ public class PotionListener {
 		return true;
 	}
 	
-	private static int getPotionColor(Collection<TimedPotion> effects) {
+	public static int getColor(ItemStack stack) {
+		PotionMeta meta = (PotionMeta) stack.getMeta();
+		if (meta.getColor() != null) {
+			return meta.getColor().asRGB();
+		} else {
+			return meta.getPotionType() == PotionType.EMPTY ? 16253176 : getPotionColor(getAllPotions(meta));
+		}
+	}
+	
+	public static int getPotionColor(Collection<Potion> effects) {
 		if (effects.isEmpty()) {
 			return 3694022;
 		}
@@ -178,9 +187,7 @@ public class PotionListener {
 		float b = 0.0F;
 		int totalAmplifier = 0;
 		
-		for (TimedPotion timedPotion : effects) {
-			Potion potion = timedPotion.getPotion();
-			
+		for (Potion potion : effects) {
 			//If should show particles
 			if ((potion.getFlags() & 0x02) > 0) {
 				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.getEffect());
@@ -201,5 +208,19 @@ public class PotionListener {
 			b = b / (float) totalAmplifier * 255.0F;
 			return (int) r << 16 | (int) g << 8 | (int) b;
 		}
+	}
+	
+	public static List<Potion> getAllPotions(PotionMeta meta) {
+		//PotionType effects plus custom effects
+		List<Potion> potions = new ArrayList<>();
+		potions.addAll(CustomPotionTypes.get(meta.getPotionType()).getEffects());
+		potions.addAll(meta.getCustomPotionEffects().stream().map((customPotion) ->
+				new Potion(Objects.requireNonNull(PotionEffect.fromId(customPotion.getId())),
+						customPotion.getAmplifier(), customPotion.getDuration(),
+						customPotion.showParticles(), customPotion.showIcon(),
+						customPotion.isAmbient()))
+				.collect(Collectors.toList()));
+		
+		return potions;
 	}
 }
