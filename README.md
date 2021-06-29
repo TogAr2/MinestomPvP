@@ -16,9 +16,7 @@ Currently, almost all vanilla PvP features are supported except for a few.
 
 ## Plans
 
-- **Applying 1.17 changes**
 - Bow and arrows
-- Totem of undying
 - Splash potions
 - Proper death messages
 
@@ -37,6 +35,7 @@ This extension provides several events:
 
 - `DamageBlockEvent`: cancellable, called when an entity blocks damage using a shield.
 - `FinalDamageEvent`: cancellable, called when the final damage calculation (including armor and effects) is completed. This event should be used instead of `EntityDamageEvent`, unless you want to detect how much damage was originally dealt.
+- `TotemUseEvent`: cancellable, called when a totem prevents an entity from dying.
 
 ## Contributing
 
