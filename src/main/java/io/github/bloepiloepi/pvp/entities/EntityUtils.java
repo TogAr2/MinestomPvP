@@ -90,16 +90,18 @@ public class EntityUtils {
 		return false;
 	}
 	
-	public static void takeShieldHit(LivingEntity entity, LivingEntity attacker) {
-		Position entityPos = entity.getPosition();
-		Position attackerPos = attacker.getPosition();
-		entity.takeKnockback(0.5F, attackerPos.getX() - entityPos.getX(), attackerPos.getZ() - entityPos.getZ());
+	public static void takeShieldHit(LivingEntity entity, LivingEntity attacker, boolean applyKnockback) {
+		if (applyKnockback) {
+			Position entityPos = entity.getPosition();
+			Position attackerPos = attacker.getPosition();
+			attacker.takeKnockback(0.5F, attackerPos.getX() - entityPos.getX(), attackerPos.getZ() - entityPos.getZ());
+		}
 		
 		if (!(entity instanceof Player)) return;
 		
 		Tool tool = Tool.fromMaterial(attacker.getItemInMainHand().getMaterial());
 		if (tool != null && tool.isAxe()) {
-			disableShield((Player) entity, true);
+			disableShield((Player) entity, true); //For some reason the vanilla server always passes true
 		}
 	}
 	

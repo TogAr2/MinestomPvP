@@ -132,7 +132,7 @@ public class AttackManager {
 		}
 		
 		Vector vec3d = target.getVelocity();
-		boolean damageSucceeded = EntityUtils.damage(target, CustomDamageType.mob(player), damage);
+		boolean damageSucceeded = EntityUtils.damage(target, CustomDamageType.player(player), damage);
 		
 		if (!damageSucceeded) {
 			SoundManager.sendToAround(player, SoundEvent.PLAYER_ATTACK_NODAMAGE, Sound.Source.PLAYER, 1.0F, 1.0F);
@@ -146,7 +146,7 @@ public class AttackManager {
 			if (target instanceof LivingEntity) {
 				target.takeKnockback(knockback * 0.5F, Math.sin(player.getPosition().getYaw() * 0.017453292F), -Math.cos(player.getPosition().getYaw() * 0.017453292F));
 			} else {
-				target.setVelocity(target.getVelocity().add(-Math.sin(player.getPosition().getYaw() * 0.017453292F), 0.1D, Math.cos(player.getPosition().getYaw() * 0.017453292F) * (float) knockback * 0.5F));
+				target.setVelocity(target.getVelocity().add(-Math.sin(player.getPosition().getYaw() * 0.017453292F) * (float) knockback * 0.5F, 0.1D, Math.cos(player.getPosition().getYaw() * 0.017453292F) * (float) knockback * 0.5F));
 			}
 			
 			player.setVelocity(player.getVelocity().multiply(new Vector(0.6D, 1.0D, 0.6D))); //TODO Is this necessary?

@@ -79,7 +79,7 @@ public class DamageListener {
 					
 					if (!type.isProjectile()) {
 						if (attacker instanceof LivingEntity) {
-							EntityUtils.takeShieldHit(entity, (LivingEntity) attacker);
+							EntityUtils.takeShieldHit(entity, (LivingEntity) attacker, damageBlockEvent.knockbackAttacker());
 						}
 					}
 					
@@ -107,8 +107,12 @@ public class DamageListener {
 			
 			FinalDamageEvent finalDamageEvent = new FinalDamageEvent(entity, type, amount);
 			EventDispatcher.call(finalDamageEvent);
+			
+			amount = finalDamageEvent.getDamage();
+			
 			if (finalDamageEvent.isCancelled() || finalDamageEvent.getDamage() <= 0.0F) {
 				event.setCancelled(true);
+				return;
 			}
 			
 			if (hurtSoundAndAnimation) {
@@ -188,6 +192,8 @@ public class DamageListener {
 								1.0f, 1.0f);
 				entity.sendPacketToViewersAndSelf(damageSoundPacket);
 			}
+			
+			event.setDamage(amount);
 		});
 	}
 	

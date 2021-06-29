@@ -11,17 +11,32 @@ import org.jetbrains.annotations.NotNull;
 public class DamageBlockEvent implements EntityEvent, CancellableEvent {
 	
 	private final LivingEntity entity;
+	private boolean knockbackAttacker;
 	
 	private boolean cancelled;
 	
 	public DamageBlockEvent(@NotNull LivingEntity entity) {
 		this.entity = entity;
+		this.knockbackAttacker = false;
 	}
 	
 	@NotNull
 	@Override
 	public LivingEntity getEntity() {
 		return entity;
+	}
+	
+	public boolean knockbackAttacker() {
+		return knockbackAttacker;
+	}
+	
+	/**
+	 * This fixes a bug introduced in 1.14. Prior to 1.14, the attacker would receive
+	 * knockback when the victim was blocking. In 1.14 and above, this is no longer the case.
+	 * To apply the fix, set this to true (false by default).
+	 */
+	public void setKnockbackAttacker(boolean knockbackAttacker) {
+		this.knockbackAttacker = knockbackAttacker;
 	}
 	
 	@Override

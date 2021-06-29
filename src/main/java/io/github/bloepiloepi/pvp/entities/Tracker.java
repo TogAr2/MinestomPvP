@@ -11,6 +11,7 @@ import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.play.SetCooldownPacket;
+import net.minestom.server.utils.time.TimeUnit;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -50,11 +51,12 @@ public class Tracker {
 	
 	public static void setCooldown(Player player, Material material, int durationTicks) {
 		cooldownEnd.get(player.getUuid()).put(material, System.currentTimeMillis() + (long) durationTicks * MinecraftServer.TICK_MS);
-		onCooldownUpdate(player, material, durationTicks);
+		onCooldown(player, material, durationTicks);
 	}
 	
-	public static void updateCooldown(long time) {
+	public static void updateCooldown() {
 		if (cooldownEnd.isEmpty()) return;
+		long time = System.currentTimeMillis();
 		
 		cooldownEnd.forEach((uuid, cooldownMap) -> {
 			if (cooldownMap.isEmpty()) return;
@@ -67,13 +69,13 @@ public class Tracker {
 				Map.Entry<Material, Long> entry = iterator.next();
 				if (entry.getValue() <= time) {
 					iterator.remove();
-					onCooldownUpdate(player, entry.getKey(), 0);
+					onCooldown(player, entry.getKey(), 0);
 				}
 			}
 		});
 	}
 	
-	public static void onCooldownUpdate(Player player, Material material, int duration) {
+	public static void onCooldown(Player player, Material material, int duration) {
 		SetCooldownPacket packet = new SetCooldownPacket();
 		packet.itemId = material.getId();
 		packet.cooldownTicks = duration;
@@ -120,6 +122,6 @@ public class Tracker {
 			}
 		});
 		
-		MinecraftServer.getUpdateManager().addTickEndCallback(Tracker::updateCooldown);
+		MinecraftServer.getSchedulerManager().buildTask(Tracker::updateCooldown).repeat(1, TimeUnit.TICK).schedule();
 	}
 }
