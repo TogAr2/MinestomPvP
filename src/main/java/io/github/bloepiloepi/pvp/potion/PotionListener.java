@@ -4,6 +4,9 @@ import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffect;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffects;
 import io.github.bloepiloepi.pvp.potion.item.CustomPotionTypes;
+import io.github.bloepiloepi.pvp.projectile.ThrownPotion;
+import io.github.bloepiloepi.pvp.utils.SoundManager;
+import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
@@ -25,10 +28,14 @@ import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.PotionType;
 import net.minestom.server.potion.TimedPotion;
+import net.minestom.server.sound.SoundEvent;
+import net.minestom.server.utils.Position;
+import net.minestom.server.utils.Vector;
 import net.minestom.server.utils.time.TimeUnit;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class PotionListener {
@@ -121,13 +128,41 @@ public class PotionListener {
 		}).filter(event -> event.getFoodItem().getMaterial() == Material.POTION).build());
 		
 		eventNode.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
-			ItemStack stack = event.getItemStack();
+			ThreadLocalRandom random = ThreadLocalRandom.current();
+			SoundManager.sendToAround(event.getPlayer(), SoundEvent.SPLASH_POTION_THROW, Sound.Source.PLAYER,
+					0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f));
 			
+			throwPotion(event.getPlayer(), event.getItemStack(), event.getHand());
 		}).filter(event -> event.getItemStack().getMaterial() == Material.SPLASH_POTION).build());
+		
+		eventNode.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
+			ThreadLocalRandom random = ThreadLocalRandom.current();
+			SoundManager.sendToAround(event.getPlayer(), SoundEvent.LINGERING_POTION_THROW, Sound.Source.NEUTRAL,
+					0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f));
+			
+			throwPotion(event.getPlayer(), event.getItemStack(), event.getHand());
+		}).filter(event -> event.getItemStack().getMaterial() == Material.LINGERING_POTION).build());
 	}
 	
-	private static void throwPotion(Player player, ItemStack stack) {
-	
+	private static void throwPotion(Player player, ItemStack stack, Player.Hand hand) {
+		ThrownPotion thrownPotion = new ThrownPotion(player);
+		thrownPotion.setItem(stack);
+		
+		Position position = player.getPosition().clone().add(0D, player.getEyeHeight(), 0D);
+		thrownPotion.setInstance(Objects.requireNonNull(player.getInstance()), position);
+		
+		Vector direction = position.getDirection();
+		position = position.clone().add(direction.getX(), direction.getY(), direction.getZ());
+		
+		thrownPotion.shoot(position, 0.5, 1.0);
+		
+		Vector playerVel = player.getVelocity();
+		thrownPotion.setVelocity(thrownPotion.getVelocity().add(playerVel.getX(),
+				player.isOnGround() ? 0.0D : playerVel.getY(), playerVel.getZ()));
+		
+		if (!player.isCreative()) {
+			player.setItemInHand(hand, stack.withAmount(stack.getAmount() - 1));
+		}
 	}
 	
 	private static void updatePotionVisibility(LivingEntity entity) {

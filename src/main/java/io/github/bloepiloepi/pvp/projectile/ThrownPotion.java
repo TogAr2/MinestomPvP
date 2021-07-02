@@ -17,7 +17,6 @@ import net.minestom.server.item.Material;
 import net.minestom.server.item.metadata.PotionMeta;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.utils.BlockPosition;
-import net.minestom.server.utils.MathUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -63,8 +62,6 @@ public class ThrownPotion extends EntityHittableProjectile {
 		
 		if (entities.isEmpty()) return;
 		
-		Entity source = getShooter() == null ? this : getShooter();
-		
 		for (LivingEntity entity : entities) {
 			if (entity.getEntityType() == EntityType.ARMOR_STAND) continue;
 			
@@ -92,5 +89,9 @@ public class ThrownPotion extends EntityHittableProjectile {
 	@NotNull
 	public ItemStack getItem() {
 		return ((ThrownPotionMeta) getEntityMeta()).getItem();
+	}
+	
+	public void setItem(@NotNull ItemStack item) {
+		((ThrownPotionMeta) getEntityMeta()).setItem(item);
 	}
 }
