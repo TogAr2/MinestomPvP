@@ -6,7 +6,6 @@ import io.github.bloepiloepi.pvp.food.FoodListener;
 import io.github.bloepiloepi.pvp.listeners.ArmorToolListener;
 import io.github.bloepiloepi.pvp.listeners.AttackManager;
 import io.github.bloepiloepi.pvp.listeners.DamageListener;
-import io.github.bloepiloepi.pvp.listeners.PositionListener;
 import io.github.bloepiloepi.pvp.potion.PotionListener;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffects;
 import io.github.bloepiloepi.pvp.potion.item.CustomPotionTypes;
@@ -25,7 +24,6 @@ public class PvpExtension extends Extension {
 		DamageListener.register(eventNode);
 		ArmorToolListener.register(eventNode);
 		FoodListener.register(eventNode);
-		PositionListener.register(eventNode);
 		PotionListener.register(eventNode);
 		
 		return eventNode;

@@ -14,10 +14,7 @@ import net.minestom.server.entity.*;
 import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityAttackEvent;
-import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
-import net.minestom.server.event.player.PlayerHandAnimationEvent;
-import net.minestom.server.event.player.PlayerTickEvent;
-import net.minestom.server.event.player.PlayerUseItemEvent;
+import net.minestom.server.event.player.*;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.network.packet.server.play.EntityAnimationPacket;
 import net.minestom.server.network.packet.server.play.EntityVelocityPacket;
@@ -38,6 +35,9 @@ public class AttackManager {
 	public static void register(EventNode<EntityEvent> eventNode) {
 		EventNode<EntityEvent> node = EventNode.type("attack-events", EventFilter.ENTITY);
 		eventNode.addChild(node);
+		
+		node.addListener(PlayerMoveEvent.class, event -> Tracker.falling.put(event.getPlayer().getUuid(),
+				event.getNewPosition().getY() - event.getPlayer().getPosition().getY() < 0));
 		
 		node.addListener(EntityAttackEvent.class, event -> {
 			if (event.getEntity() instanceof Player) {
