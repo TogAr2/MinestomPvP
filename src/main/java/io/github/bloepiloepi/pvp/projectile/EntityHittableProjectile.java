@@ -13,7 +13,8 @@ public class EntityHittableProjectile extends EntityProjectile {
 	}
 	
 	public void onHit(@Nullable Entity entity) {
-	
+		//TODO fix entity collision
+		//TODO fix block side collision
 	}
 	
 	@Override

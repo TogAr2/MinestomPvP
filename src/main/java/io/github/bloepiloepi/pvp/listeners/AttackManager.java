@@ -8,6 +8,7 @@ import io.github.bloepiloepi.pvp.entities.Tracker;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.entity.*;
 import net.minestom.server.event.EventFilter;
@@ -15,9 +16,11 @@ import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
 import net.minestom.server.event.player.PlayerHandAnimationEvent;
+import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.network.packet.server.play.EntityAnimationPacket;
+import net.minestom.server.network.packet.server.play.EntityVelocityPacket;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.particle.ParticleCreator;
@@ -53,6 +56,21 @@ public class AttackManager {
 		node.addListener(PlayerUseItemEvent.class, event -> {
 			if (Tracker.hasCooldown(event.getPlayer(), event.getItemStack().getMaterial())) {
 				event.setCancelled(true);
+			}
+		});
+		
+		node.addListener(PlayerTickEvent.class, event -> {
+			Player player = event.getPlayer();
+			Entity spectating = Tracker.spectating.get(player.getUuid());
+			if (spectating == player) return;
+			
+			//This is to make sure other players don't see the player standing still while spectating
+			//And when the player stops spectating, they are at the entities position instead of their position before spectating
+			player.teleport(spectating.getPosition());
+			
+			if (player.getEntityMeta().isSneaking() || spectating.isRemoved()
+					|| (spectating instanceof LivingEntity && ((LivingEntity) spectating).isDead())) {
+				event.getPlayer().stopSpectating();
 			}
 		});
 	}
@@ -131,7 +149,7 @@ public class AttackManager {
 			}
 		}
 		
-		Vector vec3d = target.getVelocity();
+		Vector originalVelocity = target.getVelocity();
 		boolean damageSucceeded = EntityUtils.damage(target, CustomDamageType.player(player), damage);
 		
 		if (!damageSucceeded) {
@@ -157,10 +175,17 @@ public class AttackManager {
 			//TODO sweeping
 		}
 		
-		//if (target instanceof Player) {
-		//	((Player) target).getPlayerConnection().sendPacket(new EntityVelocityPacket());
-		//	target.setVelocity(vec3d);
-		//}
+		if (target instanceof Player) {
+			EntityVelocityPacket velocityPacket = new EntityVelocityPacket();
+			velocityPacket.entityId = target.getEntityId();
+			Vector velocity = target.getVelocity().clone().multiply(8000f / MinecraftServer.TICK_PER_SECOND);
+			velocityPacket.velocityX = (short) velocity.getX();
+			velocityPacket.velocityY = (short) velocity.getY();
+			velocityPacket.velocityZ = (short) velocity.getZ();
+			
+			((Player) target).getPlayerConnection().sendPacket(velocityPacket);
+			target.getVelocity().copy(originalVelocity);
+		}
 		
 		if (critical) {
 			SoundManager.sendToAround(player, SoundEvent.PLAYER_ATTACK_CRIT, Sound.Source.PLAYER, 1.0F, 1.0F);

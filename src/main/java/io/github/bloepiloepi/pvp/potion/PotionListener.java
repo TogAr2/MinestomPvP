@@ -165,14 +165,16 @@ public class PotionListener {
 		}
 	}
 	
-	private static void updatePotionVisibility(LivingEntity entity) {
+	public static void updatePotionVisibility(LivingEntity entity) {
 		LivingEntityMeta meta = (LivingEntityMeta) entity.getEntityMeta();
+		meta.setNotifyAboutChanges(false);
 		
 		if (entity instanceof Player) {
 			if (((Player) entity).getGameMode() == GameMode.SPECTATOR) {
 				meta.setPotionEffectAmbient(false);
 				meta.setPotionEffectColor(0);
 				meta.setInvisible(true);
+				meta.setNotifyAboutChanges(true);
 				
 				return;
 			}
@@ -188,6 +190,8 @@ public class PotionListener {
 			meta.setPotionEffectColor(getPotionColor(effects.stream().map(TimedPotion::getPotion).collect(Collectors.toList())));
 			meta.setInvisible(EntityUtils.hasPotionEffect(entity, PotionEffect.INVISIBILITY));
 		}
+		
+		meta.setNotifyAboutChanges(true);
 	}
 	
 	private static boolean containsOnlyAmbientEffects(Collection<TimedPotion> effects) {

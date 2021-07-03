@@ -2,6 +2,7 @@ package io.github.bloepiloepi.pvp.entities;
 
 import io.github.bloepiloepi.pvp.food.HungerManager;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.*;
 import net.minestom.server.event.entity.EntityTickEvent;
@@ -26,6 +27,7 @@ public class Tracker {
 	public static final Map<UUID, HungerManager> hungerManager = new HashMap<>();
 	public static final Map<UUID, Map<Material, Long>> cooldownEnd = new HashMap<>();
 	public static final Map<UUID, Boolean> falling = new HashMap<>();
+	public static final Map<UUID, Entity> spectating = new HashMap<>();
 	
 	public static <K> void increaseInt(Map<K, Integer> map, K key, int amount) {
 		map.put(key, map.getOrDefault(key, 0) + amount);
@@ -96,6 +98,7 @@ public class Tracker {
 			Tracker.hungerManager.put(uuid, new HungerManager(event.getPlayer()));
 			Tracker.cooldownEnd.put(uuid, new HashMap<>());
 			Tracker.falling.put(uuid, false);
+			Tracker.spectating.put(uuid, event.getPlayer());
 		});
 		
 		node.addListener(PlayerDisconnectEvent.class, event -> {
@@ -107,6 +110,7 @@ public class Tracker {
 			Tracker.hungerManager.remove(uuid);
 			Tracker.cooldownEnd.remove(uuid);
 			Tracker.falling.remove(uuid);
+			Tracker.spectating.remove(uuid);
 		});
 		
 		node.addListener(PlayerTickEvent.class, event -> {
