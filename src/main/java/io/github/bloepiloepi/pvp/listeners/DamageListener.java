@@ -28,7 +28,7 @@ import net.minestom.server.sound.SoundEvent;
 
 public class DamageListener {
 	
-	public static void register(EventNode<EntityEvent> eventNode) {
+	public static void register(EventNode<? super EntityEvent> eventNode) {
 		EventNode<EntityEvent> node = EventNode.type("damage-events", EventFilter.ENTITY);
 		eventNode.addChild(node);
 		

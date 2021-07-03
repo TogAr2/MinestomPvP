@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 public class AttackManager {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AttackManager.class);
 	
-	public static void register(EventNode<EntityEvent> eventNode) {
+	public static void register(EventNode<? super EntityEvent> eventNode) {
 		EventNode<EntityEvent> node = EventNode.type("attack-events", EventFilter.ENTITY);
 		eventNode.addChild(node);
 		

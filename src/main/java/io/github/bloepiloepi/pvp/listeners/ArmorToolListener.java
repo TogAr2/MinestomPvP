@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class ArmorToolListener {
 	
-	public static void register(EventNode<EntityEvent> eventNode) {
+	public static void register(EventNode<? super EntityEvent> eventNode) {
 		EventNode<EntityEvent> node = EventNode.type("armor-tool-events", EventFilter.ENTITY);
 		eventNode.addChild(node);
 		

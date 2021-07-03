@@ -19,7 +19,6 @@ public class PvpExtension extends Extension {
 	public static EventNode<EntityEvent> events() {
 		EventNode<EntityEvent> eventNode = EventNode.type("pvp-events", EventFilter.ENTITY);
 		
-		Tracker.register(eventNode);
 		AttackManager.register(eventNode);
 		DamageListener.register(eventNode);
 		ArmorToolListener.register(eventNode);
@@ -34,6 +33,8 @@ public class PvpExtension extends Extension {
 		CustomEnchantments.registerAll();
 		CustomPotionEffects.registerAll();
 		CustomPotionTypes.registerAll();
+		
+		Tracker.register(getEventNode());
 	}
 	
 	@Override

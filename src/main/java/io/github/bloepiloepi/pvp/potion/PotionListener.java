@@ -43,7 +43,7 @@ public class PotionListener {
 	
 	private static final Map<TimedPotion, Integer> durationLeftMap = new ConcurrentHashMap<>();
 	
-	public static void register(EventNode<EntityEvent> eventNode) {
+	public static void register(EventNode<? super EntityEvent> eventNode) {
 		EventNode<EntityEvent> node = EventNode.type("potion-events", EventFilter.ENTITY);
 		eventNode.addChild(node);
 		
