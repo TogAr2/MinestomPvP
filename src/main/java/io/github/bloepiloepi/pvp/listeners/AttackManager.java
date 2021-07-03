@@ -12,6 +12,7 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.entity.*;
 import net.minestom.server.event.EventFilter;
+import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.player.*;
@@ -35,8 +36,8 @@ public class AttackManager {
 	public static EventNode<EntityEvent> events() {
 		EventNode<EntityEvent> node = EventNode.type("attack-events", EventFilter.ENTITY);
 		
-		node.addListener(PlayerMoveEvent.class, event -> Tracker.falling.put(event.getPlayer().getUuid(),
-				event.getNewPosition().getY() - event.getPlayer().getPosition().getY() < 0));
+		node.addListener(EventListener.builder(PlayerMoveEvent.class).handler(event -> Tracker.falling.put(event.getPlayer().getUuid(),
+				event.getNewPosition().getY() - event.getPlayer().getPosition().getY() < 0)).ignoreCancelled(false).build());
 		
 		node.addListener(EntityAttackEvent.class, event -> {
 			if (event.getEntity() instanceof Player) {
@@ -44,13 +45,14 @@ public class AttackManager {
 			}
 		});
 		
-		node.addListener(PlayerHandAnimationEvent.class, event -> resetLastAttackedTicks(event.getPlayer()));
+		node.addListener(EventListener.builder(PlayerHandAnimationEvent.class).handler(event ->
+				resetLastAttackedTicks(event.getPlayer())).ignoreCancelled(false).build());
 		
-		node.addListener(PlayerChangeHeldSlotEvent.class, event -> {
+		node.addListener(EventListener.builder(PlayerChangeHeldSlotEvent.class).handler(event -> {
 			if (!event.getPlayer().getItemInMainHand().isSimilar(event.getPlayer().getInventory().getItemStack(event.getSlot()))) {
 				resetLastAttackedTicks(event.getPlayer());
 			}
-		});
+		}).ignoreCancelled(false).build());
 		
 		node.addListener(PlayerTickEvent.class, event -> {
 			Player player = event.getPlayer();

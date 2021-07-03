@@ -97,7 +97,7 @@ public class PotionListener {
 		
 		node.addListener(EventListener.builder(PlayerPreEatEvent.class).handler(event -> {
 			event.setEatingTime(32L * MinecraftServer.TICK_MS); //Potion use time is always 32 ticks
-		}).filter(event -> event.getFoodItem().getMaterial() == Material.POTION).build());
+		}).filter(event -> event.getFoodItem().getMaterial() == Material.POTION).ignoreCancelled(false).build());
 		
 		node.addListener(EventListener.builder(PlayerEatEvent.class).handler(event -> {
 			Player player = event.getPlayer();
@@ -132,7 +132,7 @@ public class PotionListener {
 					0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f));
 			
 			throwPotion(event.getPlayer(), event.getItemStack(), event.getHand());
-		}).filter(event -> event.getItemStack().getMaterial() == Material.SPLASH_POTION).build());
+		}).filter(event -> event.getItemStack().getMaterial() == Material.SPLASH_POTION).ignoreCancelled(false).build());
 		
 		node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
 			ThreadLocalRandom random = ThreadLocalRandom.current();
@@ -140,7 +140,7 @@ public class PotionListener {
 					0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f));
 			
 			throwPotion(event.getPlayer(), event.getItemStack(), event.getHand());
-		}).filter(event -> event.getItemStack().getMaterial() == Material.LINGERING_POTION).build());
+		}).filter(event -> event.getItemStack().getMaterial() == Material.LINGERING_POTION).ignoreCancelled(false).build());
 		
 		return node;
 	}

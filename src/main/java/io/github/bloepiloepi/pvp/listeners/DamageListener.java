@@ -31,7 +31,7 @@ public class DamageListener {
 	public static EventNode<EntityEvent> events() {
 		EventNode<EntityEvent> node = EventNode.type("damage-events", EventFilter.ENTITY);
 		
-		node.addListener(EntityDamageEvent.class, event -> {
+		node.addListener(EventListener.builder(EntityDamageEvent.class).handler(event -> {
 			//TODO player has extra calculations based on difficulty
 			
 			if (event.isCancelled()) return;
@@ -193,7 +193,7 @@ public class DamageListener {
 			}
 			
 			event.setDamage(amount);
-		});
+		}).ignoreCancelled(false).build());
 		
 		return node;
 	}

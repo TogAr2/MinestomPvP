@@ -30,7 +30,7 @@ public class FoodListener {
 			}
 			
 			event.setEatingTime(foodComponent.isSnack() ? (long) ((16 / 20F) * 1000) : (long) ((32 / 20F) * 1000));
-		}).filter(event -> event.getFoodItem().getMaterial().isFood()).build()); //May also be a potion
+		}).filter(event -> event.getFoodItem().getMaterial().isFood()).ignoreCancelled(false).build()); //May also be a potion
 		
 		node.addListener(EventListener.builder(PlayerEatEvent.class).handler(event -> {
 			Tracker.hungerManager.get(event.getPlayer().getUuid()).eat(event.getFoodItem().getMaterial());
@@ -52,10 +52,10 @@ public class FoodListener {
 			}
 		}).filter(event -> event.getFoodItem().getMaterial().isFood()).build()); //May also be a potion
 		
-		node.addListener(PlayerBlockBreakEvent.class, event ->
-				EntityUtils.addExhaustion(event.getPlayer(), 0.005F));
+		node.addListener(EventListener.builder(PlayerBlockBreakEvent.class).handler(event ->
+				EntityUtils.addExhaustion(event.getPlayer(), 0.005F)).ignoreCancelled(false).build());
 		
-		node.addListener(PlayerMoveEvent.class, event -> {
+		node.addListener(EventListener.builder(PlayerMoveEvent.class).handler(event -> {
 			Player player = event.getPlayer();
 			
 			double xDiff = event.getNewPosition().getX() - player.getPosition().getX();
@@ -84,7 +84,7 @@ public class FoodListener {
 					}
 				}
 			}
-		});
+		}).ignoreCancelled(false).build());
 		
 		return node;
 	}

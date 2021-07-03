@@ -8,6 +8,7 @@ import net.minestom.server.attribute.AttributeModifier;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.event.EventFilter;
+import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.item.EntityEquipEvent;
 import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
@@ -34,8 +35,10 @@ public class ArmorToolListener {
 			}
 		});
 		
-		node.addListener(PlayerChangeHeldSlotEvent.class, event ->
-				changeHandModifiers(event.getPlayer(), EquipmentSlot.MAIN_HAND, event.getPlayer().getInventory().getItemStack(event.getSlot())));
+		node.addListener(EventListener.builder(PlayerChangeHeldSlotEvent.class).handler(event ->
+				changeHandModifiers(event.getPlayer(), EquipmentSlot.MAIN_HAND,
+						event.getPlayer().getInventory().getItemStack(event.getSlot())))
+				.ignoreCancelled(false).build());
 		
 		return node;
 	}
