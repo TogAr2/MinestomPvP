@@ -20,9 +20,8 @@ import java.util.Map;
 
 public class ArmorToolListener {
 	
-	public static void register(EventNode<? super EntityEvent> eventNode) {
+	public static EventNode<EntityEvent> events() {
 		EventNode<EntityEvent> node = EventNode.type("armor-tool-events", EventFilter.ENTITY);
-		eventNode.addChild(node);
 		
 		node.addListener(EntityEquipEvent.class, event -> {
 			if (!(event.getEntity() instanceof LivingEntity)) return;
@@ -37,6 +36,8 @@ public class ArmorToolListener {
 		
 		node.addListener(PlayerChangeHeldSlotEvent.class, event ->
 				changeHandModifiers(event.getPlayer(), EquipmentSlot.MAIN_HAND, event.getPlayer().getInventory().getItemStack(event.getSlot())));
+		
+		return node;
 	}
 	
 	private static void changeArmorModifiers(LivingEntity entity, EquipmentSlot slot, ItemStack newItem) {

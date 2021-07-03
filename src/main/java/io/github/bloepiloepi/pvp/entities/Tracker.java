@@ -9,6 +9,7 @@ import net.minestom.server.event.entity.EntityTickEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerLoginEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
+import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.play.SetCooldownPacket;
@@ -123,6 +124,12 @@ public class Tracker {
 		node.addListener(EntityTickEvent.class, event -> {
 			if (Tracker.invulnerableTime.getOrDefault(event.getEntity().getUuid(), 0) > 0) {
 				Tracker.decreaseInt(Tracker.invulnerableTime, event.getEntity().getUuid(), 1);
+			}
+		});
+		
+		node.addListener(PlayerUseItemEvent.class, event -> {
+			if (Tracker.hasCooldown(event.getPlayer(), event.getItemStack().getMaterial())) {
+				event.setCancelled(true);
 			}
 		});
 		

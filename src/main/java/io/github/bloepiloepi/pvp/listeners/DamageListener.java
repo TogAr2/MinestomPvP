@@ -28,9 +28,8 @@ import net.minestom.server.sound.SoundEvent;
 
 public class DamageListener {
 	
-	public static void register(EventNode<? super EntityEvent> eventNode) {
+	public static EventNode<EntityEvent> events() {
 		EventNode<EntityEvent> node = EventNode.type("damage-events", EventFilter.ENTITY);
-		eventNode.addChild(node);
 		
 		node.addListener(EntityDamageEvent.class, event -> {
 			//TODO player has extra calculations based on difficulty
@@ -195,6 +194,8 @@ public class DamageListener {
 			
 			event.setDamage(amount);
 		});
+		
+		return node;
 	}
 	
 	public static boolean totemProtection(LivingEntity entity, CustomDamageType type) {

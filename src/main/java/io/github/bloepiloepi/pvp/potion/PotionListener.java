@@ -43,9 +43,8 @@ public class PotionListener {
 	
 	private static final Map<TimedPotion, Integer> durationLeftMap = new ConcurrentHashMap<>();
 	
-	public static void register(EventNode<? super EntityEvent> eventNode) {
+	public static EventNode<EntityEvent> events() {
 		EventNode<EntityEvent> node = EventNode.type("potion-events", EventFilter.ENTITY);
-		eventNode.addChild(node);
 		
 		node.addListener(EntityTickEvent.class, event -> {
 			if (!(event.getEntity() instanceof LivingEntity)) return;
@@ -127,7 +126,7 @@ public class PotionListener {
 			}
 		}).filter(event -> event.getFoodItem().getMaterial() == Material.POTION).build());
 		
-		eventNode.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
+		node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
 			ThreadLocalRandom random = ThreadLocalRandom.current();
 			SoundManager.sendToAround(event.getPlayer(), SoundEvent.SPLASH_POTION_THROW, Sound.Source.PLAYER,
 					0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f));
@@ -135,13 +134,15 @@ public class PotionListener {
 			throwPotion(event.getPlayer(), event.getItemStack(), event.getHand());
 		}).filter(event -> event.getItemStack().getMaterial() == Material.SPLASH_POTION).build());
 		
-		eventNode.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
+		node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
 			ThreadLocalRandom random = ThreadLocalRandom.current();
 			SoundManager.sendToAround(event.getPlayer(), SoundEvent.LINGERING_POTION_THROW, Sound.Source.NEUTRAL,
 					0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f));
 			
 			throwPotion(event.getPlayer(), event.getItemStack(), event.getHand());
 		}).filter(event -> event.getItemStack().getMaterial() == Material.LINGERING_POTION).build());
+		
+		return node;
 	}
 	
 	private static void throwPotion(Player player, ItemStack stack, Player.Hand hand) {

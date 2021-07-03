@@ -32,9 +32,8 @@ import org.slf4j.LoggerFactory;
 public class AttackManager {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AttackManager.class);
 	
-	public static void register(EventNode<? super EntityEvent> eventNode) {
+	public static EventNode<EntityEvent> events() {
 		EventNode<EntityEvent> node = EventNode.type("attack-events", EventFilter.ENTITY);
-		eventNode.addChild(node);
 		
 		node.addListener(PlayerMoveEvent.class, event -> Tracker.falling.put(event.getPlayer().getUuid(),
 				event.getNewPosition().getY() - event.getPlayer().getPosition().getY() < 0));
@@ -53,12 +52,6 @@ public class AttackManager {
 			}
 		});
 		
-		node.addListener(PlayerUseItemEvent.class, event -> {
-			if (Tracker.hasCooldown(event.getPlayer(), event.getItemStack().getMaterial())) {
-				event.setCancelled(true);
-			}
-		});
-		
 		node.addListener(PlayerTickEvent.class, event -> {
 			Player player = event.getPlayer();
 			Entity spectating = Tracker.spectating.get(player.getUuid());
@@ -73,6 +66,8 @@ public class AttackManager {
 				event.getPlayer().stopSpectating();
 			}
 		});
+		
+		return node;
 	}
 	
 	public static float getAttackCooldownProgressPerTick(Player player) {

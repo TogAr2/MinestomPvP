@@ -17,9 +17,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class FoodListener {
 	
-	public static void register(EventNode<? super EntityEvent> eventNode) {
+	public static EventNode<PlayerEvent> events() {
 		EventNode<PlayerEvent> node = EventNode.type("food-events", EventFilter.PLAYER);
-		eventNode.addChild(node);
 		
 		node.addListener(EventListener.builder(PlayerPreEatEvent.class).handler(event -> {
 			FoodComponent foodComponent = FoodComponents.fromMaterial(event.getFoodItem().getMaterial());
@@ -86,5 +85,7 @@ public class FoodListener {
 				}
 			}
 		});
+		
+		return node;
 	}
 }
