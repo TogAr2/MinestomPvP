@@ -14,6 +14,11 @@ repositories {
     maven { url 'https://repo.minestom.net/repository/maven-public/' }
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 dependencies {
     compileOnly 'com.github.Minestom:Minestom:fbb8c1a819'
 }
