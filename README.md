@@ -27,6 +27,7 @@ Currently, most vanilla PvP features are supported.
 - Damage invulnerability
 - Weapons
 - Armor
+- Shields
 - Food
 - Potions
 - Totems
