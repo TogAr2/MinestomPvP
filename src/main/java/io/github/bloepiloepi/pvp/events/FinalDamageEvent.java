@@ -2,6 +2,7 @@ package io.github.bloepiloepi.pvp.events;
 
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import net.minestom.server.entity.LivingEntity;
+import net.minestom.server.entity.Player;
 import net.minestom.server.event.trait.CancellableEvent;
 import net.minestom.server.event.trait.EntityEvent;
 import org.jetbrains.annotations.NotNull;
@@ -56,6 +57,36 @@ public class FinalDamageEvent implements EntityEvent, CancellableEvent {
 	 */
 	public void setDamage(float damage) {
 		this.damage = damage;
+	}
+	
+	/**
+	 * Checks if the damage will kill the entity.
+	 * <br><br>
+	 * This requires some computing, caching the result may
+	 * be better if used frequently.
+	 *
+	 * @return {@code true} if the entity will be killed, {@code false} otherwise
+	 */
+	public boolean doesKillEntity() {
+		float remainingDamage = damage;
+		
+		// Additional hearts support
+		if (entity instanceof Player) {
+			final Player player = (Player) entity;
+			final float additionalHearts = player.getAdditionalHearts();
+			if (additionalHearts > 0) {
+				if (remainingDamage > additionalHearts) {
+					remainingDamage -= additionalHearts;
+					player.setAdditionalHearts(0);
+				} else {
+					player.setAdditionalHearts(additionalHearts - remainingDamage);
+					remainingDamage = 0;
+				}
+			}
+		}
+		
+		float finalHealth = entity.getHealth() - remainingDamage;
+		return finalHealth <= 0;
 	}
 	
 	@Override
