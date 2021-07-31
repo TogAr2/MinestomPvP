@@ -4,7 +4,10 @@
 [![license](https://img.shields.io/github/license/Bloepiloepi/MinestomPvP.svg?style=flat-square)](LICENSE)
 
 MinestomPvP is an extension for Minestom.
-It tries to mimic vanilla PvP as good as possible.
+It tries to mimic vanilla PvP as good as possible, while being as customizable and usable as possible.
+
+It does not only provide PvP, but also everything around it, like status effects and food.
+You can choose which features you want to use and which ones to not use.
 
 ## Table of Contents
 
@@ -63,10 +66,16 @@ This extension provides several events:
 
 It is possible to add your own features to this extension. For example, you can extend the current enchantment behavior by registering an enchantment using `CustomEnchantments`. This will provide you with a few methods for when the enchantment is used. It is also possible to do the same for potion effects using `CustomPotionEffects`, which will provide you with a few methods for when the effect is applied and removed.
 
+You can use the class `Tool`, which contains all tools and their properties (not all properties are currently included, will change soon).
+The same applies for `ToolMaterial` (wood, stone, ...) and `ArmorMaterial`.
+
 For further customization, it is always possible to use events or, if really necessary, a mixin.
 
 ## Contributing
 
-You can contribute in multiple ways. 
+You can contribute in multiple ways.
 If you have an issue or have a great idea, you can open an issue.
 You may also open a new pull request if you have made something for this project and you think it will fit in well.
+
+If anything does not integrate with your project, you can also open an issue (or submit a pull request).
+I aim towards making this extension as usable as possible!
