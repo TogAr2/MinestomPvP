@@ -10,5 +10,6 @@ public class Commands {
 		commandManager.register(new GameModeCommand());
 		commandManager.register(new NickCommand());
 		commandManager.register(new SkinCommand());
+		commandManager.register(new DamageCommand());
 	}
 }

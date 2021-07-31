@@ -34,7 +34,6 @@ public class DamageListener {
 		node.addListener(EventListener.builder(EntityDamageEvent.class).handler(event -> {
 			//TODO player has extra calculations based on difficulty
 			
-			if (event.isCancelled()) return;
 			float amount = event.getDamage();
 			
 			CustomDamageType type;

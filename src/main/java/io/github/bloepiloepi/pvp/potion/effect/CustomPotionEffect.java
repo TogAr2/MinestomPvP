@@ -63,7 +63,6 @@ public class CustomPotionEffect {
 		if (entity instanceof Player) {
 			switch (potionEffect) {
 				case HUNGER:
-					System.out.println("Adding exhaustion");
 					EntityUtils.addExhaustion((Player) entity, 0.005F * (float) (amplifier + 1));
 					return;
 				case SATURATION:

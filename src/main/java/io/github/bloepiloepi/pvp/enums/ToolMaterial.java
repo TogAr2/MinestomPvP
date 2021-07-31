@@ -25,7 +25,7 @@ public enum ToolMaterial {
 		this.items = items;
 	}
 	
-	public float getMiningSpeedMultiplier() {
+	public float getMiningSpeed() {
 		return this.miningSpeed;
 	}
 	
