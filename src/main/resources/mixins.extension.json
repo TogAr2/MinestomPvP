@@ -6,6 +6,7 @@
   "compatibilityLevel": "JAVA_11",
   "mixins": [
     "EntityMixin",
+    "EntityProjectileMixin",
     "LivingEntityMixin",
     "PlayerInventoryMixin",
     "PlayerMixin",

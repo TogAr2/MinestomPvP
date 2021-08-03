@@ -1,6 +1,7 @@
 package io.github.bloepiloepi.pvp.test;
 
 import io.github.bloepiloepi.pvp.PvpExtension;
+import io.github.bloepiloepi.pvp.projectile.ProjectileListener;
 import io.github.bloepiloepi.pvp.test.commands.Commands;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.GameMode;
@@ -29,6 +30,7 @@ public class PvpTest {
 		
 		GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
 		eventHandler.addChild(PvpExtension.events());
+		eventHandler.addChild(ProjectileListener.events()); //TODO temp
 		
 		Commands.init();
 		
