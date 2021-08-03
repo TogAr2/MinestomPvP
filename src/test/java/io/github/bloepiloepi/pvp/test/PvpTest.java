@@ -10,6 +10,8 @@ import net.minestom.server.event.player.PlayerLoginEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.extras.lan.OpenToLAN;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.item.ItemStack;
+import net.minestom.server.item.Material;
 import net.minestom.server.utils.Position;
 
 public class PvpTest {
@@ -23,6 +25,7 @@ public class PvpTest {
 		MinecraftServer.getGlobalEventHandler().addListener(PlayerLoginEvent.class, event -> {
 			event.setSpawningInstance(instance);
 			event.getPlayer().setRespawnPoint(new Position(0, 60, 0));
+			event.getPlayer().getInventory().addItemStack(ItemStack.of(Material.BARRIER));
 		});
 		
 		MinecraftServer.getGlobalEventHandler().addListener(PlayerSpawnEvent.class, event ->

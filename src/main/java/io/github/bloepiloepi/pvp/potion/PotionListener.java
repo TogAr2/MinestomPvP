@@ -19,7 +19,6 @@ import net.minestom.server.event.entity.EntityTickEvent;
 import net.minestom.server.event.player.PlayerEatEvent;
 import net.minestom.server.event.player.PlayerPreEatEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
-import net.minestom.server.event.player.PlayerUseItemOnBlockEvent;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
