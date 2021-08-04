@@ -22,8 +22,6 @@ public class ThrownEgg extends EntityHittableProjectile {
 		if (entity != null) {
 			EntityUtils.damage(entity, CustomDamageType.thrown(this, getShooter()), 0.0F);
 		}
-		
-		remove();
 	}
 	
 	@Override

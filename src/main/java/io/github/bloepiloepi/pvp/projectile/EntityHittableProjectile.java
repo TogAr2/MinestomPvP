@@ -14,11 +14,11 @@ public abstract class EntityHittableProjectile extends EntityProjectile {
 		super(shooter, entityType);
 	}
 	
-	public boolean isBeforeHitCalled() {
-		return beforeHitCalled;
+	public boolean shouldCallHit() {
+		return !beforeHitCalled;
 	}
 	
-	public void setBeforeHitCalled(boolean beforeHitCalled) {
+	public void setHitCalled(boolean beforeHitCalled) {
 		this.beforeHitCalled = beforeHitCalled;
 	}
 	
@@ -27,7 +27,7 @@ public abstract class EntityHittableProjectile extends EntityProjectile {
 	
 	@Override
 	public void onStuck() {
-		onHit(null);
+		remove();
 	}
 	
 	public abstract void setItem(@NotNull ItemStack item);

@@ -1,5 +1,6 @@
 package io.github.bloepiloepi.pvp.projectile;
 
+import io.github.bloepiloepi.pvp.entities.Tracker;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.entity.Player;
@@ -28,25 +29,46 @@ public class ProjectileListener {
 			
 			EntityHittableProjectile projectile = (EntityHittableProjectile) event.getEntity();
 			
-			if (!projectile.isBeforeHitCalled()) {
+			if (projectile.shouldCallHit()) {
 				projectile.onHit(event.getTarget());
-				projectile.setBeforeHitCalled(true);
+				projectile.setHitCalled(true);
 			}
 		}).ignoreCancelled(false).build());
 		
 		node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
 			Player player = event.getPlayer();
 			ItemStack stack = event.getItemStack();
+			
+			if (Tracker.hasCooldown(player, stack.getMaterial())) {
+				event.setCancelled(true);
+			}
+			
 			boolean snowball = stack.getMaterial() == Material.SNOWBALL;
+			boolean enderpearl = stack.getMaterial() == Material.ENDER_PEARL;
+			
+			SoundEvent soundEvent;
+			EntityHittableProjectile projectile;
+			if (snowball) {
+				soundEvent = SoundEvent.SNOWBALL_THROW;
+				projectile = new Snowball(player);
+			} else if (enderpearl) {
+				soundEvent = SoundEvent.ENDER_PEARL_THROW;
+				projectile = new ThrownEnderpearl(player);
+			} else {
+				soundEvent = SoundEvent.EGG_THROW;
+				projectile = new ThrownEgg(player);
+			}
+			
+			projectile.setItem(stack);
 			
 			ThreadLocalRandom random = ThreadLocalRandom.current();
-			SoundManager.sendToAround(player,
-					snowball ? SoundEvent.SNOWBALL_THROW : SoundEvent.EGG_THROW,
-					snowball ? Sound.Source.NEUTRAL : Sound.Source.PLAYER,
+			SoundManager.sendToAround(player, soundEvent,
+					snowball || enderpearl ? Sound.Source.NEUTRAL : Sound.Source.PLAYER,
 					0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f));
 			
-			EntityHittableProjectile projectile = snowball ? new Snowball(player) : new ThrownEgg(player);
-			projectile.setItem(stack);
+			if (enderpearl) {
+				Tracker.setCooldown(player, Material.ENDER_PEARL, 20);
+			}
 			
 			Position position = player.getPosition().clone().add(0D, player.getEyeHeight(), 0D);
 			projectile.setInstance(Objects.requireNonNull(player.getInstance()), position);
@@ -65,7 +87,8 @@ public class ProjectileListener {
 				player.setItemInHand(event.getHand(), stack.withAmount(stack.getAmount() - 1));
 			}
 		}).filter(event -> event.getItemStack().getMaterial() == Material.SNOWBALL
-				|| event.getItemStack().getMaterial() == Material.EGG)
+				|| event.getItemStack().getMaterial() == Material.EGG
+				|| event.getItemStack().getMaterial() == Material.ENDER_PEARL)
 				.ignoreCancelled(false).build());
 		
 		return node;

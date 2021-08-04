@@ -24,8 +24,6 @@ public class Snowball extends EntityHittableProjectile {
 			int damage = entity.getEntityType() == EntityType.BLAZE ? 3 : 0;
 			EntityUtils.damage(entity, CustomDamageType.thrown(this, getShooter()), damage);
 		}
-		
-		remove();
 	}
 	
 	@Override

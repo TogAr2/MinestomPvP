@@ -1,5 +1,6 @@
 package io.github.bloepiloepi.pvp.mixins;
 
+import io.github.bloepiloepi.pvp.projectile.EntityHittableProjectile;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityProjectile;
 import net.minestom.server.entity.EntityType;
@@ -14,8 +15,8 @@ import net.minestom.server.utils.Position;
 import net.minestom.server.utils.Vector;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.*;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -28,21 +29,54 @@ public abstract class EntityProjectileMixin extends Entity {
 	}
 	
 	@Shadow @Final private Entity shooter;
+	@Shadow public abstract void onStuck();
+	@Shadow public abstract void onUnstuck();
 	
-	private Position hitPosition;
-	
-	@ModifyConstant(method = "isStuck", constant = @Constant(longValue = 3))
-	private long minAliveTicks(long original) {
-		return 4;
-	}
-	
-	@Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minestom/server/entity/EntityProjectile;isStuck(Lnet/minestom/server/utils/Position;Lnet/minestom/server/utils/Position;)Z"))
-	private boolean onIsStuck(EntityProjectile entityProjectile, Position pos, Position posNow) {
-		if (pos.isSimilar(posNow)) {
-			return true;
+	/**
+	 * @author me
+	 */
+	@SuppressWarnings("ConstantConditions")
+	@Overwrite
+	public void tick(long time) {
+		Position posBefore = getPosition().clone();
+		
+		if ((Object) this instanceof EntityHittableProjectile &&
+				((EntityHittableProjectile) (Object) this).shouldCallHit()
+				&& willBeStuck(posBefore)) {
+			((EntityHittableProjectile) (Object) this).onHit(null);
+			((EntityHittableProjectile) (Object) this).setHitCalled(true);
 		}
 		
-		return hackIsStuck(pos, pos.clone().add(getVelocity().clone().multiply(0.1).toPosition()));
+		super.tick(time);
+		Position posNow = getPosition().clone();
+		if (hackIsStuck(posBefore, posNow)) {
+			if (super.onGround) {
+				return;
+			}
+			super.onGround = true;
+			getVelocity().zero();
+			sendPacketToViewersAndSelf(getVelocityPacket());
+			setNoGravity(true);
+			onStuck();
+		} else {
+			if ((Object) this instanceof EntityHittableProjectile &&
+					((EntityHittableProjectile) (Object) this).shouldCallHit()
+					&& willBeStuck(posBefore)) {
+				((EntityHittableProjectile) (Object) this).onHit(null);
+				((EntityHittableProjectile) (Object) this).setHitCalled(true);
+			}
+			
+			if (isRemoved() || !super.onGround) {
+				return;
+			}
+			super.onGround = false;
+			setNoGravity(false);
+			onUnstuck();
+		}
+	}
+	
+	private boolean willBeStuck(Position pos) {
+		return hackIsStuck(pos, pos.clone().add(getVelocity().clone().multiply(0.06).toPosition()));
 	}
 	
 	private boolean hackIsStuck(Position pos, Position posNow) {
@@ -75,7 +109,6 @@ public abstract class EntityProjectileMixin extends Entity {
 			BlockPosition bpos = pos.toBlockPosition();
 			Block block = instance.getBlock(bpos.getX(), bpos.getY() - 1, bpos.getZ());
 			if (!block.isAir() && !block.isLiquid()) {
-				hitPosition = pos;
 				return true;
 			}
 			
@@ -104,6 +137,7 @@ public abstract class EntityProjectileMixin extends Entity {
 				
 				EventDispatcher.call(new EntityAttackEvent(this, victim));
 				
+				remove();
 				return super.onGround;
 			}
 		}
