@@ -108,9 +108,11 @@ public class DamageListener {
 			
 			amount = finalDamageEvent.getDamage();
 			
-			if (finalDamageEvent.isCancelled() || finalDamageEvent.getDamage() <= 0.0F) {
+			if (finalDamageEvent.getDamage() <= 0.0F) {
 				event.setCancelled(true);
-				return;
+			}
+			if (finalDamageEvent.isCancelled()) {
+				event.setCancelled(true);
 			}
 			
 			if (hurtSoundAndAnimation) {

@@ -25,7 +25,13 @@ public class ProjectileListener {
 		
 		node.addListener(EventListener.builder(EntityAttackEvent.class).handler(event -> {
 			if (!(event.getEntity() instanceof EntityHittableProjectile)) return;
-			((EntityHittableProjectile) event.getEntity()).onHit(event.getTarget());
+			
+			EntityHittableProjectile projectile = (EntityHittableProjectile) event.getEntity();
+			
+			if (!projectile.isBeforeHitCalled()) {
+				projectile.onHit(event.getTarget());
+				projectile.setBeforeHitCalled(true);
+			}
 		}).ignoreCancelled(false).build());
 		
 		node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {

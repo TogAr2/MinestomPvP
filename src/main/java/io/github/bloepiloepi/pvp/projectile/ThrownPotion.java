@@ -46,7 +46,7 @@ public class ThrownPotion extends EntityHittableProjectile {
 			}
 		}
 		
-		BlockPosition blockPosition = getPosition().toBlockPosition();
+		BlockPosition blockPosition = getPosition().toBlockPosition().subtract(0, 1, 0);
 		Effects effect = baseType.hasInstantEffect() ? Effects.INSTANT_SPLASH : Effects.SPLASH_POTION;
 		EffectManager.sendNearby(Objects.requireNonNull(getInstance()), effect, blockPosition.getX(),
 				blockPosition.getY(), blockPosition.getZ(), PotionListener.getColor(item), 64.0D, false);

@@ -22,11 +22,7 @@ public abstract class EntityHittableProjectile extends EntityProjectile {
 		this.beforeHitCalled = beforeHitCalled;
 	}
 	
-	public void beforeHitBlock() {
-	}
-	
 	public void onHit(@Nullable Entity entity) {
-		//TODO fix block side collision
 	}
 	
 	@Override
