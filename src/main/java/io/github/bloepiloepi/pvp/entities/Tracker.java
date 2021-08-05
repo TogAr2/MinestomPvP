@@ -6,16 +6,14 @@ import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.*;
 import net.minestom.server.event.entity.EntityTickEvent;
-import net.minestom.server.event.player.PlayerDisconnectEvent;
-import net.minestom.server.event.player.PlayerLoginEvent;
-import net.minestom.server.event.player.PlayerTickEvent;
-import net.minestom.server.event.player.PlayerUseItemEvent;
+import net.minestom.server.event.player.*;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.play.SetCooldownPacket;
+import net.minestom.server.utils.Position;
+import net.minestom.server.utils.Vector;
 import net.minestom.server.utils.time.TimeUnit;
 
-import java.util.EventListener;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -29,6 +27,8 @@ public class Tracker {
 	public static final Map<UUID, HungerManager> hungerManager = new HashMap<>();
 	public static final Map<UUID, Map<Material, Long>> cooldownEnd = new HashMap<>();
 	public static final Map<UUID, Boolean> falling = new HashMap<>();
+	public static final Map<UUID, Position> previousPosition = new HashMap<>();
+	public static final Map<UUID, Vector> playerVelocity = new HashMap<>();
 	public static final Map<UUID, Entity> spectating = new HashMap<>();
 	
 	public static <K> void increaseInt(Map<K, Integer> map, K key, int amount) {
@@ -132,6 +132,24 @@ public class Tracker {
 			if (Tracker.hasCooldown(event.getPlayer(), event.getItemStack().getMaterial())) {
 				event.setCancelled(true);
 			}
+		});
+		
+		node.addListener(PlayerTickEvent.class, event -> {
+			Player player = event.getPlayer();
+			Vector velocity = playerVelocity.computeIfAbsent(player.getUuid(), (uuid) -> new Vector());
+			
+			Position newPosition = player.getPosition();
+			Position position = previousPosition.getOrDefault(player.getUuid(), newPosition);
+			
+			double dx = newPosition.getX() - position.getX();
+			double dy = newPosition.getY() - position.getY();
+			double dz = newPosition.getZ() - position.getZ();
+			
+			velocity.setX(dx * MinecraftServer.TICK_PER_SECOND);
+			velocity.setY(dy * MinecraftServer.TICK_PER_SECOND);
+			velocity.setZ(dz * MinecraftServer.TICK_PER_SECOND);
+			
+			previousPosition.put(player.getUuid(), newPosition.clone());
 		});
 		
 		MinecraftServer.getSchedulerManager().buildTask(Tracker::updateCooldown).repeat(1, TimeUnit.TICK).schedule();

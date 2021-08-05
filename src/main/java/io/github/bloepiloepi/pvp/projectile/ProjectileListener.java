@@ -79,7 +79,7 @@ public class ProjectileListener {
 			
 			projectile.shoot(position, 1.5, 1.0);
 			
-			Vector playerVel = player.getVelocity();
+			Vector playerVel = Tracker.playerVelocity.get(player.getUuid());
 			projectile.setVelocity(projectile.getVelocity().add(playerVel.getX(),
 					player.isOnGround() ? 0.0D : playerVel.getY(), playerVel.getZ()));
 			
