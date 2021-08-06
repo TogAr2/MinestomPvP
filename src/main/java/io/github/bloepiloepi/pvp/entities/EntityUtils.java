@@ -10,13 +10,17 @@ import net.minestom.server.entity.*;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
 import net.minestom.server.entity.metadata.arrow.AbstractArrowMeta;
+import net.minestom.server.instance.Instance;
+import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.TimedPotion;
+import net.minestom.server.utils.BlockPosition;
 import net.minestom.server.utils.Position;
 import net.minestom.server.utils.Vector;
+import net.minestom.server.utils.chunk.ChunkUtils;
 import net.minestom.server.utils.inventory.PlayerInventoryUtils;
 import net.minestom.server.utils.time.TimeUnit;
 import org.jetbrains.annotations.Nullable;
@@ -221,5 +225,46 @@ public class EntityUtils {
 		if (predicate.test(stack)) return Pair.of(stack, (int) player.getHeldSlot());
 		
 		return Pair.of(ItemStack.AIR, -1);
+	}
+	
+	public static boolean randomTeleport(Entity entity, Position to, boolean status) {
+		BlockPosition blockPosition = to.toBlockPosition();
+		Instance instance = entity.getInstance();
+		assert instance != null;
+		int chunkX = ChunkUtils.getChunkCoordinate(blockPosition.getX());
+		int chunkZ = ChunkUtils.getChunkCoordinate(blockPosition.getZ());
+		if (!instance.isChunkLoaded(chunkX, chunkZ)) {
+			return false;
+		}
+		
+		boolean success = false;
+		int lowestY = blockPosition.getY();
+		while (lowestY > instance.getDimensionType().getMinY()) {
+			Block block = instance.getBlock(blockPosition.getX(), lowestY - 1, blockPosition.getZ());
+			if (!block.isAir() && !block.isLiquid()) {
+				Block above = instance.getBlock(blockPosition.getX(), lowestY, blockPosition.getZ());
+				Block above2 = instance.getBlock(blockPosition.getX(), lowestY + 1, blockPosition.getZ());
+				if (above.isAir() && above2.isAir()) {
+					success = true;
+					break;
+				} else {
+					lowestY--;
+				}
+			} else {
+				lowestY--;
+			}
+		}
+		
+		if (!success) return false;
+		
+		Position finalPos = to.clone();
+		finalPos.setY(lowestY);
+		entity.teleport(finalPos);
+		
+		if (status) {
+			entity.triggerStatus((byte) 46);
+		}
+		
+		return true;
 	}
 }

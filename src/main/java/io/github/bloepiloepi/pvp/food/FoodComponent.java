@@ -2,10 +2,13 @@ package io.github.bloepiloepi.pvp.food;
 
 import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.Pair;
+import net.minestom.server.entity.Player;
+import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.potion.Potion;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 
 public class FoodComponent {
 	private final int hunger;
@@ -15,8 +18,12 @@ public class FoodComponent {
 	private final boolean snack;
 	private final List<Pair<Potion, Float>> statusEffects;
 	private final Material material;
+	private final ItemStack turnsInto;
+	private final BiConsumer<Player, ItemStack> onEat;
 	
-	private FoodComponent(int hunger, float saturationModifier, boolean meat, boolean alwaysEdible, boolean snack, List<Pair<Potion, Float>> statusEffects, Material material) {
+	private FoodComponent(int hunger, float saturationModifier, boolean meat, boolean alwaysEdible,
+	                      boolean snack, List<Pair<Potion, Float>> statusEffects, Material material,
+	                      Material turnsInto, BiConsumer<Player, ItemStack> onEat) {
 		this.hunger = hunger;
 		this.saturationModifier = saturationModifier;
 		this.meat = meat;
@@ -24,6 +31,8 @@ public class FoodComponent {
 		this.snack = snack;
 		this.statusEffects = statusEffects;
 		this.material = material;
+		this.turnsInto = turnsInto == null ? ItemStack.AIR : ItemStack.of(turnsInto);
+		this.onEat = onEat;
 	}
 	
 	public int getHunger() {
@@ -54,12 +63,26 @@ public class FoodComponent {
 		return material;
 	}
 	
+	public boolean hasTurnsInto() {
+		return !turnsInto.isAir();
+	}
+	
+	public ItemStack getTurnsInto() {
+		return turnsInto;
+	}
+	
+	public void onEat(Player player, ItemStack stack) {
+		onEat.accept(player, stack);
+	}
+	
 	public static class Builder {
 		private int hunger;
 		private float saturationModifier;
 		private boolean meat;
 		private boolean alwaysEdible;
 		private boolean snack;
+		private Material turnsInto;
+		private BiConsumer<Player, ItemStack> onEat;
 		private final List<Pair<Potion, Float>> statusEffects = Lists.newArrayList();
 		
 		public FoodComponent.Builder hunger(int hunger) {
@@ -92,8 +115,19 @@ public class FoodComponent {
 			return this;
 		}
 		
+		public FoodComponent.Builder turnsInto(Material turnsInto) {
+			this.turnsInto = turnsInto;
+			return this;
+		}
+		
+		public FoodComponent.Builder onEat(BiConsumer<Player, ItemStack> onEat) {
+			this.onEat = onEat;
+			return this;
+		}
+		
 		public FoodComponent build(Material material) {
-			FoodComponent component = new FoodComponent(this.hunger, this.saturationModifier, this.meat, this.alwaysEdible, this.snack, this.statusEffects, material);
+			FoodComponent component = new FoodComponent(this.hunger, this.saturationModifier, this.meat,
+					this.alwaysEdible, this.snack, this.statusEffects, material, turnsInto, onEat);
 			FoodComponents.registerComponent(component);
 			return component;
 		}

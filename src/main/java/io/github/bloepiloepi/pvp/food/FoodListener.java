@@ -10,7 +10,10 @@ import net.minestom.server.event.*;
 import net.minestom.server.event.player.*;
 import net.minestom.server.event.trait.PlayerEvent;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.item.ItemStack;
+import net.minestom.server.item.Material;
 import net.minestom.server.potion.Potion;
+import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.sound.SoundEvent;
 
 import java.util.List;
@@ -31,28 +34,45 @@ public class FoodListener {
 				return;
 			}
 			
-			event.setEatingTime(foodComponent.isSnack() ? (long) ((16 / 20F) * 1000) : (long) ((32 / 20F) * 1000));
+			if (event.getFoodItem().getMaterial() == Material.HONEY_BOTTLE) {
+				event.setEatingTime((long) ((40 / 20F) * 1000));
+			} else {
+				event.setEatingTime(foodComponent.isSnack() ? (long) ((16 / 20F) * 1000) : (long) ((32 / 20F) * 1000));
+			}
 		}).filter(event -> event.getFoodItem().getMaterial().isFood()).ignoreCancelled(false).build()); //May also be a potion
 		
 		node.addListener(EventListener.builder(PlayerEatEvent.class).handler(event -> {
-			Tracker.hungerManager.get(event.getPlayer().getUuid()).eat(event.getFoodItem().getMaterial());
+			Player player = event.getPlayer();
+			ItemStack stack = event.getFoodItem();
+			Tracker.hungerManager.get(player.getUuid()).eat(stack.getMaterial());
 			
 			ThreadLocalRandom random = ThreadLocalRandom.current();
-			SoundManager.sendToAround(event.getPlayer(), SoundEvent.PLAYER_BURP, Sound.Source.PLAYER,
+			SoundManager.sendToAround(player, SoundEvent.PLAYER_BURP, Sound.Source.PLAYER,
 					0.5F, random.nextFloat() * 0.1F + 0.9F);
 			
-			FoodComponent component = FoodComponents.fromMaterial(event.getFoodItem().getMaterial());
+			FoodComponent component = FoodComponents.fromMaterial(stack.getMaterial());
 			assert component != null;
 			List<Pair<Potion, Float>> effectList = component.getStatusEffects();
 			
 			for (Pair<Potion, Float> pair : effectList) {
 				if (pair.first() != null && random.nextFloat() < pair.second()) {
-					event.getPlayer().addEffect(pair.first());
+					player.addEffect(pair.first());
 				}
 			}
 			
-			if (!event.getPlayer().isCreative()) {
-				event.getPlayer().setItemInHand(event.getHand(), event.getFoodItem().withAmount((i) -> i - 1));
+			component.onEat(player, stack);
+			
+			if (!player.isCreative()) {
+				if (component.hasTurnsInto()) {
+					if (stack.getAmount() == 1) {
+						player.setItemInHand(event.getHand(), component.getTurnsInto());
+					} else {
+						player.setItemInHand(event.getHand(), stack.withAmount(stack.getAmount() - 1));
+						player.getInventory().addItemStack(component.getTurnsInto());
+					}
+				} else {
+					event.getPlayer().setItemInHand(event.getHand(), stack.withAmount(stack.getAmount() - 1));
+				}
 			}
 		}).filter(event -> event.getFoodItem().getMaterial().isFood()).build()); //May also be a potion
 		

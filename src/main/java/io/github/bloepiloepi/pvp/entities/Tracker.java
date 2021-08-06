@@ -135,6 +135,12 @@ public class Tracker {
 			}
 		});
 		
+		node.addListener(PlayerPreEatEvent.class, event -> {
+			if (Tracker.hasCooldown(event.getPlayer(), event.getFoodItem().getMaterial())) {
+				event.setCancelled(true);
+			}
+		});
+		
 		node.addListener(PlayerTickEvent.class, event -> {
 			Player player = event.getPlayer();
 			Vector velocity = playerVelocity.computeIfAbsent(player.getUuid(), (uuid) -> new Vector());
