@@ -2,14 +2,16 @@ package io.github.bloepiloepi.pvp.food;
 
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
+import io.github.bloepiloepi.pvp.utils.SoundManager;
 import it.unimi.dsi.fastutil.Pair;
+import net.kyori.adventure.sound.Sound;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.*;
 import net.minestom.server.event.player.*;
-import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.event.trait.PlayerEvent;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.potion.Potion;
+import net.minestom.server.sound.SoundEvent;
 
 import java.util.List;
 import java.util.Objects;
@@ -35,13 +37,15 @@ public class FoodListener {
 		node.addListener(EventListener.builder(PlayerEatEvent.class).handler(event -> {
 			Tracker.hungerManager.get(event.getPlayer().getUuid()).eat(event.getFoodItem().getMaterial());
 			
+			ThreadLocalRandom random = ThreadLocalRandom.current();
+			SoundManager.sendToAround(event.getPlayer(), SoundEvent.PLAYER_BURP, Sound.Source.PLAYER,
+					0.5F, random.nextFloat() * 0.1F + 0.9F);
+			
 			FoodComponent component = FoodComponents.fromMaterial(event.getFoodItem().getMaterial());
 			assert component != null;
 			List<Pair<Potion, Float>> effectList = component.getStatusEffects();
 			
 			for (Pair<Potion, Float> pair : effectList) {
-				ThreadLocalRandom random = ThreadLocalRandom.current();
-				
 				if (pair.first() != null && random.nextFloat() < pair.second()) {
 					event.getPlayer().addEffect(pair.first());
 				}

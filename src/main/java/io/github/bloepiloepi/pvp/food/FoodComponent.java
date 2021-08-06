@@ -16,7 +16,7 @@ public class FoodComponent {
 	private final List<Pair<Potion, Float>> statusEffects;
 	private final Material material;
 	
-	private FoodComponent(int hunger, float saturationModifier, boolean meat, boolean alwaysEdible, boolean snack, List<it.unimi.dsi.fastutil.Pair<Potion, Float>> statusEffects, Material material) {
+	private FoodComponent(int hunger, float saturationModifier, boolean meat, boolean alwaysEdible, boolean snack, List<Pair<Potion, Float>> statusEffects, Material material) {
 		this.hunger = hunger;
 		this.saturationModifier = saturationModifier;
 		this.meat = meat;
@@ -46,7 +46,7 @@ public class FoodComponent {
 		return this.snack;
 	}
 	
-	public List<it.unimi.dsi.fastutil.Pair<Potion, Float>> getStatusEffects() {
+	public List<Pair<Potion, Float>> getStatusEffects() {
 		return this.statusEffects;
 	}
 	
@@ -60,7 +60,7 @@ public class FoodComponent {
 		private boolean meat;
 		private boolean alwaysEdible;
 		private boolean snack;
-		private final List<it.unimi.dsi.fastutil.Pair<Potion, Float>> statusEffects = Lists.newArrayList();
+		private final List<Pair<Potion, Float>> statusEffects = Lists.newArrayList();
 		
 		public FoodComponent.Builder hunger(int hunger) {
 			this.hunger = hunger;

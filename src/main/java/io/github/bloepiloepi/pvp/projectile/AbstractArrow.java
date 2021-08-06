@@ -40,7 +40,6 @@ public abstract class AbstractArrow extends EntityHittableProjectile {
 	
 	public AbstractArrow(@Nullable Entity shooter, @NotNull EntityType entityType) {
 		super(shooter, entityType);
-		//TODO position lower than eye height?
 		
 		if (shooter instanceof Player) {
 			pickupMode = ((Player) shooter).isCreative() ? PickupMode.CREATIVE_ONLY : PickupMode.ALLOWED;

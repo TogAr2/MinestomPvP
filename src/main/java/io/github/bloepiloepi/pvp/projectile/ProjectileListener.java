@@ -97,79 +97,77 @@ public class ProjectileListener {
 			}
 		});
 		
-		node.addListener(ItemUpdateStateEvent.class, event -> {
-			if (event.getItemStack().getMaterial() == Material.BOW) {
-				Player player = event.getPlayer();
-				ItemStack stack = event.getItemStack();
-				boolean infinite = player.isCreative() || EnchantmentUtils.getLevel(Enchantment.INFINITY_ARROWS, stack) > 0;
-				
-				Pair<ItemStack, Integer> projectilePair = EntityUtils.getProjectile(player, Arrow.ARROW_PREDICATE);
-				ItemStack projectile = projectilePair.first();
-				int projectileSlot = projectilePair.second();
-				
-				if (!infinite && projectile.isAir()) return;
-				if (projectile.isAir()) {
-					projectile = Arrow.DEFAULT_ARROW;
-					projectileSlot = -1;
-				}
-				
-				long useDuration = System.currentTimeMillis() - Tracker.itemUseStartTime.get(player.getUuid());
-				double power = getBowPower(useDuration);
-				if (power < 0.1) return;
-				
-				// Arrow creation
-				AbstractArrow arrow = createArrow(projectile, player);
-				
-				if (power >= 1) {
-					arrow.setCritical(true);
-				}
-				
-				int powerEnchantment = EnchantmentUtils.getLevel(Enchantment.POWER_ARROWS, stack);
-				if (powerEnchantment > 0) {
-					arrow.setBaseDamage(arrow.getBaseDamage() + (double) powerEnchantment * 0.5 + 0.5);
-				}
-				
-				int punchEnchantment = EnchantmentUtils.getLevel(Enchantment.PUNCH_ARROWS, stack);
-				if (punchEnchantment > 0) {
-					arrow.setKnockback(punchEnchantment);
-				}
-				
-				if (EnchantmentUtils.getLevel(Enchantment.FLAMING_ARROWS, stack) > 0) {
-					EntityUtils.setOnFireForSeconds(arrow, 100);
-				}
-				
-				//TODO damage bow item
-				
-				boolean reallyInfinite = infinite && projectile.getMaterial() == Material.ARROW;
-				if (reallyInfinite || player.isCreative() && (projectile.getMaterial() == Material.SPECTRAL_ARROW
-						|| projectile.getMaterial() == Material.TIPPED_ARROW)) {
-					arrow.pickupMode = AbstractArrow.PickupMode.CREATIVE_ONLY;
-				}
-				
-				// Arrow shooting
-				Position position = player.getPosition().clone().add(0D, player.getEyeHeight(), 0D);
-				arrow.setInstance(Objects.requireNonNull(player.getInstance()),
-						position.clone().subtract(0, 0.10000000149011612D, 0)); // Yeah wait what
-				
-				Vector direction = position.getDirection();
-				position = position.clone().add(direction.getX(), direction.getY(), direction.getZ())
-						.subtract(0, 0.2, 0); //????????
-				
-				arrow.shoot(position, power * 3, 1.0);
-				
-				Vector playerVel = Tracker.playerVelocity.get(player.getUuid());
-				arrow.setVelocity(arrow.getVelocity().add(playerVel.getX(),
-						player.isOnGround() ? 0.0D : playerVel.getY(), playerVel.getZ()));
-				
-				ThreadLocalRandom random = ThreadLocalRandom.current();
-				SoundManager.sendToAround(player, SoundEvent.ARROW_SHOOT, Sound.Source.PLAYER,
-						1.0f, 1.0f / (random.nextFloat() * 0.4f + 1.2f) + (float) power * 0.5f);
-				
-				if (!reallyInfinite && !player.isCreative() && projectileSlot >= 0) {
-					player.getInventory().setItemStack(projectileSlot, projectile.withAmount(projectile.getAmount() - 1));
-				}
+		node.addListener(EventListener.builder(ItemUpdateStateEvent.class).handler(event -> {
+			Player player = event.getPlayer();
+			ItemStack stack = event.getItemStack();
+			boolean infinite = player.isCreative() || EnchantmentUtils.getLevel(Enchantment.INFINITY_ARROWS, stack) > 0;
+			
+			Pair<ItemStack, Integer> projectilePair = EntityUtils.getProjectile(player, Arrow.ARROW_PREDICATE);
+			ItemStack projectile = projectilePair.first();
+			int projectileSlot = projectilePair.second();
+			
+			if (!infinite && projectile.isAir()) return;
+			if (projectile.isAir()) {
+				projectile = Arrow.DEFAULT_ARROW;
+				projectileSlot = -1;
 			}
-		});
+			
+			long useDuration = System.currentTimeMillis() - Tracker.itemUseStartTime.get(player.getUuid());
+			double power = getBowPower(useDuration);
+			if (power < 0.1) return;
+			
+			// Arrow creation
+			AbstractArrow arrow = createArrow(projectile, player);
+			
+			if (power >= 1) {
+				arrow.setCritical(true);
+			}
+			
+			int powerEnchantment = EnchantmentUtils.getLevel(Enchantment.POWER_ARROWS, stack);
+			if (powerEnchantment > 0) {
+				arrow.setBaseDamage(arrow.getBaseDamage() + (double) powerEnchantment * 0.5 + 0.5);
+			}
+			
+			int punchEnchantment = EnchantmentUtils.getLevel(Enchantment.PUNCH_ARROWS, stack);
+			if (punchEnchantment > 0) {
+				arrow.setKnockback(punchEnchantment);
+			}
+			
+			if (EnchantmentUtils.getLevel(Enchantment.FLAMING_ARROWS, stack) > 0) {
+				EntityUtils.setOnFireForSeconds(arrow, 100);
+			}
+			
+			//TODO damage bow item
+			
+			boolean reallyInfinite = infinite && projectile.getMaterial() == Material.ARROW;
+			if (reallyInfinite || player.isCreative() && (projectile.getMaterial() == Material.SPECTRAL_ARROW
+					|| projectile.getMaterial() == Material.TIPPED_ARROW)) {
+				arrow.pickupMode = AbstractArrow.PickupMode.CREATIVE_ONLY;
+			}
+			
+			// Arrow shooting
+			Position position = player.getPosition().clone().add(0D, player.getEyeHeight(), 0D);
+			arrow.setInstance(Objects.requireNonNull(player.getInstance()),
+					position.clone().subtract(0, 0.10000000149011612D, 0)); // Yeah wait what
+			
+			Vector direction = position.getDirection();
+			position = position.clone().add(direction.getX(), direction.getY(), direction.getZ())
+					.subtract(0, 0.2, 0); //????????
+			
+			arrow.shoot(position, power * 3, 1.0);
+			
+			Vector playerVel = Tracker.playerVelocity.get(player.getUuid());
+			arrow.setVelocity(arrow.getVelocity().add(playerVel.getX(),
+					player.isOnGround() ? 0.0D : playerVel.getY(), playerVel.getZ()));
+			
+			ThreadLocalRandom random = ThreadLocalRandom.current();
+			SoundManager.sendToAround(player, SoundEvent.ARROW_SHOOT, Sound.Source.PLAYER,
+					1.0f, 1.0f / (random.nextFloat() * 0.4f + 1.2f) + (float) power * 0.5f);
+			
+			if (!reallyInfinite && !player.isCreative() && projectileSlot >= 0) {
+				player.getInventory().setItemStack(projectileSlot, projectile.withAmount(projectile.getAmount() - 1));
+			}
+		}).filter(event -> event.getItemStack().getMaterial() == Material.BOW).build());
 		
 		return node;
 	}
