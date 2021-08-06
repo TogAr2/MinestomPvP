@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -41,16 +42,22 @@ public abstract class EntityProjectileMixin extends Entity {
 	public void tick(long time) {
 		Position posBefore = getPosition().clone();
 		
-		if ((Object) this instanceof EntityHittableProjectile &&
-				((EntityHittableProjectile) (Object) this).shouldCallHit()
-				&& willBeStuck(posBefore)) {
-			((EntityHittableProjectile) (Object) this).onHit(null);
-			((EntityHittableProjectile) (Object) this).setHitCalled(true);
+		if (!super.onGround) {
+			if ((Object) this instanceof EntityHittableProjectile &&
+					((EntityHittableProjectile) (Object) this).shouldCallHit()
+					&& willBeStuck(posBefore)) {
+				((EntityHittableProjectile) (Object) this).onHit(null);
+				((EntityHittableProjectile) (Object) this).setHitCalled(true);
+				
+				if (isRemoved()) {
+					return;
+				}
+			}
 		}
 		
 		super.tick(time);
 		Position posNow = getPosition().clone();
-		if (hackIsStuck(posBefore, posNow)) {
+		if (hackIsStuck(posBefore, posNow, true)) {
 			if (super.onGround) {
 				return;
 			}
@@ -60,14 +67,20 @@ public abstract class EntityProjectileMixin extends Entity {
 			setNoGravity(true);
 			onStuck();
 		} else {
-			if ((Object) this instanceof EntityHittableProjectile &&
-					((EntityHittableProjectile) (Object) this).shouldCallHit()
-					&& willBeStuck(posBefore)) {
-				((EntityHittableProjectile) (Object) this).onHit(null);
-				((EntityHittableProjectile) (Object) this).setHitCalled(true);
+			if (!super.onGround) {
+				if ((Object) this instanceof EntityHittableProjectile &&
+						((EntityHittableProjectile) (Object) this).shouldCallHit()
+						&& willBeStuck(posBefore)) {
+					((EntityHittableProjectile) (Object) this).onHit(null);
+					((EntityHittableProjectile) (Object) this).setHitCalled(true);
+					
+					if (isRemoved()) {
+						return;
+					}
+				}
 			}
 			
-			if (isRemoved() || !super.onGround) {
+			if (!super.onGround) {
 				return;
 			}
 			super.onGround = false;
@@ -77,13 +90,17 @@ public abstract class EntityProjectileMixin extends Entity {
 	}
 	
 	private boolean willBeStuck(Position pos) {
-		return hackIsStuck(pos, pos.clone().add(getVelocity().clone().multiply(0.06).toPosition()));
+		return hackIsStuck(pos, pos.clone().add(getVelocity().clone().multiply(0.06).toPosition()), false);
 	}
 	
 	@SuppressWarnings("ConstantConditions")
-	private boolean hackIsStuck(Position pos, Position posNow) {
+	private boolean hackIsStuck(Position pos, Position posNow, boolean shouldTeleport) {
 		if (pos.isSimilar(posNow)) {
-			return true;
+			BlockPosition bpos = posNow.toBlockPosition();
+			Block block = instance.getBlock(bpos.getX(), bpos.getY() - 1, bpos.getZ());
+			if (!block.isAir() && !block.isLiquid()) {
+				return true;
+			}
 		}
 		
 		Instance instance = getInstance();
@@ -111,6 +128,7 @@ public abstract class EntityProjectileMixin extends Entity {
 			BlockPosition bpos = pos.toBlockPosition();
 			Block block = instance.getBlock(bpos.getX(), bpos.getY() - 1, bpos.getZ());
 			if (!block.isAir() && !block.isLiquid()) {
+				if (shouldTeleport) teleport(pos);
 				return true;
 			}
 			
@@ -137,16 +155,27 @@ public abstract class EntityProjectileMixin extends Entity {
 			
 			if (victimOptional.isPresent()) {
 				LivingEntity victim = (LivingEntity) victimOptional.get();
-				boolean multiHit = false;
+				boolean shouldRemove = true;
 				
 				if ((Object) this instanceof EntityHittableProjectile) {
 					EntityHittableProjectile hittable = (EntityHittableProjectile) (Object) this;
+					shouldRemove = false;
+					
 					if (hittable.shouldCallHit()) {
 						if (hittable.canMultiHit()) {
-							multiHit = true;
-							victims.forEach(hittable::onHit);
+							Iterator<Entity> iterator = victims.iterator();
+							
+							while (iterator.hasNext()) {
+								Entity entity = iterator.next();
+								if (hittable.onHit(entity)) {
+									remove();
+									break;
+								}
+							}
 						} else {
-							hittable.onHit(victim);
+							if (hittable.onHit(victim)) {
+								remove();
+							}
 						}
 						
 						hittable.setHitCalled(true);
@@ -155,9 +184,10 @@ public abstract class EntityProjectileMixin extends Entity {
 					EventDispatcher.call(new EntityAttackEvent(this, victim));
 				}
 				
-				if (!multiHit) {
+				if (shouldRemove) {
 					remove();
 				}
+				
 				return super.onGround;
 			}
 		}

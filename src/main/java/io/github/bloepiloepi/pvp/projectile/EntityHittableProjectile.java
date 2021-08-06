@@ -26,7 +26,8 @@ public abstract class EntityHittableProjectile extends EntityProjectile {
 		return false;
 	}
 	
-	public void onHit(@Nullable Entity entity) {
+	public boolean onHit(@Nullable Entity entity) {
+		return true;
 	}
 	
 	@Override

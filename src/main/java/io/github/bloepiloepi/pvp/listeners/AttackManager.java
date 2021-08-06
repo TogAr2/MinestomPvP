@@ -142,7 +142,7 @@ public class AttackManager {
 			targetHealth = ((LivingEntity) target).getHealth();
 			if (fireAspect > 0 && !target.isOnFire()) {
 				fireAspectApplied = true;
-				EntityUtils.setOnFireForSeconds((LivingEntity) target, 1);
+				EntityUtils.setOnFireForSeconds(target, 1);
 			}
 		}
 		

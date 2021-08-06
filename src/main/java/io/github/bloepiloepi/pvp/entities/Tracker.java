@@ -30,6 +30,7 @@ public class Tracker {
 	public static final Map<UUID, Position> previousPosition = new HashMap<>();
 	public static final Map<UUID, Vector> playerVelocity = new HashMap<>();
 	public static final Map<UUID, Entity> spectating = new HashMap<>();
+	public static final Map<UUID, Long> itemUseStartTime = new HashMap<>();
 	
 	public static <K> void increaseInt(Map<K, Integer> map, K key, int amount) {
 		map.put(key, map.getOrDefault(key, 0) + amount);
@@ -151,6 +152,9 @@ public class Tracker {
 			
 			previousPosition.put(player.getUuid(), newPosition.clone());
 		});
+		
+		node.addListener(PlayerItemAnimationEvent.class, event ->
+				itemUseStartTime.put(event.getPlayer().getUuid(), System.currentTimeMillis()));
 		
 		MinecraftServer.getSchedulerManager().buildTask(Tracker::updateCooldown).repeat(1, TimeUnit.TICK).schedule();
 	}

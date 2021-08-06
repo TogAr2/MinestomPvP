@@ -3,20 +3,18 @@ package io.github.bloepiloepi.pvp.projectile;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
-import net.minestom.server.entity.metadata.arrow.AbstractArrowMeta;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class SpectralArrow extends AbstractArrow {
 	private static final ItemStack PICKUP_ITEM = ItemStack.of(Material.SPECTRAL_ARROW);
 	private int duration = 200;
 	
-	public SpectralArrow(@Nullable Entity shooter, @NotNull EntityType entityType) {
-		super(shooter, entityType);
+	public SpectralArrow(@Nullable Entity shooter) {
+		super(shooter, EntityType.SPECTRAL_ARROW);
 	}
 	
 	public int getDuration() {

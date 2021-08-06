@@ -6,7 +6,6 @@ import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.metadata.item.SnowballMeta;
 import net.minestom.server.item.ItemStack;
-import net.minestom.server.utils.Position;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,13 +16,15 @@ public class Snowball extends EntityHittableProjectile {
 	}
 	
 	@Override
-	public void onHit(@Nullable Entity entity) {
+	public boolean onHit(@Nullable Entity entity) {
 		triggerStatus((byte) 3); // Snowball particles
 		
 		if (entity != null) {
 			int damage = entity.getEntityType() == EntityType.BLAZE ? 3 : 0;
 			EntityUtils.damage(entity, CustomDamageType.thrown(this, getShooter()), damage);
 		}
+		
+		return true;
 	}
 	
 	@Override

@@ -4,10 +4,11 @@ import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.enchantment.enchantments.ProtectionEnchantment;
 import io.github.bloepiloepi.pvp.enums.Tool;
+import io.github.bloepiloepi.pvp.projectile.Arrow;
+import it.unimi.dsi.fastutil.Pair;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
-import net.minestom.server.entity.metadata.ProjectileMeta;
 import net.minestom.server.entity.metadata.arrow.AbstractArrowMeta;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
@@ -16,6 +17,7 @@ import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.TimedPotion;
 import net.minestom.server.utils.Position;
 import net.minestom.server.utils.Vector;
+import net.minestom.server.utils.inventory.PlayerInventoryUtils;
 import net.minestom.server.utils.time.TimeUnit;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Predicate;
 
 public class EntityUtils {
 	
@@ -189,5 +192,34 @@ public class EntityUtils {
 		item.setInstance(Objects.requireNonNull(entity.getInstance()));
 		
 		return item;
+	}
+	
+	public static Pair<ItemStack, Integer> getProjectile(Player player, Predicate<ItemStack> predicate) {
+		return getProjectile(player, predicate, predicate);
+	}
+	
+	public static Pair<ItemStack, Integer> getProjectile(Player player, Predicate<ItemStack> heldSupportedPredicate,
+	                                      Predicate<ItemStack> allSupportedPredicate) {
+		Pair<ItemStack, Integer> held = getHeldItem(player, heldSupportedPredicate);
+		if (!held.first().isAir()) return held;
+		
+		ItemStack[] itemStacks = player.getInventory().getItemStacks();
+		for (int i = 0; i < itemStacks.length; i++) {
+			ItemStack stack = itemStacks[i];
+			if (stack == null || stack.isAir()) continue;
+			if (allSupportedPredicate.test(stack)) return Pair.of(stack, i);
+		}
+		
+		return player.isCreative() ? Pair.of(Arrow.DEFAULT_ARROW, -1) : Pair.of(ItemStack.AIR, -1);
+	}
+	
+	private static Pair<ItemStack, Integer> getHeldItem(Player player, Predicate<ItemStack> predicate) {
+		ItemStack stack = player.getItemInHand(Player.Hand.OFF);
+		if (predicate.test(stack)) return Pair.of(stack, PlayerInventoryUtils.OFFHAND_SLOT);
+		
+		stack = player.getItemInHand(Player.Hand.MAIN);
+		if (predicate.test(stack)) return Pair.of(stack, (int) player.getHeldSlot());
+		
+		return Pair.of(ItemStack.AIR, -1);
 	}
 }

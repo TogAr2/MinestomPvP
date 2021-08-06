@@ -15,19 +15,24 @@ import net.minestom.server.potion.CustomPotionEffect;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.PotionType;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 public class Arrow extends AbstractArrow {
-	private static final ItemStack DEFAULT_ARROW = ItemStack.of(Material.ARROW);
+	public static final ItemStack DEFAULT_ARROW = ItemStack.of(Material.ARROW);
+	public static final Predicate<ItemStack> ARROW_PREDICATE = stack ->
+			stack.getMaterial() == Material.ARROW
+			|| stack.getMaterial() == Material.SPECTRAL_ARROW
+			|| stack.getMaterial() == Material.TIPPED_ARROW;
+	
 	private PotionMeta potion;
 	private boolean fixedColor;
 	
-	public Arrow(@Nullable Entity shooter, @NotNull EntityType entityType) {
-		super(shooter, entityType);
+	public Arrow(@Nullable Entity shooter) {
+		super(shooter, EntityType.ARROW);
 	}
 	
 	public void inheritEffects(ItemStack stack) {

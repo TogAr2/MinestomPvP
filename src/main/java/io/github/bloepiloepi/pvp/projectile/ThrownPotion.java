@@ -31,7 +31,7 @@ public class ThrownPotion extends EntityHittableProjectile {
 	}
 	
 	@Override
-	public void onHit(@Nullable Entity entity) {
+	public boolean onHit(@Nullable Entity entity) {
 		ItemStack item = getItem();
 		
 		PotionMeta meta = (PotionMeta) item.getMeta();
@@ -50,6 +50,8 @@ public class ThrownPotion extends EntityHittableProjectile {
 		Effects effect = baseType.hasInstantEffect() ? Effects.INSTANT_SPLASH : Effects.SPLASH_POTION;
 		EffectManager.sendNearby(Objects.requireNonNull(getInstance()), effect, blockPosition.getX(),
 				blockPosition.getY(), blockPosition.getZ(), PotionListener.getColor(item), 64.0D, false);
+		
+		return true;
 	}
 	
 	private void applySplash(List<Potion> potions, @Nullable Entity hitEntity) {

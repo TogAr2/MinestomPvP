@@ -6,6 +6,7 @@ import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.utils.EffectManager;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
@@ -74,20 +75,19 @@ public abstract class AbstractArrow extends EntityHittableProjectile {
 	}
 	
 	@Override
-	public void onHit(@Nullable Entity entity) {
-		if (entity != null && piercingIgnore.contains(entity.getEntityId())) return;
-		
-		ThreadLocalRandom random = ThreadLocalRandom.current();
+	public boolean onHit(@Nullable Entity entity) {
+		if (entity != null && piercingIgnore.contains(entity.getEntityId())) return false;
 		
 		if (entity != null) {
-			double movementSpeed = getVelocity().length();
+			ThreadLocalRandom random = ThreadLocalRandom.current();
+			
+			double movementSpeed = getVelocity().length() / MinecraftServer.TICK_PER_SECOND;
 			int damage = (int) Math.ceil(MathUtils.clamp(
 					movementSpeed * baseDamage, 0.0, 2.147483647E9D));
 			
 			if (getPiercingLevel() > 0) {
 				if (piercingIgnore.size() >= getPiercingLevel() + 1) {
-					remove();
-					return;
+					return true;
 				}
 				
 				piercingIgnore.add(entity.getEntityId());
@@ -109,7 +109,7 @@ public abstract class AbstractArrow extends EntityHittableProjectile {
 			}
 			
 			if (EntityUtils.damage(entity, damageType, damage)) {
-				if (enderman) return;
+				if (enderman) return false;
 				
 				if (entity instanceof LivingEntity) {
 					LivingEntity living = (LivingEntity) entity;
@@ -147,9 +147,8 @@ public abstract class AbstractArrow extends EntityHittableProjectile {
 					SoundManager.sendToAround(this, getSound(), Sound.Source.NEUTRAL,
 							1.0F, 1.2F / (random.nextFloat() * 0.2F + 0.9F));
 				}
-				if (getPiercingLevel() <= 0) {
-					remove();
-				}
+				
+				return getPiercingLevel() <= 0;
 			} else {
 				EntityUtils.setOnFireForSeconds(entity, prevFireTicks);
 				getVelocity().multiply(-0.1);
@@ -160,26 +159,33 @@ public abstract class AbstractArrow extends EntityHittableProjectile {
 						EntityUtils.spawnItemAtLocation(this, getPickupItem(), 0.1);
 					}
 					
-					remove();
+					return true;
 				}
+				
+				return false;
 			}
-		} else {
-			if (!isSilent()) {
-				SoundManager.sendToAround(this, getSound(), Sound.Source.NEUTRAL,
-						1.0F, 1.2F / (random.nextFloat() * 0.2F + 0.9F));
-			}
-			
-			setCritical(false);
-			setPiercingLevel((byte) 0);
-			setSound(SoundEvent.ARROW_HIT);
-			piercingIgnore.clear();
 		}
+		
+		return true;
 	}
 	
 	@Override
 	public boolean canMultiHit() {
-		//TODO
-		return true;
+		return getPiercingLevel() > 0;
+	}
+	
+	@Override
+	public void onStuck() {
+		if (!isSilent()) {
+			ThreadLocalRandom random = ThreadLocalRandom.current();
+			SoundManager.sendToAround(this, getSound(), Sound.Source.NEUTRAL,
+					1.0F, 1.2F / (random.nextFloat() * 0.2F + 0.9F));
+		}
+		
+		setCritical(false);
+		setPiercingLevel((byte) 0);
+		setSound(SoundEvent.ARROW_HIT);
+		piercingIgnore.clear();
 	}
 	
 	protected abstract ItemStack getPickupItem();
@@ -234,6 +240,6 @@ public abstract class AbstractArrow extends EntityHittableProjectile {
 	public enum PickupMode {
 		DISALLOWED,
 		ALLOWED,
-		CREATIVE_ONLY;
+		CREATIVE_ONLY
 	}
 }

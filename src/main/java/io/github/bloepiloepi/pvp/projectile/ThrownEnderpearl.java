@@ -2,7 +2,6 @@ package io.github.bloepiloepi.pvp.projectile;
 
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.Player;
@@ -12,7 +11,6 @@ import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.particle.ParticleCreator;
 import net.minestom.server.utils.Position;
-import net.minestom.server.utils.time.TimeUnit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +23,7 @@ public class ThrownEnderpearl extends EntityHittableProjectile {
 	}
 	
 	@Override
-	public void onHit(@Nullable Entity entity) {
+	public boolean onHit(@Nullable Entity entity) {
 		if (entity != null) {
 			EntityUtils.damage(entity, CustomDamageType.thrown(this, getShooter()), 0.0F);
 		}
@@ -43,7 +41,7 @@ public class ThrownEnderpearl extends EntityHittableProjectile {
 			sendPacketToViewersAndSelf(packet);
 		}
 		
-		if (isRemoved()) return;
+		if (isRemoved()) return false;
 		
 		Entity shooter = getShooter();
 		if (shooter != null) {
@@ -69,6 +67,8 @@ public class ThrownEnderpearl extends EntityHittableProjectile {
 			shooter.teleport(position);
 			//TODO set falldistance to 0
 		}
+		
+		return true;
 	}
 	
 	@Override

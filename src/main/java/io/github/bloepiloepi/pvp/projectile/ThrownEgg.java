@@ -16,12 +16,14 @@ public class ThrownEgg extends EntityHittableProjectile {
 	}
 	
 	@Override
-	public void onHit(@Nullable Entity entity) {
+	public boolean onHit(@Nullable Entity entity) {
 		triggerStatus((byte) 3); // Egg particles
 		
 		if (entity != null) {
 			EntityUtils.damage(entity, CustomDamageType.thrown(this, getShooter()), 0.0F);
 		}
+		
+		return true;
 	}
 	
 	@Override

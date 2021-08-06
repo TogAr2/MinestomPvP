@@ -35,7 +35,12 @@ public abstract class EntityMixin {
 	@Shadow @NotNull public abstract Entity.@NotNull Pose getPose();
 	@Shadow @NotNull public abstract EntityMeta getEntityMeta();
 	
-	private double eyeHeight = getEyeHeight();
+	private double eyeHeight;
+	
+	@Inject(method = "<init>(Lnet/minestom/server/entity/EntityType;Ljava/util/UUID;)V", at = @At("TAIL"))
+	private void onInit(@NotNull EntityType entityType, @NotNull UUID uuid, CallbackInfo ci) {
+		eyeHeight = getNewEyeHeight(getPose());
+	}
 	
 	@SuppressWarnings("ConstantConditions")
 	@Inject(method = "teleport(Lnet/minestom/server/utils/Position;[JLjava/lang/Runnable;)V", at = @At(value = "HEAD"))
