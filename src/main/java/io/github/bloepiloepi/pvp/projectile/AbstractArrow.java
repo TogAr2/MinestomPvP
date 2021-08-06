@@ -29,6 +29,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public abstract class AbstractArrow extends EntityHittableProjectile {
 	private static final double ARROW_BASE_DAMAGE = 2.0;
 	
+	protected int pickupDelay;
 	protected int stuckTime;
 	protected PickupMode pickupMode = PickupMode.DISALLOWED;
 	protected int ticks;
@@ -52,6 +53,10 @@ public abstract class AbstractArrow extends EntityHittableProjectile {
 			stuckTime++;
 		} else {
 			stuckTime = 0;
+		}
+		
+		if (pickupDelay > 0) {
+			pickupDelay--;
 		}
 		
 		//TODO water (also for other projectiles?)
@@ -181,10 +186,30 @@ public abstract class AbstractArrow extends EntityHittableProjectile {
 					1.0F, 1.2F / (random.nextFloat() * 0.2F + 0.9F));
 		}
 		
+		pickupDelay = 7;
 		setCritical(false);
 		setPiercingLevel((byte) 0);
 		setSound(SoundEvent.ARROW_HIT);
 		piercingIgnore.clear();
+	}
+	
+	public boolean canBePickedUp(Player player) {
+		if (!((onGround || hasNoGravity()) && pickupDelay <= 0)) {
+			return false;
+		}
+		
+		switch (pickupMode) {
+			case ALLOWED:
+				return true;
+			case CREATIVE_ONLY:
+				return player.isCreative();
+			default:
+				return false;
+		}
+	}
+	
+	public boolean pickup(Player player) {
+		return player.isCreative() || player.getInventory().addItemStack(getPickupItem());
 	}
 	
 	protected abstract ItemStack getPickupItem();
@@ -234,6 +259,10 @@ public abstract class AbstractArrow extends EntityHittableProjectile {
 	
 	public void setPiercingLevel(byte piercingLevel) {
 		((AbstractArrowMeta) getEntityMeta()).setPiercingLevel(piercingLevel);
+	}
+	
+	public boolean shouldRemove() {
+		return super.shouldRemove();
 	}
 	
 	public enum PickupMode {
