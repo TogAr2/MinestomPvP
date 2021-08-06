@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Mixin(EntityProjectile.class)
 public abstract class EntityProjectileMixin extends Entity {
@@ -79,6 +80,7 @@ public abstract class EntityProjectileMixin extends Entity {
 		return hackIsStuck(pos, pos.clone().add(getVelocity().clone().multiply(0.06).toPosition()));
 	}
 	
+	@SuppressWarnings("ConstantConditions")
 	private boolean hackIsStuck(Position pos, Position posNow) {
 		if (pos.isSimilar(posNow)) {
 			return true;
@@ -126,18 +128,36 @@ public abstract class EntityProjectileMixin extends Entity {
              */
 			boolean shouldDamageShooter = getAliveTicks() < 6;
 			assert entities != null;
-			Optional<Entity> victimOptional = entities.stream()
+			Stream<Entity> victims = entities.stream()
 					.filter(entity -> {
 						if (shouldDamageShooter && entity == shooter) return false;
 						return entity.getBoundingBox().intersect(pos.getX(), pos.getY(), pos.getZ());
-					})
-					.findAny();
+					});
+			Optional<Entity> victimOptional = victims.findAny();
+			
 			if (victimOptional.isPresent()) {
 				LivingEntity victim = (LivingEntity) victimOptional.get();
+				boolean multiHit = false;
 				
-				EventDispatcher.call(new EntityAttackEvent(this, victim));
+				if ((Object) this instanceof EntityHittableProjectile) {
+					EntityHittableProjectile hittable = (EntityHittableProjectile) (Object) this;
+					if (hittable.shouldCallHit()) {
+						if (hittable.canMultiHit()) {
+							multiHit = true;
+							victims.forEach(hittable::onHit);
+						} else {
+							hittable.onHit(victim);
+						}
+						
+						hittable.setHitCalled(true);
+					}
+				} else {
+					EventDispatcher.call(new EntityAttackEvent(this, victim));
+				}
 				
-				remove();
+				if (!multiHit) {
+					remove();
+				}
 				return super.onGround;
 			}
 		}

@@ -1,7 +1,9 @@
 package io.github.bloepiloepi.pvp.utils;
 
 import net.minestom.server.effects.Effects;
+import net.minestom.server.entity.Player;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.network.packet.server.play.ChangeGameStatePacket;
 import net.minestom.server.network.packet.server.play.EffectPacket;
 import net.minestom.server.utils.BlockPosition;
 import net.minestom.server.utils.PacketUtils;
@@ -27,5 +29,14 @@ public class EffectManager {
 			
 			return dx * dx + dy * dy + dz * dz < distanceSquared;
 		});
+	}
+	
+	public static void sendGameState(@NotNull Player player,
+	                                 @NotNull ChangeGameStatePacket.Reason reason, float value) {
+		ChangeGameStatePacket packet = new ChangeGameStatePacket();
+		packet.reason = reason;
+		packet.value = value;
+		
+		player.getPlayerConnection().sendPacket(packet);
 	}
 }

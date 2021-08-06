@@ -75,9 +75,10 @@ public class ThrownPotion extends EntityHittableProjectile {
 				} else {
 					int duration = (int) (proximity * (double) potion.getDuration() + 0.5D);
 					if (duration > 20) {
+						byte flags = potion.getFlags();
 						entity.addEffect(new Potion(potion.getEffect(), potion.getAmplifier(), duration,
-								(potion.getFlags() & 0x02) > 0, (potion.getFlags() & 0x04) > 0,
-								(potion.getFlags() & 0x01) > 0));
+								PotionListener.hasParticles(flags), PotionListener.hasIcon(flags),
+								PotionListener.isAmbient(flags)));
 					}
 				}
 			}

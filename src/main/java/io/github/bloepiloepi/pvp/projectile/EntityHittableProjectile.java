@@ -15,11 +15,15 @@ public abstract class EntityHittableProjectile extends EntityProjectile {
 	}
 	
 	public boolean shouldCallHit() {
-		return !beforeHitCalled;
+		return !beforeHitCalled || canMultiHit();
 	}
 	
 	public void setHitCalled(boolean beforeHitCalled) {
 		this.beforeHitCalled = beforeHitCalled;
+	}
+	
+	public boolean canMultiHit() {
+		return false;
 	}
 	
 	public void onHit(@Nullable Entity entity) {
@@ -30,5 +34,6 @@ public abstract class EntityHittableProjectile extends EntityProjectile {
 		remove();
 	}
 	
-	public abstract void setItem(@NotNull ItemStack item);
+	public void setItem(@NotNull ItemStack item) {
+	}
 }

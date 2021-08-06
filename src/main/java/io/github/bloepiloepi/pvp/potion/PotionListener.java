@@ -3,6 +3,7 @@ package io.github.bloepiloepi.pvp.potion;
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffect;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffects;
+import io.github.bloepiloepi.pvp.potion.item.CustomPotionType;
 import io.github.bloepiloepi.pvp.potion.item.CustomPotionTypes;
 import io.github.bloepiloepi.pvp.projectile.ThrownPotion;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
@@ -198,8 +199,7 @@ public class PotionListener {
 		if (effects.isEmpty()) return true;
 		
 		for (TimedPotion potion : effects) {
-			//If no ambient
-			if ((potion.getPotion().getFlags() & 0x01) <= 0) {
+			if (!isAmbient(potion.getPotion().getFlags())) {
 				return false;
 			}
 		}
@@ -227,8 +227,7 @@ public class PotionListener {
 		int totalAmplifier = 0;
 		
 		for (Potion potion : effects) {
-			//If should show particles
-			if ((potion.getFlags() & 0x02) > 0) {
+			if (PotionListener.hasParticles(potion.getFlags())) {
 				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.getEffect());
 				int color = customPotionEffect.getColor();
 				int amplifier = potion.getAmplifier() + 1;
@@ -252,7 +251,12 @@ public class PotionListener {
 	public static List<Potion> getAllPotions(PotionMeta meta) {
 		//PotionType effects plus custom effects
 		List<Potion> potions = new ArrayList<>();
-		potions.addAll(CustomPotionTypes.get(meta.getPotionType()).getEffects());
+		
+		CustomPotionType potionType = CustomPotionTypes.get(meta.getPotionType());
+		if (potionType != null) {
+			potions.addAll(potionType.getEffects());
+		}
+		
 		potions.addAll(meta.getCustomPotionEffects().stream().map((customPotion) ->
 				new Potion(Objects.requireNonNull(PotionEffect.fromId(customPotion.getId())),
 						customPotion.getAmplifier(), customPotion.getDuration(),
@@ -261,5 +265,37 @@ public class PotionListener {
 				.collect(Collectors.toList()));
 		
 		return potions;
+	}
+	
+	public static List<Potion> getAllPotions(PotionType potionType,
+	                                         Collection<net.minestom.server.potion.CustomPotionEffect> customEffects) {
+		//PotionType effects plus custom effects
+		List<Potion> potions = new ArrayList<>();
+		
+		CustomPotionType customPotionType = CustomPotionTypes.get(potionType);
+		if (customPotionType != null) {
+			potions.addAll(customPotionType.getEffects());
+		}
+		
+		potions.addAll(customEffects.stream().map((customPotion) ->
+				new Potion(Objects.requireNonNull(PotionEffect.fromId(customPotion.getId())),
+						customPotion.getAmplifier(), customPotion.getDuration(),
+						customPotion.showParticles(), customPotion.showIcon(),
+						customPotion.isAmbient()))
+				.collect(Collectors.toList()));
+		
+		return potions;
+	}
+	
+	public static boolean isAmbient(byte flags) {
+		return (flags & 0x01) > 0;
+	}
+	
+	public static boolean hasParticles(byte flags) {
+		return (flags & 0x02) > 0;
+	}
+	
+	public static boolean hasIcon(byte flags) {
+		return (flags & 0x04) > 0;
 	}
 }

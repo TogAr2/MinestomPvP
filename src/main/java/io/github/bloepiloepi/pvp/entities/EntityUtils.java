@@ -7,6 +7,8 @@ import io.github.bloepiloepi.pvp.enums.Tool;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
+import net.minestom.server.entity.metadata.ProjectileMeta;
+import net.minestom.server.entity.metadata.arrow.AbstractArrowMeta;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.potion.Potion;
@@ -14,6 +16,8 @@ import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.TimedPotion;
 import net.minestom.server.utils.Position;
 import net.minestom.server.utils.Vector;
+import net.minestom.server.utils.time.TimeUnit;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,12 +40,15 @@ public class EntityUtils {
 		return new Potion(type, (byte) 0, 0);
 	}
 	
-	public static void setOnFireForSeconds(LivingEntity entity, int seconds) {
+	public static void setOnFireForSeconds(Entity entity, int seconds) {
+		if (!(entity instanceof LivingEntity)) return;
+		LivingEntity living = (LivingEntity) entity;
+		
 		int ticks = seconds * 20;
-		ticks = ProtectionEnchantment.transformFireDuration(entity, ticks);
+		ticks = ProtectionEnchantment.transformFireDuration(living, ticks);
 		
 		//FIXME this makes fire duration lower if it was higher than current seconds
-		entity.setFireForDuration(ticks);
+		living.setFireForDuration(ticks);
 	}
 	
 	public static boolean damage(Entity entity, DamageType type, float amount) {
@@ -53,10 +60,10 @@ public class EntityUtils {
 	}
 	
 	public static boolean blockedByShield(LivingEntity entity, CustomDamageType type) {
-		Entity damager = type.getEntity();
+		Entity damager = type.getDirectEntity();
 		boolean piercing = false;
-		if (damager instanceof EntityProjectile) {
-			if (damager.getData().<Byte>get("pierceLevel") > 0) {
+		if (damager != null && damager.getEntityMeta() instanceof AbstractArrowMeta) {
+			if (((AbstractArrowMeta) damager.getEntityMeta()).getPiercingLevel() > 0) {
 				piercing = true;
 			}
 		}
@@ -172,5 +179,15 @@ public class EntityUtils {
 		return entity.getActiveEffects().stream()
 				.map((potion) -> potion.getPotion().getEffect())
 				.anyMatch((potionEffect) -> potionEffect == effect);
+	}
+	
+	public static @Nullable ItemEntity spawnItemAtLocation(Entity entity, ItemStack itemStack, double up) {
+		if (itemStack.isAir()) return null;
+		
+		ItemEntity item = new ItemEntity(itemStack, entity.getPosition().clone().add(0, up, 0));
+		item.setPickupDelay(10, TimeUnit.TICK); // Default 0.5 seconds
+		item.setInstance(Objects.requireNonNull(entity.getInstance()));
+		
+		return item;
 	}
 }
