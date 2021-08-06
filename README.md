@@ -29,16 +29,20 @@ Currently, most vanilla PvP features are supported.
 - Armor
 - Shields
 - Food
-- Potions
 - Totems
+- Bow and arrows
+- Other projectiles (potions, snowballs, eggs, ender pearls)
 - All enchantments possible with the above features (this includes protection, sharpness, knockback, ...)
 
 ## Plans
 
-- Bow and arrows
 - Lingering potions
 - Fall damage
 - Proper death messages
+
+Also, projectiles are a little bit of a mess right now.
+I might change that in the future, but I'm not sure, since I don't think there is a better way.
+(As a user you will probably not notice this, they do work as intended.)
 
 ## Usage
 
@@ -62,6 +66,9 @@ This extension provides several events:
 - `DamageBlockEvent`: cancellable, called when an entity blocks damage using a shield.
 - `FinalDamageEvent`: cancellable, called when the final damage calculation (including armor and effects) is completed. This event should be used instead of `EntityDamageEvent`, unless you want to detect how much damage was originally dealt.
 - `TotemUseEvent`: cancellable, called when a totem prevents an entity from dying.
+- `PickupArrowEvent`: cancellable, called when a player picks up an arrow.
+- `ProjectileBlockHitEvent`: called when a projectile hits a block.
+- `ProjectileEntityHitEvent`: cancellable, called when a projectile hits an entity.
 
 ### Customization
 
