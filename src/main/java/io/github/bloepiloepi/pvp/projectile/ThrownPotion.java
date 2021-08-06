@@ -31,7 +31,7 @@ public class ThrownPotion extends EntityHittableProjectile {
 	}
 	
 	@Override
-	public boolean onHit(@Nullable Entity entity) {
+	protected boolean onHit(@Nullable Entity entity) {
 		ItemStack item = getItem();
 		
 		PotionMeta meta = (PotionMeta) item.getMeta();

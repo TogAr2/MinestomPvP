@@ -114,7 +114,7 @@ public abstract class LivingEntityMixin extends Entity {
 			
 			BoundingBox arrowBoundingBox = arrow.getBoundingBox();
 			if (expandedBoundingBox.intersect(arrowBoundingBox)) {
-				PickupArrowEvent event = new PickupArrowEvent((LivingEntity) (Entity) this, arrow);
+				PickupArrowEvent event = new PickupArrowEvent((Player) (Entity) this, arrow);
 				EventDispatcher.callCancellable(event, () -> {
 					if (arrow.pickup((Player) (Entity) this)) {
 						CollectItemPacket collectItemPacket = new CollectItemPacket();

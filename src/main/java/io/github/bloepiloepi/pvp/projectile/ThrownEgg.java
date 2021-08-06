@@ -16,7 +16,7 @@ public class ThrownEgg extends EntityHittableProjectile {
 	}
 	
 	@Override
-	public boolean onHit(@Nullable Entity entity) {
+	protected boolean onHit(@Nullable Entity entity) {
 		triggerStatus((byte) 3); // Egg particles
 		
 		if (entity != null) {

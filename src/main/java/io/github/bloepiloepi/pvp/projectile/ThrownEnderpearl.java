@@ -23,7 +23,7 @@ public class ThrownEnderpearl extends EntityHittableProjectile {
 	}
 	
 	@Override
-	public boolean onHit(@Nullable Entity entity) {
+	protected boolean onHit(@Nullable Entity entity) {
 		if (entity != null) {
 			EntityUtils.damage(entity, CustomDamageType.thrown(this, getShooter()), 0.0F);
 		}

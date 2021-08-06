@@ -79,7 +79,7 @@ public abstract class AbstractArrow extends EntityHittableProjectile {
 	}
 	
 	@Override
-	public boolean onHit(@Nullable Entity entity) {
+	protected boolean onHit(@Nullable Entity entity) {
 		if (entity != null && piercingIgnore.contains(entity.getEntityId())) return false;
 		
 		if (entity != null) {

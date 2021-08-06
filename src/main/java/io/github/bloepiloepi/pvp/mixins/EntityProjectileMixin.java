@@ -46,7 +46,7 @@ public abstract class EntityProjectileMixin extends Entity {
 			if ((Object) this instanceof EntityHittableProjectile &&
 					((EntityHittableProjectile) (Object) this).shouldCallHit()
 					&& willBeStuck(posBefore)) {
-				((EntityHittableProjectile) (Object) this).onHit(null);
+				((EntityHittableProjectile) (Object) this).hit(null);
 				((EntityHittableProjectile) (Object) this).setHitCalled(true);
 				
 				if (isRemoved()) {
@@ -71,7 +71,7 @@ public abstract class EntityProjectileMixin extends Entity {
 				if ((Object) this instanceof EntityHittableProjectile &&
 						((EntityHittableProjectile) (Object) this).shouldCallHit()
 						&& willBeStuck(posBefore)) {
-					((EntityHittableProjectile) (Object) this).onHit(null);
+					((EntityHittableProjectile) (Object) this).hit(null);
 					((EntityHittableProjectile) (Object) this).setHitCalled(true);
 					
 					if (isRemoved()) {
@@ -128,6 +128,7 @@ public abstract class EntityProjectileMixin extends Entity {
 			BlockPosition bpos = pos.toBlockPosition();
 			Block block = instance.getBlock(bpos.getX(), bpos.getY() - 1, bpos.getZ());
 			if (!block.isAir() && !block.isLiquid()) {
+				EntityHittableProjectile.hitPosition.put(getUuid(), pos.clone());
 				if (shouldTeleport) teleport(pos);
 				return true;
 			}
@@ -167,13 +168,13 @@ public abstract class EntityProjectileMixin extends Entity {
 							
 							while (iterator.hasNext()) {
 								Entity entity = iterator.next();
-								if (hittable.onHit(entity)) {
+								if (hittable.hit(entity)) {
 									remove();
 									break;
 								}
 							}
 						} else {
-							if (hittable.onHit(victim)) {
+							if (hittable.hit(victim)) {
 								remove();
 							}
 						}

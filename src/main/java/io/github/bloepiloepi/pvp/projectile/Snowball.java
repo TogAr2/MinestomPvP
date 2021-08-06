@@ -16,7 +16,7 @@ public class Snowball extends EntityHittableProjectile {
 	}
 	
 	@Override
-	public boolean onHit(@Nullable Entity entity) {
+	protected boolean onHit(@Nullable Entity entity) {
 		triggerStatus((byte) 3); // Snowball particles
 		
 		if (entity != null) {
