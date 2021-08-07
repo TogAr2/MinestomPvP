@@ -5,12 +5,14 @@ import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entities.EntityGroup;
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
+import io.github.bloepiloepi.pvp.events.PlayerSpectateEvent;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.entity.*;
+import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
@@ -100,7 +102,10 @@ public class AttackManager {
 	
 	public static void performAttack(Player player, Entity target) {
 		if (player.getGameMode() == GameMode.SPECTATOR) {
-			player.spectate(target);
+			PlayerSpectateEvent playerSpectateEvent = new PlayerSpectateEvent(player, target);
+			EventDispatcher.callCancellable(playerSpectateEvent, () -> {
+				player.spectate(target);
+			});
 			return;
 		}
 		
