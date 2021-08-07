@@ -6,6 +6,9 @@ import net.minestom.server.event.trait.CancellableEvent;
 import net.minestom.server.event.trait.PlayerEvent;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Called when a spectator tries to spectate an entity by attacking it.
+ */
 public class PlayerSpectateEvent implements PlayerEvent, CancellableEvent {
 	
 	private final Player player;

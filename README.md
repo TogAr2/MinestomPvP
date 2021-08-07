@@ -65,10 +65,12 @@ This extension provides several events:
 
 - `DamageBlockEvent`: cancellable, called when an entity blocks damage using a shield.
 - `FinalDamageEvent`: cancellable, called when the final damage calculation (including armor and effects) is completed. This event should be used instead of `EntityDamageEvent`, unless you want to detect how much damage was originally dealt.
-- `TotemUseEvent`: cancellable, called when a totem prevents an entity from dying.
 - `PickupArrowEvent`: cancellable, called when a player picks up an arrow.
+- `PlayerSpectateEvent`: cancellable, called when a spectator tries to spectate an entity by attacking it.
 - `ProjectileBlockHitEvent`: called when a projectile hits a block.
 - `ProjectileEntityHitEvent`: cancellable, called when a projectile hits an entity.
+- `ProjectileShootEvent`: cancellable, called when a player shoots or throws a projectile.
+- `TotemUseEvent`: cancellable, called when a totem prevents an entity from dying.
 
 ### Customization
 

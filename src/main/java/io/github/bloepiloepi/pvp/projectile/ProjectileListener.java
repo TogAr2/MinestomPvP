@@ -3,12 +3,14 @@ package io.github.bloepiloepi.pvp.projectile;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
+import io.github.bloepiloepi.pvp.events.ProjectileShootEvent;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
+import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
@@ -44,51 +46,54 @@ public class ProjectileListener {
 			
 			if (Tracker.hasCooldown(player, stack.getMaterial())) {
 				event.setCancelled(true);
+				return;
 			}
 			
-			boolean snowball = stack.getMaterial() == Material.SNOWBALL;
-			boolean enderpearl = stack.getMaterial() == Material.ENDER_PEARL;
-			
-			SoundEvent soundEvent;
-			EntityHittableProjectile projectile;
-			if (snowball) {
-				soundEvent = SoundEvent.SNOWBALL_THROW;
-				projectile = new Snowball(player);
-			} else if (enderpearl) {
-				soundEvent = SoundEvent.ENDER_PEARL_THROW;
-				projectile = new ThrownEnderpearl(player);
-			} else {
-				soundEvent = SoundEvent.EGG_THROW;
-				projectile = new ThrownEgg(player);
-			}
-			
-			projectile.setItem(stack);
-			
-			ThreadLocalRandom random = ThreadLocalRandom.current();
-			SoundManager.sendToAround(player, soundEvent,
-					snowball || enderpearl ? Sound.Source.NEUTRAL : Sound.Source.PLAYER,
-					0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f));
-			
-			if (enderpearl) {
-				Tracker.setCooldown(player, Material.ENDER_PEARL, 20);
-			}
-			
-			Position position = player.getPosition().clone().add(0D, player.getEyeHeight(), 0D);
-			projectile.setInstance(Objects.requireNonNull(player.getInstance()), position);
-			
-			Vector direction = position.getDirection();
-			position = position.clone().add(direction.getX(), direction.getY(), direction.getZ())
-					.subtract(0, 0.2, 0); //????????
-			
-			projectile.shoot(position, 1.5, 1.0);
-			
-			Vector playerVel = Tracker.playerVelocity.get(player.getUuid());
-			projectile.setVelocity(projectile.getVelocity().add(playerVel.getX(),
-					player.isOnGround() ? 0.0D : playerVel.getY(), playerVel.getZ()));
-			
-			if (!player.isCreative()) {
-				player.setItemInHand(event.getHand(), stack.withAmount(stack.getAmount() - 1));
-			}
+			onShoot(player, stack, () -> {
+				boolean snowball = stack.getMaterial() == Material.SNOWBALL;
+				boolean enderpearl = stack.getMaterial() == Material.ENDER_PEARL;
+				
+				SoundEvent soundEvent;
+				EntityHittableProjectile projectile;
+				if (snowball) {
+					soundEvent = SoundEvent.SNOWBALL_THROW;
+					projectile = new Snowball(player);
+				} else if (enderpearl) {
+					soundEvent = SoundEvent.ENDER_PEARL_THROW;
+					projectile = new ThrownEnderpearl(player);
+				} else {
+					soundEvent = SoundEvent.EGG_THROW;
+					projectile = new ThrownEgg(player);
+				}
+				
+				projectile.setItem(stack);
+				
+				ThreadLocalRandom random = ThreadLocalRandom.current();
+				SoundManager.sendToAround(player, soundEvent,
+						snowball || enderpearl ? Sound.Source.NEUTRAL : Sound.Source.PLAYER,
+						0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f));
+				
+				if (enderpearl) {
+					Tracker.setCooldown(player, Material.ENDER_PEARL, 20);
+				}
+				
+				Position position = player.getPosition().clone().add(0D, player.getEyeHeight(), 0D);
+				projectile.setInstance(Objects.requireNonNull(player.getInstance()), position);
+				
+				Vector direction = position.getDirection();
+				position = position.clone().add(direction.getX(), direction.getY(), direction.getZ())
+						.subtract(0, 0.2, 0); //????????
+				
+				projectile.shoot(position, 1.5, 1.0);
+				
+				Vector playerVel = Tracker.playerVelocity.get(player.getUuid());
+				projectile.setVelocity(projectile.getVelocity().add(playerVel.getX(),
+						player.isOnGround() ? 0.0D : playerVel.getY(), playerVel.getZ()));
+				
+				if (!player.isCreative()) {
+					player.setItemInHand(event.getHand(), stack.withAmount(stack.getAmount() - 1));
+				}
+			});
 		}).filter(event -> event.getItemStack().getMaterial() == Material.SNOWBALL
 				|| event.getItemStack().getMaterial() == Material.EGG
 				|| event.getItemStack().getMaterial() == Material.ENDER_PEARL)
@@ -115,7 +120,7 @@ public class ProjectileListener {
 					Tracker.itemUseHand.put(event.getPlayer().getUuid(), event.getHand());
 				}
 			}
-		}).filter(event -> event.getItemStack().getMaterial() == Material.CROSSBOW).build());
+		}).ignoreCancelled(false).filter(event -> event.getItemStack().getMaterial() == Material.CROSSBOW).build());
 		
 		node.addListener(PlayerItemAnimationEvent.class, event -> {
 			if (event.getArmAnimationType() == PlayerItemAnimationEvent.ItemAnimationType.BOW) {
@@ -144,7 +149,6 @@ public class ProjectileListener {
 				if (midLoadSoundPlayed == null) midLoadSoundPlayed = (byte) 0;
 				
 				if (progress >= 0.2 && startSoundPlayed == (byte) 0) {
-					System.out.println("Playing start sound");
 					SoundEvent startSound = getCrossbowStartSound(quickCharge);
 					SoundManager.sendToAround(player, startSound, Sound.Source.PLAYER, 0.5F, 1.0F);
 					
@@ -154,7 +158,6 @@ public class ProjectileListener {
 				
 				SoundEvent midLoadSound = quickCharge == 0 ? SoundEvent.CROSSBOW_LOADING_MIDDLE : null;
 				if (progress >= 0.5F && midLoadSound != null && midLoadSoundPlayed == (byte) 0) {
-					System.out.println("Playing mid load sound");
 					SoundManager.sendToAround(player, midLoadSound, Sound.Source.PLAYER, 0.5F, 1.0F);
 					
 					stack = stack.withTag(MID_LOAD_SOUND_PLAYED, (byte) 1);
@@ -182,58 +185,65 @@ public class ProjectileListener {
 			double power = getBowPower(useDuration);
 			if (power < 0.1) return;
 			
-			// Arrow creation
-			AbstractArrow arrow = createArrow(projectile, player);
+			ItemStack finalProjectile = projectile;
+			int finalProjectileSlot = projectileSlot;
 			
-			if (power >= 1) {
-				arrow.setCritical(true);
-			}
-			
-			int powerEnchantment = EnchantmentUtils.getLevel(Enchantment.POWER_ARROWS, stack);
-			if (powerEnchantment > 0) {
-				arrow.setBaseDamage(arrow.getBaseDamage() + (double) powerEnchantment * 0.5 + 0.5);
-			}
-			
-			int punchEnchantment = EnchantmentUtils.getLevel(Enchantment.PUNCH_ARROWS, stack);
-			if (punchEnchantment > 0) {
-				arrow.setKnockback(punchEnchantment);
-			}
-			
-			if (EnchantmentUtils.getLevel(Enchantment.FLAMING_ARROWS, stack) > 0) {
-				EntityUtils.setOnFireForSeconds(arrow, 100);
-			}
-			
-			//TODO damage bow item
-			
-			boolean reallyInfinite = infinite && projectile.getMaterial() == Material.ARROW;
-			if (reallyInfinite || player.isCreative() && (projectile.getMaterial() == Material.SPECTRAL_ARROW
-					|| projectile.getMaterial() == Material.TIPPED_ARROW)) {
-				arrow.pickupMode = AbstractArrow.PickupMode.CREATIVE_ONLY;
-			}
-			
-			// Arrow shooting
-			Position position = player.getPosition().clone().add(0D, player.getEyeHeight(), 0D);
-			arrow.setInstance(Objects.requireNonNull(player.getInstance()),
-					position.clone().subtract(0, 0.10000000149011612D, 0)); // Yeah wait what
-			
-			Vector direction = position.getDirection();
-			position = position.clone().add(direction.getX(), direction.getY(), direction.getZ())
-					.subtract(0, 0.2, 0); //????????
-			
-			arrow.shoot(position, power * 3, 1.0);
-			
-			Vector playerVel = Tracker.playerVelocity.get(player.getUuid());
-			arrow.setVelocity(arrow.getVelocity().add(playerVel.getX(),
-					player.isOnGround() ? 0.0D : playerVel.getY(), playerVel.getZ()));
-			
-			ThreadLocalRandom random = ThreadLocalRandom.current();
-			SoundManager.sendToAround(player, SoundEvent.ARROW_SHOOT, Sound.Source.PLAYER,
-					1.0f, 1.0f / (random.nextFloat() * 0.4f + 1.2f) + (float) power * 0.5f);
-			
-			if (!reallyInfinite && !player.isCreative() && projectileSlot >= 0) {
-				player.getInventory().setItemStack(projectileSlot, projectile.withAmount(projectile.getAmount() - 1));
-			}
-		}).filter(event -> event.getItemStack().getMaterial() == Material.BOW).build());
+			onShoot(player, projectile, () -> {
+				// Arrow creation
+				AbstractArrow arrow = createArrow(finalProjectile, player);
+				
+				if (power >= 1) {
+					arrow.setCritical(true);
+				}
+				
+				int powerEnchantment = EnchantmentUtils.getLevel(Enchantment.POWER_ARROWS, stack);
+				if (powerEnchantment > 0) {
+					arrow.setBaseDamage(arrow.getBaseDamage() + (double) powerEnchantment * 0.5 + 0.5);
+				}
+				
+				int punchEnchantment = EnchantmentUtils.getLevel(Enchantment.PUNCH_ARROWS, stack);
+				if (punchEnchantment > 0) {
+					arrow.setKnockback(punchEnchantment);
+				}
+				
+				if (EnchantmentUtils.getLevel(Enchantment.FLAMING_ARROWS, stack) > 0) {
+					EntityUtils.setOnFireForSeconds(arrow, 100);
+				}
+				
+				//TODO damage bow item
+				
+				boolean reallyInfinite = infinite && finalProjectile.getMaterial() == Material.ARROW;
+				if (reallyInfinite || player.isCreative()
+						&& (finalProjectile.getMaterial() == Material.SPECTRAL_ARROW
+						|| finalProjectile.getMaterial() == Material.TIPPED_ARROW)) {
+					arrow.pickupMode = AbstractArrow.PickupMode.CREATIVE_ONLY;
+				}
+				
+				// Arrow shooting
+				Position position = player.getPosition().clone().add(0D, player.getEyeHeight(), 0D);
+				arrow.setInstance(Objects.requireNonNull(player.getInstance()),
+						position.clone().subtract(0, 0.10000000149011612D, 0)); // Yeah wait what
+				
+				Vector direction = position.getDirection();
+				position = position.clone().add(direction.getX(), direction.getY(), direction.getZ())
+						.subtract(0, 0.2, 0); //????????
+				
+				arrow.shoot(position, power * 3, 1.0);
+				
+				Vector playerVel = Tracker.playerVelocity.get(player.getUuid());
+				arrow.setVelocity(arrow.getVelocity().add(playerVel.getX(),
+						player.isOnGround() ? 0.0D : playerVel.getY(), playerVel.getZ()));
+				
+				ThreadLocalRandom random = ThreadLocalRandom.current();
+				SoundManager.sendToAround(player, SoundEvent.ARROW_SHOOT, Sound.Source.PLAYER,
+						1.0f, 1.0f / (random.nextFloat() * 0.4f + 1.2f) + (float) power * 0.5f);
+				
+				if (!reallyInfinite && !player.isCreative() && finalProjectileSlot >= 0) {
+					player.getInventory().setItemStack(finalProjectileSlot,
+							finalProjectile.withAmount(finalProjectile.getAmount() - 1));
+				}
+			});
+		}).ignoreCancelled(false).filter(event -> event.getItemStack().getMaterial() == Material.BOW).build());
 		
 		node.addListener(EventListener.builder(ItemUpdateStateEvent.class).handler(event -> {
 			Player player = event.getPlayer();
@@ -257,7 +267,7 @@ public class ProjectileListener {
 					1.0F, 1.0F / (random.nextFloat() * 0.5F + 1.0F) + 0.2F);
 			
 			player.setItemInHand(event.getHand(), stack);
-		}).filter(event -> event.getItemStack().getMaterial() == Material.CROSSBOW).build());
+		}).ignoreCancelled(false).filter(event -> event.getItemStack().getMaterial() == Material.CROSSBOW).build());
 		
 		return node;
 	}
@@ -399,29 +409,31 @@ public class ProjectileListener {
 	public static void shootCrossbowProjectile(Player player, Player.Hand hand, ItemStack crossbowStack,
 	                                           ItemStack projectile, float soundPitch,
 	                                           double power, double spread, float yaw) {
-		boolean firework = projectile.getMaterial() == Material.FIREWORK_ROCKET;
-		if (firework) return; //TODO firework
-		
-		AbstractArrow arrow = getCrossbowArrow(player, crossbowStack, projectile);
-		if (player.isCreative() || yaw != 0.0) {
-			arrow.pickupMode = AbstractArrow.PickupMode.CREATIVE_ONLY;
-		}
-		
-		Position position = player.getPosition().clone().add(0D, player.getEyeHeight(), 0D);
-		arrow.setInstance(Objects.requireNonNull(player.getInstance()),
-				position.clone().subtract(0, 0.10000000149011612D, 0)); // Yeah wait what
-		
-		Position toPosition = position.clone();
-		toPosition.setYaw(toPosition.getYaw() + yaw);
-		Vector direction = toPosition.getDirection();
-		toPosition = toPosition.clone().add(direction.getX(), direction.getY(), direction.getZ())
-				.subtract(0, 0.2, 0); //????????
-		
-		arrow.shoot(toPosition, power, spread);
-		
-		//TODO damage crossbow
-		
-		SoundManager.sendToAround(player, SoundEvent.CROSSBOW_SHOOT, Sound.Source.PLAYER, 1.0F, soundPitch);
+		onShoot(player, projectile, () -> {
+			boolean firework = projectile.getMaterial() == Material.FIREWORK_ROCKET;
+			if (firework) return; //TODO firework
+			
+			AbstractArrow arrow = getCrossbowArrow(player, crossbowStack, projectile);
+			if (player.isCreative() || yaw != 0.0) {
+				arrow.pickupMode = AbstractArrow.PickupMode.CREATIVE_ONLY;
+			}
+			
+			Position position = player.getPosition().clone().add(0D, player.getEyeHeight(), 0D);
+			arrow.setInstance(Objects.requireNonNull(player.getInstance()),
+					position.clone().subtract(0, 0.10000000149011612D, 0)); // Yeah wait what
+			
+			Position toPosition = position.clone();
+			toPosition.setYaw(toPosition.getYaw() + yaw);
+			Vector direction = toPosition.getDirection();
+			toPosition = toPosition.clone().add(direction.getX(), direction.getY(), direction.getZ())
+					.subtract(0, 0.2, 0); //????????
+			
+			arrow.shoot(toPosition, power, spread);
+			
+			//TODO damage crossbow
+			
+			SoundManager.sendToAround(player, SoundEvent.CROSSBOW_SHOOT, Sound.Source.PLAYER, 1.0F, soundPitch);
+		});
 	}
 	
 	public static AbstractArrow getCrossbowArrow(Player player, ItemStack crossbowStack, ItemStack projectile) {
@@ -440,5 +452,10 @@ public class ProjectileListener {
 	public static float getRandomShotPitch(boolean high, ThreadLocalRandom random) {
 		float base = high ? 0.63F : 0.43F;
 		return 1.0F / (random.nextFloat() * 0.5F + 1.8F) + base;
+	}
+	
+	public static void onShoot(Player player, ItemStack projectile, Runnable successCallback) {
+		ProjectileShootEvent projectileShootEvent = new ProjectileShootEvent(player, projectile);
+		EventDispatcher.callCancellable(projectileShootEvent, successCallback);
 	}
 }
