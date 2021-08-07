@@ -27,6 +27,8 @@ public class Arrow extends AbstractArrow {
 			stack.getMaterial() == Material.ARROW
 			|| stack.getMaterial() == Material.SPECTRAL_ARROW
 			|| stack.getMaterial() == Material.TIPPED_ARROW;
+	public static final Predicate<ItemStack> ARROW_OR_FIREWORK_PREDICATE = ARROW_PREDICATE.or(stack ->
+			stack.getMaterial() == Material.FIREWORK_ROCKET);
 	
 	private PotionMeta potion;
 	private boolean fixedColor;

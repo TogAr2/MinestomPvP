@@ -102,6 +102,20 @@ public class EntityUtils {
 		return false;
 	}
 	
+	public static boolean isChargingCrossbow(LivingEntity entity) {
+		LivingEntityMeta meta = (LivingEntityMeta) entity.getEntityMeta();
+		
+		if (meta.isHandActive()) {
+			return entity.getItemInHand(meta.getActiveHand()).getMaterial() == Material.CROSSBOW;
+		}
+		
+		return false;
+	}
+	
+	public static Player.Hand getActiveHand(LivingEntity entity) {
+		return ((LivingEntityMeta) entity.getEntityMeta()).getActiveHand();
+	}
+	
 	public static void takeShieldHit(LivingEntity entity, LivingEntity attacker, boolean applyKnockback) {
 		if (applyKnockback) {
 			Position entityPos = entity.getPosition();

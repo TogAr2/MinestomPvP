@@ -19,9 +19,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -148,13 +146,16 @@ public abstract class EntityProjectileMixin extends Entity {
              */
 			boolean shouldDamageShooter = getAliveTicks() < 6;
 			assert entities != null;
-			Stream<Entity> victims = entities.stream()
-					.filter(entity -> {
-						if (shouldDamageShooter && entity == shooter) return false;
-						return improveHitBoundingBox(entity.getBoundingBox()).expand(0.5, 0.25, 0.5)
-								.intersect(pos.getX(), pos.getY(), pos.getZ());
-					});
-			Optional<Entity> victimOptional = victims.findAny();
+			
+			List<Entity> victims = new ArrayList<>();
+			for (Entity entity : entities) {
+				if (shouldDamageShooter && entity == shooter) continue;
+				if (improveHitBoundingBox(entity.getBoundingBox()).expand(0.5, 0.25, 0.5)
+						.intersect(pos.getX(), pos.getY(), pos.getZ())) {
+					victims.add(entity);
+				}
+			}
+			Optional<Entity> victimOptional = victims.stream().findAny();
 			
 			if (victimOptional.isPresent()) {
 				LivingEntity victim = (LivingEntity) victimOptional.get();
@@ -166,10 +167,7 @@ public abstract class EntityProjectileMixin extends Entity {
 					
 					if (hittable.shouldCallHit()) {
 						if (hittable.canMultiHit()) {
-							Iterator<Entity> iterator = victims.iterator();
-							
-							while (iterator.hasNext()) {
-								Entity entity = iterator.next();
+							for (Entity entity : victims) {
 								if (hittable.hit(entity)) {
 									remove();
 									break;

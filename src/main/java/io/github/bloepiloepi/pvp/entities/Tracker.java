@@ -31,6 +31,7 @@ public class Tracker {
 	public static final Map<UUID, Vector> playerVelocity = new HashMap<>();
 	public static final Map<UUID, Entity> spectating = new HashMap<>();
 	public static final Map<UUID, Long> itemUseStartTime = new HashMap<>();
+	public static final Map<UUID, Player.Hand> itemUseHand = new HashMap<>();
 	
 	public static <K> void increaseInt(Map<K, Integer> map, K key, int amount) {
 		map.put(key, map.getOrDefault(key, 0) + amount);
