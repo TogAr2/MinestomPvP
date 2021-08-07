@@ -72,7 +72,9 @@ public class FoodComponent {
 	}
 	
 	public void onEat(Player player, ItemStack stack) {
-		onEat.accept(player, stack);
+		if (onEat != null) {
+			onEat.accept(player, stack);
+		}
 	}
 	
 	public static class Builder {

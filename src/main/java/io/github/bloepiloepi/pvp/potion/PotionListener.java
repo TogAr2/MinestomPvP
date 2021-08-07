@@ -191,8 +191,6 @@ public class PotionListener {
 			meta.setPotionEffectColor(getPotionColor(effects.stream().map(TimedPotion::getPotion).collect(Collectors.toList())));
 			meta.setInvisible(EntityUtils.hasPotionEffect(entity, PotionEffect.INVISIBILITY));
 		}
-		
-		meta.setNotifyAboutChanges(true);
 	}
 	
 	private static boolean containsOnlyAmbientEffects(Collection<TimedPotion> effects) {
