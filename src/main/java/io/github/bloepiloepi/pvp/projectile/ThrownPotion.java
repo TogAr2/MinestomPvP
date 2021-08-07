@@ -4,7 +4,6 @@ import io.github.bloepiloepi.pvp.potion.PotionListener;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffect;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffects;
 import io.github.bloepiloepi.pvp.potion.item.CustomPotionType;
-import io.github.bloepiloepi.pvp.potion.item.CustomPotionTypes;
 import io.github.bloepiloepi.pvp.utils.EffectManager;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.effects.Effects;
@@ -45,12 +44,13 @@ public class ThrownPotion extends EntityHittableProjectile {
 			}
 		}
 		
-		BlockPosition blockPosition = getPosition().toBlockPosition().subtract(0, 1, 0);
+		BlockPosition blockPosition = getPosition().toBlockPosition();
+		if (entity == null) blockPosition = blockPosition.subtract(0, 1, 0);
 		Effects effect = CustomPotionType.hasInstantEffect(potions) ? Effects.INSTANT_SPLASH : Effects.SPLASH_POTION;
 		EffectManager.sendNearby(Objects.requireNonNull(getInstance()), effect, blockPosition.getX(),
 				blockPosition.getY(), blockPosition.getZ(), PotionListener.getColor(item), 64.0D, false);
 		
-		return true;
+		return false;
 	}
 	
 	private void applySplash(List<Potion> potions, @Nullable Entity hitEntity) {
@@ -59,6 +59,8 @@ public class ThrownPotion extends EntityHittableProjectile {
 				.filter(boundingBox::intersect).filter(entity -> entity instanceof LivingEntity)
 				.map(entity -> (LivingEntity) entity).collect(Collectors.toList());
 		
+		if (hitEntity instanceof LivingEntity && !entities.contains(hitEntity))
+			entities.add((LivingEntity) hitEntity);
 		if (entities.isEmpty()) return;
 		
 		for (LivingEntity entity : entities) {

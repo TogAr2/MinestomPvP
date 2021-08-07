@@ -56,7 +56,9 @@ public class Arrow extends AbstractArrow {
 				setColor(color.asRGB());
 			}
 			
-			potion = new PotionMeta.Builder().potionType(potionType).effects(customEffects).build();
+			PotionMeta.Builder builder = new PotionMeta.Builder().effects(customEffects);
+			if (potionType != null) builder.potionType(potionType);
+			potion = builder.build();
 		} else if (stack.getMaterial() == Material.ARROW) {
 			fixedColor = false;
 			setColor(-1);
@@ -110,7 +112,7 @@ public class Arrow extends AbstractArrow {
 		return ItemStack.builder(Material.TIPPED_ARROW).meta(meta0 -> {
 			PotionMeta.Builder meta = (PotionMeta.Builder) meta0;
 			
-			if (potion.getPotionType() != PotionType.EMPTY) {
+			if (potion.getPotionType() != null && potion.getPotionType() != PotionType.EMPTY) {
 				meta.potionType(potion.getPotionType());
 			}
 			if (!potion.getCustomPotionEffects().isEmpty()) {
