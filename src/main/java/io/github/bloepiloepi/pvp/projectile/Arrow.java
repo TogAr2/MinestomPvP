@@ -1,6 +1,8 @@
 package io.github.bloepiloepi.pvp.projectile;
 
 import io.github.bloepiloepi.pvp.potion.PotionListener;
+import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffect;
+import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffects;
 import io.github.bloepiloepi.pvp.potion.item.CustomPotionType;
 import io.github.bloepiloepi.pvp.potion.item.CustomPotionTypes;
 import net.minestom.server.color.Color;
@@ -11,7 +13,6 @@ import net.minestom.server.entity.metadata.arrow.ArrowMeta;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.item.metadata.PotionMeta;
-import net.minestom.server.potion.CustomPotionEffect;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.PotionType;
@@ -40,7 +41,8 @@ public class Arrow extends AbstractArrow {
 	public void inheritEffects(ItemStack stack) {
 		if (stack.getMaterial() == Material.TIPPED_ARROW) {
 			PotionType potionType = ((PotionMeta) stack.getMeta()).getPotionType();
-			List<CustomPotionEffect> customEffects = ((PotionMeta) stack.getMeta()).getCustomPotionEffects();
+			List<net.minestom.server.potion.CustomPotionEffect> customEffects =
+					((PotionMeta) stack.getMeta()).getCustomPotionEffects();
 			
 			Color color = ((PotionMeta) stack.getMeta()).getColor();
 			if (color == null) {
@@ -86,10 +88,17 @@ public class Arrow extends AbstractArrow {
 		CustomPotionType customPotionType = CustomPotionTypes.get(potion.getPotionType());
 		if (customPotionType != null) {
 			for (Potion potion : customPotionType.getEffects()) {
-				byte flags = potion.getFlags();
-				entity.addEffect(new Potion(potion.getEffect(), potion.getAmplifier(),
-						Math.max(potion.getDuration() / 8, 1), PotionListener.hasParticles(flags),
-						PotionListener.hasIcon(flags), PotionListener.isAmbient(flags)));
+				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.getEffect());
+				if (customPotionEffect.isInstant()) {
+					customPotionEffect.applyInstantEffect(this, null,
+							entity, potion.getAmplifier(), 1.0D);
+				} else {
+					int duration = Math.max(potion.getDuration() / 8, 1);
+					byte flags = potion.getFlags();
+					entity.addEffect(new Potion(potion.getEffect(), potion.getAmplifier(), duration,
+							PotionListener.hasParticles(flags), PotionListener.hasIcon(flags),
+							PotionListener.isAmbient(flags)));
+				}
 			}
 		}
 		
@@ -100,7 +109,18 @@ public class Arrow extends AbstractArrow {
 						customPotion.getAmplifier(), customPotion.getDuration(),
 						customPotion.showParticles(), customPotion.showIcon(),
 						customPotion.isAmbient()))
-				.forEach(entity::addEffect);
+				.forEach(potion -> {
+					CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.getEffect());
+					if (customPotionEffect.isInstant()) {
+						customPotionEffect.applyInstantEffect(this, null,
+								entity, potion.getAmplifier(), 1.0D);
+					} else {
+						byte flags = potion.getFlags();
+						entity.addEffect(new Potion(potion.getEffect(), potion.getAmplifier(),
+								potion.getDuration(), PotionListener.hasParticles(flags),
+								PotionListener.hasIcon(flags), PotionListener.isAmbient(flags)));
+					}
+				});
 	}
 	
 	@Override
@@ -126,7 +146,7 @@ public class Arrow extends AbstractArrow {
 		}).build();
 	}
 	
-	public void addPotion(CustomPotionEffect effect) {
+	public void addPotion(net.minestom.server.potion.CustomPotionEffect effect) {
 		potion.getCustomPotionEffects().add(effect);
 		setColor(PotionListener.getPotionColor(
 				PotionListener.getAllPotions(potion.getPotionType(), potion.getCustomPotionEffects())));

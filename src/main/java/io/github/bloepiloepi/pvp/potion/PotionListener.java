@@ -247,22 +247,7 @@ public class PotionListener {
 	}
 	
 	public static List<Potion> getAllPotions(PotionMeta meta) {
-		//PotionType effects plus custom effects
-		List<Potion> potions = new ArrayList<>();
-		
-		CustomPotionType potionType = CustomPotionTypes.get(meta.getPotionType());
-		if (potionType != null) {
-			potions.addAll(potionType.getEffects());
-		}
-		
-		potions.addAll(meta.getCustomPotionEffects().stream().map((customPotion) ->
-				new Potion(Objects.requireNonNull(PotionEffect.fromId(customPotion.getId())),
-						customPotion.getAmplifier(), customPotion.getDuration(),
-						customPotion.showParticles(), customPotion.showIcon(),
-						customPotion.isAmbient()))
-				.collect(Collectors.toList()));
-		
-		return potions;
+		return getAllPotions(meta.getPotionType(), meta.getCustomPotionEffects());
 	}
 	
 	public static List<Potion> getAllPotions(PotionType potionType,
