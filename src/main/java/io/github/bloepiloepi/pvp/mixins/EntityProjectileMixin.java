@@ -1,6 +1,7 @@
 package io.github.bloepiloepi.pvp.mixins;
 
 import io.github.bloepiloepi.pvp.projectile.EntityHittableProjectile;
+import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityProjectile;
 import net.minestom.server.entity.EntityType;
@@ -150,7 +151,8 @@ public abstract class EntityProjectileMixin extends Entity {
 			Stream<Entity> victims = entities.stream()
 					.filter(entity -> {
 						if (shouldDamageShooter && entity == shooter) return false;
-						return entity.getBoundingBox().intersect(pos.getX(), pos.getY(), pos.getZ());
+						return improveHitBoundingBox(entity.getBoundingBox()).expand(0.5, 0.25, 0.5)
+								.intersect(pos.getX(), pos.getY(), pos.getZ());
 					});
 			Optional<Entity> victimOptional = victims.findAny();
 			
@@ -194,5 +196,10 @@ public abstract class EntityProjectileMixin extends Entity {
 		}
 		
 		return false;
+	}
+	
+	private BoundingBox improveHitBoundingBox(BoundingBox boundingBox) {
+		return boundingBox.expand(boundingBox.getWidth() * 0.1,
+				boundingBox.getHeight() * 0.05, boundingBox.getDepth() * 0.1);
 	}
 }
