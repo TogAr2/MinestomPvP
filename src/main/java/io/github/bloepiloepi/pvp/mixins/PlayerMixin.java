@@ -23,7 +23,7 @@ public abstract class PlayerMixin extends Entity {
 	
 	@Redirect(method = "update", at = @At(value = "INVOKE", target = "Lnet/minestom/server/item/Material;isFood()Z"))
 	private boolean onIsFood(Material material) {
-		return material.isFood() || material == Material.POTION;
+		return material.isFood() || material == Material.POTION || material == Material.MILK_BUCKET;
 	}
 	
 	@Inject(method = "setGameMode", at = @At(value = "TAIL"))

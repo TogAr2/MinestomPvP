@@ -64,6 +64,9 @@ public class FoodComponents {
 	public static final FoodComponent SWEET_BERRIES = (new FoodComponent.Builder()).hunger(2).saturationModifier(0.1F).build(Material.SWEET_BERRIES);
 	public static final FoodComponent TROPICAL_FISH = (new FoodComponent.Builder()).hunger(1).saturationModifier(0.1F).build(Material.TROPICAL_FISH);
 	
+	// Not an actual food, used as a FoodComponent here for convenience
+	public static final FoodComponent MILK_BUCKET = (new FoodComponent.Builder()).alwaysEdible().drink().onEat((player, stack) -> player.clearEffects()).turnsInto(Material.BUCKET).build(Material.MILK_BUCKET);
+	
 	private static FoodComponent.Builder createSoupBuilder(int hunger, boolean alwaysEdible) {
 		FoodComponent.Builder builder = new FoodComponent.Builder().hunger(hunger)
 				.saturationModifier(0.6F).turnsInto(Material.BOWL);

@@ -13,7 +13,6 @@ import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.potion.Potion;
-import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.sound.SoundEvent;
 
 import java.util.List;
@@ -29,7 +28,8 @@ public class FoodListener {
 			FoodComponent foodComponent = FoodComponents.fromMaterial(event.getFoodItem().getMaterial());
 			
 			//If no food, or if the players hunger is full and the food is not always edible, cancel
-			if (foodComponent == null || (!foodComponent.isAlwaysEdible() && event.getPlayer().getFood() == 20)) {
+			if (foodComponent == null || (!event.getPlayer().isCreative()
+					&& !foodComponent.isAlwaysEdible() && event.getPlayer().getFood() == 20)) {
 				event.setCancelled(true);
 				return;
 			}
@@ -39,19 +39,24 @@ public class FoodListener {
 			} else {
 				event.setEatingTime(foodComponent.isSnack() ? (long) ((16 / 20F) * 1000) : (long) ((32 / 20F) * 1000));
 			}
-		}).filter(event -> event.getFoodItem().getMaterial().isFood()).ignoreCancelled(false).build()); //May also be a potion
+		}).filter(event -> event.getFoodItem().getMaterial().isFood()
+				|| event.getFoodItem().getMaterial() == Material.MILK_BUCKET)
+				.ignoreCancelled(false).build()); //May also be a potion
 		
 		node.addListener(EventListener.builder(PlayerEatEvent.class).handler(event -> {
 			Player player = event.getPlayer();
 			ItemStack stack = event.getFoodItem();
 			Tracker.hungerManager.get(player.getUuid()).eat(stack.getMaterial());
 			
-			ThreadLocalRandom random = ThreadLocalRandom.current();
-			SoundManager.sendToAround(player, SoundEvent.PLAYER_BURP, Sound.Source.PLAYER,
-					0.5F, random.nextFloat() * 0.1F + 0.9F);
-			
 			FoodComponent component = FoodComponents.fromMaterial(stack.getMaterial());
 			assert component != null;
+			ThreadLocalRandom random = ThreadLocalRandom.current();
+			
+			if (!component.isDrink()) {
+				SoundManager.sendToAround(player, SoundEvent.PLAYER_BURP, Sound.Source.PLAYER,
+						0.5F, random.nextFloat() * 0.1F + 0.9F);
+			}
+			
 			List<Pair<Potion, Float>> effectList = component.getStatusEffects();
 			
 			for (Pair<Potion, Float> pair : effectList) {
@@ -74,7 +79,8 @@ public class FoodListener {
 					event.getPlayer().setItemInHand(event.getHand(), stack.withAmount(stack.getAmount() - 1));
 				}
 			}
-		}).filter(event -> event.getFoodItem().getMaterial().isFood()).build()); //May also be a potion
+		}).filter(event -> event.getFoodItem().getMaterial().isFood()
+				|| event.getFoodItem().getMaterial() == Material.MILK_BUCKET).build()); //May also be a potion
 		
 		node.addListener(EventListener.builder(PlayerBlockBreakEvent.class).handler(event ->
 				EntityUtils.addExhaustion(event.getPlayer(), 0.005F)).ignoreCancelled(false).build());

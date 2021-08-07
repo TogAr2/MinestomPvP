@@ -12,6 +12,6 @@ public class UseItemListenerMixin {
 	//Also allow potions to be "eaten"
 	@Redirect(method = "useItemListener", at = @At(value = "INVOKE", target = "Lnet/minestom/server/item/Material;isFood()Z"))
 	private static boolean onIsFood(Material material) {
-		return material.isFood() || material == Material.POTION;
+		return material.isFood() || material == Material.POTION || material == Material.MILK_BUCKET;
 	}
 }
