@@ -239,10 +239,14 @@ public class ProjectileListener {
 			Player player = event.getPlayer();
 			ItemStack stack = event.getItemStack();
 			
-			long useDuration = System.currentTimeMillis() - Tracker.itemUseStartTime.get(player.getUuid());
-			double power = getCrossbowPowerForTime(useDuration, stack);
-			if (!(power >= 1.0F) || crossbow(stack).isCharged())
-				return;
+			int quickCharge = EnchantmentUtils.getLevel(Enchantment.QUICK_CHARGE, stack);
+			
+			if (quickCharge < 6) {
+				long useDuration = System.currentTimeMillis() - Tracker.itemUseStartTime.get(player.getUuid());
+				double power = getCrossbowPowerForTime(useDuration, stack);
+				if (!(power >= 1.0F) || crossbow(stack).isCharged())
+					return;
+			}
 			
 			stack = loadCrossbowProjectiles(player, stack);
 			if (stack == null) return;
