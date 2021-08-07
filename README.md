@@ -57,7 +57,7 @@ To integrate this extension into your minestom server, you may have to tweak a l
 When applying damage to an entity, use `CustomDamageType` instead of `DamageType` (except if you use the default ones: `GRAVITY`, `ON_FIRE` and `VOID`).
 If you have your own damage type, also extend `CustomDamageType` instead of `DamageType`.
 
-Potions are considered food: The Minestom food events are also called for drinkable potions.
+Potions and milk buckets are considered food: The Minestom food events are also called for drinkable items.
 
 ### Events
 
