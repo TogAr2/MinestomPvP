@@ -18,13 +18,14 @@ import net.minestom.server.event.item.ItemUpdateStateEvent;
 import net.minestom.server.event.player.PlayerItemAnimationEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
-import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.event.trait.PlayerEvent;
 import net.minestom.server.item.Enchantment;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.item.metadata.CrossbowMeta;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
+import net.minestom.server.utils.MathUtils;
 import net.minestom.server.utils.Position;
 import net.minestom.server.utils.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -37,8 +38,8 @@ public class ProjectileListener {
 	private static final Tag<Byte> MID_LOAD_SOUND_PLAYED = Tag.Byte("MidLoadSoundPlayed");
 	
 	// Please, don't look at the random hardcoded numbers in this class, even I am confused
-	public static EventNode<EntityEvent> events() {
-		EventNode<EntityEvent> node = EventNode.type("projectile-events", EventFilter.ENTITY);
+	public static EventNode<PlayerEvent> events() {
+		EventNode<PlayerEvent> node = EventNode.type("projectile-events", EventFilter.PLAYER);
 		
 		node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
 			ThreadLocalRandom random = ThreadLocalRandom.current();
@@ -55,14 +56,30 @@ public class ProjectileListener {
 						0.5F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
 				
 				FishingBobber bobber = new FishingBobber(player);
+				FishingBobber.fishingBobbers.put(player.getUuid(), bobber);
 				
-				Position position = player.getPosition().clone().add(0D, player.getEyeHeight(), 0D);
-				bobber.setInstance(Objects.requireNonNull(player.getInstance()), position);
+				double spread = 0.0045;
 				
-				Vector direction = position.getDirection();
-				position = position.clone().add(direction.getX(), direction.getY(), direction.getZ());
-				
-				bobber.shoot(position, 0.8, 0.0045);
+				Position playerPos = player.getPosition();
+				float playerPitch = playerPos.getPitch();
+				float playerYaw = playerPos.getYaw();
+				float zDir = (float) Math.cos(Math.toRadians(-playerYaw) - Math.PI);
+				float xDir = (float) Math.sin(Math.toRadians(-playerYaw) - Math.PI);
+				double x = playerPos.getX() - (double)xDir * 0.3D;
+				double y = playerPos.getY() + player.getEyeHeight();
+				double z = playerPos.getZ() - (double)zDir * 0.3D;
+				bobber.setInstance(Objects.requireNonNull(player.getInstance()), new Position(x, y, z));
+				Vector velocity = new Vector(-xDir, MathUtils.clamp(-(
+						(float) Math.sin(Math.toRadians(-playerPitch)) /
+						(float) -Math.cos(Math.toRadians(-playerPitch))
+				), -5.0F, 5.0F), -zDir);
+				double xz = velocity.length();
+				velocity = velocity.multiply(new Vector(
+						0.6D / xz + 0.5D + random.nextGaussian() * spread,
+						0.6D / xz + 0.5D + random.nextGaussian() * spread,
+						0.6D / xz + 0.5D + random.nextGaussian() * spread
+				));
+				bobber.setVelocity(velocity.multiply(MinecraftServer.TICK_PER_SECOND * 0.75));
 			}
 		}).filter(event -> event.getItemStack().getMaterial() == Material.FISHING_ROD).ignoreCancelled(false).build());
 		

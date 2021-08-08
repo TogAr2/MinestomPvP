@@ -50,7 +50,7 @@ public class ThrownPotion extends EntityHittableProjectile {
 		EffectManager.sendNearby(Objects.requireNonNull(getInstance()), effect, blockPosition.getX(),
 				blockPosition.getY(), blockPosition.getZ(), PotionListener.getColor(item), 64.0D, false);
 		
-		return false;
+		return true;
 	}
 	
 	private void applySplash(List<Potion> potions, @Nullable Entity hitEntity) {

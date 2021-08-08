@@ -11,12 +11,12 @@ import net.minestom.server.utils.Position;
 import net.minestom.server.utils.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class FishingBobber extends EntityHittableProjectile {
-	public static final Map<UUID, FishingBobber> fishingBobbers = new HashMap<>();
+	public static final Map<UUID, FishingBobber> fishingBobbers = new ConcurrentHashMap<>();
 	
 	private int stuckTime;
 	private Entity hooked;
@@ -25,9 +25,6 @@ public class FishingBobber extends EntityHittableProjectile {
 	public FishingBobber(@Nullable Entity shooter) {
 		super(shooter, EntityType.FISHING_BOBBER);
 		setOwnerEntity(shooter);
-		if (shooter == null) return;
-		
-		fishingBobbers.put(shooter.getUuid(), this);
 	}
 	
 	@Override
@@ -140,8 +137,11 @@ public class FishingBobber extends EntityHittableProjectile {
 	
 	@Override
 	public void remove() {
-		if (getShooter() != null) {
-			fishingBobbers.remove(getShooter().getUuid());
+		Entity shooter = getShooter();
+		if (shooter != null) {
+			if (fishingBobbers.get(shooter.getUuid()) == this) {
+				fishingBobbers.remove(getShooter().getUuid());
+			}
 		}
 		
 		super.remove();

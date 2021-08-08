@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
-//TODO move to Data class
 public class Tracker {
 	public static final Map<UUID, Integer> lastAttackedTicks = new HashMap<>();
 	public static final Map<UUID, Integer> invulnerableTime = new HashMap<>();
