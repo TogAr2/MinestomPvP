@@ -6,6 +6,7 @@ import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.*;
 import net.minestom.server.event.entity.EntityTickEvent;
+import net.minestom.server.event.entity.EntityVelocityEvent;
 import net.minestom.server.event.player.*;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.item.Material;
@@ -158,6 +159,12 @@ public class Tracker {
 			velocity.setZ(dz * MinecraftServer.TICK_PER_SECOND);
 			
 			previousPosition.put(player.getUuid(), newPosition.clone());
+		});
+		
+		node.addListener(EntityVelocityEvent.class, event -> {
+			if (event.getEntity() instanceof Player) {
+				playerVelocity.put(event.getEntity().getUuid(), event.getVelocity());
+			}
 		});
 		
 		node.addListener(PlayerItemAnimationEvent.class, event ->

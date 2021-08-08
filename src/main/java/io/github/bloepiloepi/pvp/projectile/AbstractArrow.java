@@ -128,7 +128,7 @@ public abstract class AbstractArrow extends EntityHittableProjectile {
 						knockbackVector.setY(0.1);
 						
 						if (knockbackVector.lengthSquared() > 0) {
-							living.setVelocity(living.getVelocity().copy(knockbackVector));
+							living.setVelocity(EntityUtils.getActualVelocity(living).copy(knockbackVector));
 						}
 					}
 					

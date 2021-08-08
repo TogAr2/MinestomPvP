@@ -103,9 +103,7 @@ public class AttackManager {
 	public static void performAttack(Player player, Entity target) {
 		if (player.getGameMode() == GameMode.SPECTATOR) {
 			PlayerSpectateEvent playerSpectateEvent = new PlayerSpectateEvent(player, target);
-			EventDispatcher.callCancellable(playerSpectateEvent, () -> {
-				player.spectate(target);
-			});
+			EventDispatcher.callCancellable(playerSpectateEvent, () -> player.spectate(target));
 			return;
 		}
 		
@@ -169,7 +167,7 @@ public class AttackManager {
 				target.setVelocity(target.getVelocity().add(-Math.sin(player.getPosition().getYaw() * 0.017453292F) * (float) knockback * 0.5F, 0.1D, Math.cos(player.getPosition().getYaw() * 0.017453292F) * (float) knockback * 0.5F));
 			}
 			
-			player.setVelocity(player.getVelocity().multiply(new Vector(0.6D, 1.0D, 0.6D))); //TODO Is this necessary?
+			player.setVelocity(EntityUtils.getActualVelocity(player).multiply(new Vector(0.6D, 1.0D, 0.6D))); //TODO Is this necessary?
 			player.setSprinting(false);
 		}
 		
@@ -177,17 +175,17 @@ public class AttackManager {
 			//TODO sweeping
 		}
 		
-		if (target instanceof Player) {
-			EntityVelocityPacket velocityPacket = new EntityVelocityPacket();
-			velocityPacket.entityId = target.getEntityId();
-			Vector velocity = target.getVelocity().clone().multiply(8000f / MinecraftServer.TICK_PER_SECOND);
-			velocityPacket.velocityX = (short) velocity.getX();
-			velocityPacket.velocityY = (short) velocity.getY();
-			velocityPacket.velocityZ = (short) velocity.getZ();
+		//if (target instanceof Player) {
+		//	EntityVelocityPacket velocityPacket = new EntityVelocityPacket();
+		//	velocityPacket.entityId = target.getEntityId();
+		//	Vector velocity = target.getVelocity().clone().multiply(8000f / MinecraftServer.TICK_PER_SECOND);
+		//	velocityPacket.velocityX = (short) velocity.getX();
+		//	velocityPacket.velocityY = (short) velocity.getY();
+		//	velocityPacket.velocityZ = (short) velocity.getZ();
 			
-			((Player) target).getPlayerConnection().sendPacket(velocityPacket);
-			target.getVelocity().copy(originalVelocity);
-		}
+		//	((Player) target).getPlayerConnection().sendPacket(velocityPacket);
+		//	target.getVelocity().copy(originalVelocity);
+		//}
 		
 		if (critical) {
 			SoundManager.sendToAround(player, SoundEvent.PLAYER_ATTACK_CRIT, Sound.Source.PLAYER, 1.0F, 1.0F);

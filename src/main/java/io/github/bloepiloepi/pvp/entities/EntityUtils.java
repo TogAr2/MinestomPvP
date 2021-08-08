@@ -282,4 +282,19 @@ public class EntityUtils {
 		
 		return true;
 	}
+	
+	public static void updateProjectileRotation(EntityProjectile projectile) {
+		Vector velocity = projectile.getVelocity();
+		double xz = Math.sqrt(velocity.getX() * velocity.getX() + velocity.getZ() * velocity.getZ());
+		projectile.getPosition().setYaw((float) Math.toDegrees(Math.atan2(velocity.getY(), xz)));
+		projectile.getPosition().setPitch((float) Math.toDegrees(Math.atan2(velocity.getX(), velocity.getZ())));
+	}
+	
+	public static Vector getActualVelocity(Entity entity) {
+		if (!(entity instanceof Player)) {
+			return entity.getVelocity();
+		} else {
+			return Tracker.playerVelocity.get(entity.getUuid());
+		}
+	}
 }

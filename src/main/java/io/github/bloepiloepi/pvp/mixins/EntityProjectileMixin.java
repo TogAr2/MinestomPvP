@@ -21,7 +21,6 @@ import org.spongepowered.asm.mixin.Shadow;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Mixin(EntityProjectile.class)
 public abstract class EntityProjectileMixin extends Entity {
@@ -56,7 +55,7 @@ public abstract class EntityProjectileMixin extends Entity {
 		
 		super.tick(time);
 		Position posNow = getPosition().clone();
-		if (hackIsStuck(posBefore, posNow, true, true)) {
+		if (hackIsStuck(posBefore, posNow, true)) {
 			if (super.onGround) {
 				return;
 			}
@@ -89,11 +88,11 @@ public abstract class EntityProjectileMixin extends Entity {
 	}
 	
 	private boolean willBeStuck(Position pos) {
-		return hackIsStuck(pos, pos.clone().add(getVelocity().clone().multiply(0.06).toPosition()), false, false);
+		return hackIsStuck(pos, pos.clone().add(getVelocity().clone().multiply(0.06).toPosition()), false);
 	}
 	
 	@SuppressWarnings("ConstantConditions")
-	private boolean hackIsStuck(Position pos, Position posNow, boolean shouldTeleport, boolean shouldCheckEntities) {
+	private boolean hackIsStuck(Position pos, Position posNow, boolean shouldTeleport) {
 		if (pos.isSimilar(posNow)) {
 			BlockPosition bpos = posNow.toBlockPosition();
 			Block block = instance.getBlock(bpos.getX(), bpos.getY() - 1, bpos.getZ());
@@ -140,8 +139,6 @@ public abstract class EntityProjectileMixin extends Entity {
 						.filter(entity -> entity instanceof LivingEntity)
 						.collect(Collectors.toSet());
 			}
-			
-			if (!shouldCheckEntities) continue;
             /*
               We won't check collisions with entities for first ticks of arrow's life, because it spawns in the
               shooter and will immediately damage him.

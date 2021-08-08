@@ -41,6 +41,32 @@ public class ProjectileListener {
 		EventNode<EntityEvent> node = EventNode.type("projectile-events", EventFilter.ENTITY);
 		
 		node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
+			ThreadLocalRandom random = ThreadLocalRandom.current();
+			Player player = event.getPlayer();
+			
+			if (FishingBobber.fishingBobbers.containsKey(player.getUuid())) {
+				int durability = FishingBobber.fishingBobbers.get(player.getUuid()).retrieve();
+				//TODO damage fishing rod
+				
+				SoundManager.sendToAround(player, SoundEvent.FISHING_BOBBER_RETRIEVE, Sound.Source.NEUTRAL,
+						1.0F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
+			} else {
+				SoundManager.sendToAround(player, SoundEvent.FISHING_BOBBER_THROW, Sound.Source.NEUTRAL,
+						0.5F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
+				
+				FishingBobber bobber = new FishingBobber(player);
+				
+				Position position = player.getPosition().clone().add(0D, player.getEyeHeight(), 0D);
+				bobber.setInstance(Objects.requireNonNull(player.getInstance()), position);
+				
+				Vector direction = position.getDirection();
+				position = position.clone().add(direction.getX(), direction.getY(), direction.getZ());
+				
+				bobber.shoot(position, 0.8, 0.0045);
+			}
+		}).filter(event -> event.getItemStack().getMaterial() == Material.FISHING_ROD).ignoreCancelled(false).build());
+		
+		node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
 			Player player = event.getPlayer();
 			ItemStack stack = event.getItemStack();
 			
@@ -86,7 +112,7 @@ public class ProjectileListener {
 				
 				projectile.shoot(position, 1.5, 1.0);
 				
-				Vector playerVel = Tracker.playerVelocity.get(player.getUuid());
+				Vector playerVel = EntityUtils.getActualVelocity(player);
 				projectile.setVelocity(projectile.getVelocity().add(playerVel.getX(),
 						player.isOnGround() ? 0.0D : playerVel.getY(), playerVel.getZ()));
 				
@@ -230,7 +256,7 @@ public class ProjectileListener {
 				
 				arrow.shoot(position, power * 3, 1.0);
 				
-				Vector playerVel = Tracker.playerVelocity.get(player.getUuid());
+				Vector playerVel = EntityUtils.getActualVelocity(player);
 				arrow.setVelocity(arrow.getVelocity().add(playerVel.getX(),
 						player.isOnGround() ? 0.0D : playerVel.getY(), playerVel.getZ()));
 				

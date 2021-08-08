@@ -1,6 +1,7 @@
 package io.github.bloepiloepi.pvp.potion;
 
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
+import io.github.bloepiloepi.pvp.entities.Tracker;
 import io.github.bloepiloepi.pvp.food.FoodListener;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffect;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffects;
@@ -165,7 +166,7 @@ public class PotionListener {
 		
 		thrownPotion.shoot(position, 0.5, 1.0);
 		
-		Vector playerVel = player.getVelocity();
+		Vector playerVel = EntityUtils.getActualVelocity(player);
 		thrownPotion.setVelocity(thrownPotion.getVelocity().add(playerVel.getX(),
 				player.isOnGround() ? 0.0D : playerVel.getY(), playerVel.getZ()));
 		
@@ -176,14 +177,12 @@ public class PotionListener {
 	
 	public static void updatePotionVisibility(LivingEntity entity) {
 		LivingEntityMeta meta = (LivingEntityMeta) entity.getEntityMeta();
-		meta.setNotifyAboutChanges(false);
 		
 		if (entity instanceof Player) {
 			if (((Player) entity).getGameMode() == GameMode.SPECTATOR) {
 				meta.setPotionEffectAmbient(false);
 				meta.setPotionEffectColor(0);
 				meta.setInvisible(true);
-				meta.setNotifyAboutChanges(true);
 				
 				return;
 			}

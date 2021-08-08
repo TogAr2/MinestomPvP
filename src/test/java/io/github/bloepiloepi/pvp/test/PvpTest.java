@@ -25,7 +25,7 @@ public class PvpTest {
 		MinecraftServer.getGlobalEventHandler().addListener(PlayerLoginEvent.class, event -> {
 			event.setSpawningInstance(instance);
 			event.getPlayer().setRespawnPoint(new Position(0, 60, 0));
-			event.getPlayer().getInventory().addItemStack(ItemStack.of(Material.BARRIER));
+			event.getPlayer().setPermissionLevel(4);
 		});
 		
 		MinecraftServer.getGlobalEventHandler().addListener(PlayerSpawnEvent.class, event ->
