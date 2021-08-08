@@ -132,23 +132,19 @@ public class PotionListener {
 		}).filter(event -> event.getFoodItem().getMaterial() == Material.POTION).build());
 		
 		node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
-			ProjectileListener.onShoot(event.getPlayer(), event.getItemStack(), () -> {
-				ThreadLocalRandom random = ThreadLocalRandom.current();
-				SoundManager.sendToAround(event.getPlayer(), SoundEvent.SPLASH_POTION_THROW, Sound.Source.PLAYER,
-						0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f));
-				
-				throwPotion(event.getPlayer(), event.getItemStack(), event.getHand());
-			});
+			ThreadLocalRandom random = ThreadLocalRandom.current();
+			SoundManager.sendToAround(event.getPlayer(), SoundEvent.SPLASH_POTION_THROW, Sound.Source.PLAYER,
+					0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f));
+			
+			throwPotion(event.getPlayer(), event.getItemStack(), event.getHand());
 		}).filter(event -> event.getItemStack().getMaterial() == Material.SPLASH_POTION).ignoreCancelled(false).build());
 		
 		node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
-			ProjectileListener.onShoot(event.getPlayer(), event.getItemStack(), () -> {
-				ThreadLocalRandom random = ThreadLocalRandom.current();
-				SoundManager.sendToAround(event.getPlayer(), SoundEvent.LINGERING_POTION_THROW, Sound.Source.NEUTRAL,
-						0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f));
-				
-				throwPotion(event.getPlayer(), event.getItemStack(), event.getHand());
-			});
+			ThreadLocalRandom random = ThreadLocalRandom.current();
+			SoundManager.sendToAround(event.getPlayer(), SoundEvent.LINGERING_POTION_THROW, Sound.Source.NEUTRAL,
+					0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f));
+			
+			throwPotion(event.getPlayer(), event.getItemStack(), event.getHand());
 		}).filter(event -> event.getItemStack().getMaterial() == Material.LINGERING_POTION).ignoreCancelled(false).build());
 		
 		return node;
