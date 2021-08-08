@@ -6,6 +6,8 @@ import io.github.bloepiloepi.pvp.enchantment.enchantments.ProtectionEnchantment;
 import io.github.bloepiloepi.pvp.enums.Tool;
 import io.github.bloepiloepi.pvp.projectile.Arrow;
 import it.unimi.dsi.fastutil.Pair;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
@@ -295,6 +297,17 @@ public class EntityUtils {
 			return entity.getVelocity();
 		} else {
 			return Tracker.playerVelocity.get(entity.getUuid());
+		}
+	}
+	
+	public static Component getName(Entity entity) {
+		HoverEvent<HoverEvent.ShowEntity> hoverEvent = HoverEvent.showEntity(entity.getEntityType().key(), entity.getUuid());
+		if (entity instanceof Player) {
+			return ((Player) entity).getName().hoverEvent(hoverEvent);
+		} else {
+			String name = entity.getEntityType().name();
+			name = name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
+			return Component.text(name).hoverEvent(hoverEvent);
 		}
 	}
 }
