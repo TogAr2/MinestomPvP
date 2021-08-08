@@ -9,6 +9,7 @@
     "EntityMixin",
     "EntityProjectileMixin",
     "LivingEntityMixin",
+    "NBTUtilsMixin",
     "PlayerAccessor",
     "PlayerInventoryMixin",
     "PlayerMixin",
