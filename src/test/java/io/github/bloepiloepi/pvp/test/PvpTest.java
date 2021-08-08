@@ -1,7 +1,6 @@
 package io.github.bloepiloepi.pvp.test;
 
 import io.github.bloepiloepi.pvp.PvpExtension;
-import io.github.bloepiloepi.pvp.projectile.ProjectileListener;
 import io.github.bloepiloepi.pvp.test.commands.Commands;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.GameMode;
@@ -10,8 +9,6 @@ import net.minestom.server.event.player.PlayerLoginEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.extras.lan.OpenToLAN;
 import net.minestom.server.instance.Instance;
-import net.minestom.server.item.ItemStack;
-import net.minestom.server.item.Material;
 import net.minestom.server.utils.Position;
 
 public class PvpTest {
@@ -33,7 +30,6 @@ public class PvpTest {
 		
 		GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
 		eventHandler.addChild(PvpExtension.events());
-		eventHandler.addChild(ProjectileListener.events()); //TODO temp
 		
 		Commands.init();
 		

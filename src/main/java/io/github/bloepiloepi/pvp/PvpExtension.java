@@ -9,6 +9,7 @@ import io.github.bloepiloepi.pvp.listeners.DamageListener;
 import io.github.bloepiloepi.pvp.potion.PotionListener;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffects;
 import io.github.bloepiloepi.pvp.potion.item.CustomPotionTypes;
+import io.github.bloepiloepi.pvp.projectile.ProjectileListener;
 import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityEvent;
@@ -25,6 +26,7 @@ public class PvpExtension extends Extension {
 		node.addChild(armorToolEvents());
 		node.addChild(foodEvents());
 		node.addChild(potionEvents());
+		node.addChild(projectileEvents());
 		
 		return node;
 	}
@@ -82,6 +84,17 @@ public class PvpExtension extends Extension {
 	 */
 	public static EventNode<EntityEvent> potionEvents() {
 		return PotionListener.events();
+	}
+	
+	/**
+	 * Creates an EventNode with projectile events.
+	 * This includes fishing rods, snowballs, eggs,
+	 * ender pearls, bows and crossbows.
+	 *
+	 * @return The EventNode with projectile events
+	 */
+	public static EventNode<PlayerEvent> projectileEvents() {
+		return ProjectileListener.events();
 	}
 	
 	@Override
