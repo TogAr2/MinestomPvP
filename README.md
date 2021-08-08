@@ -30,7 +30,8 @@ Currently, most vanilla PvP features are supported.
 - Shields
 - Food
 - Totems
-- Bow and arrows
+- Bows and crossbows
+- Fishing rods (only hooking entities, not fishing)
 - Other projectiles (potions, snowballs, eggs, ender pearls)
 - All enchantments possible with the above features (this includes protection, sharpness, knockback, ...)
 
