@@ -46,7 +46,7 @@ public class FoodComponents {
 	public static final FoodComponent ENCHANTED_GOLDEN_APPLE = (new FoodComponent.Builder()).hunger(4).saturationModifier(1.2F).statusEffect(new Potion(PotionEffect.REGENERATION, (byte) 1, 400), 1.0F).statusEffect(new Potion(PotionEffect.DAMAGE_RESISTANCE, (byte) 0, 6000), 1.0F).statusEffect(new Potion(PotionEffect.FIRE_RESISTANCE, (byte) 0, 6000), 1.0F).statusEffect(new Potion(PotionEffect.ABSORPTION, (byte) 3, 2400), 1.0F).alwaysEdible().build(Material.ENCHANTED_GOLDEN_APPLE);
 	public static final FoodComponent GOLDEN_APPLE = (new FoodComponent.Builder()).hunger(4).saturationModifier(1.2F).statusEffect(new Potion(PotionEffect.REGENERATION, (byte) 1, 100), 1.0F).statusEffect(new Potion(PotionEffect.ABSORPTION, (byte) 0, 2400), 1.0F).alwaysEdible().build(Material.GOLDEN_APPLE);
 	public static final FoodComponent GOLDEN_CARROT = (new FoodComponent.Builder()).hunger(6).saturationModifier(1.2F).build(Material.GOLDEN_CARROT);
-	public static final FoodComponent HONEY_BOTTLE = (new FoodComponent.Builder()).hunger(6).saturationModifier(0.1F).onEat((player, stack) -> player.removeEffect(PotionEffect.POISON)).turnsInto(Material.GLASS_BOTTLE).build(Material.HONEY_BOTTLE);
+	public static final FoodComponent HONEY_BOTTLE = (new FoodComponent.Builder()).hunger(6).saturationModifier(0.1F).drink().onEat((player, stack) -> player.removeEffect(PotionEffect.POISON)).turnsInto(Material.GLASS_BOTTLE).build(Material.HONEY_BOTTLE);
 	public static final FoodComponent MELON_SLICE = (new FoodComponent.Builder()).hunger(2).saturationModifier(0.3F).build(Material.MELON_SLICE);
 	public static final FoodComponent MUSHROOM_STEW = createSoup(6, Material.MUSHROOM_STEW);
 	public static final FoodComponent MUTTON = (new FoodComponent.Builder()).hunger(2).saturationModifier(0.3F).meat().build(Material.MUTTON);
@@ -131,7 +131,7 @@ public class FoodComponents {
 							Sound.Source.PLAYER, 1.0F, 1.0F);
 					
 					if (!player.isSilent()) {
-						SoundManager.sendToAround(player, SoundEvent.CHORUS_FRUIT_TELEPORT,
+						SoundManager.sendToAround(player, player, SoundEvent.CHORUS_FRUIT_TELEPORT,
 								Sound.Source.PLAYER, 1.0F, 1.0F);
 					}
 					

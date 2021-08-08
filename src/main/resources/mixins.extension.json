@@ -9,6 +9,7 @@
     "EntityMixin",
     "EntityProjectileMixin",
     "LivingEntityMixin",
+    "PlayerAccessor",
     "PlayerInventoryMixin",
     "PlayerMixin",
     "UseItemListenerMixin"

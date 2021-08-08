@@ -1,6 +1,7 @@
 package io.github.bloepiloepi.pvp.potion;
 
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
+import io.github.bloepiloepi.pvp.food.FoodListener;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffect;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffects;
 import io.github.bloepiloepi.pvp.potion.item.CustomPotionType;
@@ -103,6 +104,8 @@ public class PotionListener {
 		node.addListener(EventListener.builder(PlayerEatEvent.class).handler(event -> {
 			Player player = event.getPlayer();
 			ItemStack stack = event.getFoodItem();
+			
+			FoodListener.triggerEatSounds(player, null);
 			
 			List<Potion> potions = getAllPotions((PotionMeta) stack.getMeta());
 			

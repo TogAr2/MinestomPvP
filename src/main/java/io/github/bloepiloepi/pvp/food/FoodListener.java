@@ -2,9 +2,11 @@ package io.github.bloepiloepi.pvp.food;
 
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
+import io.github.bloepiloepi.pvp.mixins.PlayerAccessor;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.sound.Sound;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.*;
 import net.minestom.server.event.player.*;
@@ -14,6 +16,7 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.sound.SoundEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
@@ -34,11 +37,7 @@ public class FoodListener {
 				return;
 			}
 			
-			if (event.getFoodItem().getMaterial() == Material.HONEY_BOTTLE) {
-				event.setEatingTime((long) ((40 / 20F) * 1000));
-			} else {
-				event.setEatingTime(foodComponent.isSnack() ? (long) ((16 / 20F) * 1000) : (long) ((32 / 20F) * 1000));
-			}
+			event.setEatingTime((long) getUseTime(foodComponent) * MinecraftServer.TICK_MS);
 		}).filter(event -> event.getFoodItem().getMaterial().isFood()
 				|| event.getFoodItem().getMaterial() == Material.MILK_BUCKET)
 				.ignoreCancelled(false).build()); //May also be a potion
@@ -52,7 +51,9 @@ public class FoodListener {
 			assert component != null;
 			ThreadLocalRandom random = ThreadLocalRandom.current();
 			
-			if (!component.isDrink()) {
+			triggerEatSounds(player, component);
+			
+			if (!component.isDrink() || event.getFoodItem().getMaterial() == Material.HONEY_BOTTLE) {
 				SoundManager.sendToAround(player, SoundEvent.PLAYER_BURP, Sound.Source.PLAYER,
 						0.5F, random.nextFloat() * 0.1F + 0.9F);
 			}
@@ -81,6 +82,13 @@ public class FoodListener {
 			}
 		}).filter(event -> event.getFoodItem().getMaterial().isFood()
 				|| event.getFoodItem().getMaterial() == Material.MILK_BUCKET).build()); //May also be a potion
+		
+		node.addListener(PlayerTickEvent.class, event -> {
+			Player player = event.getPlayer();
+			if (player.isSilent() || !player.isEating()) return;
+			
+			eatSounds(player);
+		});
 		
 		node.addListener(EventListener.builder(PlayerBlockBreakEvent.class).handler(event ->
 				EntityUtils.addExhaustion(event.getPlayer(), 0.005F)).ignoreCancelled(false).build());
@@ -117,5 +125,43 @@ public class FoodListener {
 		}).ignoreCancelled(false).build());
 		
 		return node;
+	}
+	
+	public static void eatSounds(Player player) {
+		ItemStack stack = player.getItemInHand(Objects.requireNonNull(player.getEatingHand()));
+		
+		FoodComponent component = FoodComponents.fromMaterial(stack.getMaterial());
+		
+		long useTime = getUseTime(component);
+		long usedDuration = System.currentTimeMillis() - ((PlayerAccessor) player).getStartEatingTime();
+		long usedTicks = usedDuration / MinecraftServer.TICK_MS;
+		long remainingUseTicks = useTime - usedTicks;
+		
+		boolean canTrigger = (component != null && component.isSnack()) || remainingUseTicks <= useTime - 7;
+		boolean shouldTrigger = canTrigger && remainingUseTicks % 4 == 0;
+		if (!shouldTrigger) return;
+		
+		triggerEatSounds(player, component);
+	}
+	
+	public static void triggerEatSounds(Player player, @Nullable FoodComponent component) {
+		ThreadLocalRandom random = ThreadLocalRandom.current();
+		
+		if (component == null || component.isDrink()) { // null = potion
+			SoundEvent soundEvent = component != null ? component.getMaterial() == Material.HONEY_BOTTLE ?
+					SoundEvent.HONEY_DRINK : SoundEvent.GENERIC_DRINK : SoundEvent.GENERIC_DRINK;
+			SoundManager.sendToAround(player, player, soundEvent, Sound.Source.PLAYER,
+					0.5F, random.nextFloat() * 0.1F + 0.9F);
+		} else {
+			SoundManager.sendToAround(player, player, SoundEvent.GENERIC_EAT, Sound.Source.PLAYER,
+					0.5F + 0.5F * random.nextInt(2),
+					(random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F);
+		}
+	}
+	
+	private static int getUseTime(@Nullable FoodComponent foodComponent) {
+		if (foodComponent == null) return 32; // null = potion
+		if (foodComponent.getMaterial() == Material.HONEY_BOTTLE) return 40;
+		return foodComponent.isSnack() ? 16 : 32;
 	}
 }
