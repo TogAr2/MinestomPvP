@@ -77,8 +77,6 @@ public class ArmorToolListener {
 	}
 	
 	private static void removeAttributeModifiers(LivingEntity entity, Map<Attribute, AttributeModifier> modifiers) {
-		boolean sprint = entity.isSprinting();
-		
 		for (Map.Entry<Attribute, AttributeModifier> entry : modifiers.entrySet()) {
 			AttributeInstance attribute = entity.getAttribute(entry.getKey());
 			
@@ -91,19 +89,13 @@ public class ArmorToolListener {
 			
 			toRemove.forEach(attribute::removeModifier);
 		}
-		
-		entity.setSprinting(sprint);
 	}
 	
 	private static void addAttributeModifiers(LivingEntity entity, Map<Attribute, AttributeModifier> modifiers) {
-		boolean sprint = entity.isSprinting();
-		
 		for (Map.Entry<Attribute, AttributeModifier> entry : modifiers.entrySet()) {
 			AttributeInstance attribute = entity.getAttribute(entry.getKey());
 			attribute.addModifier(entry.getValue());
 		}
-		
-		entity.setSprinting(sprint); //TODO ??????????
 	}
 	
 	// Exact code from minestom but for a specific set of attributes
