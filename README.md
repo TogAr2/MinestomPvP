@@ -39,7 +39,7 @@ Currently, most vanilla PvP features are supported.
 
 - Lingering potions
 - Fall damage
-- Proper death messages
+- Fireworks (for crossbows)
 
 Also, projectiles are a little bit of a mess right now.
 I might change that in the future, but I'm not sure, since I don't think there is a better way.
