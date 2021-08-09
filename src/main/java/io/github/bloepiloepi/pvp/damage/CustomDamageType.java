@@ -1,6 +1,7 @@
 package io.github.bloepiloepi.pvp.damage;
 
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
+import io.github.bloepiloepi.pvp.entities.Tracker;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
@@ -191,8 +192,7 @@ public class CustomDamageType extends DamageType {
 		return this;
 	}
 	
-	@Override
-	public @Nullable Component buildDeathMessage(@NotNull Player killed) {
+	public @Nullable Component getDeathMessage(@NotNull Player killed) {
 		String id = "death.attack." + getIdentifier();
 		LivingEntity killer = getKillCredit(killed);
 		if (killer == null) {
@@ -201,6 +201,11 @@ public class CustomDamageType extends DamageType {
 			return Component.translatable(id + ".player", EntityUtils.getName(killed),
 					EntityUtils.getName(killer));
 		}
+	}
+	
+	@Override
+	public @Nullable Component buildDeathMessage(@NotNull Player killed) {
+		return Tracker.combatManager.get(killed.getUuid()).getDeathMessage();
 	}
 	
 	@Override
@@ -275,7 +280,9 @@ public class CustomDamageType extends DamageType {
 	}
 	
 	public static @Nullable LivingEntity getKillCredit(@NotNull Player killed) {
-		//TODO
+		LivingEntity killer = Tracker.combatManager.get(killed.getUuid()).getKiller();
+		if (killer != null) return killer;
+		//TODO last hurt by
 		return null;
 	}
 }

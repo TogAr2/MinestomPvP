@@ -1,23 +1,22 @@
 package io.github.bloepiloepi.pvp.damage;
 
+import io.github.bloepiloepi.pvp.entities.EntityUtils;
+import net.kyori.adventure.text.Component;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
+import net.minestom.server.item.ItemStack;
 import net.minestom.server.utils.Position;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class CustomEntityDamage extends CustomDamageType {
-	@Nullable
 	protected final Entity entity;
 	private boolean thorns;
 	
-	public CustomEntityDamage(String name, @Nullable Entity entity) {
+	public CustomEntityDamage(String name, Entity entity) {
 		super(name);
 		this.entity = entity;
-	}
-	
-	public CustomEntityDamage(@Nullable Entity entity) {
-		this("entity_source", entity);
 	}
 	
 	public CustomEntityDamage setThorns() {
@@ -35,7 +34,16 @@ public class CustomEntityDamage extends CustomDamageType {
 		return this.entity;
 	}
 	
-	//TODO death message
+	@Override
+	public @Nullable Component getDeathMessage(@NotNull Player killed) {
+		ItemStack weapon = entity instanceof LivingEntity ? ((LivingEntity) entity).getItemInMainHand() : ItemStack.AIR;
+		String id = "death.attack." + getIdentifier();
+		if (!weapon.isAir() && weapon.getDisplayName() != null) {
+			return Component.translatable(id + ".item", EntityUtils.getName(killed), EntityUtils.getName(entity), weapon.getDisplayName());
+		} else {
+			return Component.translatable(id, EntityUtils.getName(killed), EntityUtils.getName(entity));
+		}
+	}
 	
 	@Override
 	public boolean isScaledWithDifficulty() {

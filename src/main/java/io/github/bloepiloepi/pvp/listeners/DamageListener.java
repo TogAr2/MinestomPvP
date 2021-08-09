@@ -238,6 +238,7 @@ public class DamageListener {
 		
 		if (amount != 0.0F && entity instanceof Player) {
 			EntityUtils.addExhaustion((Player) entity, type.getExhaustion());
+			Tracker.combatManager.get(entity.getUuid()).recordDamage(type, amount);
 		}
 		
 		return amount;
