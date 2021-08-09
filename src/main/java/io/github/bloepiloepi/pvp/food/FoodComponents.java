@@ -62,6 +62,7 @@ public class FoodComponents {
 	public static final FoodComponent SPIDER_EYE = (new FoodComponent.Builder()).hunger(2).saturationModifier(0.8F).statusEffect(new Potion(PotionEffect.POISON, (byte) 0, 100), 1.0F).build(Material.SPIDER_EYE);
 	public static final FoodComponent SUSPICIOUS_STEW = createSuspiciousStew();
 	public static final FoodComponent SWEET_BERRIES = (new FoodComponent.Builder()).hunger(2).saturationModifier(0.1F).build(Material.SWEET_BERRIES);
+	public static final FoodComponent GLOW_BERRIES = (new FoodComponent.Builder()).hunger(2).saturationModifier(0.1F).build(Material.GLOW_BERRIES);
 	public static final FoodComponent TROPICAL_FISH = (new FoodComponent.Builder()).hunger(1).saturationModifier(0.1F).build(Material.TROPICAL_FISH);
 	
 	// Not an actual food, used as a FoodComponent here for convenience
