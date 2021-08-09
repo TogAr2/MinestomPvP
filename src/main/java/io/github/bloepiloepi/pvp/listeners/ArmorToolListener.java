@@ -14,8 +14,11 @@ import net.minestom.server.event.item.EntityEquipEvent;
 import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.item.ItemStack;
+import net.minestom.server.network.packet.server.play.EntityPropertiesPacket;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -101,5 +104,34 @@ public class ArmorToolListener {
 		}
 		
 		entity.setSprinting(sprint); //TODO ??????????
+	}
+	
+	// Exact code from minestom but for a specific set of attributes
+	public static @NotNull EntityPropertiesPacket getPropertiesPacket(@NotNull LivingEntity entity,
+	                                                                  @NotNull Collection<AttributeInstance> update) {
+		// Get all the attributes which should be sent to the client
+		final AttributeInstance[] instances = update.stream()
+				.filter(i -> i.getAttribute().isShared())
+				.toArray(AttributeInstance[]::new);
+		
+		
+		EntityPropertiesPacket propertiesPacket = new EntityPropertiesPacket();
+		propertiesPacket.entityId = entity.getEntityId();
+		
+		EntityPropertiesPacket.Property[] properties = new EntityPropertiesPacket.Property[instances.length];
+		for (int i = 0; i < properties.length; ++i) {
+			EntityPropertiesPacket.Property property = new EntityPropertiesPacket.Property();
+			
+			final float value = instances[i].getBaseValue();
+			
+			property.instance = instances[i];
+			property.attribute = instances[i].getAttribute();
+			property.value = value;
+			
+			properties[i] = property;
+		}
+		
+		propertiesPacket.properties = properties;
+		return propertiesPacket;
 	}
 }
