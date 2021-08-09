@@ -4,10 +4,12 @@ import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.enchantment.enchantments.ProtectionEnchantment;
 import io.github.bloepiloepi.pvp.enums.Tool;
+import io.github.bloepiloepi.pvp.mixins.LivingEntityAccessor;
 import io.github.bloepiloepi.pvp.projectile.Arrow;
 import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
@@ -56,9 +58,12 @@ public class EntityUtils {
 		
 		int ticks = seconds * 20;
 		ticks = ProtectionEnchantment.transformFireDuration(living, ticks);
+		int millis = ticks * MinecraftServer.TICK_MS;
 		
-		//FIXME this makes fire duration lower if it was higher than current seconds
-		living.setFireForDuration(ticks);
+		long fireExtinguishTime = ((LivingEntityAccessor) living).fireExtinguishTime();
+		if (System.currentTimeMillis() + millis > fireExtinguishTime) {
+			living.setFireForDuration(millis, TimeUnit.MILLISECOND);
+		}
 	}
 	
 	public static boolean damage(Entity entity, DamageType type, float amount) {
