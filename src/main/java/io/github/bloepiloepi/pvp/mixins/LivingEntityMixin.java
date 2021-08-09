@@ -2,9 +2,7 @@ package io.github.bloepiloepi.pvp.mixins;
 
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.events.PickupArrowEvent;
-import io.github.bloepiloepi.pvp.listeners.ArmorToolListener;
 import io.github.bloepiloepi.pvp.projectile.AbstractArrow;
-import net.minestom.server.attribute.AttributeInstance;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
@@ -15,10 +13,7 @@ import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.entity.EntityDamageEvent;
 import net.minestom.server.instance.Chunk;
 import net.minestom.server.instance.Instance;
-import net.minestom.server.network.ConnectionState;
 import net.minestom.server.network.packet.server.play.CollectItemPacket;
-import net.minestom.server.network.packet.server.play.EntityPropertiesPacket;
-import net.minestom.server.network.player.PlayerConnection;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -100,28 +95,6 @@ public abstract class LivingEntityMixin extends Entity {
 		});
 		
 		return !entityDamageEvent.isCancelled();
-	}
-	
-	@SuppressWarnings("ConstantConditions")
-	@Inject(method = "onAttributeChanged", at = @At("HEAD"), cancellable = true)
-	private void dirtyOnAttributeChanged(@NotNull AttributeInstance attributeInstance, CallbackInfo ci) {
-		ci.cancel();
-		
-		if (attributeInstance.getAttribute().isShared()) {
-			boolean self = false;
-			if ((Entity) this instanceof Player) {
-				Player player = (Player) (Entity) this;
-				PlayerConnection playerConnection = player.getPlayerConnection();
-				// connection null during Player initialization (due to #super call)
-				self = playerConnection != null && playerConnection.getConnectionState() == ConnectionState.PLAY;
-			}
-			EntityPropertiesPacket packet = ArmorToolListener.getPropertiesPacket((LivingEntity) (Entity) this, Collections.singleton(attributeInstance));
-			if (self) {
-				sendPacketToViewersAndSelf(packet);
-			} else {
-				sendPacketToViewers(packet);
-			}
-		}
 	}
 	
 	@SuppressWarnings("ConstantConditions")
