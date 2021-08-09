@@ -1,6 +1,7 @@
 package io.github.bloepiloepi.pvp.projectile;
 
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.ItemEntity;
@@ -132,6 +133,7 @@ public class FishingBobber extends EntityHittableProjectile {
 		Position pos = getPosition();
 		Vector velocity = new Vector(shooterPos.getX() - pos.getX(), shooterPos.getY() - pos.getY(),
 				shooterPos.getZ() - pos.getZ()).multiply(0.1);
+		velocity.multiply(MinecraftServer.TICK_PER_SECOND);
 		entity.setVelocity(EntityUtils.getActualVelocity(entity).add(velocity));
 	}
 	
