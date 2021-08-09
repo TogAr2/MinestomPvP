@@ -2,10 +2,12 @@ package io.github.bloepiloepi.pvp.mixins;
 
 import io.github.bloepiloepi.pvp.entities.Tracker;
 import io.github.bloepiloepi.pvp.potion.PotionListener;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.*;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -49,6 +51,16 @@ public abstract class PlayerMixin extends LivingEntity {
 	
 	@Inject(method = "update", at = @At(value = "HEAD"))
 	private void onUpdate(long time, CallbackInfo ci) {
+		if (Tracker.lastDamagedBy.containsKey(getUuid())) {
+			LivingEntity lastDamagedBy = Tracker.lastDamagedBy.get(getUuid());
+			if (lastDamagedBy.isDead()) {
+				Tracker.lastDamagedBy.remove(getUuid());
+			} else if (System.currentTimeMillis() - Tracker.lastDamageTime.get(getUuid()) > 5000) {
+				// After 5 seconds of no attack the last damaged by does not count anymore
+				Tracker.lastDamagedBy.remove(getUuid());
+			}
+		}
+		
 		if (getAliveTicks() % 20 == 0) {
 			Tracker.combatManager.get(getUuid()).recheckStatus();
 		}

@@ -4,6 +4,7 @@ import io.github.bloepiloepi.pvp.damage.combat.CombatManager;
 import io.github.bloepiloepi.pvp.food.HungerManager;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
+import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.*;
 import net.minestom.server.event.entity.EntityTickEvent;
@@ -33,6 +34,8 @@ public class Tracker {
 	public static final Map<UUID, Player.Hand> itemUseHand = new HashMap<>();
 	public static final Map<UUID, Block> lastClimbedBlock = new HashMap<>();
 	public static final Map<UUID, CombatManager> combatManager = new HashMap<>();
+	public static final Map<UUID, LivingEntity> lastDamagedBy = new HashMap<>();
+	public static final Map<UUID, Long> lastDamageTime = new HashMap<>();
 	
 	public static <K> void increaseInt(Map<K, Integer> map, K key, int amount) {
 		map.put(key, map.getOrDefault(key, 0) + amount);
@@ -123,6 +126,8 @@ public class Tracker {
 			Tracker.itemUseHand.remove(uuid);
 			Tracker.lastClimbedBlock.remove(uuid);
 			Tracker.combatManager.remove(uuid);
+			Tracker.lastDamagedBy.remove(uuid);
+			Tracker.lastDamageTime.remove(uuid);
 		});
 		
 		node.addListener(PlayerTickEvent.class, event -> {

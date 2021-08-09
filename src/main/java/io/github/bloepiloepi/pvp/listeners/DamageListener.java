@@ -60,9 +60,10 @@ public class DamageListener {
 				amount *= 0.75F;
 			}
 			
-			Entity attacker = null;
-			if (type instanceof CustomEntityDamage) {
-				attacker = type.getDirectEntity();
+			Entity attacker = type.getEntity();
+			if (entity instanceof Player && attacker instanceof LivingEntity) {
+				Tracker.lastDamagedBy.put(entity.getUuid(), (LivingEntity) attacker);
+				Tracker.lastDamageTime.put(entity.getUuid(), System.currentTimeMillis());
 			}
 			
 			boolean shield = false;

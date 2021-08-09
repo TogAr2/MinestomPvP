@@ -281,8 +281,10 @@ public class CustomDamageType extends DamageType {
 	
 	public static @Nullable LivingEntity getKillCredit(@NotNull Player killed) {
 		LivingEntity killer = Tracker.combatManager.get(killed.getUuid()).getKiller();
-		if (killer != null) return killer;
-		//TODO last hurt by
-		return null;
+		if (killer == null) {
+			killer = Tracker.lastDamagedBy.get(killed.getUuid());
+		}
+		
+		return killer;
 	}
 }
