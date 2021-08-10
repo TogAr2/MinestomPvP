@@ -70,7 +70,6 @@ This extension provides several events:
 - `PlayerSpectateEvent`: cancellable, called when a spectator tries to spectate an entity by attacking it.
 - `ProjectileBlockHitEvent`: called when a projectile hits a block.
 - `ProjectileEntityHitEvent`: cancellable, called when a projectile hits an entity.
-- `ProjectileShootEvent`: cancellable, called when a player shoots or throws a projectile.
 - `TotemUseEvent`: cancellable, called when a totem prevents an entity from dying.
 
 ### Customization
