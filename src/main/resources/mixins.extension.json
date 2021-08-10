@@ -11,6 +11,7 @@
     "LivingEntityMixin",
     "NBTUtilsMixin",
     "PlayerAccessor",
+    "PlayerDiggingListenerMixin",
     "PlayerInventoryMixin",
     "PlayerMixin",
     "UseItemListenerMixin"
