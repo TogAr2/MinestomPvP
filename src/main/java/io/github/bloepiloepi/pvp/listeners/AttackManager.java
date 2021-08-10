@@ -139,14 +139,8 @@ public class AttackManager {
 		//TODO formula for sweeping
 		
 		float targetHealth = 0.0F;
-		boolean fireAspectApplied = false;
-		int fireAspect = EnchantmentUtils.getFireAspect(player);
 		if (target instanceof LivingEntity) {
 			targetHealth = ((LivingEntity) target).getHealth();
-			if (fireAspect > 0 && !target.isOnFire()) {
-				fireAspectApplied = true;
-				EntityUtils.setOnFireForSeconds(target, 1);
-			}
 		}
 		
 		Vector originalVelocity = target.getVelocity();
@@ -154,9 +148,6 @@ public class AttackManager {
 		
 		if (!damageSucceeded) {
 			SoundManager.sendToAround(player, SoundEvent.PLAYER_ATTACK_NODAMAGE, Sound.Source.PLAYER, 1.0F, 1.0F);
-			if (fireAspectApplied) {
-				target.setOnFire(false);
-			}
 			return;
 		}
 		
@@ -220,10 +211,12 @@ public class AttackManager {
 		//TODO damage itemstack
 		
 		if (target instanceof LivingEntity) {
-			float n = targetHealth - ((LivingEntity) target).getHealth();
+			int fireAspect = EnchantmentUtils.getFireAspect(player);
 			if (fireAspect > 0) {
-				((LivingEntity) target).setFireForDuration(fireAspect * 4);
+				EntityUtils.setOnFireForSeconds(target, fireAspect * 4);
 			}
+			
+			float n = targetHealth - ((LivingEntity) target).getHealth();
 			
 			//Damage indicator particles
 			if (n > 2.0F) {

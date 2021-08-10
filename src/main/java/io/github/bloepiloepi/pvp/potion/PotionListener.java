@@ -1,13 +1,11 @@
 package io.github.bloepiloepi.pvp.potion;
 
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
-import io.github.bloepiloepi.pvp.entities.Tracker;
 import io.github.bloepiloepi.pvp.food.FoodListener;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffect;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffects;
 import io.github.bloepiloepi.pvp.potion.item.CustomPotionType;
 import io.github.bloepiloepi.pvp.potion.item.CustomPotionTypes;
-import io.github.bloepiloepi.pvp.projectile.ProjectileListener;
 import io.github.bloepiloepi.pvp.projectile.ThrownPotion;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
@@ -92,7 +90,7 @@ public class PotionListener {
 			//Delay update 1 tick because we need to have the removing effect removed
 			MinecraftServer.getSchedulerManager().buildTask(() ->
 					updatePotionVisibility((LivingEntity) event.getEntity())
-			).delay(1, TimeUnit.TICK).schedule();
+			).delay(1, TimeUnit.SERVER_TICK).schedule();
 		});
 		
 		node.addListener(EntityDeathEvent.class, event ->

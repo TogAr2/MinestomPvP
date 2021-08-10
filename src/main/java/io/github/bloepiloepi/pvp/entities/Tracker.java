@@ -36,6 +36,7 @@ public class Tracker {
 	public static final Map<UUID, CombatManager> combatManager = new HashMap<>();
 	public static final Map<UUID, LivingEntity> lastDamagedBy = new HashMap<>();
 	public static final Map<UUID, Long> lastDamageTime = new HashMap<>();
+	public static final Map<UUID, Long> fireExtinguishTime = new HashMap<>();
 	
 	public static <K> void increaseInt(Map<K, Integer> map, K key, int amount) {
 		map.put(key, map.getOrDefault(key, 0) + amount);
@@ -187,6 +188,6 @@ public class Tracker {
 			}
 		});
 		
-		MinecraftServer.getSchedulerManager().buildTask(Tracker::updateCooldown).repeat(1, TimeUnit.TICK).schedule();
+		MinecraftServer.getSchedulerManager().buildTask(Tracker::updateCooldown).repeat(1, TimeUnit.SERVER_TICK).schedule();
 	}
 }

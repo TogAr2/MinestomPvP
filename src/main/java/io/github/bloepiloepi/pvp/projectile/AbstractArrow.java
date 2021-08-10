@@ -3,7 +3,6 @@ package io.github.bloepiloepi.pvp.projectile;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
-import io.github.bloepiloepi.pvp.mixins.LivingEntityAccessor;
 import io.github.bloepiloepi.pvp.utils.EffectManager;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
@@ -125,9 +124,11 @@ public abstract class AbstractArrow extends EntityHittableProjectile {
 								.multiply(new Vector(1, 0, 1))
 								.normalize().multiply(knockback * 0.6);
 						knockbackVector.setY(0.1);
+						knockbackVector.multiply(MinecraftServer.TICK_PER_SECOND);
 						
 						if (knockbackVector.lengthSquared() > 0) {
-							living.setVelocity(EntityUtils.getActualVelocity(living).copy(knockbackVector));
+							Vector newVel = EntityUtils.getActualVelocity(living).add(knockbackVector);
+							living.setVelocity(newVel);
 						}
 					}
 					

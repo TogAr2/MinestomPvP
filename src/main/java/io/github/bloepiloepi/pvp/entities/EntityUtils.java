@@ -14,6 +14,8 @@ import net.minestom.server.entity.*;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
 import net.minestom.server.entity.metadata.arrow.AbstractArrowMeta;
+import net.minestom.server.event.EventDispatcher;
+import net.minestom.server.event.entity.EntityFireEvent;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
@@ -30,6 +32,8 @@ import net.minestom.server.utils.inventory.PlayerInventoryUtils;
 import net.minestom.server.utils.time.TimeUnit;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Duration;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -52,17 +56,44 @@ public class EntityUtils {
 		return new Potion(type, (byte) 0, 0);
 	}
 	
-	public static void setOnFireForSeconds(Entity entity, int seconds) {
-		if (!(entity instanceof LivingEntity)) return;
-		LivingEntity living = (LivingEntity) entity;
+	public static void setFireForDuration(Entity entity, int duration, TemporalUnit temporalUnit) {
+		setFireForDuration(entity, Duration.of(duration, temporalUnit));
+	}
+	
+	public static void setFireForDuration(Entity entity, Duration duration) {
+		if (entity instanceof LivingEntity) {
+			((LivingEntity) entity).setFireForDuration(duration);
+			return;
+		}
 		
-		int ticks = seconds * 20;
-		ticks = ProtectionEnchantment.transformFireDuration(living, ticks);
+		EntityFireEvent entityFireEvent = new EntityFireEvent(entity, duration);
+		
+		// Do not start fire event if the fire needs to be removed (< 0 duration)
+		if (duration.toMillis() > 0) {
+			EventDispatcher.callCancellable(entityFireEvent, () -> {
+				final long fireTime = entityFireEvent.getFireTime(TimeUnit.MILLISECOND);
+				entity.setOnFire(true);
+				Tracker.fireExtinguishTime.put(entity.getUuid(), System.currentTimeMillis() + fireTime);
+			});
+		} else {
+			Tracker.fireExtinguishTime.put(entity.getUuid(), System.currentTimeMillis());
+		}
+	}
+	
+	public static void setOnFireForSeconds(Entity entity, int seconds) {
+		boolean living = entity instanceof LivingEntity;
+		LivingEntity livingEntity = living ? (LivingEntity) entity : null;
+		
+		int ticks = seconds * MinecraftServer.TICK_PER_SECOND;
+		if (living) {
+			ticks = ProtectionEnchantment.transformFireDuration(livingEntity, ticks);
+		}
 		int millis = ticks * MinecraftServer.TICK_MS;
 		
-		long fireExtinguishTime = ((LivingEntityAccessor) living).fireExtinguishTime();
+		long fireExtinguishTime = living ? ((LivingEntityAccessor) livingEntity).fireExtinguishTime() :
+				Tracker.fireExtinguishTime.getOrDefault(entity.getUuid(), 0L);
 		if (System.currentTimeMillis() + millis > fireExtinguishTime) {
-			living.setFireForDuration(millis, TimeUnit.MILLISECOND);
+			setFireForDuration(entity, millis, TimeUnit.MILLISECOND);
 		}
 	}
 	
@@ -214,7 +245,7 @@ public class EntityUtils {
 		if (itemStack.isAir()) return null;
 		
 		ItemEntity item = new ItemEntity(itemStack, entity.getPosition().clone().add(0, up, 0));
-		item.setPickupDelay(10, TimeUnit.TICK); // Default 0.5 seconds
+		item.setPickupDelay(10, TimeUnit.SERVER_TICK); // Default 0.5 seconds
 		item.setInstance(Objects.requireNonNull(entity.getInstance()));
 		
 		return item;

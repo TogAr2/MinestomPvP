@@ -11,6 +11,7 @@ import net.minestom.server.entity.metadata.EntityMeta;
 import net.minestom.server.entity.metadata.monster.PiglinMeta;
 import net.minestom.server.entity.metadata.monster.zombie.ZombieMeta;
 import net.minestom.server.entity.metadata.other.ArmorStandMeta;
+import net.minestom.server.instance.Instance;
 import net.minestom.server.utils.Position;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,6 +35,9 @@ public abstract class EntityMixin {
 	
 	@Shadow @NotNull public abstract Entity.@NotNull Pose getPose();
 	@Shadow @NotNull public abstract EntityMeta getEntityMeta();
+	@Shadow public abstract @Nullable Instance getInstance();
+	@Shadow public abstract boolean isOnFire();
+	@Shadow public abstract void setOnFire(boolean fire);
 	
 	private double eyeHeight;
 	
@@ -65,6 +69,22 @@ public abstract class EntityMixin {
 	@Overwrite
 	public double getEyeHeight() {
 		return eyeHeight;
+	}
+	
+	@Inject(method = "tick", at = @At("HEAD"))
+	private void onTick(long time, CallbackInfo ci) {
+		if (getInstance() == null) return;
+		
+		if (isOnFire() && Tracker.fireExtinguishTime.containsKey(getUuid())) {
+			if (time > Tracker.fireExtinguishTime.get(getUuid())) {
+				setOnFire(false);
+			}
+		}
+	}
+	
+	@Inject(method = "remove", at = @At("TAIL"))
+	private void onRemove(CallbackInfo ci) {
+		Tracker.fireExtinguishTime.remove(getUuid());
 	}
 	
 	@SuppressWarnings("ConstantConditions")
