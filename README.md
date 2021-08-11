@@ -18,6 +18,7 @@ You can choose which features you want to use and which ones to not use.
 - [Events](#events)
 - [Customization](#customization)
 - [Contributing](#contributing)
+- [Credits](#credits)
 
 ## Features
 
@@ -89,3 +90,7 @@ You may also open a new pull request if you have made something for this project
 
 If anything does not integrate with your project, you can also open an issue (or submit a pull request).
 I aim towards making this extension as usable as possible!
+
+## Credits
+
+Thanks to [kiipy](https://github.com/kiipy) for testing and finding bugs.
