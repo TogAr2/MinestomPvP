@@ -4,15 +4,14 @@ import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
+import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
-import net.minestom.server.item.ItemMeta;
 import net.minestom.server.item.Material;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
 import net.minestom.server.utils.MathUtils;
-import net.minestom.server.utils.Position;
 import org.jglrxavpok.hephaistos.nbt.NBTCompound;
 import org.jglrxavpok.hephaistos.nbt.NBTList;
 
@@ -43,7 +42,7 @@ public class FoodComponents {
 	public static final FoodComponent COOKED_SALMON = (new FoodComponent.Builder()).hunger(6).saturationModifier(0.8F).build(Material.COOKED_SALMON);
 	public static final FoodComponent COOKIE = (new FoodComponent.Builder()).hunger(2).saturationModifier(0.1F).build(Material.COOKIE);
 	public static final FoodComponent DRIED_KELP = (new FoodComponent.Builder()).hunger(1).saturationModifier(0.3F).snack().build(Material.DRIED_KELP);
-	public static final FoodComponent ENCHANTED_GOLDEN_APPLE = (new FoodComponent.Builder()).hunger(4).saturationModifier(1.2F).statusEffect(new Potion(PotionEffect.REGENERATION, (byte) 1, 400), 1.0F).statusEffect(new Potion(PotionEffect.DAMAGE_RESISTANCE, (byte) 0, 6000), 1.0F).statusEffect(new Potion(PotionEffect.FIRE_RESISTANCE, (byte) 0, 6000), 1.0F).statusEffect(new Potion(PotionEffect.ABSORPTION, (byte) 3, 2400), 1.0F).alwaysEdible().build(Material.ENCHANTED_GOLDEN_APPLE);
+	public static final FoodComponent ENCHANTED_GOLDEN_APPLE = (new FoodComponent.Builder()).hunger(4).saturationModifier(1.2F).statusEffect(new Potion(PotionEffect.REGENERATION, (byte) 1, 400), 1.0F).statusEffect(new Potion(PotionEffect.RESISTANCE, (byte) 0, 6000), 1.0F).statusEffect(new Potion(PotionEffect.FIRE_RESISTANCE, (byte) 0, 6000), 1.0F).statusEffect(new Potion(PotionEffect.ABSORPTION, (byte) 3, 2400), 1.0F).alwaysEdible().build(Material.ENCHANTED_GOLDEN_APPLE);
 	public static final FoodComponent GOLDEN_APPLE = (new FoodComponent.Builder()).hunger(4).saturationModifier(1.2F).statusEffect(new Potion(PotionEffect.REGENERATION, (byte) 1, 100), 1.0F).statusEffect(new Potion(PotionEffect.ABSORPTION, (byte) 0, 2400), 1.0F).alwaysEdible().build(Material.GOLDEN_APPLE);
 	public static final FoodComponent GOLDEN_CARROT = (new FoodComponent.Builder()).hunger(6).saturationModifier(1.2F).build(Material.GOLDEN_CARROT);
 	public static final FoodComponent HONEY_BOTTLE = (new FoodComponent.Builder()).hunger(6).saturationModifier(0.1F).drink().onEat((player, stack) -> player.removeEffect(PotionEffect.POISON)).turnsInto(Material.GLASS_BOTTLE).build(Material.HONEY_BOTTLE);
@@ -53,7 +52,7 @@ public class FoodComponents {
 	public static final FoodComponent POISONOUS_POTATO = (new FoodComponent.Builder()).hunger(2).saturationModifier(0.3F).statusEffect(new Potion(PotionEffect.POISON, (byte) 0, 100), 0.6F).build(Material.POISONOUS_POTATO);
 	public static final FoodComponent PORKCHOP = (new FoodComponent.Builder()).hunger(3).saturationModifier(0.3F).meat().build(Material.PORKCHOP);
 	public static final FoodComponent POTATO = (new FoodComponent.Builder()).hunger(1).saturationModifier(0.3F).build(Material.POTATO);
-	public static final FoodComponent PUFFERFISH = (new FoodComponent.Builder()).hunger(1).saturationModifier(0.1F).statusEffect(new Potion(PotionEffect.POISON, (byte) 3, 1200), 1.0F).statusEffect(new Potion(PotionEffect.HUNGER, (byte) 2, 300), 1.0F).statusEffect(new Potion(PotionEffect.CONFUSION, (byte) 0, 300), 1.0F).build(Material.PUFFERFISH);
+	public static final FoodComponent PUFFERFISH = (new FoodComponent.Builder()).hunger(1).saturationModifier(0.1F).statusEffect(new Potion(PotionEffect.POISON, (byte) 3, 1200), 1.0F).statusEffect(new Potion(PotionEffect.HUNGER, (byte) 2, 300), 1.0F).statusEffect(new Potion(PotionEffect.NAUSEA, (byte) 0, 300), 1.0F).build(Material.PUFFERFISH);
 	public static final FoodComponent PUMPKIN_PIE = (new FoodComponent.Builder()).hunger(8).saturationModifier(0.3F).build(Material.PUMPKIN_PIE);
 	public static final FoodComponent RABBIT = (new FoodComponent.Builder()).hunger(3).saturationModifier(0.3F).meat().build(Material.RABBIT);
 	public static final FoodComponent RABBIT_STEW = createSoup(10, Material.RABBIT_STEW);
@@ -110,10 +109,13 @@ public class FoodComponents {
 			Instance instance = player.getInstance();
 			assert instance != null;
 			
-			Position prevPosition = player.getPosition().clone();
-			double prevX = player.getPosition().getX();
-			double prevY = player.getPosition().getY();
-			double prevZ = player.getPosition().getZ();
+			Pos prevPosition = player.getPosition();
+			double prevX = prevPosition.x();
+			double prevY = prevPosition.y();
+			double prevZ = prevPosition.z();
+			
+			float pitch = prevPosition.pitch();
+			float yaw = prevPosition.yaw();
 			
 			// Max 16 tries
 			for (int i = 0; i < 16; i++) {
@@ -127,12 +129,12 @@ public class FoodComponents {
 					player.getVehicle().removePassenger(player);
 				}
 				
-				if (EntityUtils.randomTeleport(player, new Position(x, y, z), true)) {
-					SoundManager.sendToAround(instance, prevPosition, SoundEvent.CHORUS_FRUIT_TELEPORT,
+				if (EntityUtils.randomTeleport(player, new Pos(x, y, z, yaw, pitch), true)) {
+					SoundManager.sendToAround(instance, prevPosition, SoundEvent.ITEM_CHORUS_FRUIT_TELEPORT,
 							Sound.Source.PLAYER, 1.0F, 1.0F);
 					
 					if (!player.isSilent()) {
-						SoundManager.sendToAround(player, player, SoundEvent.CHORUS_FRUIT_TELEPORT,
+						SoundManager.sendToAround(player, player, SoundEvent.ITEM_CHORUS_FRUIT_TELEPORT,
 								Sound.Source.PLAYER, 1.0F, 1.0F);
 					}
 					

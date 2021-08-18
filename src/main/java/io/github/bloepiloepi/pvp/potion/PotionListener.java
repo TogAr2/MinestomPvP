@@ -10,6 +10,8 @@ import io.github.bloepiloepi.pvp.projectile.ThrownPotion;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
 import net.minestom.server.event.*;
@@ -30,8 +32,6 @@ import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.PotionType;
 import net.minestom.server.potion.TimedPotion;
 import net.minestom.server.sound.SoundEvent;
-import net.minestom.server.utils.Position;
-import net.minestom.server.utils.Vector;
 import net.minestom.server.utils.time.TimeUnit;
 
 import java.util.*;
@@ -131,7 +131,7 @@ public class PotionListener {
 		
 		node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
 			ThreadLocalRandom random = ThreadLocalRandom.current();
-			SoundManager.sendToAround(event.getPlayer(), SoundEvent.SPLASH_POTION_THROW, Sound.Source.PLAYER,
+			SoundManager.sendToAround(event.getPlayer(), SoundEvent.ENTITY_SPLASH_POTION_THROW, Sound.Source.PLAYER,
 					0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f));
 			
 			throwPotion(event.getPlayer(), event.getItemStack(), event.getHand());
@@ -139,7 +139,7 @@ public class PotionListener {
 		
 		node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
 			ThreadLocalRandom random = ThreadLocalRandom.current();
-			SoundManager.sendToAround(event.getPlayer(), SoundEvent.LINGERING_POTION_THROW, Sound.Source.NEUTRAL,
+			SoundManager.sendToAround(event.getPlayer(), SoundEvent.ENTITY_LINGERING_POTION_THROW, Sound.Source.NEUTRAL,
 					0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f));
 			
 			throwPotion(event.getPlayer(), event.getItemStack(), event.getHand());
@@ -152,17 +152,17 @@ public class PotionListener {
 		ThrownPotion thrownPotion = new ThrownPotion(player);
 		thrownPotion.setItem(stack);
 		
-		Position position = player.getPosition().clone().add(0D, player.getEyeHeight(), 0D);
+		Pos position = player.getPosition().add(0D, player.getEyeHeight(), 0D);
 		thrownPotion.setInstance(Objects.requireNonNull(player.getInstance()), position);
 		
-		Vector direction = position.getDirection();
-		position = position.clone().add(direction.getX(), direction.getY(), direction.getZ());
+		Vec direction = position.direction();
+		position = position.add(direction.x(), direction.y(), direction.z());
 		
 		thrownPotion.shoot(position, 0.5, 1.0);
 		
-		Vector playerVel = EntityUtils.getActualVelocity(player);
-		thrownPotion.setVelocity(thrownPotion.getVelocity().add(playerVel.getX(),
-				player.isOnGround() ? 0.0D : playerVel.getY(), playerVel.getZ()));
+		Vec playerVel = EntityUtils.getActualVelocity(player);
+		thrownPotion.setVelocity(thrownPotion.getVelocity().add(playerVel.x(),
+				player.isOnGround() ? 0.0D : playerVel.y(), playerVel.z()));
 		
 		if (!player.isCreative()) {
 			player.setItemInHand(hand, stack.withAmount(stack.getAmount() - 1));

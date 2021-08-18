@@ -6,11 +6,14 @@ import io.github.bloepiloepi.pvp.entities.EntityGroup;
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
 import io.github.bloepiloepi.pvp.events.PlayerSpectateEvent;
+import io.github.bloepiloepi.pvp.mixins.EntityAccessor;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
+import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.*;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventFilter;
@@ -27,8 +30,6 @@ import net.minestom.server.particle.ParticleCreator;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.utils.MathUtils;
-import net.minestom.server.utils.Position;
-import net.minestom.server.utils.Vector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ public class AttackManager {
 		EventNode<EntityEvent> node = EventNode.type("attack-events", EventFilter.ENTITY);
 		
 		node.addListener(EventListener.builder(PlayerMoveEvent.class).handler(event -> Tracker.falling.put(event.getPlayer().getUuid(),
-				event.getNewPosition().getY() - event.getPlayer().getPosition().getY() < 0)).ignoreCancelled(false).build());
+				event.getNewPosition().y() - event.getPlayer().getPosition().y() < 0)).ignoreCancelled(false).build());
 		
 		node.addListener(EntityAttackEvent.class, event -> {
 			if (event.getEntity() instanceof Player) {
@@ -124,7 +125,7 @@ public class AttackManager {
 		boolean bl2 = false;
 		int knockback = EnchantmentUtils.getKnockback(player);
 		if (player.isSprinting() && strongAttack) {
-			SoundManager.sendToAround(player, SoundEvent.PLAYER_ATTACK_KNOCKBACK, Sound.Source.PLAYER, 1.0F, 1.0F);
+			SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_KNOCKBACK, Sound.Source.PLAYER, 1.0F, 1.0F);
 			knockback++;
 			bl2 = true;
 		}
@@ -143,22 +144,22 @@ public class AttackManager {
 			targetHealth = ((LivingEntity) target).getHealth();
 		}
 		
-		Vector originalVelocity = target.getVelocity();
+		Vec originalVelocity = target.getVelocity();
 		boolean damageSucceeded = EntityUtils.damage(target, CustomDamageType.player(player), damage);
 		
 		if (!damageSucceeded) {
-			SoundManager.sendToAround(player, SoundEvent.PLAYER_ATTACK_NODAMAGE, Sound.Source.PLAYER, 1.0F, 1.0F);
+			SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_NODAMAGE, Sound.Source.PLAYER, 1.0F, 1.0F);
 			return;
 		}
 		
 		if (knockback > 0) {
 			if (target instanceof LivingEntity) {
-				target.takeKnockback(knockback * 0.5F, Math.sin(player.getPosition().getYaw() * 0.017453292F), -Math.cos(player.getPosition().getYaw() * 0.017453292F));
+				target.takeKnockback(knockback * 0.5F, Math.sin(player.getPosition().yaw() * 0.017453292F), -Math.cos(player.getPosition().yaw() * 0.017453292F));
 			} else {
-				target.setVelocity(target.getVelocity().add(-Math.sin(player.getPosition().getYaw() * 0.017453292F) * (float) knockback * 0.5F, 0.1D, Math.cos(player.getPosition().getYaw() * 0.017453292F) * (float) knockback * 0.5F));
+				target.setVelocity(target.getVelocity().add(-Math.sin(player.getPosition().yaw() * 0.017453292F) * (float) knockback * 0.5F, 0.1D, Math.cos(player.getPosition().yaw() * 0.017453292F) * (float) knockback * 0.5F));
 			}
 			
-			//player.setVelocity(EntityUtils.getActualVelocity(player).multiply(new Vector(0.6D, 1.0D, 0.6D))); //TODO Is this necessary?
+			((EntityAccessor) player).velocity(EntityUtils.getActualVelocity(player).mul(0.6D, 1.0D, 0.6D));
 			player.setSprinting(false);
 		}
 		
@@ -173,13 +174,13 @@ public class AttackManager {
 		//	velocityPacket.velocityX = (short) velocity.getX();
 		//	velocityPacket.velocityY = (short) velocity.getY();
 		//	velocityPacket.velocityZ = (short) velocity.getZ();
-			
+		
 		//	((Player) target).getPlayerConnection().sendPacket(velocityPacket);
 		//	target.getVelocity().copy(originalVelocity);
 		//}
 		
 		if (critical) {
-			SoundManager.sendToAround(player, SoundEvent.PLAYER_ATTACK_CRIT, Sound.Source.PLAYER, 1.0F, 1.0F);
+			SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_CRIT, Sound.Source.PLAYER, 1.0F, 1.0F);
 			
 			EntityAnimationPacket packet = new EntityAnimationPacket();
 			packet.entityId = target.getEntityId();
@@ -189,9 +190,9 @@ public class AttackManager {
 		
 		if (!critical && !sweeping) {
 			if (strongAttack) {
-				SoundManager.sendToAround(player, SoundEvent.PLAYER_ATTACK_STRONG, Sound.Source.PLAYER, 1.0F, 1.0F);
+				SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_STRONG, Sound.Source.PLAYER, 1.0F, 1.0F);
 			} else {
-				SoundManager.sendToAround(player, SoundEvent.PLAYER_ATTACK_WEAK, Sound.Source.PLAYER, 1.0F, 1.0F);
+				SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_WEAK, Sound.Source.PLAYER, 1.0F, 1.0F);
 			}
 		}
 		
@@ -221,10 +222,10 @@ public class AttackManager {
 			//Damage indicator particles
 			if (n > 2.0F) {
 				int count = (int) ((double) n * 0.5D);
-				Position targetPosition = target.getPosition();
+				Pos targetPosition = target.getPosition();
 				ParticlePacket packet = ParticleCreator.createParticlePacket(
 						Particle.DAMAGE_INDICATOR, false,
-						targetPosition.getX(), EntityUtils.getBodyY(target, 0.5), targetPosition.getZ(),
+						targetPosition.x(), EntityUtils.getBodyY(target, 0.5), targetPosition.z(),
 						0.1F, 0F, 0.1F,
 						0.2F, count, (writer) -> {});
 				

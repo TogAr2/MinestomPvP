@@ -97,33 +97,4 @@ public class ArmorToolListener {
 			attribute.addModifier(entry.getValue());
 		}
 	}
-	
-	// Exact code from minestom but for a specific set of attributes
-	public static @NotNull EntityPropertiesPacket getPropertiesPacket(@NotNull LivingEntity entity,
-	                                                                  @NotNull Collection<AttributeInstance> update) {
-		// Get all the attributes which should be sent to the client
-		final AttributeInstance[] instances = update.stream()
-				.filter(i -> i.getAttribute().isShared())
-				.toArray(AttributeInstance[]::new);
-		
-		
-		EntityPropertiesPacket propertiesPacket = new EntityPropertiesPacket();
-		propertiesPacket.entityId = entity.getEntityId();
-		
-		EntityPropertiesPacket.Property[] properties = new EntityPropertiesPacket.Property[instances.length];
-		for (int i = 0; i < properties.length; ++i) {
-			EntityPropertiesPacket.Property property = new EntityPropertiesPacket.Property();
-			
-			final float value = instances[i].getBaseValue();
-			
-			property.instance = instances[i];
-			property.attribute = instances[i].getAttribute();
-			property.value = value;
-			
-			properties[i] = property;
-		}
-		
-		propertiesPacket.properties = properties;
-		return propertiesPacket;
-	}
 }

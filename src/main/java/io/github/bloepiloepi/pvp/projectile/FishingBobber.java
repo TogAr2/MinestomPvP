@@ -2,14 +2,14 @@ package io.github.bloepiloepi.pvp.projectile;
 
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.ItemEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.metadata.other.FishingHookMeta;
 import net.minestom.server.item.Material;
-import net.minestom.server.utils.Position;
-import net.minestom.server.utils.Vector;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -49,7 +49,7 @@ public class FishingBobber extends EntityHittableProjectile {
 		
 		if (state == State.IN_AIR) {
 			if (hooked != null) {
-				getVelocity().zero();
+				velocity = Vec.ZERO;
 				setNoGravity(true);
 				state = State.HOOKED_ENTITY;
 				return;
@@ -62,9 +62,8 @@ public class FishingBobber extends EntityHittableProjectile {
 						setNoGravity(false);
 						state = State.IN_AIR;
 					} else {
-						Position hookedPos = hooked.getPosition();
-						teleport(new Position(hookedPos.getX(), EntityUtils.getBodyY(hooked, 0.8),
-								hookedPos.getZ()));
+						Pos hookedPos = hooked.getPosition();
+						teleport(hookedPos.add(0, EntityUtils.getBodyY(hooked, 0.8), 0));
 					}
 				}
 				
@@ -129,11 +128,11 @@ public class FishingBobber extends EntityHittableProjectile {
 		Entity shooter = getShooter();
 		if (shooter == null) return;
 		
-		Position shooterPos = shooter.getPosition();
-		Position pos = getPosition();
-		Vector velocity = new Vector(shooterPos.getX() - pos.getX(), shooterPos.getY() - pos.getY(),
-				shooterPos.getZ() - pos.getZ()).multiply(0.1);
-		velocity.multiply(MinecraftServer.TICK_PER_SECOND);
+		Pos shooterPos = shooter.getPosition();
+		Pos pos = getPosition();
+		Vec velocity = new Vec(shooterPos.x() - pos.x(), shooterPos.y() - pos.y(),
+				shooterPos.z() - pos.z()).mul(0.1);
+		velocity = velocity.mul(MinecraftServer.TICK_PER_SECOND);
 		entity.setVelocity(EntityUtils.getActualVelocity(entity).add(velocity));
 	}
 	

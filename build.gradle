@@ -20,6 +20,6 @@ java {
 }
 
 dependencies {
-    compileOnly 'com.github.Minestom:Minestom:ccd8bea434'
-    testImplementation 'com.github.Minestom:Minestom:ccd8bea434'
+    compileOnly 'com.github.Minestom:Minestom:f26e6ef91f'
+    testImplementation 'com.github.Minestom:Minestom:f26e6ef91f'
 }

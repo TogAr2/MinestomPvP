@@ -10,6 +10,8 @@ import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
@@ -23,11 +25,6 @@ import net.minestom.server.item.Material;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.TimedPotion;
-import net.minestom.server.utils.BlockPosition;
-import net.minestom.server.utils.MathUtils;
-import net.minestom.server.utils.Position;
-import net.minestom.server.utils.Vector;
-import net.minestom.server.utils.chunk.ChunkUtils;
 import net.minestom.server.utils.inventory.PlayerInventoryUtils;
 import net.minestom.server.utils.time.TimeUnit;
 import org.jetbrains.annotations.Nullable;
@@ -115,14 +112,14 @@ public class EntityUtils {
 		}
 		
 		if (!type.bypassesArmor() && !piercing && isBlocking(entity)) {
-			Position attackerPos = type.getPosition();
+			Pos attackerPos = type.getPosition();
 			if (attackerPos != null) {
-				Position entityPos = entity.getPosition();
+				Pos entityPos = entity.getPosition();
 				
-				Vector attackerPosVector = attackerPos.toVector();
-				Vector entityRotation = entityPos.getDirection();
-				Vector attackerDirection = entityPos.toVector().subtract(attackerPosVector).normalize();
-				attackerDirection.setY(0);
+				Vec attackerPosVector = attackerPos.asVec();
+				Vec entityRotation = entityPos.direction();
+				Vec attackerDirection = entityPos.asVec().sub(attackerPosVector).normalize();
+				attackerDirection = attackerDirection.withY(0);
 				
 				return attackerDirection.dot(entityRotation) < 0.0D;
 			}
@@ -157,9 +154,9 @@ public class EntityUtils {
 	
 	public static void takeShieldHit(LivingEntity entity, LivingEntity attacker, boolean applyKnockback) {
 		if (applyKnockback) {
-			Position entityPos = entity.getPosition();
-			Position attackerPos = attacker.getPosition();
-			attacker.takeKnockback(0.5F, attackerPos.getX() - entityPos.getX(), attackerPos.getZ() - entityPos.getZ());
+			Pos entityPos = entity.getPosition();
+			Pos attackerPos = attacker.getPosition();
+			attacker.takeKnockback(0.5F, attackerPos.x() - entityPos.x(), attackerPos.z() - entityPos.z());
 		}
 		
 		if (!(entity instanceof Player)) return;
@@ -209,30 +206,18 @@ public class EntityUtils {
 	public static boolean isClimbing(Player player) {
 		if (player.getGameMode() == GameMode.SPECTATOR) return false;
 		
-		switch (Objects.requireNonNull(player.getInstance()).getBlock(player.getPosition().toBlockPosition())) {
-			case LADDER:
-			case VINE:
-			case TWISTING_VINES:
-			case TWISTING_VINES_PLANT:
-			case WEEPING_VINES:
-			case WEEPING_VINES_PLANT:
-			case ACACIA_TRAPDOOR:
-			case BIRCH_TRAPDOOR:
-			case CRIMSON_TRAPDOOR:
-			case DARK_OAK_TRAPDOOR:
-			case IRON_TRAPDOOR:
-			case JUNGLE_TRAPDOOR:
-			case OAK_TRAPDOOR:
-			case SPRUCE_TRAPDOOR:
-			case WARPED_TRAPDOOR:
-				return true;
-			default:
-				return false;
-		}
+		Block block = Objects.requireNonNull(player.getInstance()).getBlock(player.getPosition());
+		return block.compare(Block.LADDER) || block.compare(Block.VINE) || block.compare(Block.TWISTING_VINES)
+				|| block.compare(Block.TWISTING_VINES_PLANT) || block.compare(Block.WEEPING_VINES)
+				|| block.compare(Block.WEEPING_VINES_PLANT) || block.compare(Block.ACACIA_TRAPDOOR)
+				|| block.compare(Block.BIRCH_TRAPDOOR) || block.compare(Block.CRIMSON_TRAPDOOR)
+				|| block.compare(Block.DARK_OAK_TRAPDOOR) || block.compare(Block.IRON_TRAPDOOR)
+				|| block.compare(Block.JUNGLE_TRAPDOOR) || block.compare(Block.OAK_TRAPDOOR)
+				|| block.compare(Block.SPRUCE_TRAPDOOR) || block.compare(Block.WARPED_TRAPDOOR);
 	}
 	
 	public static double getBodyY(Entity entity, double heightScale) {
-		return entity.getPosition().getY() + entity.getBoundingBox().getHeight() * heightScale;
+		return entity.getPosition().y() + entity.getBoundingBox().getHeight() * heightScale;
 	}
 	
 	public static boolean hasPotionEffect(LivingEntity entity, PotionEffect effect) {
@@ -244,9 +229,9 @@ public class EntityUtils {
 	public static @Nullable ItemEntity spawnItemAtLocation(Entity entity, ItemStack itemStack, double up) {
 		if (itemStack.isAir()) return null;
 		
-		ItemEntity item = new ItemEntity(itemStack, entity.getPosition().clone().add(0, up, 0));
+		ItemEntity item = new ItemEntity(itemStack);
 		item.setPickupDelay(10, TimeUnit.SERVER_TICK); // Default 0.5 seconds
-		item.setInstance(Objects.requireNonNull(entity.getInstance()));
+		item.setInstance(Objects.requireNonNull(entity.getInstance()), entity.getPosition().add(0, up, 0));
 		
 		return item;
 	}
@@ -280,23 +265,17 @@ public class EntityUtils {
 		return Pair.of(ItemStack.AIR, -1);
 	}
 	
-	public static boolean randomTeleport(Entity entity, Position to, boolean status) {
-		BlockPosition blockPosition = to.toBlockPosition();
+	public static boolean randomTeleport(Entity entity, Pos to, boolean status) {
 		Instance instance = entity.getInstance();
 		assert instance != null;
-		int chunkX = ChunkUtils.getChunkCoordinate(blockPosition.getX());
-		int chunkZ = ChunkUtils.getChunkCoordinate(blockPosition.getZ());
-		if (!instance.isChunkLoaded(chunkX, chunkZ)) {
-			return false;
-		}
 		
 		boolean success = false;
-		int lowestY = blockPosition.getY();
+		int lowestY = to.blockY();
 		while (lowestY > instance.getDimensionType().getMinY()) {
-			Block block = instance.getBlock(blockPosition.getX(), lowestY - 1, blockPosition.getZ());
+			Block block = instance.getBlock(to.blockX(), lowestY - 1, to.blockZ());
 			if (!block.isAir() && !block.isLiquid()) {
-				Block above = instance.getBlock(blockPosition.getX(), lowestY, blockPosition.getZ());
-				Block above2 = instance.getBlock(blockPosition.getX(), lowestY + 1, blockPosition.getZ());
+				Block above = instance.getBlock(to.blockX(), lowestY, to.blockZ());
+				Block above2 = instance.getBlock(to.blockX(), lowestY + 1, to.blockZ());
 				if (above.isAir() && above2.isAir()) {
 					success = true;
 					break;
@@ -310,9 +289,7 @@ public class EntityUtils {
 		
 		if (!success) return false;
 		
-		Position finalPos = to.clone();
-		finalPos.setY(lowestY);
-		entity.teleport(finalPos);
+		entity.teleport(to.withY(lowestY));
 		
 		if (status) {
 			entity.triggerStatus((byte) 46);
@@ -322,13 +299,14 @@ public class EntityUtils {
 	}
 	
 	public static void updateProjectileRotation(EntityProjectile projectile) {
-		Vector velocity = projectile.getVelocity();
-		double xz = Math.sqrt(velocity.getX() * velocity.getX() + velocity.getZ() * velocity.getZ());
-		projectile.getPosition().setYaw((float) Math.toDegrees(Math.atan2(velocity.getY(), xz)));
-		projectile.getPosition().setPitch((float) Math.toDegrees(Math.atan2(velocity.getX(), velocity.getZ())));
+		Vec velocity = projectile.getVelocity();
+		double xz = Math.sqrt(velocity.x() * velocity.x() + velocity.z() * velocity.z());
+		float yaw = (float) Math.toDegrees(Math.atan2(velocity.y(), xz));
+		float pitch = (float) Math.toDegrees(Math.atan2(velocity.x(), velocity.z()));
+		projectile.teleport(projectile.getPosition().withYaw(yaw).withPitch(pitch));
 	}
 	
-	public static Vector getActualVelocity(Entity entity) {
+	public static Vec getActualVelocity(Entity entity) {
 		if (!(entity instanceof Player)) {
 			return entity.getVelocity();
 		} else {

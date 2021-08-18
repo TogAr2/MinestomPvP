@@ -26,7 +26,7 @@ public class NBTUtilsMixin {
 			
 			enchantList.add(new NBTCompound()
 					.setShort("lvl", level)
-					.setString("id", enchantment.getNamespaceID().asString())
+					.setString("id", enchantment.name())
 			);
 		}
 		nbt.set(listName, enchantList);

@@ -44,36 +44,34 @@ public class CustomPotionEffect {
 	}
 	
 	public void applyUpdateEffect(LivingEntity entity, byte amplifier) {
-		switch (potionEffect) {
-			case REGENERATION:
-				if (entity.getHealth() < entity.getMaxHealth()) {
-					entity.setHealth(entity.getHealth() + 1);
-				}
-				return;
-			case POISON:
-				if (entity.getHealth() > 1.0F) {
-					entity.damage(CustomDamageType.MAGIC, 1.0F);
-				}
-				return;
-			case WITHER:
-				entity.damage(CustomDamageType.WITHER, 1.0F);
-				return;
+		if (potionEffect == PotionEffect.REGENERATION) {
+			if (entity.getHealth() < entity.getMaxHealth()) {
+				entity.setHealth(entity.getHealth() + 1);
+			}
+			return;
+		} else if (potionEffect == PotionEffect.POISON) {
+			if (entity.getHealth() > 1.0F) {
+				entity.damage(CustomDamageType.MAGIC, 1.0F);
+			}
+			return;
+		} else if (potionEffect == PotionEffect.WITHER) {
+			entity.damage(CustomDamageType.WITHER, 1.0F);
+			return;
 		}
 		
 		if (entity instanceof Player) {
-			switch (potionEffect) {
-				case HUNGER:
-					EntityUtils.addExhaustion((Player) entity, 0.005F * (float) (amplifier + 1));
-					return;
-				case SATURATION:
-					if (((Player) entity).isOnline()) {
-						Tracker.hungerManager.get(entity.getUuid()).add(amplifier + 1, 1.0F);
-					}
-					return;
+			if (potionEffect == PotionEffect.HUNGER) {
+				EntityUtils.addExhaustion((Player) entity, 0.005F * (float) (amplifier + 1));
+				return;
+			} else if (potionEffect == PotionEffect.SATURATION) {
+				if (((Player) entity).isOnline()) {
+					Tracker.hungerManager.get(entity.getUuid()).add(amplifier + 1, 1.0F);
+				}
+				return;
 			}
 		}
 		
-		if (potionEffect == PotionEffect.HARM || potionEffect == PotionEffect.HEAL) {
+		if (potionEffect == PotionEffect.INSTANT_DAMAGE || potionEffect == PotionEffect.INSTANT_HEALTH) {
 			EntityGroup entityGroup = EntityGroup.ofEntity(entity);
 			
 			if (shouldHeal(entityGroup)) {
@@ -87,7 +85,7 @@ public class CustomPotionEffect {
 	public void applyInstantEffect(@Nullable Entity source, @Nullable Entity attacker, LivingEntity target, byte amplifier, double proximity) {
 		EntityGroup targetGroup = EntityGroup.ofEntity(target);
 		
-		if (potionEffect != PotionEffect.HARM && potionEffect != PotionEffect.HEAL) {
+		if (potionEffect != PotionEffect.INSTANT_DAMAGE && potionEffect != PotionEffect.INSTANT_HEALTH) {
 			applyUpdateEffect(target, amplifier);
 			return;
 		}
@@ -106,24 +104,20 @@ public class CustomPotionEffect {
 	}
 	
 	private boolean shouldHeal(EntityGroup group) {
-		return (group.isUndead() && potionEffect == PotionEffect.HARM)
-				|| (!group.isUndead() && potionEffect == PotionEffect.HEAL);
+		return (group.isUndead() && potionEffect == PotionEffect.INSTANT_DAMAGE)
+				|| (!group.isUndead() && potionEffect == PotionEffect.INSTANT_HEALTH);
 	}
 	
 	public boolean canApplyUpdateEffect(int duration, byte amplifier) {
 		int applyInterval;
-		switch (potionEffect) {
-			case REGENERATION:
-				applyInterval = 50 >> amplifier;
-				break;
-			case POISON:
-				applyInterval = 25 >> amplifier;
-				break;
-			case WITHER:
-				applyInterval = 40 >> amplifier;
-				break;
-			default:
-				return potionEffect == PotionEffect.HUNGER;
+		if (potionEffect == PotionEffect.REGENERATION) {
+			applyInterval = 50 >> amplifier;
+		} else if (potionEffect == PotionEffect.POISON) {
+			applyInterval = 25 >> amplifier;
+		} else if (potionEffect == PotionEffect.WITHER) {
+			applyInterval = 40 >> amplifier;
+		} else {
+			return potionEffect == PotionEffect.HUNGER;
 		}
 		
 		if (applyInterval > 0) {

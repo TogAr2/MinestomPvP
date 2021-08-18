@@ -2,6 +2,7 @@ package io.github.bloepiloepi.pvp.projectile;
 
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
+import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.Player;
@@ -10,7 +11,6 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.particle.ParticleCreator;
-import net.minestom.server.utils.Position;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,13 +28,13 @@ public class ThrownEnderpearl extends EntityHittableProjectile {
 			EntityUtils.damage(entity, CustomDamageType.thrown(this, getShooter()), 0.0F);
 		}
 		
-		Position position = getPosition();
+		Pos position = getPosition();
 		ThreadLocalRandom random = ThreadLocalRandom.current();
 		
 		for (int i = 0; i < 32; i++) {
 			ParticlePacket packet = ParticleCreator.createParticlePacket(
 					Particle.PORTAL, false,
-					position.getX(), position.getY() + random.nextDouble() * 2, position.getZ(),
+					position.x(), position.y() + random.nextDouble() * 2, position.z(),
 					(float) random.nextGaussian(), 0.0F, (float) random.nextGaussian(),
 					0, 1, (writer) -> {});
 			
@@ -45,8 +45,8 @@ public class ThrownEnderpearl extends EntityHittableProjectile {
 		
 		Entity shooter = getShooter();
 		if (shooter != null) {
-			position.setPitch(shooter.getPosition().getPitch());
-			position.setYaw(shooter.getPosition().getYaw());
+			Pos shooterPos = shooter.getPosition();
+			position = position.withPitch(shooterPos.pitch()).withYaw(shooterPos.yaw());
 		}
 		
 		if (shooter instanceof Player) {

@@ -7,6 +7,8 @@ import io.github.bloepiloepi.pvp.utils.EffectManager;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
@@ -17,7 +19,6 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.network.packet.server.play.ChangeGameStatePacket;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.utils.MathUtils;
-import net.minestom.server.utils.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -70,11 +71,11 @@ public abstract class AbstractArrow extends EntityHittableProjectile {
 	@Override
 	public void onUnstuck() {
 		ThreadLocalRandom random = ThreadLocalRandom.current();
-		setVelocity(getPosition().getDirection().multiply(new Vector(
+		setVelocity(getPosition().direction().mul(
 				random.nextFloat() * 0.2,
 				random.nextFloat() * 0.2,
 				random.nextFloat() * 0.2
-		)));
+		));
 		ticks = 0;
 	}
 	
@@ -120,14 +121,14 @@ public abstract class AbstractArrow extends EntityHittableProjectile {
 					}
 					
 					if (knockback > 0) {
-						Vector knockbackVector = getVelocity()
-								.multiply(new Vector(1, 0, 1))
-								.normalize().multiply(knockback * 0.6);
-						knockbackVector.setY(0.1);
-						knockbackVector.multiply(MinecraftServer.TICK_PER_SECOND);
+						Vec knockbackVec = getVelocity()
+								.mul(1, 0, 1)
+								.normalize().mul(knockback * 0.6);
+						knockbackVec = knockbackVec.add(0, 0.1, 0)
+								.mul(MinecraftServer.TICK_PER_SECOND / 2.0);
 						
-						if (knockbackVector.lengthSquared() > 0) {
-							Vector newVel = EntityUtils.getActualVelocity(living).add(knockbackVector);
+						if (knockbackVec.lengthSquared() > 0) {
+							Vec newVel = EntityUtils.getActualVelocity(living).add(knockbackVec);
 							living.setVelocity(newVel);
 						}
 					}
@@ -154,8 +155,9 @@ public abstract class AbstractArrow extends EntityHittableProjectile {
 				
 				return getPiercingLevel() <= 0;
 			} else {
-				getVelocity().multiply(-0.1);
-				getPosition().setYaw(getPosition().getYaw() + 180);
+				Pos position = getPosition();
+				setVelocity(getVelocity().mul(-0.1));
+				teleport(position.withYaw(position.yaw() + 180));
 				
 				if (getVelocity().lengthSquared() < 1.0E-7D) {
 					if (pickupMode == PickupMode.ALLOWED) {
@@ -188,7 +190,7 @@ public abstract class AbstractArrow extends EntityHittableProjectile {
 		pickupDelay = 7;
 		setCritical(false);
 		setPiercingLevel((byte) 0);
-		setSound(SoundEvent.ARROW_HIT);
+		setSound(SoundEvent.ENTITY_ARROW_HIT);
 		piercingIgnore.clear();
 	}
 	
@@ -225,7 +227,7 @@ public abstract class AbstractArrow extends EntityHittableProjectile {
 	}
 	
 	protected SoundEvent getDefaultSound() {
-		return SoundEvent.ARROW_HIT;
+		return SoundEvent.ENTITY_ARROW_HIT;
 	}
 	
 	public int getKnockback() {

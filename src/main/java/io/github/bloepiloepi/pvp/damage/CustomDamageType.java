@@ -3,13 +3,13 @@ package io.github.bloepiloepi.pvp.damage;
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
 import net.kyori.adventure.text.Component;
+import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.instance.Explosion;
 import net.minestom.server.sound.SoundEvent;
-import net.minestom.server.utils.Position;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -254,7 +254,7 @@ public class CustomDamageType extends DamageType {
 	}
 	
 	@Nullable
-	public Position getPosition() {
+	public Pos getPosition() {
 		return null;
 	}
 	
@@ -263,7 +263,7 @@ public class CustomDamageType extends DamageType {
 	public SoundEvent getSound(@NotNull LivingEntity entity) {
 		//TODO
 		if (this.isFire() && entity instanceof Player) {
-			return SoundEvent.PLAYER_HURT_ON_FIRE;
+			return SoundEvent.ENTITY_PLAYER_HURT_ON_FIRE;
 		} else {
 			return super.getSound(entity);
 		}
@@ -273,9 +273,9 @@ public class CustomDamageType extends DamageType {
 	public SoundEvent getDeathSound(@NotNull LivingEntity entity) {
 		//TODO
 		if (entity instanceof Player) {
-			return SoundEvent.PLAYER_DEATH;
+			return SoundEvent.ENTITY_PLAYER_DEATH;
 		} else {
-			return SoundEvent.GENERIC_DEATH;
+			return SoundEvent.ENTITY_GENERIC_DEATH;
 		}
 	}
 	

@@ -1,13 +1,13 @@
 package io.github.bloepiloepi.pvp.projectile;
 
 import io.github.bloepiloepi.pvp.events.ProjectileHitEvent;
+import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityProjectile;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.trait.CancellableEvent;
 import net.minestom.server.item.ItemStack;
-import net.minestom.server.utils.Position;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,7 +17,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class EntityHittableProjectile extends EntityProjectile {
-	public static final Map<UUID, Position> hitPosition = new HashMap<>();
+	public static final Map<UUID, Pos> hitPosition = new HashMap<>();
 	
 	private boolean hitCalled = false;
 	

@@ -54,7 +54,7 @@ public class FoodListener {
 			triggerEatSounds(player, component);
 			
 			if (!component.isDrink() || event.getFoodItem().getMaterial() == Material.HONEY_BOTTLE) {
-				SoundManager.sendToAround(player, SoundEvent.PLAYER_BURP, Sound.Source.PLAYER,
+				SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_BURP, Sound.Source.PLAYER,
 						0.5F, random.nextFloat() * 0.1F + 0.9F);
 			}
 			
@@ -96,9 +96,9 @@ public class FoodListener {
 		node.addListener(EventListener.builder(PlayerMoveEvent.class).handler(event -> {
 			Player player = event.getPlayer();
 			
-			double xDiff = event.getNewPosition().getX() - player.getPosition().getX();
-			double yDiff = event.getNewPosition().getY() - player.getPosition().getY();
-			double zDiff = event.getNewPosition().getZ() - player.getPosition().getZ();
+			double xDiff = event.getNewPosition().x() - player.getPosition().x();
+			double yDiff = event.getNewPosition().y() - player.getPosition().y();
+			double zDiff = event.getNewPosition().z() - player.getPosition().z();
 			
 			//Check if movement was a jump
 			if (yDiff > 0.0D && player.isOnGround()) {
@@ -115,7 +115,7 @@ public class FoodListener {
 					EntityUtils.addExhaustion(player, (player.isSprinting() ? 0.1F : 0.0F) * (float) l * 0.01F);
 				}
 			} else {
-				if (Objects.requireNonNull(player.getInstance()).getBlock(player.getPosition().toBlockPosition()) == Block.WATER) {
+				if (Objects.requireNonNull(player.getInstance()).getBlock(player.getPosition()) == Block.WATER) {
 					int l = (int) Math.round(Math.sqrt(xDiff * xDiff + yDiff * yDiff + zDiff * zDiff) * 100.0F);
 					if (l > 0) {
 						EntityUtils.addExhaustion(player, 0.01F * (float) l * 0.01F);
@@ -149,11 +149,11 @@ public class FoodListener {
 		
 		if (component == null || component.isDrink()) { // null = potion
 			SoundEvent soundEvent = component != null ? component.getMaterial() == Material.HONEY_BOTTLE ?
-					SoundEvent.HONEY_DRINK : SoundEvent.GENERIC_DRINK : SoundEvent.GENERIC_DRINK;
+					SoundEvent.ITEM_HONEY_BOTTLE_DRINK : SoundEvent.ENTITY_GENERIC_DRINK : SoundEvent.ENTITY_GENERIC_DRINK;
 			SoundManager.sendToAround(player, player, soundEvent, Sound.Source.PLAYER,
 					0.5F, random.nextFloat() * 0.1F + 0.9F);
 		} else {
-			SoundManager.sendToAround(player, player, SoundEvent.GENERIC_EAT, Sound.Source.PLAYER,
+			SoundManager.sendToAround(player, player, SoundEvent.ENTITY_GENERIC_EAT, Sound.Source.PLAYER,
 					0.5F + 0.5F * random.nextInt(2),
 					(random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F);
 		}

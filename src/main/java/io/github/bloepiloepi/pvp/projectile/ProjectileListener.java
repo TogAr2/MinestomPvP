@@ -7,6 +7,8 @@ import io.github.bloepiloepi.pvp.utils.SoundManager;
 import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventDispatcher;
@@ -26,8 +28,6 @@ import net.minestom.server.item.metadata.CrossbowMeta;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
 import net.minestom.server.utils.MathUtils;
-import net.minestom.server.utils.Position;
-import net.minestom.server.utils.Vector;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -49,10 +49,10 @@ public class ProjectileListener {
 				int durability = FishingBobber.fishingBobbers.get(player.getUuid()).retrieve();
 				//TODO damage fishing rod
 				
-				SoundManager.sendToAround(player, SoundEvent.FISHING_BOBBER_RETRIEVE, Sound.Source.NEUTRAL,
+				SoundManager.sendToAround(player, SoundEvent.ENTITY_FISHING_BOBBER_RETRIEVE, Sound.Source.NEUTRAL,
 						1.0F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
 			} else {
-				SoundManager.sendToAround(player, SoundEvent.FISHING_BOBBER_THROW, Sound.Source.NEUTRAL,
+				SoundManager.sendToAround(player, SoundEvent.ENTITY_FISHING_BOBBER_THROW, Sound.Source.NEUTRAL,
 						0.5F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
 				
 				FishingBobber bobber = new FishingBobber(player);
@@ -67,26 +67,26 @@ public class ProjectileListener {
 				}
 				double spread = shootEvent.getSpread();
 				
-				Position playerPos = player.getPosition();
-				float playerPitch = playerPos.getPitch();
-				float playerYaw = playerPos.getYaw();
+				Pos playerPos = player.getPosition();
+				float playerPitch = playerPos.pitch();
+				float playerYaw = playerPos.yaw();
 				float zDir = (float) Math.cos(Math.toRadians(-playerYaw) - Math.PI);
 				float xDir = (float) Math.sin(Math.toRadians(-playerYaw) - Math.PI);
-				double x = playerPos.getX() - (double)xDir * 0.3D;
-				double y = playerPos.getY() + player.getEyeHeight();
-				double z = playerPos.getZ() - (double)zDir * 0.3D;
-				bobber.setInstance(Objects.requireNonNull(player.getInstance()), new Position(x, y, z));
-				Vector velocity = new Vector(-xDir, MathUtils.clamp(-(
+				double x = playerPos.x() - (double)xDir * 0.3D;
+				double y = playerPos.y() + player.getEyeHeight();
+				double z = playerPos.z() - (double)zDir * 0.3D;
+				bobber.setInstance(Objects.requireNonNull(player.getInstance()), new Pos(x, y, z));
+				Vec velocity = new Vec(-xDir, MathUtils.clamp(-(
 						(float) Math.sin(Math.toRadians(-playerPitch)) /
 						(float) -Math.cos(Math.toRadians(-playerPitch))
 				), -5.0F, 5.0F), -zDir);
 				double xz = velocity.length();
-				velocity = velocity.multiply(new Vector(
+				velocity = velocity.mul(
 						0.6D / xz + 0.5D + random.nextGaussian() * spread,
 						0.6D / xz + 0.5D + random.nextGaussian() * spread,
 						0.6D / xz + 0.5D + random.nextGaussian() * spread
-				));
-				bobber.setVelocity(velocity.multiply(MinecraftServer.TICK_PER_SECOND * 0.75));
+				);
+				bobber.setVelocity(velocity.mul(MinecraftServer.TICK_PER_SECOND * 0.75));
 			}
 		}).filter(event -> event.getItemStack().getMaterial() == Material.FISHING_ROD).ignoreCancelled(false).build());
 		
@@ -105,13 +105,13 @@ public class ProjectileListener {
 			SoundEvent soundEvent;
 			EntityHittableProjectile projectile;
 			if (snowball) {
-				soundEvent = SoundEvent.SNOWBALL_THROW;
+				soundEvent = SoundEvent.ENTITY_SNOWBALL_THROW;
 				projectile = new Snowball(player);
 			} else if (enderpearl) {
-				soundEvent = SoundEvent.ENDER_PEARL_THROW;
+				soundEvent = SoundEvent.ENTITY_ENDER_PEARL_THROW;
 				projectile = new ThrownEnderpearl(player);
 			} else {
-				soundEvent = SoundEvent.EGG_THROW;
+				soundEvent = SoundEvent.ENTITY_EGG_THROW;
 				projectile = new ThrownEgg(player);
 			}
 			
@@ -126,18 +126,17 @@ public class ProjectileListener {
 				Tracker.setCooldown(player, Material.ENDER_PEARL, 20);
 			}
 			
-			Position position = player.getPosition().clone().add(0D, player.getEyeHeight(), 0D);
+			Pos position = player.getPosition().add(0D, player.getEyeHeight(), 0D);
 			projectile.setInstance(Objects.requireNonNull(player.getInstance()), position);
 			
-			Vector direction = position.getDirection();
-			position = position.clone().add(direction.getX(), direction.getY(), direction.getZ())
-					.subtract(0, 0.2, 0); //????????
+			Vec direction = position.direction();
+			position = position.add(direction).sub(0, 0.2, 0); //????????
 			
 			projectile.shoot(position, 1.5, 1.0);
 			
-			Vector playerVel = EntityUtils.getActualVelocity(player);
-			projectile.setVelocity(projectile.getVelocity().add(playerVel.getX(),
-					player.isOnGround() ? 0.0D : playerVel.getY(), playerVel.getZ()));
+			Vec playerVel = EntityUtils.getActualVelocity(player);
+			projectile.setVelocity(projectile.getVelocity().add(playerVel.x(),
+					player.isOnGround() ? 0.0D : playerVel.y(), playerVel.z()));
 			
 			if (!player.isCreative()) {
 				player.setItemInHand(event.getHand(), stack.withAmount(stack.getAmount() - 1));
@@ -204,7 +203,7 @@ public class ProjectileListener {
 					player.setItemInHand(hand, stack);
 				}
 				
-				SoundEvent midLoadSound = quickCharge == 0 ? SoundEvent.CROSSBOW_LOADING_MIDDLE : null;
+				SoundEvent midLoadSound = quickCharge == 0 ? SoundEvent.ITEM_CROSSBOW_LOADING_MIDDLE : null;
 				if (progress >= 0.5F && midLoadSound != null && midLoadSoundPlayed == (byte) 0) {
 					SoundManager.sendToAround(player, midLoadSound, Sound.Source.PLAYER, 0.5F, 1.0F);
 					
@@ -217,7 +216,7 @@ public class ProjectileListener {
 		node.addListener(EventListener.builder(ItemUpdateStateEvent.class).handler(event -> {
 			Player player = event.getPlayer();
 			ItemStack stack = event.getItemStack();
-			boolean infinite = player.isCreative() || EnchantmentUtils.getLevel(Enchantment.INFINITY_ARROWS, stack) > 0;
+			boolean infinite = player.isCreative() || EnchantmentUtils.getLevel(Enchantment.INFINITY, stack) > 0;
 			
 			Pair<ItemStack, Integer> projectilePair = EntityUtils.getProjectile(player, Arrow.ARROW_PREDICATE);
 			ItemStack projectile = projectilePair.first();
@@ -240,17 +239,17 @@ public class ProjectileListener {
 				arrow.setCritical(true);
 			}
 			
-			int powerEnchantment = EnchantmentUtils.getLevel(Enchantment.POWER_ARROWS, stack);
+			int powerEnchantment = EnchantmentUtils.getLevel(Enchantment.POWER, stack);
 			if (powerEnchantment > 0) {
 				arrow.setBaseDamage(arrow.getBaseDamage() + (double) powerEnchantment * 0.5 + 0.5);
 			}
 			
-			int punchEnchantment = EnchantmentUtils.getLevel(Enchantment.PUNCH_ARROWS, stack);
+			int punchEnchantment = EnchantmentUtils.getLevel(Enchantment.PUNCH, stack);
 			if (punchEnchantment > 0) {
 				arrow.setKnockback(punchEnchantment);
 			}
 			
-			if (EnchantmentUtils.getLevel(Enchantment.FLAMING_ARROWS, stack) > 0) {
+			if (EnchantmentUtils.getLevel(Enchantment.FLAME, stack) > 0) {
 				EntityUtils.setOnFireForSeconds(arrow, 100);
 			}
 			
@@ -264,22 +263,21 @@ public class ProjectileListener {
 			}
 			
 			// Arrow shooting
-			Position position = player.getPosition().clone().add(0D, player.getEyeHeight(), 0D);
+			Pos position = player.getPosition().add(0D, player.getEyeHeight(), 0D);
 			arrow.setInstance(Objects.requireNonNull(player.getInstance()),
-					position.clone().subtract(0, 0.10000000149011612D, 0)); // Yeah wait what
+					position.sub(0, 0.10000000149011612D, 0)); // Yeah wait what
 			
-			Vector direction = position.getDirection();
-			position = position.clone().add(direction.getX(), direction.getY(), direction.getZ())
-					.subtract(0, 0.2, 0); //????????
+			Vec direction = position.direction();
+			position = position.add(direction).sub(0, 0.2, 0); //????????
 			
 			arrow.shoot(position, power * 3, 1.0);
 			
-			Vector playerVel = EntityUtils.getActualVelocity(player);
-			arrow.setVelocity(arrow.getVelocity().add(playerVel.getX(),
-					player.isOnGround() ? 0.0D : playerVel.getY(), playerVel.getZ()));
+			Vec playerVel = EntityUtils.getActualVelocity(player);
+			arrow.setVelocity(arrow.getVelocity().add(playerVel.x(),
+					player.isOnGround() ? 0.0D : playerVel.y(), playerVel.z()));
 			
 			ThreadLocalRandom random = ThreadLocalRandom.current();
-			SoundManager.sendToAround(player, SoundEvent.ARROW_SHOOT, Sound.Source.PLAYER,
+			SoundManager.sendToAround(player, SoundEvent.ENTITY_ARROW_SHOOT, Sound.Source.PLAYER,
 					1.0f, 1.0f / (random.nextFloat() * 0.4f + 1.2f) + (float) power * 0.5f);
 			
 			if (!reallyInfinite && !player.isCreative() && projectileSlot >= 0) {
@@ -306,7 +304,7 @@ public class ProjectileListener {
 			stack = setCrossbowCharged(stack, true);
 			
 			ThreadLocalRandom random = ThreadLocalRandom.current();
-			SoundManager.sendToAround(player, SoundEvent.CROSSBOW_LOADING_END, Sound.Source.PLAYER,
+			SoundManager.sendToAround(player, SoundEvent.ITEM_CROSSBOW_LOADING_END, Sound.Source.PLAYER,
 					1.0F, 1.0F / (random.nextFloat() * 0.5F + 1.0F) + 0.2F);
 			
 			player.setItemInHand(event.getHand(), stack);
@@ -382,13 +380,13 @@ public class ProjectileListener {
 	public static SoundEvent getCrossbowStartSound(int quickCharge) {
 		switch (quickCharge) {
 			case 1:
-				return SoundEvent.CROSSBOW_QUICK_CHARGE_1;
+				return SoundEvent.ITEM_CROSSBOW_QUICK_CHARGE_1;
 			case 2:
-				return SoundEvent.CROSSBOW_QUICK_CHARGE_2;
+				return SoundEvent.ITEM_CROSSBOW_QUICK_CHARGE_2;
 			case 3:
-				return SoundEvent.CROSSBOW_QUICK_CHARGE_3;
+				return SoundEvent.ITEM_CROSSBOW_QUICK_CHARGE_3;
 			default:
-				return SoundEvent.CROSSBOW_LOADING_START;
+				return SoundEvent.ITEM_CROSSBOW_LOADING_START;
 		}
 	}
 	
@@ -460,27 +458,25 @@ public class ProjectileListener {
 			arrow.pickupMode = AbstractArrow.PickupMode.CREATIVE_ONLY;
 		}
 		
-		Position position = player.getPosition().clone().add(0D, player.getEyeHeight(), 0D);
+		Pos position = player.getPosition().add(0D, player.getEyeHeight(), 0D);
 		arrow.setInstance(Objects.requireNonNull(player.getInstance()),
-				position.clone().subtract(0, 0.10000000149011612D, 0)); // Yeah wait what
+				position.sub(0, 0.10000000149011612D, 0)); // Yeah wait what
 		
-		Position toPosition = position.clone();
-		toPosition.setYaw(toPosition.getYaw() + yaw);
-		Vector direction = toPosition.getDirection();
-		toPosition = toPosition.clone().add(direction.getX(), direction.getY(), direction.getZ())
-				.subtract(0, 0.2, 0); //????????
+		position = position.withYaw(position.yaw() + yaw);
+		Vec direction = position.direction();
+		position = position.add(direction).sub(0, 0.2, 0); //????????
 		
-		arrow.shoot(toPosition, power, spread);
+		arrow.shoot(position, power, spread);
 		
 		//TODO damage crossbow
 		
-		SoundManager.sendToAround(player, SoundEvent.CROSSBOW_SHOOT, Sound.Source.PLAYER, 1.0F, soundPitch);
+		SoundManager.sendToAround(player, SoundEvent.ITEM_CROSSBOW_SHOOT, Sound.Source.PLAYER, 1.0F, soundPitch);
 	}
 	
 	public static AbstractArrow getCrossbowArrow(Player player, ItemStack crossbowStack, ItemStack projectile) {
 		AbstractArrow arrow = createArrow(projectile, player);
 		arrow.setCritical(true); // Player shooter is always critical
-		arrow.setSound(SoundEvent.CROSSBOW_HIT);
+		arrow.setSound(SoundEvent.ITEM_CROSSBOW_HIT);
 		
 		int piercing = EnchantmentUtils.getLevel(Enchantment.PIERCING, crossbowStack);
 		if (piercing > 0) {

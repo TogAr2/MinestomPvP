@@ -1,10 +1,10 @@
 package io.github.bloepiloepi.pvp.events;
 
 import io.github.bloepiloepi.pvp.projectile.EntityHittableProjectile;
+import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.event.trait.CancellableEvent;
 import net.minestom.server.event.trait.EntityEvent;
-import net.minestom.server.utils.Position;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -32,14 +32,14 @@ public abstract class ProjectileHitEvent implements EntityEvent {
 	 */
 	public static class ProjectileBlockHitEvent extends ProjectileHitEvent {
 		
-		private final Position position;
+		private final Pos position;
 		
-		public ProjectileBlockHitEvent(@NotNull EntityHittableProjectile projectile, @NotNull Position position) {
+		public ProjectileBlockHitEvent(@NotNull EntityHittableProjectile projectile, @NotNull Pos position) {
 			super(projectile);
 			this.position = position;
 		}
 		
-		public Position getPosition() {
+		public Pos getPosition() {
 			return position;
 		}
 	}

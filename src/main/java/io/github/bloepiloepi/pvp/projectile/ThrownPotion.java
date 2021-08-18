@@ -6,6 +6,7 @@ import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffects;
 import io.github.bloepiloepi.pvp.potion.item.CustomPotionType;
 import io.github.bloepiloepi.pvp.utils.EffectManager;
 import net.minestom.server.collision.BoundingBox;
+import net.minestom.server.coordinate.Pos;
 import net.minestom.server.effects.Effects;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
@@ -15,7 +16,6 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.item.metadata.PotionMeta;
 import net.minestom.server.potion.Potion;
-import net.minestom.server.utils.BlockPosition;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,11 +44,11 @@ public class ThrownPotion extends EntityHittableProjectile {
 			}
 		}
 		
-		BlockPosition blockPosition = getPosition().toBlockPosition();
-		if (entity == null) blockPosition = blockPosition.subtract(0, 1, 0);
+		Pos position = getPosition();
+		if (entity == null) position = position.sub(0, 1, 0);
 		Effects effect = CustomPotionType.hasInstantEffect(potions) ? Effects.INSTANT_SPLASH : Effects.SPLASH_POTION;
-		EffectManager.sendNearby(Objects.requireNonNull(getInstance()), effect, blockPosition.getX(),
-				blockPosition.getY(), blockPosition.getZ(), PotionListener.getColor(item), 64.0D, false);
+		EffectManager.sendNearby(Objects.requireNonNull(getInstance()), effect, position.blockX(),
+				position.blockY(), position.blockZ(), PotionListener.getColor(item), 64.0D, false);
 		
 		return true;
 	}

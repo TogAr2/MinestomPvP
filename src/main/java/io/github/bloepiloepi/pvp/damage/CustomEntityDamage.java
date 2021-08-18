@@ -2,11 +2,11 @@ package io.github.bloepiloepi.pvp.damage;
 
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import net.kyori.adventure.text.Component;
+import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.item.ItemStack;
-import net.minestom.server.utils.Position;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,7 +52,7 @@ public class CustomEntityDamage extends CustomDamageType {
 	
 	@Override
 	@Nullable
-	public Position getPosition() {
+	public Pos getPosition() {
 		return this.entity != null ? this.entity.getPosition() : null;
 	}
 }

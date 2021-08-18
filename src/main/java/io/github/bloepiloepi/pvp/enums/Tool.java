@@ -58,7 +58,7 @@ public enum Tool {
 	
 	Tool(@Nullable ToolMaterial toolMaterial, float attackDamage, float attackSpeed) {
 		float finalAttackDamage = attackDamage + (toolMaterial == null ? 0 : toolMaterial.getAttackDamage());
-		this.material = Material.valueOf(this.name());
+		this.material = Material.fromNamespaceId(this.name().toLowerCase());
 		
 		this.attributeModifiers.put(Attribute.ATTACK_DAMAGE, new AttributeModifier(ModifierUUID.ATTACK_DAMAGE_MODIFIER_ID, "Tool modifier", finalAttackDamage, AttributeOperation.ADDITION));
 		this.attributeModifiers.put(Attribute.ATTACK_SPEED, new AttributeModifier(ModifierUUID.ATTACK_SPEED_MODIFIER_ID, "Tool modifier", attackSpeed, AttributeOperation.ADDITION));

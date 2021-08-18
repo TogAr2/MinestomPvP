@@ -5,13 +5,13 @@
   "target": "@env(DEFAULT)",
   "compatibilityLevel": "JAVA_11",
   "mixins": [
+    "EntityAccessor",
     "EntityMixin",
     "EntityProjectileMixin",
     "LivingEntityAccessor",
     "LivingEntityMixin",
     "NBTUtilsMixin",
     "PlayerAccessor",
-    "PlayerDiggingListenerMixin",
     "PlayerInventoryMixin",
     "PlayerMixin",
     "UseItemListenerMixin"

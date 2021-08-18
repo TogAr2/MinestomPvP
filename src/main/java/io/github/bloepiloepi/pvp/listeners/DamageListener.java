@@ -144,10 +144,10 @@ public class DamageListener {
 				}
 				
 				if (attacker != null && !shield) {
-					double h = attacker.getPosition().getX() - entity.getPosition().getX();
+					double h = attacker.getPosition().x() - entity.getPosition().x();
 					
 					double i;
-					for(i = attacker.getPosition().getZ() - entity.getPosition().getZ(); h * h + i * i < 1.0E-4D; i = (Math.random() - Math.random()) * 0.01D) {
+					for(i = attacker.getPosition().z() - entity.getPosition().z(); h * h + i * i < 1.0E-4D; i = (Math.random() - Math.random()) * 0.01D) {
 						h = (Math.random() - Math.random()) * 0.01D;
 					}
 					
@@ -258,8 +258,8 @@ public class DamageListener {
 			return amount;
 		} else {
 			int k;
-			if (EntityUtils.hasEffect(entity, PotionEffect.DAMAGE_RESISTANCE)) {
-				k = (EntityUtils.getEffect(entity, PotionEffect.DAMAGE_RESISTANCE).getAmplifier() + 1) * 5;
+			if (EntityUtils.hasEffect(entity, PotionEffect.RESISTANCE)) {
+				k = (EntityUtils.getEffect(entity, PotionEffect.RESISTANCE).getAmplifier() + 1) * 5;
 				int j = 25 - k;
 				float f = amount * (float) j;
 				amount = Math.max(f / 25.0F, 0.0F);

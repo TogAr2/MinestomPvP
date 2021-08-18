@@ -2,6 +2,8 @@ package io.github.bloepiloepi.pvp.mixins;
 
 import io.github.bloepiloepi.pvp.projectile.EntityHittableProjectile;
 import net.minestom.server.collision.BoundingBox;
+import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityProjectile;
 import net.minestom.server.entity.EntityType;
@@ -11,9 +13,6 @@ import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.instance.Chunk;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
-import net.minestom.server.utils.BlockPosition;
-import net.minestom.server.utils.Position;
-import net.minestom.server.utils.Vector;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -38,7 +37,7 @@ public abstract class EntityProjectileMixin extends Entity {
 	@SuppressWarnings("ConstantConditions")
 	@Overwrite
 	public void tick(long time) {
-		Position posBefore = getPosition().clone();
+		Pos posBefore = getPosition();
 		
 		if (!super.onGround) {
 			if ((Object) this instanceof EntityHittableProjectile &&
@@ -54,13 +53,13 @@ public abstract class EntityProjectileMixin extends Entity {
 		}
 		
 		super.tick(time);
-		Position posNow = getPosition().clone();
+		Pos posNow = getPosition();
 		if (hackIsStuck(posBefore, posNow, true)) {
 			if (super.onGround) {
 				return;
 			}
 			super.onGround = true;
-			getVelocity().zero();
+			this.velocity = Vec.ZERO;
 			sendPacketToViewersAndSelf(getVelocityPacket());
 			setNoGravity(true);
 			onStuck();
@@ -87,15 +86,14 @@ public abstract class EntityProjectileMixin extends Entity {
 		}
 	}
 	
-	private boolean willBeStuck(Position pos) {
-		return hackIsStuck(pos, pos.clone().add(getVelocity().clone().multiply(0.06).toPosition()), false);
+	private boolean willBeStuck(Pos pos) {
+		return hackIsStuck(pos, pos.add(getVelocity().mul(0.06).asPosition()), false);
 	}
 	
 	@SuppressWarnings("ConstantConditions")
-	private boolean hackIsStuck(Position pos, Position posNow, boolean shouldTeleport) {
-		if (pos.isSimilar(posNow)) {
-			BlockPosition bpos = posNow.toBlockPosition();
-			Block block = instance.getBlock(bpos.getX(), bpos.getY() - 1, bpos.getZ());
+	private boolean hackIsStuck(Pos pos, Pos posNow, boolean shouldTeleport) {
+		if (pos.samePoint(posNow)) {
+			Block block = instance.getBlock(posNow.sub(0, 1, 0));
 			if (!block.isAir() && !block.isLiquid()) {
 				return true;
 			}
@@ -111,22 +109,19 @@ public abstract class EntityProjectileMixin extends Entity {
           For each point we will be checking blocks and entities we're in.
          */
 		double part = .25D; // half of the bounding box
-		Vector dir = posNow.toVector().subtract(pos.toVector());
+		final var dir = posNow.sub(pos).asVec();
 		int parts = (int) Math.ceil(dir.length() / part);
-		Position direction = dir.normalize().multiply(part).toPosition();
+		final var direction = dir.normalize().mul(part).asPosition();
 		for (int i = 0; i < parts; ++i) {
 			// If we're at last part, we can't just add another direction-vector, because we can exceed end point.
 			if (i == parts - 1) {
-				pos.setX(posNow.getX());
-				pos.setY(posNow.getY());
-				pos.setZ(posNow.getZ());
+				pos = posNow;
 			} else {
-				pos.add(direction);
+				pos = pos.add(direction);
 			}
-			BlockPosition bpos = pos.toBlockPosition();
-			Block block = instance.getBlock(bpos.getX(), bpos.getY() - 1, bpos.getZ());
+			Block block = instance.getBlock(pos);
 			if (!block.isAir() && !block.isLiquid()) {
-				EntityHittableProjectile.hitPosition.put(getUuid(), pos.clone());
+				EntityHittableProjectile.hitPosition.put(getUuid(), pos);
 				if (shouldTeleport) teleport(pos);
 				return true;
 			}
@@ -149,8 +144,7 @@ public abstract class EntityProjectileMixin extends Entity {
 			List<Entity> victims = new ArrayList<>();
 			for (Entity entity : entities) {
 				if (shouldDamageShooter && entity == shooter) continue;
-				if (improveHitBoundingBox(entity.getBoundingBox()).expand(0.5, 0.25, 0.5)
-						.intersect(pos.getX(), pos.getY(), pos.getZ())) {
+				if (improveHitBoundingBox(entity.getBoundingBox()).expand(0.5, 0.25, 0.5).intersect(pos)) {
 					victims.add(entity);
 				}
 			}

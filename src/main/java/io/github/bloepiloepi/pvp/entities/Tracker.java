@@ -3,6 +3,8 @@ package io.github.bloepiloepi.pvp.entities;
 import io.github.bloepiloepi.pvp.damage.combat.CombatManager;
 import io.github.bloepiloepi.pvp.food.HungerManager;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
@@ -14,8 +16,6 @@ import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.play.SetCooldownPacket;
-import net.minestom.server.utils.Position;
-import net.minestom.server.utils.Vector;
 import net.minestom.server.utils.time.TimeUnit;
 
 import java.util.*;
@@ -27,8 +27,8 @@ public class Tracker {
 	public static final Map<UUID, HungerManager> hungerManager = new HashMap<>();
 	public static final Map<UUID, Map<Material, Long>> cooldownEnd = new HashMap<>();
 	public static final Map<UUID, Boolean> falling = new HashMap<>();
-	public static final Map<UUID, Position> previousPosition = new HashMap<>();
-	public static final Map<UUID, Vector> playerVelocity = new HashMap<>();
+	public static final Map<UUID, Pos> previousPosition = new HashMap<>();
+	public static final Map<UUID, Vec> playerVelocity = new HashMap<>();
 	public static final Map<UUID, Entity> spectating = new HashMap<>();
 	public static final Map<UUID, Long> itemUseStartTime = new HashMap<>();
 	public static final Map<UUID, Player.Hand> itemUseHand = new HashMap<>();
@@ -88,7 +88,7 @@ public class Tracker {
 	
 	public static void onCooldown(Player player, Material material, int duration) {
 		SetCooldownPacket packet = new SetCooldownPacket();
-		packet.itemId = material.getId();
+		packet.itemId = material.id();
 		packet.cooldownTicks = duration;
 		
 		player.getPlayerConnection().sendPacket(packet);
@@ -137,20 +137,21 @@ public class Tracker {
 			Tracker.increaseInt(Tracker.lastAttackedTicks, player.getUuid(), 1);
 			Tracker.hungerManager.get(player.getUuid()).update();
 			
-			Vector velocity = playerVelocity.computeIfAbsent(player.getUuid(), (uuid) -> new Vector());
+			Pos newPosition = player.getPosition();
+			Pos position = previousPosition.getOrDefault(player.getUuid(), newPosition);
 			
-			Position newPosition = player.getPosition();
-			Position position = previousPosition.getOrDefault(player.getUuid(), newPosition);
+			double dx = newPosition.x() - position.x();
+			double dy = newPosition.y() - position.y();
+			double dz = newPosition.z() - position.z();
 			
-			double dx = newPosition.getX() - position.getX();
-			double dy = newPosition.getY() - position.getY();
-			double dz = newPosition.getZ() - position.getZ();
+			Vec velocity = new Vec(
+					dx * MinecraftServer.TICK_PER_SECOND,
+					dy * MinecraftServer.TICK_PER_SECOND,
+					dz * MinecraftServer.TICK_PER_SECOND
+			);
 			
-			velocity.setX(dx * MinecraftServer.TICK_PER_SECOND);
-			velocity.setY(dy * MinecraftServer.TICK_PER_SECOND);
-			velocity.setZ(dz * MinecraftServer.TICK_PER_SECOND);
-			
-			previousPosition.put(player.getUuid(), newPosition.clone());
+			Tracker.playerVelocity.put(player.getUuid(), velocity);
+			previousPosition.put(player.getUuid(), newPosition);
 		});
 		
 		node.addListener(EntityTickEvent.class, event -> {
@@ -184,10 +185,12 @@ public class Tracker {
 			Player player = event.getPlayer();
 			if (EntityUtils.isClimbing(player)) {
 				lastClimbedBlock.put(player.getUuid(), Objects.requireNonNull(player.getInstance())
-						.getBlock(player.getPosition().toBlockPosition()));
+						.getBlock(player.getPosition()));
 			}
 		});
 		
-		MinecraftServer.getSchedulerManager().buildTask(Tracker::updateCooldown).repeat(1, TimeUnit.SERVER_TICK).schedule();
+		MinecraftServer.getSchedulerManager()
+				.buildTask(Tracker::updateCooldown)
+				.repeat(1, TimeUnit.SERVER_TICK).schedule();
 	}
 }

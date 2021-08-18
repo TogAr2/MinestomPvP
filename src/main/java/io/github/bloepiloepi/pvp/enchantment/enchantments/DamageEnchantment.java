@@ -36,7 +36,7 @@ public class DamageEnchantment extends CustomEnchantment {
 			LivingEntity livingEntity = (LivingEntity) target;
 			if (type == Type.ARTHROPODS && EntityGroup.ofEntity(livingEntity) == EntityGroup.ARTHROPOD) {
 				int i = 20 + ThreadLocalRandom.current().nextInt(10 * level);
-				livingEntity.addEffect(new Potion(PotionEffect.MOVEMENT_SLOWDOWN, (byte) 3, i));
+				livingEntity.addEffect(new Potion(PotionEffect.SLOWNESS, (byte) 3, i));
 			}
 		}
 	}

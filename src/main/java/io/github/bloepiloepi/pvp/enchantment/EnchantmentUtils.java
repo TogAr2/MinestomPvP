@@ -97,7 +97,7 @@ public class EnchantmentUtils {
 	}
 	
 	public static float getSweepingMultiplier(LivingEntity entity) {
-		int i = getEquipmentLevel(CustomEnchantments.get(Enchantment.SWEEPING_EDGE), entity);
+		int i = getEquipmentLevel(CustomEnchantments.get(Enchantment.SWEEPING), entity);
 		if (i <= 0) return 0.0F;
 		return 1.0F - 1.0F / (float) (i + 1);
 	}
@@ -137,6 +137,6 @@ public class EnchantmentUtils {
 	}
 	
 	public static short getBlockEfficiency(LivingEntity entity) {
-		return getEquipmentLevel(CustomEnchantments.get(Enchantment.BLOCK_EFFICIENCY), entity);
+		return getEquipmentLevel(CustomEnchantments.get(Enchantment.EFFICIENCY), entity);
 	}
 }
