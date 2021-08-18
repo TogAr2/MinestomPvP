@@ -18,6 +18,7 @@ You can choose which features you want to use and which ones to not use.
 - [Events](#events)
 - [Customization](#customization)
 - [Contributing](#contributing)
+- [Credits](#credits)
 
 ## Features
 
@@ -70,7 +71,6 @@ This extension provides several events:
 - `PlayerSpectateEvent`: cancellable, called when a spectator tries to spectate an entity by attacking it.
 - `ProjectileBlockHitEvent`: called when a projectile hits a block.
 - `ProjectileEntityHitEvent`: cancellable, called when a projectile hits an entity.
-- `ProjectileShootEvent`: cancellable, called when a player shoots or throws a projectile.
 - `TotemUseEvent`: cancellable, called when a totem prevents an entity from dying.
 
 ### Customization
@@ -90,3 +90,7 @@ You may also open a new pull request if you have made something for this project
 
 If anything does not integrate with your project, you can also open an issue (or submit a pull request).
 I aim towards making this extension as usable as possible!
+
+## Credits
+
+Thanks to [kiipy](https://github.com/kiipy) for testing and finding bugs.
