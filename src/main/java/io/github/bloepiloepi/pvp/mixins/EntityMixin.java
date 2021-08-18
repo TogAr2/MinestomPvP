@@ -3,6 +3,7 @@ package io.github.bloepiloepi.pvp.mixins;
 import io.github.bloepiloepi.pvp.entities.Tracker;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
@@ -21,6 +22,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -52,6 +54,11 @@ public abstract class EntityMixin {
 		} else {
 			return onGround ? drag : 0.98;
 		}
+	}
+	
+	@Redirect(method = "takeKnockback", at = @At(value = "INVOKE", target = "Lnet/minestom/server/coordinate/Vec;mul(D)Lnet/minestom/server/coordinate/Vec;"))
+	private @NotNull Vec onMul(Vec vec, double value) {
+		return vec.mul(value * 2);
 	}
 	
 	@Inject(method = "<init>(Lnet/minestom/server/entity/EntityType;Ljava/util/UUID;)V", at = @At("TAIL"))
