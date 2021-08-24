@@ -66,6 +66,7 @@ Potions and milk buckets are considered food: The Minestom food events are also 
 This extension provides several events:
 
 - `DamageBlockEvent`: cancellable, called when an entity blocks damage using a shield.
+- `EntityKnockbackEvent`: cancellable, called when an entity gets knocked back by another entity. Gets called twice for weapons with the knockback enchantment (once for default damage knockback, once for the extra knockback).
 - `FinalDamageEvent`: cancellable, called when the final damage calculation (including armor and effects) is completed. This event should be used instead of `EntityDamageEvent`, unless you want to detect how much damage was originally dealt.
 - `PickupArrowEvent`: cancellable, called when a player picks up an arrow.
 - `PlayerSpectateEvent`: cancellable, called when a spectator tries to spectate an entity by attacking it.

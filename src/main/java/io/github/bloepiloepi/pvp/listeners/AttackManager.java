@@ -5,12 +5,12 @@ import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entities.EntityGroup;
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
+import io.github.bloepiloepi.pvp.events.EntityKnockbackEvent;
 import io.github.bloepiloepi.pvp.events.PlayerSpectateEvent;
 import io.github.bloepiloepi.pvp.mixins.EntityAccessor;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -23,7 +23,6 @@ import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.player.*;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.network.packet.server.play.EntityAnimationPacket;
-import net.minestom.server.network.packet.server.play.EntityVelocityPacket;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.particle.ParticleCreator;
@@ -153,11 +152,15 @@ public class AttackManager {
 		}
 		
 		if (knockback > 0) {
-			if (target instanceof LivingEntity) {
-				target.takeKnockback(knockback * 0.5F, Math.sin(player.getPosition().yaw() * 0.017453292F), -Math.cos(player.getPosition().yaw() * 0.017453292F));
-			} else {
-				target.setVelocity(target.getVelocity().add(-Math.sin(player.getPosition().yaw() * 0.017453292F) * (float) knockback * 0.5F, 0.1D, Math.cos(player.getPosition().yaw() * 0.017453292F) * (float) knockback * 0.5F));
-			}
+			EntityKnockbackEvent entityKnockbackEvent = new EntityKnockbackEvent(target, player, true, knockback * 0.5F);
+			EventDispatcher.callCancellable(entityKnockbackEvent, () -> {
+				float strength = entityKnockbackEvent.getStrength();
+				if (target instanceof LivingEntity) {
+					target.takeKnockback(strength, Math.sin(player.getPosition().yaw() * 0.017453292F), -Math.cos(player.getPosition().yaw() * 0.017453292F));
+				} else {
+					target.setVelocity(target.getVelocity().add(-Math.sin(player.getPosition().yaw() * 0.017453292F) * strength, 0.1D, Math.cos(player.getPosition().yaw() * 0.017453292F) * strength));
+				}
+			});
 			
 			((EntityAccessor) player).velocity(player.getVelocity().mul(0.6D, 1.0D, 0.6D));
 			player.setSprinting(false);

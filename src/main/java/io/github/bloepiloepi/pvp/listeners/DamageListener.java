@@ -6,6 +6,7 @@ import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
 import io.github.bloepiloepi.pvp.events.DamageBlockEvent;
+import io.github.bloepiloepi.pvp.events.EntityKnockbackEvent;
 import io.github.bloepiloepi.pvp.events.FinalDamageEvent;
 import io.github.bloepiloepi.pvp.events.TotemUseEvent;
 import io.github.bloepiloepi.pvp.utils.DamageUtils;
@@ -151,7 +152,17 @@ public class DamageListener {
 						h = (Math.random() - Math.random()) * 0.01D;
 					}
 					
-					entity.takeKnockback(0.4F, h, i);
+					Entity directAttacker = type.getDirectEntity();
+					if (directAttacker == null) {
+						directAttacker = attacker;
+					}
+					EntityKnockbackEvent entityKnockbackEvent = new EntityKnockbackEvent(entity, directAttacker, false, 0.4F);
+					double finalH = h;
+					double finalI = i;
+					EventDispatcher.callCancellable(entityKnockbackEvent, () -> {
+						float strength = entityKnockbackEvent.getStrength();
+						entity.takeKnockback(strength, finalH, finalI);
+					});
 				}
 			}
 			
