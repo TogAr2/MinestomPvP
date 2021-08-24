@@ -160,7 +160,7 @@ public class PotionListener {
 		
 		thrownPotion.shoot(position, 0.5, 1.0);
 		
-		Vec playerVel = EntityUtils.getActualVelocity(player);
+		Vec playerVel = player.getVelocity();
 		thrownPotion.setVelocity(thrownPotion.getVelocity().add(playerVel.x(),
 				player.isOnGround() ? 0.0D : playerVel.y(), playerVel.z()));
 		

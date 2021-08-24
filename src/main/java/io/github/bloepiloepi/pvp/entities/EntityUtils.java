@@ -306,14 +306,6 @@ public class EntityUtils {
 		projectile.teleport(projectile.getPosition().withYaw(yaw).withPitch(pitch));
 	}
 	
-	public static Vec getActualVelocity(Entity entity) {
-		if (!(entity instanceof Player)) {
-			return entity.getVelocity();
-		} else {
-			return Tracker.playerVelocity.get(entity.getUuid());
-		}
-	}
-	
 	public static Component getName(Entity entity) {
 		HoverEvent<HoverEvent.ShowEntity> hoverEvent = HoverEvent.showEntity(entity.getEntityType().key(), entity.getUuid());
 		if (entity instanceof Player) {

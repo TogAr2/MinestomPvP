@@ -128,7 +128,7 @@ public abstract class AbstractArrow extends EntityHittableProjectile {
 								.mul(MinecraftServer.TICK_PER_SECOND / 2.0);
 						
 						if (knockbackVec.lengthSquared() > 0) {
-							Vec newVel = EntityUtils.getActualVelocity(living).add(knockbackVec);
+							Vec newVel = living.getVelocity().add(knockbackVec);
 							living.setVelocity(newVel);
 						}
 					}

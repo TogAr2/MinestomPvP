@@ -133,7 +133,7 @@ public class FishingBobber extends EntityHittableProjectile {
 		Vec velocity = new Vec(shooterPos.x() - pos.x(), shooterPos.y() - pos.y(),
 				shooterPos.z() - pos.z()).mul(0.1);
 		velocity = velocity.mul(MinecraftServer.TICK_PER_SECOND);
-		entity.setVelocity(EntityUtils.getActualVelocity(entity).add(velocity));
+		entity.setVelocity(entity.getVelocity().add(velocity));
 	}
 	
 	@Override

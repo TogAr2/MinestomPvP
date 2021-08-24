@@ -159,7 +159,7 @@ public class AttackManager {
 				target.setVelocity(target.getVelocity().add(-Math.sin(player.getPosition().yaw() * 0.017453292F) * (float) knockback * 0.5F, 0.1D, Math.cos(player.getPosition().yaw() * 0.017453292F) * (float) knockback * 0.5F));
 			}
 			
-			((EntityAccessor) player).velocity(EntityUtils.getActualVelocity(player).mul(0.6D, 1.0D, 0.6D));
+			((EntityAccessor) player).velocity(player.getVelocity().mul(0.6D, 1.0D, 0.6D));
 			player.setSprinting(false);
 		}
 		

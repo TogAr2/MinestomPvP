@@ -2,6 +2,7 @@ package io.github.bloepiloepi.pvp.entities;
 
 import io.github.bloepiloepi.pvp.damage.combat.CombatManager;
 import io.github.bloepiloepi.pvp.food.HungerManager;
+import io.github.bloepiloepi.pvp.mixins.EntityAccessor;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -27,8 +28,6 @@ public class Tracker {
 	public static final Map<UUID, HungerManager> hungerManager = new HashMap<>();
 	public static final Map<UUID, Map<Material, Long>> cooldownEnd = new HashMap<>();
 	public static final Map<UUID, Boolean> falling = new HashMap<>();
-	public static final Map<UUID, Pos> previousPosition = new HashMap<>();
-	public static final Map<UUID, Vec> playerVelocity = new HashMap<>();
 	public static final Map<UUID, Entity> spectating = new HashMap<>();
 	public static final Map<UUID, Long> itemUseStartTime = new HashMap<>();
 	public static final Map<UUID, Player.Hand> itemUseHand = new HashMap<>();
@@ -120,8 +119,6 @@ public class Tracker {
 			Tracker.hungerManager.remove(uuid);
 			Tracker.cooldownEnd.remove(uuid);
 			Tracker.falling.remove(uuid);
-			Tracker.previousPosition.remove(uuid);
-			Tracker.playerVelocity.remove(uuid);
 			Tracker.spectating.remove(uuid);
 			Tracker.itemUseStartTime.remove(uuid);
 			Tracker.itemUseHand.remove(uuid);
@@ -136,22 +133,6 @@ public class Tracker {
 			
 			Tracker.increaseInt(Tracker.lastAttackedTicks, player.getUuid(), 1);
 			Tracker.hungerManager.get(player.getUuid()).update();
-			
-			Pos newPosition = player.getPosition();
-			Pos position = previousPosition.getOrDefault(player.getUuid(), newPosition);
-			
-			double dx = newPosition.x() - position.x();
-			double dy = newPosition.y() - position.y();
-			double dz = newPosition.z() - position.z();
-			
-			Vec velocity = new Vec(
-					dx * MinecraftServer.TICK_PER_SECOND,
-					dy * MinecraftServer.TICK_PER_SECOND,
-					dz * MinecraftServer.TICK_PER_SECOND
-			);
-			
-			Tracker.playerVelocity.put(player.getUuid(), velocity);
-			previousPosition.put(player.getUuid(), newPosition);
 		});
 		
 		node.addListener(EntityTickEvent.class, event -> {
@@ -169,12 +150,6 @@ public class Tracker {
 		node.addListener(PlayerPreEatEvent.class, event -> {
 			if (Tracker.hasCooldown(event.getPlayer(), event.getFoodItem().getMaterial())) {
 				event.setCancelled(true);
-			}
-		});
-		
-		node.addListener(EntityVelocityEvent.class, event -> {
-			if (event.getEntity() instanceof Player) {
-				playerVelocity.put(event.getEntity().getUuid(), event.getVelocity());
 			}
 		});
 		

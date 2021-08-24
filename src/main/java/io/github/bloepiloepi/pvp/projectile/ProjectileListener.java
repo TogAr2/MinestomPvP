@@ -134,7 +134,7 @@ public class ProjectileListener {
 			
 			projectile.shoot(position, 1.5, 1.0);
 			
-			Vec playerVel = EntityUtils.getActualVelocity(player);
+			Vec playerVel = player.getVelocity();
 			projectile.setVelocity(projectile.getVelocity().add(playerVel.x(),
 					player.isOnGround() ? 0.0D : playerVel.y(), playerVel.z()));
 			
@@ -272,7 +272,7 @@ public class ProjectileListener {
 			
 			arrow.shoot(position, power * 3, 1.0);
 			
-			Vec playerVel = EntityUtils.getActualVelocity(player);
+			Vec playerVel = player.getVelocity();
 			arrow.setVelocity(arrow.getVelocity().add(playerVel.x(),
 					player.isOnGround() ? 0.0D : playerVel.y(), playerVel.z()));
 			

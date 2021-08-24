@@ -3,11 +3,14 @@ package io.github.bloepiloepi.pvp.test;
 import io.github.bloepiloepi.pvp.PvpExtension;
 import io.github.bloepiloepi.pvp.test.commands.Commands;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.GameMode;
+import net.minestom.server.entity.LivingEntity;
+import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
-import net.minestom.server.event.player.PlayerLoginEvent;
-import net.minestom.server.event.player.PlayerSpawnEvent;
+import net.minestom.server.event.player.*;
 import net.minestom.server.extras.lan.OpenToLAN;
 import net.minestom.server.instance.Instance;
 
@@ -24,10 +27,27 @@ public class PvpTest {
 			event.setSpawningInstance(instance);
 			event.getPlayer().setRespawnPoint(spawn);
 			event.getPlayer().setPermissionLevel(4);
+			
+			LivingEntity entity = new LivingEntity(EntityType.ZOMBIE);
+			entity.setInstance(instance, spawn);
+			entity.getAttribute(Attribute.MAX_HEALTH).setBaseValue(20);
+			entity.heal();
 		});
 		
 		MinecraftServer.getGlobalEventHandler().addListener(PlayerSpawnEvent.class, event ->
 				event.getPlayer().setGameMode(GameMode.CREATIVE));
+		
+		MinecraftServer.getGlobalEventHandler().addListener(PlayerSwapItemEvent.class, event -> {
+			Player player = event.getPlayer();
+			double x = Math.sin(player.getPosition().yaw() * (Math.PI / 180));
+			double z = -Math.cos(player.getPosition().yaw() * (Math.PI / 180));
+			player.takeKnockback(0.4F, x, z);
+		});
+		
+		MinecraftServer.getGlobalEventHandler().addListener(PlayerStartFlyingEvent.class,
+				event -> event.getPlayer().setNoGravity(true));
+		MinecraftServer.getGlobalEventHandler().addListener(PlayerStopFlyingEvent.class,
+				event -> event.getPlayer().setNoGravity(false));
 		
 		GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
 		eventHandler.addChild(PvpExtension.events());
