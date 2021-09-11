@@ -66,6 +66,7 @@ public abstract class EntityMixin {
 	
 	/**
 	 * @author me
+	 * @return the eye height
 	 */
 	@Overwrite
 	public double getEyeHeight() {

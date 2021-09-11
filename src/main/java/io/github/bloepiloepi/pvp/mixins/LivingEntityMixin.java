@@ -43,6 +43,9 @@ public abstract class LivingEntityMixin extends Entity {
 	
 	/**
 	 * @author me
+	 * @param type the damage type
+	 * @param value the damage amount
+	 * @return true if the damage was successful
 	 */
 	@SuppressWarnings("ConstantConditions")
 	@Overwrite
