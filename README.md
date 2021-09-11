@@ -9,6 +9,8 @@ It tries to mimic vanilla PvP as good as possible, while being as customizable a
 It does not only provide PvP, but also everything around it, like status effects and food.
 You can choose which features you want to use and which ones to not use.
 
+**I am aware of an issue where projectile collision is not entirely accurate, since the Minestom new block api. I will implement a fix for this at some point.**
+
 ## Table of Contents
 
 - [Features](#features)
