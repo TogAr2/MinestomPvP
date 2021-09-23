@@ -38,14 +38,8 @@ public class AttackManager {
 	public static EventNode<EntityEvent> events() {
 		EventNode<EntityEvent> node = EventNode.type("attack-events", EventFilter.ENTITY);
 		
-		node.addListener(EventListener.builder(PlayerMoveEvent.class).handler(event -> Tracker.falling.put(event.getPlayer().getUuid(),
-				event.getNewPosition().y() - event.getPlayer().getPosition().y() < 0)).ignoreCancelled(false).build());
-		
-		node.addListener(EntityAttackEvent.class, event -> {
-			if (event.getEntity() instanceof Player) {
-				onEntityHit((Player) event.getEntity(), event.getTarget());
-			}
-		});
+		node.addListener(EntityAttackEvent.class, event -> entityHit(event.getEntity(), event.getTarget(), false));
+		node.addListener(PlayerTickEvent.class, AttackManager::spectateTick);
 		
 		node.addListener(EventListener.builder(PlayerHandAnimationEvent.class).handler(event ->
 				resetLastAttackedTicks(event.getPlayer())).ignoreCancelled(false).build());
@@ -56,20 +50,14 @@ public class AttackManager {
 			}
 		}).ignoreCancelled(false).build());
 		
-		node.addListener(PlayerTickEvent.class, event -> {
-			Player player = event.getPlayer();
-			Entity spectating = Tracker.spectating.get(player.getUuid());
-			if (spectating == player) return;
-			
-			//This is to make sure other players don't see the player standing still while spectating
-			//And when the player stops spectating, they are at the entities position instead of their position before spectating
-			player.teleport(spectating.getPosition());
-			
-			if (player.getEntityMeta().isSneaking() || spectating.isRemoved()
-					|| (spectating instanceof LivingEntity && ((LivingEntity) spectating).isDead())) {
-				event.getPlayer().stopSpectating();
-			}
-		});
+		return node;
+	}
+	
+	public static EventNode<EntityEvent> legacyEvents() {
+		EventNode<EntityEvent> node = EventNode.type("legacy-attack-events", EventFilter.ENTITY);
+		
+		node.addListener(EntityAttackEvent.class, event -> entityHit(event.getEntity(), event.getTarget(), true));
+		node.addListener(PlayerTickEvent.class, AttackManager::spectateTick);
 		
 		return node;
 	}
@@ -86,10 +74,27 @@ public class AttackManager {
 		Tracker.lastAttackedTicks.put(player.getUuid(), 0);
 	}
 	
-	public static void onEntityHit(Player player, Entity target) {
+	private static void spectateTick(PlayerTickEvent event) {
+		Player player = event.getPlayer();
+		Entity spectating = Tracker.spectating.get(player.getUuid());
+		if (spectating == player) return;
+		
+		//This is to make sure other players don't see the player standing still while spectating
+		//And when the player stops spectating, they are at the entities position instead of their position before spectating
+		player.teleport(spectating.getPosition());
+		
+		if (player.getEntityMeta().isSneaking() || spectating.isRemoved()
+				|| (spectating instanceof LivingEntity && ((LivingEntity) spectating).isDead())) {
+			event.getPlayer().stopSpectating();
+		}
+	}
+	
+	private static void entityHit(Entity entity, Entity target, boolean legacy) {
 		if (target == null) return;
+		if (!(entity instanceof Player)) return;
+		Player player = (Player) entity;
 		if (player.isDead()) return;
-		if (player.getDistanceSquared(target) >= 36.0D) return;
+		if (entity.getDistanceSquared(target) >= 36.0D) return;
 		
 		if (target instanceof ItemEntity || target instanceof ExperienceOrb || target instanceof EntityProjectile || target == player) {
 			player.kick(Component.translatable("multiplayer.disconnect.invalid_entity_attacked"));
@@ -97,10 +102,10 @@ public class AttackManager {
 			return;
 		}
 		
-		performAttack(player, target);
+		performAttack(player, target, legacy);
 	}
 	
-	public static void performAttack(Player player, Entity target) {
+	public static void performAttack(Player player, Entity target, boolean legacy) {
 		if (player.getGameMode() == GameMode.SPECTATOR) {
 			PlayerSpectateEvent playerSpectateEvent = new PlayerSpectateEvent(player, target);
 			EventDispatcher.callCancellable(playerSpectateEvent, () -> player.spectate(target));
@@ -124,12 +129,12 @@ public class AttackManager {
 		boolean bl2 = false;
 		int knockback = EnchantmentUtils.getKnockback(player);
 		if (player.isSprinting() && strongAttack) {
-			SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_KNOCKBACK, Sound.Source.PLAYER, 1.0F, 1.0F);
+			if (!legacy) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_KNOCKBACK, Sound.Source.PLAYER, 1.0F, 1.0F);
 			knockback++;
 			bl2 = true;
 		}
 		
-		boolean critical = strongAttack && !EntityUtils.isClimbing(player) && Tracker.falling.get(player.getUuid()) && !player.isOnGround() && !EntityUtils.hasEffect(player, PotionEffect.BLINDNESS) && player.getVehicle() == null && target instanceof LivingEntity && !player.isSprinting();
+		boolean critical = strongAttack && !EntityUtils.isClimbing(player) && player.getVelocity().y() < 0 && !player.isOnGround() && !EntityUtils.hasEffect(player, PotionEffect.BLINDNESS) && player.getVehicle() == null && target instanceof LivingEntity && !player.isSprinting();
 		if (critical) {
 			damage *= 1.5F;
 		}
@@ -147,7 +152,7 @@ public class AttackManager {
 		boolean damageSucceeded = EntityUtils.damage(target, CustomDamageType.player(player), damage);
 		
 		if (!damageSucceeded) {
-			SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_NODAMAGE, Sound.Source.PLAYER, 1.0F, 1.0F);
+			if (!legacy) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_NODAMAGE, Sound.Source.PLAYER, 1.0F, 1.0F);
 			return;
 		}
 		
@@ -183,7 +188,7 @@ public class AttackManager {
 		//}
 		
 		if (critical) {
-			SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_CRIT, Sound.Source.PLAYER, 1.0F, 1.0F);
+			if (!legacy) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_CRIT, Sound.Source.PLAYER, 1.0F, 1.0F);
 			
 			EntityAnimationPacket packet = new EntityAnimationPacket();
 			packet.entityId = target.getEntityId();
@@ -193,9 +198,9 @@ public class AttackManager {
 		
 		if (!critical && !sweeping) {
 			if (strongAttack) {
-				SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_STRONG, Sound.Source.PLAYER, 1.0F, 1.0F);
+				if (!legacy) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_STRONG, Sound.Source.PLAYER, 1.0F, 1.0F);
 			} else {
-				SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_WEAK, Sound.Source.PLAYER, 1.0F, 1.0F);
+				if (!legacy) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_WEAK, Sound.Source.PLAYER, 1.0F, 1.0F);
 			}
 		}
 		

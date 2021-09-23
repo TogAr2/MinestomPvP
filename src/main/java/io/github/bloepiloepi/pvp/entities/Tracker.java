@@ -27,7 +27,6 @@ public class Tracker {
 	public static final Map<UUID, Float> lastDamageTaken = new HashMap<>();
 	public static final Map<UUID, HungerManager> hungerManager = new HashMap<>();
 	public static final Map<UUID, Map<Material, Long>> cooldownEnd = new HashMap<>();
-	public static final Map<UUID, Boolean> falling = new HashMap<>();
 	public static final Map<UUID, Entity> spectating = new HashMap<>();
 	public static final Map<UUID, Long> itemUseStartTime = new HashMap<>();
 	public static final Map<UUID, Player.Hand> itemUseHand = new HashMap<>();
@@ -105,7 +104,6 @@ public class Tracker {
 			Tracker.lastDamageTaken.put(uuid, 0F);
 			Tracker.hungerManager.put(uuid, new HungerManager(event.getPlayer()));
 			Tracker.cooldownEnd.put(uuid, new HashMap<>());
-			Tracker.falling.put(uuid, false);
 			Tracker.spectating.put(uuid, event.getPlayer());
 			Tracker.combatManager.put(uuid, new CombatManager(event.getPlayer()));
 		});
@@ -118,7 +116,6 @@ public class Tracker {
 			Tracker.lastDamageTaken.remove(uuid);
 			Tracker.hungerManager.remove(uuid);
 			Tracker.cooldownEnd.remove(uuid);
-			Tracker.falling.remove(uuid);
 			Tracker.spectating.remove(uuid);
 			Tracker.itemUseStartTime.remove(uuid);
 			Tracker.itemUseHand.remove(uuid);
