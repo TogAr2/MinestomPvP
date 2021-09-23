@@ -41,6 +41,19 @@ public class PvpExtension extends Extension {
 		return node;
 	}
 	
+	public static EventNode<EntityEvent> legacyEvents() {
+		EventNode<EntityEvent> node = EventNode.type("pvp-events", EventFilter.ENTITY);
+		
+		node.addChild(AttackManager.legacyEvents());
+		node.addChild(DamageListener.legacyEvents());
+		node.addChild(armorToolEvents());
+		node.addChild(foodEvents());
+		node.addChild(potionEvents());
+		node.addChild(projectileEvents());
+		
+		return node;
+	}
+	
 	/**
 	 * Creates an EventNode with attack events.
 	 * This includes entity hitting, attack cooldown

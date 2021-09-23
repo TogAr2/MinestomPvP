@@ -30,7 +30,7 @@ public class PvpTest {
 			
 			LivingEntity entity = new LivingEntity(EntityType.ZOMBIE);
 			entity.setInstance(instance, spawn);
-			entity.getAttribute(Attribute.MAX_HEALTH).setBaseValue(20);
+			entity.getAttribute(Attribute.MAX_HEALTH).setBaseValue(500);
 			entity.heal();
 		});
 		
@@ -52,7 +52,7 @@ public class PvpTest {
 				event -> event.getPlayer().setNoGravity(false));
 		
 		GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-		eventHandler.addChild(PvpExtension.events());
+		eventHandler.addChild(PvpExtension.legacyEvents());
 		
 		Commands.init();
 		

@@ -1,17 +1,17 @@
 package io.github.bloepiloepi.pvp.listeners;
 
+import io.github.bloepiloepi.pvp.LegacyKnockbackSettings;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.damage.CustomEntityDamage;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
-import io.github.bloepiloepi.pvp.events.DamageBlockEvent;
-import io.github.bloepiloepi.pvp.events.EntityKnockbackEvent;
-import io.github.bloepiloepi.pvp.events.FinalDamageEvent;
-import io.github.bloepiloepi.pvp.events.TotemUseEvent;
+import io.github.bloepiloepi.pvp.events.*;
 import io.github.bloepiloepi.pvp.utils.DamageUtils;
 import net.kyori.adventure.sound.Sound;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
@@ -32,183 +32,218 @@ public class DamageListener {
 	public static EventNode<EntityEvent> events() {
 		EventNode<EntityEvent> node = EventNode.type("damage-events", EventFilter.ENTITY);
 		
-		node.addListener(EventListener.builder(EntityDamageEvent.class).handler(event -> {
-			//TODO player has extra calculations based on difficulty
-			
-			float amount = event.getDamage();
-			
-			CustomDamageType type;
-			if (event.getDamageType() instanceof CustomDamageType) {
-				type = (CustomDamageType) event.getDamageType();
+		node.addListener(EventListener.builder(EntityDamageEvent.class)
+				.handler(event -> handleEntityDamage(event, false))
+				.ignoreCancelled(false)
+				.build());
+		
+		return node;
+	}
+	
+	public static EventNode<EntityEvent> legacyEvents() {
+		EventNode<EntityEvent> node = EventNode.type("legacy-damage-events", EventFilter.ENTITY);
+		
+		node.addListener(EventListener.builder(EntityDamageEvent.class)
+				.handler(event -> handleEntityDamage(event, true))
+				.ignoreCancelled(false)
+				.build());
+		
+		return node;
+	}
+	
+	public static void handleEntityDamage(EntityDamageEvent event, boolean legacy) {
+		//TODO player has extra calculations based on difficulty
+		
+		float amount = event.getDamage();
+		
+		CustomDamageType type;
+		if (event.getDamageType() instanceof CustomDamageType) {
+			type = (CustomDamageType) event.getDamageType();
+		} else {
+			if (event.getDamageType() == DamageType.GRAVITY) {
+				type = CustomDamageType.FALL;
+			} else if (event.getDamageType() == DamageType.ON_FIRE) {
+				type = CustomDamageType.ON_FIRE;
 			} else {
-				if (event.getDamageType() == DamageType.GRAVITY) {
-					type = CustomDamageType.FALL;
-				} else if (event.getDamageType() == DamageType.ON_FIRE) {
-					type = CustomDamageType.ON_FIRE;
-				} else {
-					type = CustomDamageType.OUT_OF_WORLD;
-				}
+				type = CustomDamageType.OUT_OF_WORLD;
 			}
+		}
+		
+		LivingEntity entity = event.getEntity();
+		if (type.isFire() && EntityUtils.hasEffect(entity, PotionEffect.FIRE_RESISTANCE)) {
+			event.setCancelled(true);
+			return;
+		}
+		
+		if (type.damagesHelmet() && !entity.getEquipment(EquipmentSlot.HELMET).isAir()) {
+			//TODO damage helmet item
+			amount *= 0.75F;
+		}
+		
+		Entity attacker = type.getEntity();
+		if (entity instanceof Player && attacker instanceof LivingEntity) {
+			Tracker.lastDamagedBy.put(entity.getUuid(), (LivingEntity) attacker);
+			Tracker.lastDamageTime.put(entity.getUuid(), System.currentTimeMillis());
+		}
+		
+		boolean shield = false;
+		if (amount > 0.0F && EntityUtils.blockedByShield(entity, type)) {
+			DamageBlockEvent damageBlockEvent = new DamageBlockEvent(entity);
+			EventDispatcher.call(damageBlockEvent);
 			
-			LivingEntity entity = event.getEntity();
-			if (type.isFire() && EntityUtils.hasEffect(entity, PotionEffect.FIRE_RESISTANCE)) {
+			//TODO damage shield item
+			
+			if (!damageBlockEvent.isCancelled()) {
+				amount = 0.0F;
+				
+				if (!type.isProjectile()) {
+					if (attacker instanceof LivingEntity) {
+						EntityUtils.takeShieldHit(entity, (LivingEntity) attacker, damageBlockEvent.knockbackAttacker());
+					}
+				}
+				
+				shield = true;
+			}
+		}
+		
+		boolean hurtSoundAndAnimation = true;
+		if (Tracker.invulnerableTime.getOrDefault(entity.getUuid(), 0) > 10.0F) {
+			float lastDamage = Tracker.lastDamageTaken.get(entity.getUuid());
+			
+			if (amount <= lastDamage) {
 				event.setCancelled(true);
 				return;
 			}
 			
-			if (type.damagesHelmet() && !entity.getEquipment(EquipmentSlot.HELMET).isAir()) {
-				//TODO damage helmet item
-				amount *= 0.75F;
-			}
-			
-			Entity attacker = type.getEntity();
-			if (entity instanceof Player && attacker instanceof LivingEntity) {
-				Tracker.lastDamagedBy.put(entity.getUuid(), (LivingEntity) attacker);
-				Tracker.lastDamageTime.put(entity.getUuid(), System.currentTimeMillis());
-			}
-			
-			boolean shield = false;
-			if (amount > 0.0F && EntityUtils.blockedByShield(entity, type)) {
-				DamageBlockEvent damageBlockEvent = new DamageBlockEvent(entity);
-				EventDispatcher.call(damageBlockEvent);
-				
-				//TODO damage shield item
-				
-				if (!damageBlockEvent.isCancelled()) {
-					amount = 0.0F;
-					
-					if (!type.isProjectile()) {
-						if (attacker instanceof LivingEntity) {
-							EntityUtils.takeShieldHit(entity, (LivingEntity) attacker, damageBlockEvent.knockbackAttacker());
-						}
-					}
-					
-					shield = true;
-				}
-			}
-			
-			boolean hurtSoundAndAnimation = true;
-			if (Tracker.invulnerableTime.getOrDefault(entity.getUuid(), 0) > 10.0F) {
-				float lastDamage = Tracker.lastDamageTaken.get(entity.getUuid());
-				
-				if (amount <= lastDamage) {
-					event.setCancelled(true);
-					return;
-				}
-				
-				Tracker.lastDamageTaken.put(entity.getUuid(), amount);
-				amount = applyDamage(entity, type, amount - lastDamage);
-				hurtSoundAndAnimation = false;
+			Tracker.lastDamageTaken.put(entity.getUuid(), amount);
+			amount = applyDamage(entity, type, amount - lastDamage);
+			hurtSoundAndAnimation = false;
+		} else {
+			Tracker.lastDamageTaken.put(entity.getUuid(), amount);
+			Tracker.invulnerableTime.put(entity.getUuid(), 20);
+			amount = applyDamage(entity, type, amount);
+		}
+		
+		FinalDamageEvent finalDamageEvent = new FinalDamageEvent(entity, type, amount);
+		EventDispatcher.call(finalDamageEvent);
+		
+		amount = finalDamageEvent.getDamage();
+		
+		if (finalDamageEvent.getDamage() <= 0.0F) {
+			event.setCancelled(true);
+		}
+		if (finalDamageEvent.isCancelled()) {
+			event.setCancelled(true);
+		}
+		
+		if (hurtSoundAndAnimation) {
+			if (shield) {
+				entity.triggerStatus((byte) 29);
+			} else if (type instanceof CustomEntityDamage && ((CustomEntityDamage) type).isThorns()) {
+				entity.triggerStatus((byte) 33);
 			} else {
-				Tracker.lastDamageTaken.put(entity.getUuid(), amount);
-				Tracker.invulnerableTime.put(entity.getUuid(), 20);
-				amount = applyDamage(entity, type, amount);
-			}
-			
-			FinalDamageEvent finalDamageEvent = new FinalDamageEvent(entity, type, amount);
-			EventDispatcher.call(finalDamageEvent);
-			
-			amount = finalDamageEvent.getDamage();
-			
-			if (finalDamageEvent.getDamage() <= 0.0F) {
-				event.setCancelled(true);
-			}
-			if (finalDamageEvent.isCancelled()) {
-				event.setCancelled(true);
-			}
-			
-			if (hurtSoundAndAnimation) {
-				if (shield) {
-					entity.triggerStatus((byte) 29);
-				} else if (type instanceof CustomEntityDamage && ((CustomEntityDamage) type).isThorns()) {
-					entity.triggerStatus((byte) 33);
+				byte status;
+				if (type == CustomDamageType.DROWN) {
+					//Drown sound and animation
+					status = 36;
+				} else if (type.isFire()) {
+					//Burn sound and animation
+					status = 37;
+				} else if (type == CustomDamageType.SWEET_BERRY_BUSH) {
+					//Sweet berry bush sound and animation
+					status = 44;
+				} else if (type == CustomDamageType.FREEZE) {
+					//Freeze sound and animation
+					status = 57;
 				} else {
-					byte status;
-					if (type == CustomDamageType.DROWN) {
-						//Drown sound and animation
-						status = 36;
-					} else if (type.isFire()) {
-						//Burn sound and animation
-						status = 37;
-					} else if (type == CustomDamageType.SWEET_BERRY_BUSH) {
-						//Sweet berry bush sound and animation
-						status = 44;
-					} else if (type == CustomDamageType.FREEZE) {
-						//Freeze sound and animation
-						status = 57;
-					} else {
-						//Damage sound and animation
-						status = 2;
-					}
-					
-					entity.triggerStatus(status);
+					//Damage sound and animation
+					status = 2;
 				}
 				
-				if (attacker != null && !shield) {
-					double h = attacker.getPosition().x() - entity.getPosition().x();
-					
-					double i;
-					for(i = attacker.getPosition().z() - entity.getPosition().z(); h * h + i * i < 1.0E-4D; i = (Math.random() - Math.random()) * 0.01D) {
-						h = (Math.random() - Math.random()) * 0.01D;
-					}
-					
-					Entity directAttacker = type.getDirectEntity();
-					if (directAttacker == null) {
-						directAttacker = attacker;
-					}
+				entity.triggerStatus(status);
+			}
+			
+			if (attacker != null && !shield) {
+				double h = attacker.getPosition().x() - entity.getPosition().x();
+				
+				double i;
+				for(i = attacker.getPosition().z() - entity.getPosition().z(); h * h + i * i < 1.0E-4D; i = (Math.random() - Math.random()) * 0.01D) {
+					h = (Math.random() - Math.random()) * 0.01D;
+				}
+				
+				Entity directAttacker = type.getDirectEntity();
+				if (directAttacker == null) {
+					directAttacker = attacker;
+				}
+				double finalH = h;
+				double finalI = i;
+				if (!legacy) {
 					EntityKnockbackEvent entityKnockbackEvent = new EntityKnockbackEvent(entity, directAttacker, false, 0.4F);
-					double finalH = h;
-					double finalI = i;
 					EventDispatcher.callCancellable(entityKnockbackEvent, () -> {
 						float strength = entityKnockbackEvent.getStrength();
 						entity.takeKnockback(strength, finalH, finalI);
 					});
-				}
-			}
-			
-			if (shield) {
-				event.setCancelled(true);
-				return;
-			}
-			
-			SoundEvent sound = null;
-			
-			float totalHealth = entity.getHealth() + (entity instanceof Player ? ((Player) entity).getAdditionalHearts() : 0);
-			if (totalHealth - amount <= 0) {
-				boolean totem = totemProtection(entity, type);
-				
-				if (totem) {
-					event.setCancelled(true);
-				} else if (hurtSoundAndAnimation) {
-					//Death sound
-					sound = type.getDeathSound(entity);
-				}
-			} else if (hurtSoundAndAnimation) {
-				//Damage sound
-				sound = type.getSound(entity);
-			}
-			
-			//Play sound
-			if (sound != null) {
-				Sound.Source soundCategory;
-				if (entity instanceof Player) {
-					soundCategory = Sound.Source.PLAYER;
 				} else {
-					// TODO: separate living entity categories
-					soundCategory = Sound.Source.HOSTILE;
+					double magnitude = Math.sqrt(h * h + i * i);
+					LegacyKnockbackEvent legacyKnockbackEvent = new LegacyKnockbackEvent(entity, directAttacker, false);
+					EventDispatcher.callCancellable(legacyKnockbackEvent, () -> {
+						LegacyKnockbackSettings settings = legacyKnockbackEvent.getSettings();
+						Vec newVelocity = entity.getVelocity();
+						
+						double horizontal = settings.getHorizontal();
+						newVelocity = newVelocity.withX((newVelocity.x() / 2) - (finalH / magnitude * horizontal));
+						newVelocity = newVelocity.withY((newVelocity.y() / 2) + settings.getVertical());
+						newVelocity = newVelocity.withZ((newVelocity.z() / 2) - (finalI / magnitude * horizontal));
+						
+						if (newVelocity.y() > settings.getVerticalLimit())
+							newVelocity = newVelocity.withY(settings.getVerticalLimit());
+						
+						entity.setVelocity(newVelocity);
+					});
 				}
-				
-				SoundEffectPacket damageSoundPacket =
-						SoundEffectPacket.create(soundCategory, sound,
-								entity.getPosition(),
-								1.0f, 1.0f);
-				entity.sendPacketToViewersAndSelf(damageSoundPacket);
+			}
+		}
+		
+		if (shield) {
+			event.setCancelled(true);
+			return;
+		}
+		
+		SoundEvent sound = null;
+		
+		float totalHealth = entity.getHealth() + (entity instanceof Player ? ((Player) entity).getAdditionalHearts() : 0);
+		if (totalHealth - amount <= 0) {
+			boolean totem = totemProtection(entity, type);
+			
+			if (totem) {
+				event.setCancelled(true);
+			} else if (hurtSoundAndAnimation) {
+				//Death sound
+				sound = type.getDeathSound(entity);
+			}
+		} else if (hurtSoundAndAnimation) {
+			//Damage sound
+			sound = type.getSound(entity);
+		}
+		
+		//Play sound
+		if (sound != null) {
+			Sound.Source soundCategory;
+			if (entity instanceof Player) {
+				soundCategory = Sound.Source.PLAYER;
+			} else {
+				// TODO: separate living entity categories
+				soundCategory = Sound.Source.HOSTILE;
 			}
 			
-			event.setDamage(amount);
-		}).ignoreCancelled(false).build());
+			SoundEffectPacket damageSoundPacket =
+					SoundEffectPacket.create(soundCategory, sound,
+							entity.getPosition(),
+							1.0f, 1.0f);
+			entity.sendPacketToViewersAndSelf(damageSoundPacket);
+		}
 		
-		return node;
+		event.setDamage(amount);
 	}
 	
 	public static boolean totemProtection(LivingEntity entity, CustomDamageType type) {

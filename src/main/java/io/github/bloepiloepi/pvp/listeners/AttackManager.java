@@ -1,16 +1,19 @@
 package io.github.bloepiloepi.pvp.listeners;
 
+import io.github.bloepiloepi.pvp.LegacyKnockbackSettings;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entities.EntityGroup;
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
 import io.github.bloepiloepi.pvp.events.EntityKnockbackEvent;
+import io.github.bloepiloepi.pvp.events.LegacyKnockbackEvent;
 import io.github.bloepiloepi.pvp.events.PlayerSpectateEvent;
 import io.github.bloepiloepi.pvp.mixins.EntityAccessor;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -157,15 +160,36 @@ public class AttackManager {
 		}
 		
 		if (knockback > 0) {
-			EntityKnockbackEvent entityKnockbackEvent = new EntityKnockbackEvent(target, player, true, knockback * 0.5F);
-			EventDispatcher.callCancellable(entityKnockbackEvent, () -> {
-				float strength = entityKnockbackEvent.getStrength();
+			if (!legacy) {
+				EntityKnockbackEvent entityKnockbackEvent = new EntityKnockbackEvent(target, player, true, knockback * 0.5F);
+				EventDispatcher.callCancellable(entityKnockbackEvent, () -> {
+					float strength = entityKnockbackEvent.getStrength();
+					if (target instanceof LivingEntity) {
+						target.takeKnockback(strength, Math.sin(player.getPosition().yaw() * 0.017453292F), -Math.cos(player.getPosition().yaw() * 0.017453292F));
+					} else {
+						target.setVelocity(target.getVelocity().add(-Math.sin(player.getPosition().yaw() * 0.017453292F) * strength, 0.1D, Math.cos(player.getPosition().yaw() * 0.017453292F) * strength));
+					}
+				});
+			} else {
+				float finalKnockback;
 				if (target instanceof LivingEntity) {
-					target.takeKnockback(strength, Math.sin(player.getPosition().yaw() * 0.017453292F), -Math.cos(player.getPosition().yaw() * 0.017453292F));
+					float knockbackResistance = ((LivingEntity) target).getAttributeValue(Attribute.KNOCKBACK_RESISTANCE);
+					finalKnockback = knockback * (1 - knockbackResistance);
 				} else {
-					target.setVelocity(target.getVelocity().add(-Math.sin(player.getPosition().yaw() * 0.017453292F) * strength, 0.1D, Math.cos(player.getPosition().yaw() * 0.017453292F) * strength));
+					finalKnockback = knockback;
 				}
-			});
+				
+				LegacyKnockbackEvent legacyKnockbackEvent = new LegacyKnockbackEvent(target, player, true);
+				EventDispatcher.callCancellable(legacyKnockbackEvent, () -> {
+					LegacyKnockbackSettings settings = legacyKnockbackEvent.getSettings();
+					
+					target.setVelocity(target.getVelocity().add(
+							-Math.sin(player.getPosition().yaw() * 3.1415927F / 180.0F) * finalKnockback * settings.getExtraHorizontal(),
+							settings.getExtraVertical(),
+							Math.cos(player.getPosition().yaw() * 3.1415927F / 180.0F) * finalKnockback * settings.getExtraHorizontal()
+					));
+				});
+			}
 			
 			((EntityAccessor) player).velocity(player.getVelocity().mul(0.6D, 1.0D, 0.6D));
 			player.setSprinting(false);
