@@ -10,6 +10,11 @@ import io.github.bloepiloepi.pvp.potion.PotionListener;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffects;
 import io.github.bloepiloepi.pvp.potion.item.CustomPotionTypes;
 import io.github.bloepiloepi.pvp.projectile.ProjectileListener;
+import net.minestom.server.attribute.Attribute;
+import net.minestom.server.attribute.AttributeInstance;
+import net.minestom.server.attribute.AttributeModifier;
+import net.minestom.server.attribute.AttributeOperation;
+import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityEvent;
@@ -17,6 +22,11 @@ import net.minestom.server.event.trait.PlayerEvent;
 import net.minestom.server.extensions.Extension;
 
 public class PvpExtension extends Extension {
+	private static final AttributeModifier LEGACY_ATTACK_SPEED = new AttributeModifier(
+			"legacy-attack",
+			Float.MAX_VALUE / 2,
+			AttributeOperation.ADDITION
+	);
 	
 	public static EventNode<EntityEvent> events() {
 		EventNode<EntityEvent> node = EventNode.type("pvp-events", EventFilter.ENTITY);
@@ -95,6 +105,22 @@ public class PvpExtension extends Extension {
 	 */
 	public static EventNode<PlayerEvent> projectileEvents() {
 		return ProjectileListener.events();
+	}
+	
+	/**
+	 * Applies or removes the attribute modifier to remove the
+	 * players attack indicator.
+	 *
+	 * @param player the player
+	 * @param noAttackSpeed {@code true} if attack speed should be disabled
+	 */
+	public static void setNoAttackSpeed(Player player, boolean noAttackSpeed) {
+		AttributeInstance instance = player.getAttribute(Attribute.ATTACK_SPEED);
+		if (noAttackSpeed) {
+			instance.addModifier(LEGACY_ATTACK_SPEED);
+		} else {
+			instance.removeModifier(LEGACY_ATTACK_SPEED);
+		}
 	}
 	
 	@Override

@@ -34,8 +34,10 @@ public class PvpTest {
 			entity.heal();
 		});
 		
-		MinecraftServer.getGlobalEventHandler().addListener(PlayerSpawnEvent.class, event ->
-				event.getPlayer().setGameMode(GameMode.CREATIVE));
+		MinecraftServer.getGlobalEventHandler().addListener(PlayerSpawnEvent.class, event -> {
+			event.getPlayer().setGameMode(GameMode.CREATIVE);
+			PvpExtension.setNoAttackSpeed(event.getPlayer(), true);
+		});
 		
 		MinecraftServer.getGlobalEventHandler().addListener(PlayerSwapItemEvent.class, event -> {
 			Player player = event.getPlayer();
