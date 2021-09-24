@@ -6,6 +6,7 @@ import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.item.ItemUpdateStateEvent;
+import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
 import net.minestom.server.event.player.PlayerHandAnimationEvent;
 import net.minestom.server.event.player.PlayerSwapItemEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
@@ -31,6 +32,11 @@ public class SwordBlockHandler {
 		
 		node.addListener(EventListener.builder(PlayerSwapItemEvent.class)
 				.handler(SwordBlockHandler::handleSwapItem)
+				.ignoreCancelled(false)
+				.build());
+		
+		node.addListener(EventListener.builder(PlayerChangeHeldSlotEvent.class)
+				.handler(SwordBlockHandler::handleChangeSlot)
 				.ignoreCancelled(false)
 				.build());
 		
@@ -62,14 +68,16 @@ public class SwordBlockHandler {
 		}
 	}
 	
+	private static void unblock(Player player) {
+		if (Tracker.blockReplacementItem.containsKey(player.getUuid())) {
+			Tracker.blockingSword.put(player.getUuid(), false);
+			player.setItemInOffHand(Tracker.blockReplacementItem.get(player.getUuid()));
+		}
+	}
+	
 	private static void handleUpdateState(ItemUpdateStateEvent event) {
 		if (event.getHand() == Player.Hand.OFF && event.getItemStack().getMaterial() == Material.SHIELD) {
-			Player player = event.getPlayer();
-			
-			if (Tracker.blockReplacementItem.containsKey(player.getUuid())) {
-				Tracker.blockingSword.put(player.getUuid(), false);
-				player.setItemInOffHand(Tracker.blockReplacementItem.get(player.getUuid()));
-			}
+			unblock(event.getPlayer());
 		}
 	}
 	
@@ -78,6 +86,14 @@ public class SwordBlockHandler {
 		if (player.getItemInOffHand().getMaterial() == Material.SHIELD
 				&& Tracker.blockingSword.get(player.getUuid())) {
 			event.setCancelled(true);
+		}
+	}
+	
+	private static void handleChangeSlot(PlayerChangeHeldSlotEvent event) {
+		Player player = event.getPlayer();
+		if (player.getItemInOffHand().getMaterial() == Material.SHIELD
+				&& Tracker.blockingSword.get(player.getUuid())) {
+			unblock(player);
 		}
 	}
 	
