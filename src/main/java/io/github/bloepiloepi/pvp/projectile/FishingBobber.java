@@ -26,6 +26,8 @@ public class FishingBobber extends EntityHittableProjectile {
 		super(shooter, EntityType.FISHING_BOBBER);
 		this.legacy = legacy;
 		setOwnerEntity(shooter);
+		
+		if (legacy) setGravity(getGravityDragPerTick(), 0.04);
 	}
 	
 	@Override
