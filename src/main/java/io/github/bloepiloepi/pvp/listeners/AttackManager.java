@@ -274,6 +274,6 @@ public class AttackManager {
 			}
 		}
 		
-		EntityUtils.addExhaustion(player, 0.1F);
+		EntityUtils.addExhaustion(player, legacy ? 0.3F: 0.1F);
 	}
 }

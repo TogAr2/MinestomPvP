@@ -131,12 +131,8 @@ public class Tracker {
 			Tracker.lastSwingTime.remove(uuid);
 		});
 		
-		node.addListener(PlayerTickEvent.class, event -> {
-			Player player = event.getPlayer();
-			
-			Tracker.increaseInt(Tracker.lastAttackedTicks, player.getUuid(), 1);
-			Tracker.hungerManager.get(player.getUuid()).update();
-		});
+		node.addListener(PlayerTickEvent.class, event ->
+				Tracker.increaseInt(Tracker.lastAttackedTicks, event.getPlayer().getUuid(), 1));
 		
 		node.addListener(EntityTickEvent.class, event -> {
 			if (Tracker.invulnerableTime.getOrDefault(event.getEntity().getUuid(), 0) > 0) {

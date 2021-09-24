@@ -18,6 +18,7 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.*;
 import net.minestom.server.event.entity.EntityDamageEvent;
+import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
@@ -31,6 +32,9 @@ public class DamageListener {
 	public static EventNode<EntityEvent> events() {
 		EventNode<EntityEvent> node = EventNode.type("damage-events", EventFilter.ENTITY);
 		
+		node.addListener(PlayerTickEvent.class, event ->
+				Tracker.hungerManager.get(event.getPlayer().getUuid()).update(false));
+		
 		node.addListener(EventListener.builder(EntityDamageEvent.class)
 				.handler(event -> handleEntityDamage(event, false))
 				.ignoreCancelled(false)
@@ -41,6 +45,9 @@ public class DamageListener {
 	
 	public static EventNode<EntityEvent> legacyEvents() {
 		EventNode<EntityEvent> node = EventNode.type("legacy-damage-events", EventFilter.ENTITY);
+		
+		node.addListener(PlayerTickEvent.class, event ->
+				Tracker.hungerManager.get(event.getPlayer().getUuid()).update(true));
 		
 		node.addListener(EventListener.builder(EntityDamageEvent.class)
 				.handler(event -> handleEntityDamage(event, true))
@@ -124,12 +131,12 @@ public class DamageListener {
 			}
 			
 			Tracker.lastDamageTaken.put(entity.getUuid(), amount);
-			amount = applyDamage(entity, type, amount - lastDamage);
+			amount = applyDamage(entity, type, amount - lastDamage, legacy);
 			hurtSoundAndAnimation = false;
 		} else {
 			Tracker.lastDamageTaken.put(entity.getUuid(), amount);
 			Tracker.invulnerableTime.put(entity.getUuid(), 20);
-			amount = applyDamage(entity, type, amount);
+			amount = applyDamage(entity, type, amount, legacy);
 		}
 		
 		FinalDamageEvent finalDamageEvent = new FinalDamageEvent(entity, type, amount);
@@ -287,12 +294,12 @@ public class DamageListener {
 		return hasTotem;
 	}
 	
-	public static float applyDamage(LivingEntity entity, CustomDamageType type, float amount) {
+	public static float applyDamage(LivingEntity entity, CustomDamageType type, float amount, boolean legacy) {
 		amount = applyArmorToDamage(entity, type, amount);
 		amount = applyEnchantmentsToDamage(entity, type, amount);
 		
 		if (amount != 0.0F && entity instanceof Player) {
-			EntityUtils.addExhaustion((Player) entity, type.getExhaustion());
+			EntityUtils.addExhaustion((Player) entity, type.getExhaustion() * (legacy ? 3 : 1));
 			Tracker.combatManager.get(entity.getUuid()).recordDamage(type, amount);
 		}
 		

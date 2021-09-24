@@ -48,7 +48,7 @@ public class PvpExtension extends Extension {
 		node.addChild(AttackManager.legacyEvents());
 		node.addChild(DamageListener.legacyEvents());
 		node.addChild(armorToolEvents());
-		node.addChild(foodEvents());
+		node.addChild(FoodListener.events(true));
 		node.addChild(potionEvents());
 		node.addChild(ProjectileListener.events(true));
 		node.addChild(SwordBlockHandler.legacyEvents());
@@ -97,7 +97,7 @@ public class PvpExtension extends Extension {
 	 * @return The EventNode with food events
 	 */
 	public static EventNode<PlayerEvent> foodEvents() {
-		return FoodListener.events();
+		return FoodListener.events(false);
 	}
 	
 	/**
