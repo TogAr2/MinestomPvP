@@ -39,13 +39,6 @@ public class PvpTest {
 			PvpExtension.setNoAttackSpeed(event.getPlayer(), true);
 		});
 		
-		MinecraftServer.getGlobalEventHandler().addListener(PlayerSwapItemEvent.class, event -> {
-			Player player = event.getPlayer();
-			double x = Math.sin(player.getPosition().yaw() * (Math.PI / 180));
-			double z = -Math.cos(player.getPosition().yaw() * (Math.PI / 180));
-			player.takeKnockback(0.4F, x, z);
-		});
-		
 		MinecraftServer.getGlobalEventHandler().addListener(PlayerStartFlyingEvent.class,
 				event -> event.getPlayer().setNoGravity(true));
 		MinecraftServer.getGlobalEventHandler().addListener(PlayerStopFlyingEvent.class,
