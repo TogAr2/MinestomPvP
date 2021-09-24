@@ -1,6 +1,6 @@
 package io.github.bloepiloepi.pvp.events;
 
-import io.github.bloepiloepi.pvp.LegacyKnockbackSettings;
+import io.github.bloepiloepi.pvp.legacy.LegacyKnockbackSettings;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.event.trait.CancellableEvent;
 import net.minestom.server.event.trait.EntityEvent;

@@ -1,6 +1,6 @@
 package io.github.bloepiloepi.pvp.listeners;
 
-import io.github.bloepiloepi.pvp.LegacyKnockbackSettings;
+import io.github.bloepiloepi.pvp.legacy.LegacyKnockbackSettings;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entities.EntityGroup;
@@ -13,7 +13,6 @@ import io.github.bloepiloepi.pvp.mixins.EntityAccessor;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;

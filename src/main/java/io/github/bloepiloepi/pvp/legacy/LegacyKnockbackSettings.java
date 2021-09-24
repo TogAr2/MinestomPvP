@@ -1,4 +1,4 @@
-package io.github.bloepiloepi.pvp;
+package io.github.bloepiloepi.pvp.legacy;
 
 import net.minestom.server.MinecraftServer;
 

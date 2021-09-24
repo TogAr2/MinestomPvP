@@ -2,19 +2,16 @@ package io.github.bloepiloepi.pvp.entities;
 
 import io.github.bloepiloepi.pvp.damage.combat.CombatManager;
 import io.github.bloepiloepi.pvp.food.HungerManager;
-import io.github.bloepiloepi.pvp.mixins.EntityAccessor;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.coordinate.Pos;
-import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.*;
 import net.minestom.server.event.entity.EntityTickEvent;
-import net.minestom.server.event.entity.EntityVelocityEvent;
 import net.minestom.server.event.player.*;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.play.SetCooldownPacket;
 import net.minestom.server.utils.time.TimeUnit;
@@ -35,6 +32,8 @@ public class Tracker {
 	public static final Map<UUID, LivingEntity> lastDamagedBy = new HashMap<>();
 	public static final Map<UUID, Long> lastDamageTime = new HashMap<>();
 	public static final Map<UUID, Long> fireExtinguishTime = new HashMap<>();
+	public static final Map<UUID, ItemStack> blockReplacementItem = new HashMap<>();
+	public static final Map<UUID, Boolean> blockingSword = new HashMap<>();
 	
 	public static <K> void increaseInt(Map<K, Integer> map, K key, int amount) {
 		map.put(key, map.getOrDefault(key, 0) + amount);
@@ -106,6 +105,7 @@ public class Tracker {
 			Tracker.cooldownEnd.put(uuid, new HashMap<>());
 			Tracker.spectating.put(uuid, event.getPlayer());
 			Tracker.combatManager.put(uuid, new CombatManager(event.getPlayer()));
+			Tracker.blockingSword.put(uuid, false);
 		});
 		
 		node.addListener(PlayerDisconnectEvent.class, event -> {
@@ -123,6 +123,9 @@ public class Tracker {
 			Tracker.combatManager.remove(uuid);
 			Tracker.lastDamagedBy.remove(uuid);
 			Tracker.lastDamageTime.remove(uuid);
+			Tracker.fireExtinguishTime.remove(uuid);
+			Tracker.blockReplacementItem.remove(uuid);
+			Tracker.blockingSword.remove(uuid);
 		});
 		
 		node.addListener(PlayerTickEvent.class, event -> {

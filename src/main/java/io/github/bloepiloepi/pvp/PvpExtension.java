@@ -3,6 +3,7 @@ package io.github.bloepiloepi.pvp;
 import io.github.bloepiloepi.pvp.enchantment.CustomEnchantments;
 import io.github.bloepiloepi.pvp.entities.Tracker;
 import io.github.bloepiloepi.pvp.food.FoodListener;
+import io.github.bloepiloepi.pvp.legacy.SwordBlockHandler;
 import io.github.bloepiloepi.pvp.listeners.ArmorToolListener;
 import io.github.bloepiloepi.pvp.listeners.AttackManager;
 import io.github.bloepiloepi.pvp.listeners.DamageListener;
@@ -50,6 +51,7 @@ public class PvpExtension extends Extension {
 		node.addChild(foodEvents());
 		node.addChild(potionEvents());
 		node.addChild(projectileEvents());
+		node.addChild(SwordBlockHandler.legacyEvents());
 		
 		return node;
 	}
