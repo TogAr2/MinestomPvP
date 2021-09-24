@@ -136,7 +136,11 @@ public class AttackManager {
 			bl2 = true;
 		}
 		
-		boolean critical = strongAttack && !EntityUtils.isClimbing(player) && player.getVelocity().y() < 0 && !player.isOnGround() && !EntityUtils.hasEffect(player, PotionEffect.BLINDNESS) && player.getVehicle() == null && target instanceof LivingEntity && !player.isSprinting();
+		boolean critical = strongAttack && !EntityUtils.isClimbing(player) && player.getVelocity().y() < 0 && !player.isOnGround() && !EntityUtils.hasEffect(player, PotionEffect.BLINDNESS) && player.getVehicle() == null && target instanceof LivingEntity;
+		if (!legacy) {
+			// Not sprinting required for critical in 1.9+
+			critical = critical && !player.isSprinting();
+		}
 		if (critical) {
 			damage *= 1.5F;
 		}
