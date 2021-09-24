@@ -33,24 +33,25 @@ public class SwordBlockHandler {
 	private static void handleUseItem(PlayerUseItemEvent event) {
 		Player player = event.getPlayer();
 		
-		if (isSword(event.getItemStack()) && !Tracker.blockingSword.get(player.getUuid())) {
-			Player.Hand oppositeHand = event.getHand() == Player.Hand.MAIN ? Player.Hand.OFF : Player.Hand.MAIN;
-			Tracker.blockReplacementItem.put(player.getUuid(), player.getItemInHand(oppositeHand));
+		if (event.getHand() == Player.Hand.MAIN
+				&& isSword(event.getItemStack())
+				&& !Tracker.blockingSword.get(player.getUuid())) {
+			Tracker.blockReplacementItem.put(player.getUuid(), player.getItemInOffHand());
 			Tracker.blockingSword.put(player.getUuid(), true);
 			
-			player.setItemInHand(oppositeHand, SHIELD);
-			player.refreshActiveHand(true, oppositeHand == Player.Hand.OFF, false);
+			player.setItemInOffHand(SHIELD);
+			player.refreshActiveHand(true, true, false);
 			player.sendPacketToViewersAndSelf(player.getMetadataPacket());
 		}
 	}
 	
 	private static void handleUpdateState(ItemUpdateStateEvent event) {
-		if (event.getItemStack().getMaterial() == Material.SHIELD) {
+		if (event.getHand() == Player.Hand.OFF && event.getItemStack().getMaterial() == Material.SHIELD) {
 			Player player = event.getPlayer();
 			
 			if (Tracker.blockReplacementItem.containsKey(player.getUuid())) {
 				Tracker.blockingSword.put(player.getUuid(), false);
-				player.setItemInHand(event.getHand(), Tracker.blockReplacementItem.get(player.getUuid()));
+				player.setItemInOffHand(Tracker.blockReplacementItem.get(player.getUuid()));
 			}
 		}
 	}
