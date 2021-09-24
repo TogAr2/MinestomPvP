@@ -34,6 +34,8 @@ import net.minestom.server.utils.MathUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 public class AttackManager {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AttackManager.class);
 	
@@ -142,7 +144,11 @@ public class AttackManager {
 			critical = critical && !player.isSprinting();
 		}
 		if (critical) {
-			damage *= 1.5F;
+			if (legacy) {
+				damage += ThreadLocalRandom.current().nextInt((int) (damage / 2 + 2));
+			} else {
+				damage *= 1.5F;
+			}
 		}
 		
 		damage += enchantedDamage;
