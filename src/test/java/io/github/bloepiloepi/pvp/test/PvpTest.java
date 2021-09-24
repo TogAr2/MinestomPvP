@@ -27,6 +27,8 @@ public class PvpTest {
 			event.setSpawningInstance(instance);
 			event.getPlayer().setRespawnPoint(spawn);
 			event.getPlayer().setPermissionLevel(4);
+			event.getPlayer().getAttribute(Attribute.MAX_HEALTH).setBaseValue(1000);
+			event.getPlayer().heal();
 			
 			LivingEntity entity = new LivingEntity(EntityType.ZOMBIE);
 			entity.setInstance(instance, spawn);

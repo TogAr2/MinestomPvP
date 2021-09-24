@@ -55,7 +55,7 @@ public class SwordBlockHandler {
 		if (event.getHand() == Player.Hand.MAIN && isSword(event.getItemStack())
 				&& !Tracker.blockingSword.get(player.getUuid())) {
 			long elapsedSwingTime = System.currentTimeMillis() - Tracker.lastSwingTime.get(player.getUuid());
-			if (elapsedSwingTime < 200) {
+			if (elapsedSwingTime < 50) {
 				return;
 			}
 			
