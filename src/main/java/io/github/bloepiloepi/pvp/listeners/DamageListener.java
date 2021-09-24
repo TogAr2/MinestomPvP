@@ -137,7 +137,7 @@ public class DamageListener {
 		
 		amount = finalDamageEvent.getDamage();
 		
-		if (finalDamageEvent.getDamage() <= 0.0F) {
+		if (finalDamageEvent.getDamage() <= 0.0F && !legacy) {
 			event.setCancelled(true);
 		}
 		if (finalDamageEvent.isCancelled()) {
@@ -252,6 +252,8 @@ public class DamageListener {
 		}
 		
 		event.setDamage(amount);
+		System.out.println("Cancelled " + event.isCancelled());
+		System.out.println("Amount " + amount);
 	}
 	
 	public static boolean totemProtection(LivingEntity entity, CustomDamageType type) {

@@ -38,7 +38,7 @@ public class ProjectileListener {
 	private static final Tag<Byte> MID_LOAD_SOUND_PLAYED = Tag.Byte("MidLoadSoundPlayed");
 	
 	// Please, don't look at the random hardcoded numbers in this class, even I am confused
-	public static EventNode<PlayerEvent> events() {
+	public static EventNode<PlayerEvent> events(boolean legacy) {
 		EventNode<PlayerEvent> node = EventNode.type("projectile-events", EventFilter.PLAYER);
 		
 		node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
@@ -55,7 +55,7 @@ public class ProjectileListener {
 				SoundManager.sendToAround(player, SoundEvent.ENTITY_FISHING_BOBBER_THROW, Sound.Source.NEUTRAL,
 						0.5F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
 				
-				FishingBobber bobber = new FishingBobber(player);
+				FishingBobber bobber = new FishingBobber(player, legacy);
 				FishingBobber.fishingBobbers.put(player.getUuid(), bobber);
 				
 				EntityShootEvent shootEvent = new EntityShootEvent(player, bobber,
