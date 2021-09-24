@@ -59,7 +59,7 @@ public class ProjectileListener {
 				FishingBobber.fishingBobbers.put(player.getUuid(), bobber);
 				
 				EntityShootEvent shootEvent = new EntityShootEvent(player, bobber,
-						player.getPosition(), 0, 0.0045);
+						player.getPosition(), 0, legacy ? 0.0075 : 0.0045);
 				EventDispatcher.call(shootEvent);
 				if (shootEvent.isCancelled()) {
 					bobber.remove();
@@ -70,22 +70,51 @@ public class ProjectileListener {
 				Pos playerPos = player.getPosition();
 				float playerPitch = playerPos.pitch();
 				float playerYaw = playerPos.yaw();
+				
 				float zDir = (float) Math.cos(Math.toRadians(-playerYaw) - Math.PI);
 				float xDir = (float) Math.sin(Math.toRadians(-playerYaw) - Math.PI);
-				double x = playerPos.x() - (double)xDir * 0.3D;
+				double x = playerPos.x() - (double) xDir * 0.3D;
 				double y = playerPos.y() + player.getEyeHeight();
-				double z = playerPos.z() - (double)zDir * 0.3D;
+				double z = playerPos.z() - (double) zDir * 0.3D;
 				bobber.setInstance(Objects.requireNonNull(player.getInstance()), new Pos(x, y, z));
-				Vec velocity = new Vec(-xDir, MathUtils.clamp(-(
-						(float) Math.sin(Math.toRadians(-playerPitch)) /
-						(float) -Math.cos(Math.toRadians(-playerPitch))
-				), -5.0F, 5.0F), -zDir);
-				double xz = velocity.length();
-				velocity = velocity.mul(
-						0.6D / xz + 0.5D + random.nextGaussian() * spread,
-						0.6D / xz + 0.5D + random.nextGaussian() * spread,
-						0.6D / xz + 0.5D + random.nextGaussian() * spread
-				);
+				
+				Vec velocity;
+				
+				if (!legacy) {
+					velocity = new Vec(
+							-xDir,
+							MathUtils.clamp(-(
+									(float) Math.sin(Math.toRadians(-playerPitch)) /
+									(float) -Math.cos(Math.toRadians(-playerPitch))
+							), -5.0F, 5.0F),
+							-zDir
+					);
+					double length = velocity.length();
+					velocity = velocity.mul(
+							0.6D / length + 0.5D + random.nextGaussian() * spread,
+							0.6D / length + 0.5D + random.nextGaussian() * spread,
+							0.6D / length + 0.5D + random.nextGaussian() * spread
+					);
+				} else {
+					double maxVelocity = 0.4F;
+					velocity = new Vec(
+							-Math.sin(playerYaw / 180.0F * (float) Math.PI)
+									* Math.cos(playerPitch / 180.0F * (float) Math.PI) * maxVelocity,
+							-Math.sin(playerPitch / 180.0F * (float) Math.PI) * maxVelocity,
+							Math.cos(playerYaw / 180.0F * (float) Math.PI)
+									* Math.cos(playerPitch / 180.0F * (float) Math.PI) * maxVelocity
+					);
+					double length = velocity.length();
+					velocity = velocity
+							.div(length)
+							.add(
+									random.nextGaussian() * spread,
+									random.nextGaussian() * spread,
+									random.nextGaussian() * spread
+							)
+							.mul(1.5);
+				}
+				
 				bobber.setVelocity(velocity.mul(MinecraftServer.TICK_PER_SECOND * 0.75));
 			}
 		}).filter(event -> event.getItemStack().getMaterial() == Material.FISHING_ROD).ignoreCancelled(false).build());
