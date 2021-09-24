@@ -86,22 +86,31 @@ public class DamageListener {
 		}
 		
 		boolean shield = false;
-		if (amount > 0.0F && EntityUtils.blockedByShield(entity, type)) {
-			DamageBlockEvent damageBlockEvent = new DamageBlockEvent(entity);
+		if (amount > 0.0F && EntityUtils.blockedByShield(entity, type, legacy)) {
+			float resultingDamage = 0.0F;
+			if (legacy) {
+				resultingDamage = (amount + 1.0F) * 0.5F;
+				if (resultingDamage < 0.0F)
+					resultingDamage = 0.0F;
+			}
+			
+			DamageBlockEvent damageBlockEvent = new DamageBlockEvent(entity, amount, resultingDamage);
 			EventDispatcher.call(damageBlockEvent);
 			
 			//TODO damage shield item
 			
 			if (!damageBlockEvent.isCancelled()) {
-				amount = 0.0F;
+				amount = damageBlockEvent.getResultingDamage();
 				
-				if (!type.isProjectile()) {
-					if (attacker instanceof LivingEntity) {
-						EntityUtils.takeShieldHit(entity, (LivingEntity) attacker, damageBlockEvent.knockbackAttacker());
+				if (!legacy) {
+					if (!type.isProjectile()) {
+						if (attacker instanceof LivingEntity) {
+							EntityUtils.takeShieldHit(entity, (LivingEntity) attacker, damageBlockEvent.knockbackAttacker());
+						}
 					}
+					
+					shield = true;
 				}
-				
-				shield = true;
 			}
 		}
 		
