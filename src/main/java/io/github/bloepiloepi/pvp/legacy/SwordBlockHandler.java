@@ -6,6 +6,7 @@ import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.item.ItemUpdateStateEvent;
+import net.minestom.server.event.player.PlayerHandAnimationEvent;
 import net.minestom.server.event.player.PlayerSwapItemEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.event.trait.PlayerEvent;
@@ -33,15 +34,25 @@ public class SwordBlockHandler {
 				.ignoreCancelled(false)
 				.build());
 		
+		node.addListener(PlayerHandAnimationEvent.class, event -> {
+			if (event.getHand() == Player.Hand.MAIN) {
+				Tracker.lastSwingTime.put(event.getPlayer().getUuid(), System.currentTimeMillis());
+			}
+		});
+		
 		return node;
 	}
 	
 	private static void handleUseItem(PlayerUseItemEvent event) {
 		Player player = event.getPlayer();
 		
-		if (event.getHand() == Player.Hand.MAIN
-				&& isSword(event.getItemStack())
+		if (event.getHand() == Player.Hand.MAIN && isSword(event.getItemStack())
 				&& !Tracker.blockingSword.get(player.getUuid())) {
+			long elapsedSwingTime = System.currentTimeMillis() - Tracker.lastSwingTime.get(player.getUuid());
+			if (elapsedSwingTime < 200) {
+				return;
+			}
+			
 			Tracker.blockReplacementItem.put(player.getUuid(), player.getItemInOffHand());
 			Tracker.blockingSword.put(player.getUuid(), true);
 			

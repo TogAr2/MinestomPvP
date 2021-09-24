@@ -34,6 +34,7 @@ public class Tracker {
 	public static final Map<UUID, Long> fireExtinguishTime = new HashMap<>();
 	public static final Map<UUID, ItemStack> blockReplacementItem = new HashMap<>();
 	public static final Map<UUID, Boolean> blockingSword = new HashMap<>();
+	public static final Map<UUID, Long> lastSwingTime = new HashMap<>();
 	
 	public static <K> void increaseInt(Map<K, Integer> map, K key, int amount) {
 		map.put(key, map.getOrDefault(key, 0) + amount);
@@ -106,6 +107,7 @@ public class Tracker {
 			Tracker.spectating.put(uuid, event.getPlayer());
 			Tracker.combatManager.put(uuid, new CombatManager(event.getPlayer()));
 			Tracker.blockingSword.put(uuid, false);
+			Tracker.lastSwingTime.put(uuid, 0L);
 		});
 		
 		node.addListener(PlayerDisconnectEvent.class, event -> {
@@ -126,6 +128,7 @@ public class Tracker {
 			Tracker.fireExtinguishTime.remove(uuid);
 			Tracker.blockReplacementItem.remove(uuid);
 			Tracker.blockingSword.remove(uuid);
+			Tracker.lastSwingTime.remove(uuid);
 		});
 		
 		node.addListener(PlayerTickEvent.class, event -> {
