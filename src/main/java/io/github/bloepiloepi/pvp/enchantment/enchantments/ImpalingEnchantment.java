@@ -11,7 +11,7 @@ public class ImpalingEnchantment extends CustomEnchantment {
 	}
 	
 	@Override
-	public float getAttackDamage(short level, EntityGroup group) {
+	public float getAttackDamage(short level, EntityGroup group, boolean legacy) {
 		return group == EntityGroup.AQUATIC ? (float) level * 2.5F : 0.0F;
 	}
 }

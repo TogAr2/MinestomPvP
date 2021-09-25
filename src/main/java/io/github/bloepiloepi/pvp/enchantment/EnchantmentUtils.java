@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.entities.EntityGroup;
 import io.github.bloepiloepi.pvp.enums.ArmorMaterial;
-import it.unimi.dsi.fastutil.Pair;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
@@ -91,9 +90,9 @@ public class EnchantmentUtils {
 		return result.get();
 	}
 	
-	public static float getAttackDamage(ItemStack stack, EntityGroup group) {
+	public static float getAttackDamage(ItemStack stack, EntityGroup group, boolean legacy) {
 		AtomicReference<Float> result = new AtomicReference<>((float) 0);
-		forEachEnchantment((enchantment, level) -> result.updateAndGet(v -> v + enchantment.getAttackDamage(level, group)), stack);
+		forEachEnchantment((enchantment, level) -> result.updateAndGet(v -> v + enchantment.getAttackDamage(level, group, legacy)), stack);
 		return result.get();
 	}
 	

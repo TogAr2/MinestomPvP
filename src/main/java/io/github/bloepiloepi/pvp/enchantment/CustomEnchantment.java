@@ -41,7 +41,7 @@ public class CustomEnchantment {
 		return 0;
 	}
 	
-	public float getAttackDamage(short level, EntityGroup group) {
+	public float getAttackDamage(short level, EntityGroup group, boolean legacy) {
 		return 0.0F;
 	}
 	

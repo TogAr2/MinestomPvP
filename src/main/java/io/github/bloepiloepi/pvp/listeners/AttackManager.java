@@ -119,9 +119,9 @@ public class AttackManager {
 		float damage = player.getAttributeValue(Attribute.ATTACK_DAMAGE);
 		float enchantedDamage;
 		if (target instanceof LivingEntity) {
-			enchantedDamage = EnchantmentUtils.getAttackDamage(player.getItemInMainHand(), EntityGroup.ofEntity((LivingEntity) target));
+			enchantedDamage = EnchantmentUtils.getAttackDamage(player.getItemInMainHand(), EntityGroup.ofEntity((LivingEntity) target), legacy);
 		} else {
-			enchantedDamage = EnchantmentUtils.getAttackDamage(player.getItemInMainHand(), EntityGroup.DEFAULT);
+			enchantedDamage = EnchantmentUtils.getAttackDamage(player.getItemInMainHand(), EntityGroup.DEFAULT, legacy);
 		}
 		
 		float i = getAttackCooldownProgress(player, 0.5F);
