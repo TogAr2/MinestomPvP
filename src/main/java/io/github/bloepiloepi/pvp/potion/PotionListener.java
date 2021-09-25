@@ -44,7 +44,7 @@ public class PotionListener {
 	
 	private static final Map<TimedPotion, Integer> durationLeftMap = new ConcurrentHashMap<>();
 	
-	public static EventNode<EntityEvent> events() {
+	public static EventNode<EntityEvent> events(boolean legacy) {
 		EventNode<EntityEvent> node = EventNode.type("potion-events", EventFilter.ENTITY);
 		
 		node.addListener(EntityTickEvent.class, event -> {
@@ -76,7 +76,7 @@ public class PotionListener {
 			if (!(event.getEntity() instanceof LivingEntity)) return;
 			
 			CustomPotionEffect customPotionEffect = CustomPotionEffects.get(event.getPotion().getEffect());
-			customPotionEffect.onApplied((LivingEntity) event.getEntity(), event.getPotion().getAmplifier());
+			customPotionEffect.onApplied((LivingEntity) event.getEntity(), event.getPotion().getAmplifier(), legacy);
 			
 			updatePotionVisibility((LivingEntity) event.getEntity());
 		});
@@ -85,7 +85,7 @@ public class PotionListener {
 			if (!(event.getEntity() instanceof LivingEntity)) return;
 			
 			CustomPotionEffect customPotionEffect = CustomPotionEffects.get(event.getPotion().getEffect());
-			customPotionEffect.onRemoved((LivingEntity) event.getEntity(), event.getPotion().getAmplifier());
+			customPotionEffect.onRemoved((LivingEntity) event.getEntity(), event.getPotion().getAmplifier(), legacy);
 			
 			//Delay update 1 tick because we need to have the removing effect removed
 			MinecraftServer.getSchedulerManager().buildTask(() ->

@@ -9,8 +9,8 @@ public class HealthBoostPotionEffect extends CustomPotionEffect {
 	}
 	
 	@Override
-	public void onRemoved(LivingEntity entity, byte amplifier) {
-		super.onRemoved(entity, amplifier);
+	public void onRemoved(LivingEntity entity, byte amplifier, boolean legacy) {
+		super.onRemoved(entity, amplifier, legacy);
 		
 		if (entity.getHealth() > entity.getMaxHealth()) {
 			entity.setHealth(entity.getMaxHealth());

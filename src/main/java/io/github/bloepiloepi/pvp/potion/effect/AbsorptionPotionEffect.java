@@ -10,22 +10,22 @@ public class AbsorptionPotionEffect extends CustomPotionEffect {
 	}
 	
 	@Override
-	public void onApplied(LivingEntity entity, byte amplifier) {
+	public void onApplied(LivingEntity entity, byte amplifier, boolean legacy) {
 		if (entity instanceof Player) {
 			Player player = (Player) entity;
 			player.setAdditionalHearts(player.getAdditionalHearts() + (float) (4 * (amplifier + 1)));
 		}
 		
-		super.onApplied(entity, amplifier);
+		super.onApplied(entity, amplifier, legacy);
 	}
 	
 	@Override
-	public void onRemoved(LivingEntity entity, byte amplifier) {
+	public void onRemoved(LivingEntity entity, byte amplifier, boolean legacy) {
 		if (entity instanceof Player) {
 			Player player = (Player) entity;
 			player.setAdditionalHearts(Math.max(player.getAdditionalHearts() - (float) (4 * (amplifier + 1)), 0));
 		}
 		
-		super.onRemoved(entity, amplifier);
+		super.onRemoved(entity, amplifier, legacy);
 	}
 }
