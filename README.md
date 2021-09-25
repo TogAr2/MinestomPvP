@@ -9,6 +9,8 @@ It tries to mimic vanilla PvP as good as possible, while being as customizable a
 It does not only provide PvP, but also everything around it, like status effects and food.
 You can choose which features you want to use and which ones to not use.
 
+It also has the option to use legacy (pre-1.9) pvp.
+
 **I am aware of an issue where projectile collision is not entirely accurate, since the Minestom new block api. I will implement a fix for this at some point.**
 
 ## Table of Contents
@@ -30,11 +32,11 @@ Currently, most vanilla PvP features are supported.
 - Damage invulnerability
 - Weapons
 - Armor
-- Shields
+- Shields (or sword blocking)
 - Food
 - Totems
 - Bows and crossbows
-- Fishing rods (only hooking entities, not fishing)
+- Fishing rods (only hooking entities or legacy knockback, not fishing)
 - Other projectiles (potions, snowballs, eggs, ender pearls)
 - All enchantments possible with the above features (this includes protection, sharpness, knockback, ...)
 
@@ -54,6 +56,14 @@ You can get an `EventNode` with all PvP related events listening using `PvpExten
 You can add this node as a child to any other node and the pvp will work in the scope.
 Separated features of this extension are also available as static methods in `PvpExtension`.
 
+### Legacy PvP
+
+You can get the `EventNode` for legacy PvP using `PvpExtension.legacyEvents()`.
+**Do not combine it with any non-legacy node, this will cause issues.**
+
+To disable attack cooldown for a player and set their attack damage to the legacy value, use `PvpExtension.setLegacyAttack(player, true)`.
+To enable the cooldown again and set the attack damage to the new value, use `false` instead of `true`.
+
 ### Integration
 
 To integrate this extension into your minestom server, you may have to tweak a little bit to make sure everything works correctly.
@@ -67,8 +77,8 @@ Potions and milk buckets are considered food: The Minestom food events are also 
 
 This extension provides several events:
 
-- `DamageBlockEvent`: cancellable, called when an entity blocks damage using a shield.
-- `EntityKnockbackEvent`: cancellable, called when an entity gets knocked back by another entity. Gets called twice for weapons with the knockback enchantment (once for default damage knockback, once for the extra knockback).
+- `DamageBlockEvent`: cancellable, called when an entity blocks damage using a shield. This event can be used to set the remaining damage.
+- `EntityKnockbackEvent`: cancellable, called when an entity gets knocked back by another entity. Gets called twice for weapons with the knockback enchantment (once for default damage knockback, once for the extra knockback). This event can be used to set the knockback strength or the legacy knockback settings.
 - `FinalDamageEvent`: cancellable, called when the final damage calculation (including armor and effects) is completed. This event should be used instead of `EntityDamageEvent`, unless you want to detect how much damage was originally dealt.
 - `PickupArrowEvent`: cancellable, called when a player picks up an arrow.
 - `PlayerSpectateEvent`: cancellable, called when a spectator tries to spectate an entity by attacking it.
