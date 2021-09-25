@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.entities.EntityGroup;
 import io.github.bloepiloepi.pvp.enums.ArmorMaterial;
+import it.unimi.dsi.fastutil.Pair;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
@@ -78,7 +79,7 @@ public class EnchantmentUtils {
 		}
 	}
 	
-	private static void forEachEnchantment(BiConsumer<CustomEnchantment, Short> consumer, Iterable<ItemStack> stacks) {
+	public static void forEachEnchantment(BiConsumer<CustomEnchantment, Short> consumer, Iterable<ItemStack> stacks) {
 		for (ItemStack itemStack : stacks) {
 			forEachEnchantment(consumer, itemStack);
 		}

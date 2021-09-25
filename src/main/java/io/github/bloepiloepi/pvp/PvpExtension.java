@@ -43,7 +43,7 @@ public class PvpExtension extends Extension {
 	}
 	
 	public static EventNode<EntityEvent> legacyEvents() {
-		EventNode<EntityEvent> node = EventNode.type("pvp-events", EventFilter.ENTITY);
+		EventNode<EntityEvent> node = EventNode.type("legacy-pvp-events", EventFilter.ENTITY);
 		
 		node.addChild(AttackManager.legacyEvents());
 		node.addChild(DamageListener.legacyEvents());

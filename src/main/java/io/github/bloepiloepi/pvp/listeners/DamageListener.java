@@ -27,6 +27,8 @@ import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.sound.SoundEvent;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 public class DamageListener {
 	
 	public static EventNode<EntityEvent> events() {
@@ -295,8 +297,8 @@ public class DamageListener {
 	}
 	
 	public static float applyDamage(LivingEntity entity, CustomDamageType type, float amount, boolean legacy) {
-		amount = applyArmorToDamage(entity, type, amount);
-		amount = applyEnchantmentsToDamage(entity, type, amount);
+		amount = applyArmorToDamage(entity, type, amount, legacy);
+		amount = applyEnchantmentsToDamage(entity, type, amount, legacy);
 		
 		if (amount != 0.0F && entity instanceof Player) {
 			EntityUtils.addExhaustion((Player) entity, type.getExhaustion() * (legacy ? 3 : 1));
@@ -306,15 +308,24 @@ public class DamageListener {
 		return amount;
 	}
 	
-	public static float applyArmorToDamage(LivingEntity entity, CustomDamageType type, float amount) {
+	private static final float LEGACY_REDUCTION_PER_ARMOR = 0.04F;
+	
+	public static float applyArmorToDamage(LivingEntity entity, CustomDamageType type, float amount, boolean legacy) {
 		if (!type.bypassesArmor()) {
-			amount = DamageUtils.getDamageLeft(amount, (float) Math.floor(entity.getAttributeValue(Attribute.ARMOR)), entity.getAttributeValue(Attribute.ARMOR_TOUGHNESS));
+			float armorValue = entity.getAttributeValue(Attribute.ARMOR);
+			if (!legacy) {
+				amount = DamageUtils.getDamageLeft(amount, (float) Math.floor(armorValue), entity.getAttributeValue(Attribute.ARMOR_TOUGHNESS));
+			} else {
+				float reductionPercentage = armorValue * LEGACY_REDUCTION_PER_ARMOR;
+				float reducedDamage = amount * reductionPercentage;
+				amount = amount - reducedDamage;
+			}
 		}
 		
 		return amount;
 	}
 	
-	public static float applyEnchantmentsToDamage(LivingEntity entity, CustomDamageType type, float amount) {
+	public static float applyEnchantmentsToDamage(LivingEntity entity, CustomDamageType type, float amount, boolean legacy) {
 		if (type.isUnblockable()) {
 			return amount;
 		} else {
@@ -330,12 +341,27 @@ public class DamageListener {
 				return 0.0F;
 			} else {
 				k = EnchantmentUtils.getProtectionAmount(EntityUtils.getArmorItems(entity), type);
-				if (k > 0) {
-					amount = DamageUtils.getInflictedDamage(amount, (float) k);
+				if (!legacy) {
+					if (k > 0) {
+						amount = DamageUtils.getInflictedDamage(amount, (float) k);
+					}
+				} else {
+					float reductionPercentage = calculateLegacyEnchantmentReduction(k);
+					float reducedDamage = amount * reductionPercentage;
+					if (reducedDamage > 0) {
+						amount = amount - reducedDamage;
+					}
 				}
 				
 				return amount;
 			}
 		}
+	}
+	
+	private static float calculateLegacyEnchantmentReduction(int totalProtection) {
+		totalProtection = Math.min(25, totalProtection);
+		totalProtection = (int) Math.ceil(totalProtection * ThreadLocalRandom.current().nextDouble(0.5, 1));
+		totalProtection = Math.min(20, totalProtection);
+		return LEGACY_REDUCTION_PER_ARMOR * totalProtection;
 	}
 }

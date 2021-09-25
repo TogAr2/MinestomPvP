@@ -61,6 +61,7 @@ public class CustomPotionEffect {
 		
 		if (entity instanceof Player) {
 			if (potionEffect == PotionEffect.HUNGER) {
+				//TODO exhaustion value for legacy has to be 0.025
 				EntityUtils.addExhaustion((Player) entity, 0.005F * (float) (amplifier + 1));
 				return;
 			} else if (potionEffect == PotionEffect.SATURATION) {
