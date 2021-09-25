@@ -123,18 +123,21 @@ public class PvpExtension extends Extension {
 	}
 	
 	/**
-	 * Applies or removes the attribute modifier to remove the
-	 * players attack indicator.
+	 * Disables or enables legacy attack for a player.
+	 * With legacy attack, the player has no attack speed and 1.0 attack damage instead of 2.0.
 	 *
 	 * @param player the player
-	 * @param noAttackSpeed {@code true} if attack speed should be disabled
+	 * @param legacyAttack {@code true} if legacy attack should be enabled
 	 */
-	public static void setNoAttackSpeed(Player player, boolean noAttackSpeed) {
-		AttributeInstance instance = player.getAttribute(Attribute.ATTACK_SPEED);
-		if (noAttackSpeed) {
-			instance.addModifier(LEGACY_ATTACK_SPEED);
+	public static void setLegacyAttack(Player player, boolean legacyAttack) {
+		AttributeInstance speed = player.getAttribute(Attribute.ATTACK_SPEED);
+		AttributeInstance damage = player.getAttribute(Attribute.ATTACK_DAMAGE);
+		if (legacyAttack) {
+			speed.addModifier(LEGACY_ATTACK_SPEED);
+			damage.setBaseValue(1.0F);
 		} else {
-			instance.removeModifier(LEGACY_ATTACK_SPEED);
+			speed.removeModifier(LEGACY_ATTACK_SPEED);
+			damage.setBaseValue(damage.getAttribute().getDefaultValue());
 		}
 	}
 	

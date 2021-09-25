@@ -8,7 +8,6 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.LivingEntity;
-import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.*;
 import net.minestom.server.extras.lan.OpenToLAN;
@@ -38,7 +37,7 @@ public class PvpTest {
 		
 		MinecraftServer.getGlobalEventHandler().addListener(PlayerSpawnEvent.class, event -> {
 			event.getPlayer().setGameMode(GameMode.CREATIVE);
-			PvpExtension.setNoAttackSpeed(event.getPlayer(), true);
+			PvpExtension.setLegacyAttack(event.getPlayer(), true);
 		});
 		
 		MinecraftServer.getGlobalEventHandler().addListener(PlayerStartFlyingEvent.class,
