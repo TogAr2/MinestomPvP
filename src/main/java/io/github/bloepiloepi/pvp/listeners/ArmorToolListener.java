@@ -24,7 +24,7 @@ import java.util.Map;
 
 public class ArmorToolListener {
 	
-	public static EventNode<EntityEvent> events() {
+	public static EventNode<EntityEvent> events(boolean legacy) {
 		EventNode<EntityEvent> node = EventNode.type("armor-tool-events", EventFilter.ENTITY);
 		
 		node.addListener(EntityEquipEvent.class, event -> {
@@ -32,7 +32,7 @@ public class ArmorToolListener {
 			LivingEntity livingEntity = (LivingEntity) event.getEntity();
 			
 			if (event.getSlot().isArmor()) {
-				changeArmorModifiers(livingEntity, event.getSlot(), event.getEquippedItem());
+				changeArmorModifiers(livingEntity, event.getSlot(), event.getEquippedItem(), legacy);
 			} else if (event.getSlot().isHand()) {
 				changeHandModifiers(livingEntity, event.getSlot(), event.getEquippedItem());
 			}
@@ -46,18 +46,18 @@ public class ArmorToolListener {
 		return node;
 	}
 	
-	private static void changeArmorModifiers(LivingEntity entity, EquipmentSlot slot, ItemStack newItem) {
+	private static void changeArmorModifiers(LivingEntity entity, EquipmentSlot slot, ItemStack newItem, boolean legacy) {
 		//Remove previous armor
 		ItemStack previousStack = entity.getEquipment(slot);
 		ArmorMaterial material = ArmorMaterial.fromMaterial(previousStack.getMaterial());
 		if (material != null) {
-			removeAttributeModifiers(entity, material.getAttributes(slot, previousStack));
+			removeAttributeModifiers(entity, material.getAttributes(slot, previousStack, legacy));
 		}
 		
 		//Add new armor
 		material = ArmorMaterial.fromMaterial(newItem.getMaterial());
 		if (material != null) {
-			addAttributeModifiers(entity, material.getAttributes(slot, newItem));
+			addAttributeModifiers(entity, material.getAttributes(slot, newItem, legacy));
 		}
 	}
 	

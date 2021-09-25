@@ -15,29 +15,31 @@ import java.util.Map;
 import java.util.UUID;
 
 public enum ArmorMaterial {
-	LEATHER(new int[]{1, 2, 3, 1}, SoundEvent.ITEM_ARMOR_EQUIP_LEATHER, 0.0F, 0.0F, Material.LEATHER_BOOTS, Material.LEATHER_LEGGINGS, Material.LEATHER_CHESTPLATE, Material.LEATHER_HELMET),
-	CHAIN(new int[]{1, 4, 5, 2}, SoundEvent.ITEM_ARMOR_EQUIP_CHAIN, 0.0F, 0.0F, Material.CHAINMAIL_BOOTS, Material.CHAINMAIL_LEGGINGS, Material.CHAINMAIL_CHESTPLATE, Material.CHAINMAIL_HELMET),
-	IRON(new int[]{2, 5, 6, 2}, SoundEvent.ITEM_ARMOR_EQUIP_IRON, 0.0F, 0.0F, Material.IRON_BOOTS, Material.IRON_LEGGINGS, Material.IRON_CHESTPLATE, Material.IRON_HELMET),
-	GOLD(new int[]{1, 3, 5, 2}, SoundEvent.ITEM_ARMOR_EQUIP_GOLD, 0.0F, 0.0F, Material.GOLDEN_BOOTS, Material.GOLDEN_LEGGINGS, Material.GOLDEN_CHESTPLATE, Material.GOLDEN_HELMET),
-	DIAMOND(new int[]{3, 6, 8, 3}, SoundEvent.ITEM_ARMOR_EQUIP_DIAMOND, 2.0F, 0.0F, Material.DIAMOND_BOOTS, Material.DIAMOND_LEGGINGS, Material.DIAMOND_CHESTPLATE, Material.DIAMOND_HELMET),
-	TURTLE(new int[]{2, 5, 6, 2}, SoundEvent.ITEM_ARMOR_EQUIP_TURTLE, 0.0F, 0.0F, Material.TURTLE_HELMET),
-	NETHERITE(new int[]{3, 6, 8, 3}, SoundEvent.ITEM_ARMOR_EQUIP_NETHERITE, 3.0F, 0.1F, Material.NETHERITE_BOOTS, Material.NETHERITE_LEGGINGS, Material.NETHERITE_CHESTPLATE, Material.NETHERITE_HELMET);
+	LEATHER(new int[]{1, 2, 3, 1}, new int[]{1, 3, 2, 1}, SoundEvent.ITEM_ARMOR_EQUIP_LEATHER, 0.0F, 0.0F, Material.LEATHER_BOOTS, Material.LEATHER_LEGGINGS, Material.LEATHER_CHESTPLATE, Material.LEATHER_HELMET),
+	CHAIN(new int[]{1, 4, 5, 2}, new int[]{2, 5, 4, 1}, SoundEvent.ITEM_ARMOR_EQUIP_CHAIN, 0.0F, 0.0F, Material.CHAINMAIL_BOOTS, Material.CHAINMAIL_LEGGINGS, Material.CHAINMAIL_CHESTPLATE, Material.CHAINMAIL_HELMET),
+	IRON(new int[]{2, 5, 6, 2}, new int[]{2, 6, 5, 2}, SoundEvent.ITEM_ARMOR_EQUIP_IRON, 0.0F, 0.0F, Material.IRON_BOOTS, Material.IRON_LEGGINGS, Material.IRON_CHESTPLATE, Material.IRON_HELMET),
+	GOLD(new int[]{1, 3, 5, 2}, new int[]{2, 5, 3, 1}, SoundEvent.ITEM_ARMOR_EQUIP_GOLD, 0.0F, 0.0F, Material.GOLDEN_BOOTS, Material.GOLDEN_LEGGINGS, Material.GOLDEN_CHESTPLATE, Material.GOLDEN_HELMET),
+	DIAMOND(new int[]{3, 6, 8, 3}, new int[]{3, 8, 6, 3}, SoundEvent.ITEM_ARMOR_EQUIP_DIAMOND, 2.0F, 0.0F, Material.DIAMOND_BOOTS, Material.DIAMOND_LEGGINGS, Material.DIAMOND_CHESTPLATE, Material.DIAMOND_HELMET),
+	TURTLE(new int[]{2, 5, 6, 2}, new int[]{2, 6, 5, 2}, SoundEvent.ITEM_ARMOR_EQUIP_TURTLE, 0.0F, 0.0F, Material.TURTLE_HELMET),
+	NETHERITE(new int[]{3, 6, 8, 3}, new int[]{3, 8, 6, 3}, SoundEvent.ITEM_ARMOR_EQUIP_NETHERITE, 3.0F, 0.1F, Material.NETHERITE_BOOTS, Material.NETHERITE_LEGGINGS, Material.NETHERITE_CHESTPLATE, Material.NETHERITE_HELMET);
 	
 	private final int[] protectionAmounts;
+	private final int[] legacyProtectionAmounts;
 	private final SoundEvent equipSound;
 	private final float toughness;
 	private final float knockbackResistance;
 	private final Material[] items;
 	
-	ArmorMaterial(int[] protectionAmounts, SoundEvent equipSound, float toughness, float knockbackResistance, Material... items) {
+	ArmorMaterial(int[] protectionAmounts, int[] legacyProtectionAmounts, SoundEvent equipSound, float toughness, float knockbackResistance, Material... items) {
 		this.protectionAmounts = protectionAmounts;
+		this.legacyProtectionAmounts = legacyProtectionAmounts;
 		this.equipSound = equipSound;
 		this.toughness = toughness;
 		this.knockbackResistance = knockbackResistance;
 		this.items = items;
 	}
 	
-	public int getProtectionAmount(EquipmentSlot slot) {
+	public int getProtectionAmount(EquipmentSlot slot, boolean legacy) {
 		int id;
 		switch (slot) {
 			case HELMET: id = 3; break;
@@ -47,7 +49,7 @@ public enum ArmorMaterial {
 			default: return 0;
 		}
 		
-		return this.protectionAmounts[id];
+		return legacy ? this.legacyProtectionAmounts[id] : this.protectionAmounts[id];
 	}
 	
 	public SoundEvent getEquipSound() {
@@ -62,7 +64,7 @@ public enum ArmorMaterial {
 		return this.knockbackResistance;
 	}
 	
-	public Map<Attribute, AttributeModifier> getAttributes(EquipmentSlot slot, ItemStack item) {
+	public Map<Attribute, AttributeModifier> getAttributes(EquipmentSlot slot, ItemStack item, boolean legacy) {
 		Map<Attribute, AttributeModifier> modifiers = new HashMap<>();
 		for (ItemAttribute itemAttribute : item.getMeta().getAttributes()) {
 			if (EquipmentSlot.fromAttributeSlot(itemAttribute.getSlot()) == slot) {
@@ -72,7 +74,7 @@ public enum ArmorMaterial {
 		
 		if (slot == getRequiredSlot(item.getMaterial())) {
 			UUID modifierUUID = getModifierUUID(slot);
-			modifiers.put(Attribute.ARMOR, new AttributeModifier(modifierUUID, "Armor modifier", getProtectionAmount(slot), AttributeOperation.ADDITION));
+			modifiers.put(Attribute.ARMOR, new AttributeModifier(modifierUUID, "Armor modifier", getProtectionAmount(slot, legacy), AttributeOperation.ADDITION));
 			modifiers.put(Attribute.ARMOR_TOUGHNESS, new AttributeModifier(modifierUUID, "Armor toughness", this.toughness, AttributeOperation.ADDITION));
 			if (this.knockbackResistance > 0) {
 				modifiers.put(Attribute.KNOCKBACK_RESISTANCE, new AttributeModifier(modifierUUID, "Armor knockback resistance", this.knockbackResistance, AttributeOperation.ADDITION));

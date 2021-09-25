@@ -47,7 +47,7 @@ public class PvpExtension extends Extension {
 		
 		node.addChild(AttackManager.legacyEvents());
 		node.addChild(DamageListener.legacyEvents());
-		node.addChild(armorToolEvents());
+		node.addChild(ArmorToolListener.events(true));
 		node.addChild(FoodListener.events(true));
 		node.addChild(potionEvents());
 		node.addChild(ProjectileListener.events(true));
@@ -87,7 +87,7 @@ public class PvpExtension extends Extension {
 	 * @return The EventNode with armor and tool events
 	 */
 	public static EventNode<EntityEvent> armorToolEvents() {
-		return ArmorToolListener.events();
+		return ArmorToolListener.events(false);
 	}
 	
 	/**
