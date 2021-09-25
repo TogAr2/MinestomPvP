@@ -8,7 +8,6 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.LivingEntity;
-import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.*;
 import net.minestom.server.extras.lan.OpenToLAN;
@@ -27,21 +26,18 @@ public class PvpTest {
 			event.setSpawningInstance(instance);
 			event.getPlayer().setRespawnPoint(spawn);
 			event.getPlayer().setPermissionLevel(4);
+			event.getPlayer().getAttribute(Attribute.MAX_HEALTH).setBaseValue(1000);
+			event.getPlayer().heal();
 			
 			LivingEntity entity = new LivingEntity(EntityType.ZOMBIE);
 			entity.setInstance(instance, spawn);
-			entity.getAttribute(Attribute.MAX_HEALTH).setBaseValue(20);
+			entity.getAttribute(Attribute.MAX_HEALTH).setBaseValue(500);
 			entity.heal();
 		});
 		
-		MinecraftServer.getGlobalEventHandler().addListener(PlayerSpawnEvent.class, event ->
-				event.getPlayer().setGameMode(GameMode.CREATIVE));
-		
-		MinecraftServer.getGlobalEventHandler().addListener(PlayerSwapItemEvent.class, event -> {
-			Player player = event.getPlayer();
-			double x = Math.sin(player.getPosition().yaw() * (Math.PI / 180));
-			double z = -Math.cos(player.getPosition().yaw() * (Math.PI / 180));
-			player.takeKnockback(0.4F, x, z);
+		MinecraftServer.getGlobalEventHandler().addListener(PlayerSpawnEvent.class, event -> {
+			event.getPlayer().setGameMode(GameMode.CREATIVE);
+			PvpExtension.setLegacyAttack(event.getPlayer(), true);
 		});
 		
 		MinecraftServer.getGlobalEventHandler().addListener(PlayerStartFlyingEvent.class,
@@ -50,7 +46,7 @@ public class PvpTest {
 				event -> event.getPlayer().setNoGravity(false));
 		
 		GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-		eventHandler.addChild(PvpExtension.events());
+		eventHandler.addChild(PvpExtension.legacyEvents());
 		
 		Commands.init();
 		

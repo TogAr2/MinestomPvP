@@ -30,7 +30,7 @@ public class HungerManager {
 		}
 	}
 	
-	public void update() {
+	public void update(boolean legacy) {
 		if (!player.getGameMode().canTakeDamage()) return;
 		
 		Difficulty difficulty = MinecraftServer.getDifficulty();
@@ -45,7 +45,7 @@ public class HungerManager {
 		}
 		
 		//Natural regeneration
-		if (player.getFoodSaturation() > 0.0F && player.getHealth() > 0.0F && player.getHealth() < player.getMaxHealth() && player.getFood() >= 20) {
+		if (!legacy && player.getFoodSaturation() > 0.0F && player.getHealth() > 0.0F && player.getHealth() < player.getMaxHealth() && player.getFood() >= 20) {
 			++this.foodStarvationTimer;
 			if (this.foodStarvationTimer >= 10) {
 				float f = Math.min(player.getFoodSaturation(), 6.0F);
@@ -57,7 +57,7 @@ public class HungerManager {
 			++this.foodStarvationTimer;
 			if (this.foodStarvationTimer >= 80) {
 				player.setHealth(player.getHealth() + 1.0F);
-				this.addExhaustion(6.0F);
+				this.addExhaustion(legacy ? 3.0F : 6.0F);
 				this.foodStarvationTimer = 0;
 			}
 		} else if (player.getFood() <= 0) {

@@ -20,8 +20,9 @@ public class DamageEnchantment extends CustomEnchantment {
 	}
 	
 	@Override
-	public float getAttackDamage(short level, EntityGroup group) {
+	public float getAttackDamage(short level, EntityGroup group, boolean legacy) {
 		if (type == Type.ALL) {
+			if (legacy) return level * 1.25F;
 			return 1.0F + (float) Math.max(0, level - 1) * 0.5F;
 		} else if (type == Type.UNDEAD && group == EntityGroup.UNDEAD) {
 			return (float) level * 2.5F;

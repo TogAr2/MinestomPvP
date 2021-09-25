@@ -9,12 +9,12 @@ public class GlowingPotionEffect extends CustomPotionEffect {
 	}
 	
 	@Override
-	public void onApplied(LivingEntity entity, byte amplifier) {
+	public void onApplied(LivingEntity entity, byte amplifier, boolean legacy) {
 		entity.setGlowing(true);
 	}
 	
 	@Override
-	public void onRemoved(LivingEntity entity, byte amplifier) {
+	public void onRemoved(LivingEntity entity, byte amplifier, boolean legacy) {
 		entity.setGlowing(false);
 	}
 }

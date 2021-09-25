@@ -2,6 +2,7 @@ package io.github.bloepiloepi.pvp.test.commands;
 
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import net.minestom.server.command.builder.Command;
+import net.minestom.server.command.builder.arguments.ArgumentLiteral;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.command.builder.arguments.minecraft.ArgumentEntity;
 import net.minestom.server.command.builder.arguments.number.ArgumentFloat;
@@ -13,6 +14,7 @@ public class DamageCommand extends Command {
 	public DamageCommand() {
 		super("damage");
 		
+		ArgumentLiteral nonGenArg = ArgumentType.Literal("nongen");
 		ArgumentEntity entityArg = ArgumentType.Entity("entity").singleEntity(true);
 		ArgumentFloat amountArg = ArgumentType.Float("amount");
 		
@@ -29,5 +31,19 @@ public class DamageCommand extends Command {
 			
 			((LivingEntity) entity).damage(CustomDamageType.GENERIC, args.get(amountArg));
 		}, entityArg, amountArg);
+		
+		addSyntax((sender, args) -> {
+			Entity entity = args.get(entityArg).findFirstEntity(sender);
+			if (entity == null) {
+				sender.sendMessage("Could not find an entity");
+				return;
+			}
+			if (!(entity instanceof LivingEntity)) {
+				sender.sendMessage("Invalid entity");
+				return;
+			}
+			
+			((LivingEntity) entity).damage(CustomDamageType.player(sender.asPlayer()), args.get(amountArg));
+		}, nonGenArg, entityArg, amountArg);
 	}
 }

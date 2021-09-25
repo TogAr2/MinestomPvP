@@ -78,7 +78,7 @@ public class EnchantmentUtils {
 		}
 	}
 	
-	private static void forEachEnchantment(BiConsumer<CustomEnchantment, Short> consumer, Iterable<ItemStack> stacks) {
+	public static void forEachEnchantment(BiConsumer<CustomEnchantment, Short> consumer, Iterable<ItemStack> stacks) {
 		for (ItemStack itemStack : stacks) {
 			forEachEnchantment(consumer, itemStack);
 		}
@@ -90,9 +90,9 @@ public class EnchantmentUtils {
 		return result.get();
 	}
 	
-	public static float getAttackDamage(ItemStack stack, EntityGroup group) {
+	public static float getAttackDamage(ItemStack stack, EntityGroup group, boolean legacy) {
 		AtomicReference<Float> result = new AtomicReference<>((float) 0);
-		forEachEnchantment((enchantment, level) -> result.updateAndGet(v -> v + enchantment.getAttackDamage(level, group)), stack);
+		forEachEnchantment((enchantment, level) -> result.updateAndGet(v -> v + enchantment.getAttackDamage(level, group, legacy)), stack);
 		return result.get();
 	}
 	

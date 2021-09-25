@@ -24,9 +24,11 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ThrownPotion extends EntityHittableProjectile {
+	private final boolean legacy;
 	
-	public ThrownPotion(@Nullable Entity shooter) {
+	public ThrownPotion(@Nullable Entity shooter, boolean legacy) {
 		super(shooter, EntityType.POTION);
+		this.legacy = legacy;
 	}
 	
 	@Override
@@ -34,7 +36,7 @@ public class ThrownPotion extends EntityHittableProjectile {
 		ItemStack item = getItem();
 		
 		PotionMeta meta = (PotionMeta) item.getMeta();
-		List<Potion> potions = PotionListener.getAllPotions(meta);
+		List<Potion> potions = PotionListener.getAllPotions(meta, legacy);
 		
 		if (!potions.isEmpty()) {
 			if (item.getMaterial() == Material.LINGERING_POTION) {
@@ -47,8 +49,11 @@ public class ThrownPotion extends EntityHittableProjectile {
 		Pos position = getPosition();
 		if (entity == null) position = position.sub(0, 1, 0);
 		Effects effect = CustomPotionType.hasInstantEffect(potions) ? Effects.INSTANT_SPLASH : Effects.SPLASH_POTION;
-		EffectManager.sendNearby(Objects.requireNonNull(getInstance()), effect, position.blockX(),
-				position.blockY(), position.blockZ(), PotionListener.getColor(item), 64.0D, false);
+		EffectManager.sendNearby(
+				Objects.requireNonNull(getInstance()), effect, position.blockX(),
+				position.blockY(), position.blockZ(), PotionListener.getColor(item, legacy),
+				64.0D, false
+		);
 		
 		return true;
 	}
@@ -76,7 +81,10 @@ public class ThrownPotion extends EntityHittableProjectile {
 				if (customPotionEffect.isInstant()) {
 					customPotionEffect.applyInstantEffect(this, getShooter(), entity,potion.getAmplifier(), proximity);
 				} else {
-					int duration = (int) (proximity * (double) potion.getDuration() + 0.5D);
+					int duration = potion.getDuration();
+					if (legacy) duration = (int) Math.floor(duration * 0.75);
+					duration = (int) (proximity * (double) duration + 0.5D);
+					
 					if (duration > 20) {
 						byte flags = potion.getFlags();
 						entity.addEffect(new Potion(potion.getEffect(), potion.getAmplifier(), duration,

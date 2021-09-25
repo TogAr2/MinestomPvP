@@ -3,6 +3,7 @@ package io.github.bloepiloepi.pvp;
 import io.github.bloepiloepi.pvp.enchantment.CustomEnchantments;
 import io.github.bloepiloepi.pvp.entities.Tracker;
 import io.github.bloepiloepi.pvp.food.FoodListener;
+import io.github.bloepiloepi.pvp.legacy.SwordBlockHandler;
 import io.github.bloepiloepi.pvp.listeners.ArmorToolListener;
 import io.github.bloepiloepi.pvp.listeners.AttackManager;
 import io.github.bloepiloepi.pvp.listeners.DamageListener;
@@ -10,6 +11,11 @@ import io.github.bloepiloepi.pvp.potion.PotionListener;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffects;
 import io.github.bloepiloepi.pvp.potion.item.CustomPotionTypes;
 import io.github.bloepiloepi.pvp.projectile.ProjectileListener;
+import net.minestom.server.attribute.Attribute;
+import net.minestom.server.attribute.AttributeInstance;
+import net.minestom.server.attribute.AttributeModifier;
+import net.minestom.server.attribute.AttributeOperation;
+import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityEvent;
@@ -17,6 +23,11 @@ import net.minestom.server.event.trait.PlayerEvent;
 import net.minestom.server.extensions.Extension;
 
 public class PvpExtension extends Extension {
+	private static final AttributeModifier LEGACY_ATTACK_SPEED = new AttributeModifier(
+			"legacy-attack",
+			Float.MAX_VALUE / 2,
+			AttributeOperation.ADDITION
+	);
 	
 	public static EventNode<EntityEvent> events() {
 		EventNode<EntityEvent> node = EventNode.type("pvp-events", EventFilter.ENTITY);
@@ -27,6 +38,20 @@ public class PvpExtension extends Extension {
 		node.addChild(foodEvents());
 		node.addChild(potionEvents());
 		node.addChild(projectileEvents());
+		
+		return node;
+	}
+	
+	public static EventNode<EntityEvent> legacyEvents() {
+		EventNode<EntityEvent> node = EventNode.type("legacy-pvp-events", EventFilter.ENTITY);
+		
+		node.addChild(AttackManager.legacyEvents());
+		node.addChild(DamageListener.legacyEvents());
+		node.addChild(ArmorToolListener.events(true));
+		node.addChild(FoodListener.events(true));
+		node.addChild(PotionListener.events(true));
+		node.addChild(ProjectileListener.events(true));
+		node.addChild(SwordBlockHandler.legacyEvents());
 		
 		return node;
 	}
@@ -62,7 +87,7 @@ public class PvpExtension extends Extension {
 	 * @return The EventNode with armor and tool events
 	 */
 	public static EventNode<EntityEvent> armorToolEvents() {
-		return ArmorToolListener.events();
+		return ArmorToolListener.events(false);
 	}
 	
 	/**
@@ -72,7 +97,7 @@ public class PvpExtension extends Extension {
 	 * @return The EventNode with food events
 	 */
 	public static EventNode<PlayerEvent> foodEvents() {
-		return FoodListener.events();
+		return FoodListener.events(false);
 	}
 	
 	/**
@@ -83,7 +108,7 @@ public class PvpExtension extends Extension {
 	 * @return The EventNode with potion events
 	 */
 	public static EventNode<EntityEvent> potionEvents() {
-		return PotionListener.events();
+		return PotionListener.events(false);
 	}
 	
 	/**
@@ -94,7 +119,26 @@ public class PvpExtension extends Extension {
 	 * @return The EventNode with projectile events
 	 */
 	public static EventNode<PlayerEvent> projectileEvents() {
-		return ProjectileListener.events();
+		return ProjectileListener.events(false);
+	}
+	
+	/**
+	 * Disables or enables legacy attack for a player.
+	 * With legacy attack, the player has no attack speed and 1.0 attack damage instead of 2.0.
+	 *
+	 * @param player the player
+	 * @param legacyAttack {@code true} if legacy attack should be enabled
+	 */
+	public static void setLegacyAttack(Player player, boolean legacyAttack) {
+		AttributeInstance speed = player.getAttribute(Attribute.ATTACK_SPEED);
+		AttributeInstance damage = player.getAttribute(Attribute.ATTACK_DAMAGE);
+		if (legacyAttack) {
+			speed.addModifier(LEGACY_ATTACK_SPEED);
+			damage.setBaseValue(1.0F);
+		} else {
+			speed.removeModifier(LEGACY_ATTACK_SPEED);
+			damage.setBaseValue(damage.getAttribute().getDefaultValue());
+		}
 	}
 	
 	@Override

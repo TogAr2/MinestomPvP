@@ -22,6 +22,7 @@ public class CustomPotionEffect {
 	public static final int PERMANENT = 32767;
 	
 	private final Map<Attribute, AttributeModifier> attributeModifiers = new HashMap<>();
+	private Map<Attribute, AttributeModifier> legacyAttributeModifiers;
 	private final PotionEffect potionEffect;
 	private final int color;
 	
@@ -43,6 +44,13 @@ public class CustomPotionEffect {
 		return this;
 	}
 	
+	public CustomPotionEffect addLegacyAttributeModifier(Attribute attribute, String uuid, float amount, AttributeOperation operation) {
+		if (legacyAttributeModifiers == null)
+			legacyAttributeModifiers = new HashMap<>();
+		legacyAttributeModifiers.put(attribute, new AttributeModifier(UUID.fromString(uuid), potionEffect.name(), amount, operation));
+		return this;
+	}
+	
 	public void applyUpdateEffect(LivingEntity entity, byte amplifier) {
 		if (potionEffect == PotionEffect.REGENERATION) {
 			if (entity.getHealth() < entity.getMaxHealth()) {
@@ -61,6 +69,7 @@ public class CustomPotionEffect {
 		
 		if (entity instanceof Player) {
 			if (potionEffect == PotionEffect.HUNGER) {
+				//TODO exhaustion value for legacy has to be 0.025
 				EntityUtils.addExhaustion((Player) entity, 0.005F * (float) (amplifier + 1));
 				return;
 			} else if (potionEffect == PotionEffect.SATURATION) {
@@ -131,16 +140,30 @@ public class CustomPotionEffect {
 		return false;
 	}
 	
-	public void onApplied(LivingEntity entity, byte amplifier) {
-		attributeModifiers.forEach((attribute, modifier) -> {
+	public void onApplied(LivingEntity entity, byte amplifier, boolean legacy) {
+		Map<Attribute, AttributeModifier> modifiers;
+		if (legacy && legacyAttributeModifiers != null) {
+			modifiers = legacyAttributeModifiers;
+		} else {
+			modifiers = attributeModifiers;
+		}
+		
+		modifiers.forEach((attribute, modifier) -> {
 			AttributeInstance instance = entity.getAttribute(attribute);
 			instance.removeModifier(modifier);
 			instance.addModifier(new AttributeModifier(modifier.getId(), potionEffect.name() + " " + amplifier, adjustModifierAmount(amplifier, modifier), modifier.getOperation()));
 		});
 	}
 	
-	public void onRemoved(LivingEntity entity, byte amplifier) {
-		attributeModifiers.forEach((attribute, modifier) ->
+	public void onRemoved(LivingEntity entity, byte amplifier, boolean legacy) {
+		Map<Attribute, AttributeModifier> modifiers;
+		if (legacy && legacyAttributeModifiers != null) {
+			modifiers = legacyAttributeModifiers;
+		} else {
+			modifiers = attributeModifiers;
+		}
+		
+		modifiers.forEach((attribute, modifier) ->
 				entity.getAttribute(attribute).removeModifier(modifier));
 	}
 	

@@ -31,11 +31,13 @@ public class Arrow extends AbstractArrow {
 	public static final Predicate<ItemStack> ARROW_OR_FIREWORK_PREDICATE = ARROW_PREDICATE.or(stack ->
 			stack.getMaterial() == Material.FIREWORK_ROCKET);
 	
+	private final boolean legacy;
 	private PotionMeta potion;
 	private boolean fixedColor;
 	
-	public Arrow(@Nullable Entity shooter) {
+	public Arrow(@Nullable Entity shooter, boolean legacy) {
 		super(shooter, EntityType.ARROW);
+		this.legacy = legacy;
 	}
 	
 	public void inheritEffects(ItemStack stack) {
@@ -51,7 +53,7 @@ public class Arrow extends AbstractArrow {
 					setColor(-1);
 				} else {
 					setColor(PotionListener.getPotionColor(
-							PotionListener.getAllPotions(potionType, customEffects)));
+							PotionListener.getAllPotions(potionType, customEffects, legacy)));
 				}
 			} else {
 				fixedColor = true;
@@ -87,7 +89,7 @@ public class Arrow extends AbstractArrow {
 	protected void onHurt(LivingEntity entity) {
 		CustomPotionType customPotionType = CustomPotionTypes.get(potion.getPotionType());
 		if (customPotionType != null) {
-			for (Potion potion : customPotionType.getEffects()) {
+			for (Potion potion : legacy ? customPotionType.getLegacyEffects() : customPotionType.getEffects()) {
 				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.getEffect());
 				if (customPotionEffect.isInstant()) {
 					customPotionEffect.applyInstantEffect(this, null,
@@ -149,7 +151,7 @@ public class Arrow extends AbstractArrow {
 	public void addPotion(net.minestom.server.potion.CustomPotionEffect effect) {
 		potion.getCustomPotionEffects().add(effect);
 		setColor(PotionListener.getPotionColor(
-				PotionListener.getAllPotions(potion.getPotionType(), potion.getCustomPotionEffects())));
+				PotionListener.getAllPotions(potion.getPotionType(), potion.getCustomPotionEffects(), legacy)));
 	}
 	
 	private void setColor(int color) {

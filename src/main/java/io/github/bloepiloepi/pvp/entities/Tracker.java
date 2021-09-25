@@ -2,19 +2,16 @@ package io.github.bloepiloepi.pvp.entities;
 
 import io.github.bloepiloepi.pvp.damage.combat.CombatManager;
 import io.github.bloepiloepi.pvp.food.HungerManager;
-import io.github.bloepiloepi.pvp.mixins.EntityAccessor;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.coordinate.Pos;
-import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.*;
 import net.minestom.server.event.entity.EntityTickEvent;
-import net.minestom.server.event.entity.EntityVelocityEvent;
 import net.minestom.server.event.player.*;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.play.SetCooldownPacket;
 import net.minestom.server.utils.time.TimeUnit;
@@ -27,7 +24,6 @@ public class Tracker {
 	public static final Map<UUID, Float> lastDamageTaken = new HashMap<>();
 	public static final Map<UUID, HungerManager> hungerManager = new HashMap<>();
 	public static final Map<UUID, Map<Material, Long>> cooldownEnd = new HashMap<>();
-	public static final Map<UUID, Boolean> falling = new HashMap<>();
 	public static final Map<UUID, Entity> spectating = new HashMap<>();
 	public static final Map<UUID, Long> itemUseStartTime = new HashMap<>();
 	public static final Map<UUID, Player.Hand> itemUseHand = new HashMap<>();
@@ -36,6 +32,9 @@ public class Tracker {
 	public static final Map<UUID, LivingEntity> lastDamagedBy = new HashMap<>();
 	public static final Map<UUID, Long> lastDamageTime = new HashMap<>();
 	public static final Map<UUID, Long> fireExtinguishTime = new HashMap<>();
+	public static final Map<UUID, ItemStack> blockReplacementItem = new HashMap<>();
+	public static final Map<UUID, Boolean> blockingSword = new HashMap<>();
+	public static final Map<UUID, Long> lastSwingTime = new HashMap<>();
 	
 	public static <K> void increaseInt(Map<K, Integer> map, K key, int amount) {
 		map.put(key, map.getOrDefault(key, 0) + amount);
@@ -105,9 +104,10 @@ public class Tracker {
 			Tracker.lastDamageTaken.put(uuid, 0F);
 			Tracker.hungerManager.put(uuid, new HungerManager(event.getPlayer()));
 			Tracker.cooldownEnd.put(uuid, new HashMap<>());
-			Tracker.falling.put(uuid, false);
 			Tracker.spectating.put(uuid, event.getPlayer());
 			Tracker.combatManager.put(uuid, new CombatManager(event.getPlayer()));
+			Tracker.blockingSword.put(uuid, false);
+			Tracker.lastSwingTime.put(uuid, 0L);
 		});
 		
 		node.addListener(PlayerDisconnectEvent.class, event -> {
@@ -118,7 +118,6 @@ public class Tracker {
 			Tracker.lastDamageTaken.remove(uuid);
 			Tracker.hungerManager.remove(uuid);
 			Tracker.cooldownEnd.remove(uuid);
-			Tracker.falling.remove(uuid);
 			Tracker.spectating.remove(uuid);
 			Tracker.itemUseStartTime.remove(uuid);
 			Tracker.itemUseHand.remove(uuid);
@@ -126,14 +125,14 @@ public class Tracker {
 			Tracker.combatManager.remove(uuid);
 			Tracker.lastDamagedBy.remove(uuid);
 			Tracker.lastDamageTime.remove(uuid);
+			Tracker.fireExtinguishTime.remove(uuid);
+			Tracker.blockReplacementItem.remove(uuid);
+			Tracker.blockingSword.remove(uuid);
+			Tracker.lastSwingTime.remove(uuid);
 		});
 		
-		node.addListener(PlayerTickEvent.class, event -> {
-			Player player = event.getPlayer();
-			
-			Tracker.increaseInt(Tracker.lastAttackedTicks, player.getUuid(), 1);
-			Tracker.hungerManager.get(player.getUuid()).update();
-		});
+		node.addListener(PlayerTickEvent.class, event ->
+				Tracker.increaseInt(Tracker.lastAttackedTicks, event.getPlayer().getUuid(), 1));
 		
 		node.addListener(EntityTickEvent.class, event -> {
 			if (Tracker.invulnerableTime.getOrDefault(event.getEntity().getUuid(), 0) > 0) {

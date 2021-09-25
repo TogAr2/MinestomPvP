@@ -102,7 +102,7 @@ public class EntityUtils {
 		return false;
 	}
 	
-	public static boolean blockedByShield(LivingEntity entity, CustomDamageType type) {
+	public static boolean blockedByShield(LivingEntity entity, CustomDamageType type, boolean legacy) {
 		Entity damager = type.getDirectEntity();
 		boolean piercing = false;
 		if (damager != null && damager.getEntityMeta() instanceof AbstractArrowMeta) {
@@ -112,6 +112,8 @@ public class EntityUtils {
 		}
 		
 		if (!type.bypassesArmor() && !piercing && isBlocking(entity)) {
+			if (legacy) return true;
+			
 			Pos attackerPos = type.getPosition();
 			if (attackerPos != null) {
 				Pos entityPos = entity.getPosition();
@@ -188,7 +190,7 @@ public class EntityUtils {
 	public static Iterable<ItemStack> getArmorItems(LivingEntity entity) {
 		List<ItemStack> list = new ArrayList<>();
 		for (EquipmentSlot slot : EquipmentSlot.values()) {
-			if (slot.isArmor()) {
+			if (slot.isArmor() && !entity.getEquipment(slot).isAir()) {
 				list.add(entity.getEquipment(slot));
 			}
 		}

@@ -24,7 +24,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class FoodListener {
 	
-	public static EventNode<PlayerEvent> events() {
+	public static EventNode<PlayerEvent> events(boolean legacy) {
 		EventNode<PlayerEvent> node = EventNode.type("food-events", EventFilter.PLAYER);
 		
 		node.addListener(EventListener.builder(PlayerPreEatEvent.class).handler(event -> {
@@ -90,8 +90,10 @@ public class FoodListener {
 			eatSounds(player);
 		});
 		
-		node.addListener(EventListener.builder(PlayerBlockBreakEvent.class).handler(event ->
-				EntityUtils.addExhaustion(event.getPlayer(), 0.005F)).ignoreCancelled(false).build());
+		node.addListener(EventListener.builder(PlayerBlockBreakEvent.class)
+				.handler(event -> EntityUtils.addExhaustion(event.getPlayer(), legacy ? 0.025F : 0.005F))
+				.ignoreCancelled(false)
+				.build());
 		
 		node.addListener(EventListener.builder(PlayerMoveEvent.class).handler(event -> {
 			Player player = event.getPlayer();
@@ -103,9 +105,9 @@ public class FoodListener {
 			//Check if movement was a jump
 			if (yDiff > 0.0D && player.isOnGround()) {
 				if (player.isSprinting()) {
-					EntityUtils.addExhaustion(player, 0.2F);
+					EntityUtils.addExhaustion(player, legacy ? 0.8F : 0.2F);
 				} else {
-					EntityUtils.addExhaustion(player, 0.05F);
+					EntityUtils.addExhaustion(player, legacy ? 0.2F : 0.05F);
 				}
 			}
 			
