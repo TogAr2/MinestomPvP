@@ -59,13 +59,13 @@ public class ProjectileListener {
 				FishingBobber.fishingBobbers.put(player.getUuid(), bobber);
 				
 				EntityShootEvent shootEvent = new EntityShootEvent(player, bobber,
-						player.getPosition(), 0, legacy ? 0.0075 : 0.0045);
+						player.getPosition(), 0, 1.0);
 				EventDispatcher.call(shootEvent);
 				if (shootEvent.isCancelled()) {
 					bobber.remove();
 					return;
 				}
-				double spread = shootEvent.getSpread();
+				double spread = shootEvent.getSpread() * (legacy ? 0.0075 : 0.0045);
 				
 				Pos playerPos = player.getPosition();
 				float playerPitch = playerPos.pitch();
@@ -181,7 +181,8 @@ public class ProjectileListener {
 				// Make sure the animation event is not called, because this is not an animation
 				event.setCancelled(true);
 				
-				stack = performCrossbowShooting(event.getPlayer(), event.getHand(), stack, getCrossbowPower(stack), 1.0);
+				stack = performCrossbowShooting(event.getPlayer(), event.getHand(), stack,
+						getCrossbowPower(stack), 1.0, legacy);
 				event.getPlayer().setItemInHand(event.getHand(), setCrossbowCharged(stack, false));
 			} else {
 				if (EntityUtils.getProjectile(event.getPlayer(),
@@ -262,7 +263,7 @@ public class ProjectileListener {
 			if (power < 0.1) return;
 			
 			// Arrow creation
-			AbstractArrow arrow = createArrow(projectile, player);
+			AbstractArrow arrow = createArrow(projectile, player, legacy);
 			
 			if (power >= 1) {
 				arrow.setCritical(true);
@@ -352,11 +353,11 @@ public class ProjectileListener {
 		return power;
 	}
 	
-	public static AbstractArrow createArrow(ItemStack stack, @Nullable Entity shooter) {
+	public static AbstractArrow createArrow(ItemStack stack, @Nullable Entity shooter, boolean legacy) {
 		if (stack.getMaterial() == Material.SPECTRAL_ARROW) {
 			return new SpectralArrow(shooter);
 		} else {
-			Arrow arrow = new Arrow(shooter);
+			Arrow arrow = new Arrow(shooter, legacy);
 			arrow.inheritEffects(stack);
 			return arrow;
 		}
@@ -450,11 +451,11 @@ public class ProjectileListener {
 	}
 	
 	public static ItemStack performCrossbowShooting(Player player, Player.Hand hand, ItemStack stack,
-	                                           double power, double spread) {
+	                                           double power, double spread, boolean legacy) {
 		CrossbowMeta meta = crossbow(stack);
 		ItemStack projectile = meta.getProjectile1();
 		if (!projectile.isAir()) {
-			shootCrossbowProjectile(player, hand, stack, projectile, 1.0F, power, spread, 0.0F);
+			shootCrossbowProjectile(player, hand, stack, projectile, 1.0F, power, spread, 0.0F, legacy);
 		}
 		
 		if (meta.isTriple()) {
@@ -465,11 +466,11 @@ public class ProjectileListener {
 			
 			projectile = meta.getProjectile2();
 			if (!projectile.isAir()) {
-				shootCrossbowProjectile(player, hand, stack, projectile, firstPitch, power, spread, -10.0F);
+				shootCrossbowProjectile(player, hand, stack, projectile, firstPitch, power, spread, -10.0F, legacy);
 			}
 			projectile = meta.getProjectile3();
 			if (!projectile.isAir()) {
-				shootCrossbowProjectile(player, hand, stack, projectile, secondPitch, power, spread, 10.0F);
+				shootCrossbowProjectile(player, hand, stack, projectile, secondPitch, power, spread, 10.0F, legacy);
 			}
 		}
 		
@@ -478,11 +479,11 @@ public class ProjectileListener {
 	
 	public static void shootCrossbowProjectile(Player player, Player.Hand hand, ItemStack crossbowStack,
 	                                           ItemStack projectile, float soundPitch,
-	                                           double power, double spread, float yaw) {
+	                                           double power, double spread, float yaw, boolean legacy) {
 		boolean firework = projectile.getMaterial() == Material.FIREWORK_ROCKET;
 		if (firework) return; //TODO firework
 		
-		AbstractArrow arrow = getCrossbowArrow(player, crossbowStack, projectile);
+		AbstractArrow arrow = getCrossbowArrow(player, crossbowStack, projectile, legacy);
 		if (player.isCreative() || yaw != 0.0) {
 			arrow.pickupMode = AbstractArrow.PickupMode.CREATIVE_ONLY;
 		}
@@ -502,8 +503,8 @@ public class ProjectileListener {
 		SoundManager.sendToAround(player, SoundEvent.ITEM_CROSSBOW_SHOOT, Sound.Source.PLAYER, 1.0F, soundPitch);
 	}
 	
-	public static AbstractArrow getCrossbowArrow(Player player, ItemStack crossbowStack, ItemStack projectile) {
-		AbstractArrow arrow = createArrow(projectile, player);
+	public static AbstractArrow getCrossbowArrow(Player player, ItemStack crossbowStack, ItemStack projectile, boolean legacy) {
+		AbstractArrow arrow = createArrow(projectile, player, legacy);
 		arrow.setCritical(true); // Player shooter is always critical
 		arrow.setSound(SoundEvent.ITEM_CROSSBOW_HIT);
 		

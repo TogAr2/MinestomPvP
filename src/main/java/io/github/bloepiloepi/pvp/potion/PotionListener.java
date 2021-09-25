@@ -106,7 +106,7 @@ public class PotionListener {
 			
 			FoodListener.triggerEatSounds(player, null);
 			
-			List<Potion> potions = getAllPotions((PotionMeta) stack.getMeta());
+			List<Potion> potions = getAllPotions((PotionMeta) stack.getMeta(), legacy);
 			
 			//Apply the potions
 			for (Potion potion : potions) {
@@ -134,7 +134,7 @@ public class PotionListener {
 			SoundManager.sendToAround(event.getPlayer(), SoundEvent.ENTITY_SPLASH_POTION_THROW, Sound.Source.PLAYER,
 					0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f));
 			
-			throwPotion(event.getPlayer(), event.getItemStack(), event.getHand());
+			throwPotion(event.getPlayer(), event.getItemStack(), event.getHand(), legacy);
 		}).filter(event -> event.getItemStack().getMaterial() == Material.SPLASH_POTION).ignoreCancelled(false).build());
 		
 		node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
@@ -142,14 +142,14 @@ public class PotionListener {
 			SoundManager.sendToAround(event.getPlayer(), SoundEvent.ENTITY_LINGERING_POTION_THROW, Sound.Source.NEUTRAL,
 					0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f));
 			
-			throwPotion(event.getPlayer(), event.getItemStack(), event.getHand());
+			throwPotion(event.getPlayer(), event.getItemStack(), event.getHand(), legacy);
 		}).filter(event -> event.getItemStack().getMaterial() == Material.LINGERING_POTION).ignoreCancelled(false).build());
 		
 		return node;
 	}
 	
-	private static void throwPotion(Player player, ItemStack stack, Player.Hand hand) {
-		ThrownPotion thrownPotion = new ThrownPotion(player);
+	private static void throwPotion(Player player, ItemStack stack, Player.Hand hand, boolean legacy) {
+		ThrownPotion thrownPotion = new ThrownPotion(player, legacy);
 		thrownPotion.setItem(stack);
 		
 		Pos position = player.getPosition().add(0D, player.getEyeHeight(), 0D);
@@ -206,12 +206,12 @@ public class PotionListener {
 		return true;
 	}
 	
-	public static int getColor(ItemStack stack) {
+	public static int getColor(ItemStack stack, boolean legacy) {
 		PotionMeta meta = (PotionMeta) stack.getMeta();
 		if (meta.getColor() != null) {
 			return meta.getColor().asRGB();
 		} else {
-			return meta.getPotionType() == PotionType.EMPTY ? 16253176 : getPotionColor(getAllPotions(meta));
+			return meta.getPotionType() == PotionType.EMPTY ? 16253176 : getPotionColor(getAllPotions(meta, legacy));
 		}
 	}
 	
@@ -247,18 +247,19 @@ public class PotionListener {
 		}
 	}
 	
-	public static List<Potion> getAllPotions(PotionMeta meta) {
-		return getAllPotions(meta.getPotionType(), meta.getCustomPotionEffects());
+	public static List<Potion> getAllPotions(PotionMeta meta, boolean legacy) {
+		return getAllPotions(meta.getPotionType(), meta.getCustomPotionEffects(), legacy);
 	}
 	
 	public static List<Potion> getAllPotions(PotionType potionType,
-	                                         Collection<net.minestom.server.potion.CustomPotionEffect> customEffects) {
+	                                         Collection<net.minestom.server.potion.CustomPotionEffect> customEffects,
+	                                         boolean legacy) {
 		//PotionType effects plus custom effects
 		List<Potion> potions = new ArrayList<>();
 		
 		CustomPotionType customPotionType = CustomPotionTypes.get(potionType);
 		if (customPotionType != null) {
-			potions.addAll(customPotionType.getEffects());
+			potions.addAll(legacy ? customPotionType.getLegacyEffects() : customPotionType.getEffects());
 		}
 		
 		potions.addAll(customEffects.stream().map((customPotion) ->

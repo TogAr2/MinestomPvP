@@ -11,10 +11,16 @@ import java.util.List;
 public class CustomPotionType {
 	private final PotionType potionType;
 	private final List<Potion> effects;
+	private List<Potion> legacyEffects;
 	
 	public CustomPotionType(PotionType potionType, Potion... effects) {
 		this.potionType = potionType;
 		this.effects = ImmutableList.copyOf(effects);
+	}
+	
+	public CustomPotionType legacy(Potion... effects) {
+		legacyEffects = ImmutableList.copyOf(effects);
+		return this;
 	}
 	
 	public PotionType getPotionType() {
@@ -22,6 +28,12 @@ public class CustomPotionType {
 	}
 	
 	public List<Potion> getEffects() {
+		return effects;
+	}
+	
+	public List<Potion> getLegacyEffects() {
+		if (legacyEffects != null)
+			return legacyEffects;
 		return effects;
 	}
 	
