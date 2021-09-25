@@ -316,9 +316,9 @@ public class DamageListener {
 			if (!legacy) {
 				amount = DamageUtils.getDamageLeft(amount, (float) Math.floor(armorValue), entity.getAttributeValue(Attribute.ARMOR_TOUGHNESS));
 			} else {
-				float reductionPercentage = armorValue * LEGACY_REDUCTION_PER_ARMOR;
-				float reducedDamage = amount * reductionPercentage;
-				amount = amount - reducedDamage;
+				int i = 25 - (int) armorValue;
+				float f1 = amount * (float) i;
+				amount = f1 / 25.0F;
 			}
 		}
 		
@@ -346,22 +346,19 @@ public class DamageListener {
 						amount = DamageUtils.getInflictedDamage(amount, (float) k);
 					}
 				} else {
-					float reductionPercentage = calculateLegacyEnchantmentReduction(k);
-					float reducedDamage = amount * reductionPercentage;
-					if (reducedDamage > 0) {
-						amount = amount - reducedDamage;
+					if (k > 20) {
+						k = 20;
+					}
+					
+					if (k > 0) {
+						int j = 25 - k;
+						float f = amount * (float) j;
+						amount = f / 25.0F;
 					}
 				}
 				
 				return amount;
 			}
 		}
-	}
-	
-	private static float calculateLegacyEnchantmentReduction(int totalProtection) {
-		totalProtection = Math.min(25, totalProtection);
-		totalProtection = (int) Math.ceil(totalProtection * ThreadLocalRandom.current().nextDouble(0.5, 1));
-		totalProtection = Math.min(20, totalProtection);
-		return LEGACY_REDUCTION_PER_ARMOR * totalProtection;
 	}
 }
