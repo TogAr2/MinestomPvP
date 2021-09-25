@@ -64,6 +64,10 @@ You can get the `EventNode` for legacy PvP using `PvpExtension.legacyEvents()`.
 To disable attack cooldown for a player and set their attack damage to the legacy value, use `PvpExtension.setLegacyAttack(player, true)`.
 To enable the cooldown again and set the attack damage to the new value, use `false` instead of `true`.
 
+#### Knockback
+
+A lot of servers like to customize their 1.8 knockback. It is also possible to do so with this extension. In `EntityKnockbackEvent`, you can set a `LegacyKnockbackSettings` object. It contains information about how the knockback is calculated. A builder is obtainable by using `LegacyKnockbackSettings.builder()`. For more information, check the [config of BukkitOldCombatMechanics](https://github.com/kernitus/BukkitOldCombatMechanics/blob/d222286fd84fe983fdbdff79699182837871ab9b/src/main/resources/config.yml#L279).
+
 ### Integration
 
 To integrate this extension into your minestom server, you may have to tweak a little bit to make sure everything works correctly.
@@ -78,8 +82,9 @@ Potions and milk buckets are considered food: The Minestom food events are also 
 This extension provides several events:
 
 - `DamageBlockEvent`: cancellable, called when an entity blocks damage using a shield. This event can be used to set the remaining damage.
-- `EntityKnockbackEvent`: cancellable, called when an entity gets knocked back by another entity. Gets called twice for weapons with the knockback enchantment (once for default damage knockback, once for the extra knockback). This event can be used to set the knockback strength or the legacy knockback settings.
+- `EntityKnockbackEvent`: cancellable, called when an entity gets knocked back by another entity. Gets called twice for weapons with the knockback enchantment (once for default damage knockback, once for the extra knockback). This event can be used to set the knockback strength.
 - `FinalDamageEvent`: cancellable, called when the final damage calculation (including armor and effects) is completed. This event should be used instead of `EntityDamageEvent`, unless you want to detect how much damage was originally dealt.
+- `LegacyKnockbackEvent`: cancellable, called when an entity gets knocked back by another entity using legacy pvp. Same applies as for `EntityKnockbackEvent`. This event can be used to change the knockback settings.
 - `PickupArrowEvent`: cancellable, called when a player picks up an arrow.
 - `PlayerSpectateEvent`: cancellable, called when a spectator tries to spectate an entity by attacking it.
 - `ProjectileBlockHitEvent`: called when a projectile hits a block.
@@ -107,3 +112,5 @@ I aim towards making this extension as usable as possible!
 ## Credits
 
 Thanks to [kiipy](https://github.com/kiipy) for testing and finding bugs.
+
+I used [BukkitOldCombatMechanics](https://github.com/kernitus/BukkitOldCombatMechanics) as a resource for recreating legacy pvp.
