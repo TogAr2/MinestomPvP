@@ -14,11 +14,8 @@ import net.minestom.server.event.item.EntityEquipEvent;
 import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.item.ItemStack;
-import net.minestom.server.network.packet.server.play.EntityPropertiesPacket;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -34,13 +31,13 @@ public class ArmorToolListener {
 			if (event.getSlot().isArmor()) {
 				changeArmorModifiers(livingEntity, event.getSlot(), event.getEquippedItem(), legacy);
 			} else if (event.getSlot().isHand()) {
-				changeHandModifiers(livingEntity, event.getSlot(), event.getEquippedItem());
+				changeHandModifiers(livingEntity, event.getSlot(), event.getEquippedItem(), legacy);
 			}
 		});
 		
 		node.addListener(EventListener.builder(PlayerChangeHeldSlotEvent.class).handler(event ->
 				changeHandModifiers(event.getPlayer(), EquipmentSlot.MAIN_HAND,
-						event.getPlayer().getInventory().getItemStack(event.getSlot())))
+						event.getPlayer().getInventory().getItemStack(event.getSlot()), legacy))
 				.ignoreCancelled(false).build());
 		
 		return node;
@@ -61,18 +58,18 @@ public class ArmorToolListener {
 		}
 	}
 	
-	private static void changeHandModifiers(LivingEntity entity, EquipmentSlot slot, ItemStack newItem) {
+	private static void changeHandModifiers(LivingEntity entity, EquipmentSlot slot, ItemStack newItem, boolean legacy) {
 		//Remove previous attribute modifiers
 		ItemStack previousStack = entity.getEquipment(slot);
 		Tool tool = Tool.fromMaterial(previousStack.getMaterial());
 		if (tool != null) {
-			removeAttributeModifiers(entity, tool.getAttributes(slot, previousStack));
+			removeAttributeModifiers(entity, tool.getAttributes(slot, previousStack, legacy));
 		}
 		
 		//Add new attribute modifiers
 		tool = Tool.fromMaterial(newItem.getMaterial());
 		if (tool != null) {
-			addAttributeModifiers(entity, tool.getAttributes(slot, newItem));
+			addAttributeModifiers(entity, tool.getAttributes(slot, newItem, legacy));
 		}
 	}
 	
