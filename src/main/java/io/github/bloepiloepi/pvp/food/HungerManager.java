@@ -1,8 +1,10 @@
 package io.github.bloepiloepi.pvp.food;
 
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
+import io.github.bloepiloepi.pvp.events.PlayerExhaustEvent;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
+import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.item.Material;
 import net.minestom.server.world.Difficulty;
 
@@ -75,6 +77,8 @@ public class HungerManager {
 	}
 	
 	public void addExhaustion(float exhaustion) {
-		this.exhaustion = Math.min(this.exhaustion + exhaustion, 40.0F);
+		PlayerExhaustEvent playerExhaustEvent = new PlayerExhaustEvent(player, exhaustion);
+		EventDispatcher.callCancellable(playerExhaustEvent, () ->
+				this.exhaustion = Math.min(this.exhaustion + playerExhaustEvent.getAmount(), 40.0F));
 	}
 }

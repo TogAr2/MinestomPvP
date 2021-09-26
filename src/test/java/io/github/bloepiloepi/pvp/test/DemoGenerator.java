@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class DemoGenerator implements ChunkGenerator {
 	@Override
@@ -18,7 +19,11 @@ public class DemoGenerator implements ChunkGenerator {
 		for (int x = 0; x < Chunk.CHUNK_SIZE_X; x++) {
 			for (int z = 0; z < Chunk.CHUNK_SIZE_Z; z++) {
 				for (int y = 0; y < 60; y++) {
-					batch.setBlock(x, y, z, Block.STONE);
+					if (ThreadLocalRandom.current().nextInt(10) == 1) {
+						batch.setBlock(x, y, z, Block.GOLD_BLOCK);
+					} else {
+						batch.setBlock(x, y, z, Block.QUARTZ_BLOCK);
+					}
 				}
 			}
 		}
