@@ -39,8 +39,8 @@ public class FoodListener {
 			
 			event.setEatingTime((long) getUseTime(foodComponent) * MinecraftServer.TICK_MS);
 		}).filter(event -> event.getFoodItem().getMaterial().isFood()
-				|| event.getFoodItem().getMaterial() == Material.MILK_BUCKET)
-				.ignoreCancelled(false).build()); //May also be a potion
+				|| event.getFoodItem().getMaterial() == Material.MILK_BUCKET) //May also be a potion
+				.build());
 		
 		node.addListener(EventListener.builder(PlayerEatEvent.class).handler(event -> {
 			Player player = event.getPlayer();
@@ -92,7 +92,6 @@ public class FoodListener {
 		
 		node.addListener(EventListener.builder(PlayerBlockBreakEvent.class)
 				.handler(event -> EntityUtils.addExhaustion(event.getPlayer(), legacy ? 0.025F : 0.005F))
-				.ignoreCancelled(false)
 				.build());
 		
 		node.addListener(EventListener.builder(PlayerMoveEvent.class).handler(event -> {
@@ -124,7 +123,7 @@ public class FoodListener {
 					}
 				}
 			}
-		}).ignoreCancelled(false).build());
+		}).build());
 		
 		return node;
 	}

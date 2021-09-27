@@ -117,7 +117,7 @@ public class ProjectileListener {
 				
 				bobber.setVelocity(velocity.mul(MinecraftServer.TICK_PER_SECOND * 0.75));
 			}
-		}).filter(event -> event.getItemStack().getMaterial() == Material.FISHING_ROD).ignoreCancelled(false).build());
+		}).filter(event -> event.getItemStack().getMaterial() == Material.FISHING_ROD).build());
 		
 		node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
 			Player player = event.getPlayer();
@@ -173,7 +173,7 @@ public class ProjectileListener {
 		}).filter(event -> event.getItemStack().getMaterial() == Material.SNOWBALL
 				|| event.getItemStack().getMaterial() == Material.EGG
 				|| event.getItemStack().getMaterial() == Material.ENDER_PEARL)
-				.ignoreCancelled(false).build());
+				.build());
 		
 		node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
 			ItemStack stack = event.getItemStack();
@@ -197,7 +197,7 @@ public class ProjectileListener {
 					Tracker.itemUseHand.put(event.getPlayer().getUuid(), event.getHand());
 				}
 			}
-		}).ignoreCancelled(false).filter(event -> event.getItemStack().getMaterial() == Material.CROSSBOW).build());
+		}).filter(event -> event.getItemStack().getMaterial() == Material.CROSSBOW).build());
 		
 		node.addListener(PlayerItemAnimationEvent.class, event -> {
 			if (event.getArmAnimationType() == PlayerItemAnimationEvent.ItemAnimationType.BOW) {
@@ -314,7 +314,7 @@ public class ProjectileListener {
 				player.getInventory().setItemStack(projectileSlot,
 						projectile.withAmount(projectile.getAmount() - 1));
 			}
-		}).ignoreCancelled(false).filter(event -> event.getItemStack().getMaterial() == Material.BOW).build());
+		}).filter(event -> event.getItemStack().getMaterial() == Material.BOW).build());
 		
 		node.addListener(EventListener.builder(ItemUpdateStateEvent.class).handler(event -> {
 			Player player = event.getPlayer();
@@ -338,7 +338,7 @@ public class ProjectileListener {
 					1.0F, 1.0F / (random.nextFloat() * 0.5F + 1.0F) + 0.2F);
 			
 			player.setItemInHand(event.getHand(), stack);
-		}).ignoreCancelled(false).filter(event -> event.getItemStack().getMaterial() == Material.CROSSBOW).build());
+		}).filter(event -> event.getItemStack().getMaterial() == Material.CROSSBOW).build());
 		
 		return node;
 	}

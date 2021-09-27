@@ -46,13 +46,13 @@ public class AttackManager {
 		node.addListener(PlayerTickEvent.class, AttackManager::spectateTick);
 		
 		node.addListener(EventListener.builder(PlayerHandAnimationEvent.class).handler(event ->
-				resetLastAttackedTicks(event.getPlayer())).ignoreCancelled(false).build());
+				resetLastAttackedTicks(event.getPlayer())).build());
 		
 		node.addListener(EventListener.builder(PlayerChangeHeldSlotEvent.class).handler(event -> {
 			if (!event.getPlayer().getItemInMainHand().isSimilar(event.getPlayer().getInventory().getItemStack(event.getSlot()))) {
 				resetLastAttackedTicks(event.getPlayer());
 			}
-		}).ignoreCancelled(false).build());
+		}).build());
 		
 		return node;
 	}

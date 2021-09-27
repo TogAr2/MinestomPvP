@@ -22,22 +22,18 @@ public class SwordBlockHandler {
 		
 		node.addListener(EventListener.builder(PlayerUseItemEvent.class)
 				.handler(SwordBlockHandler::handleUseItem)
-				.ignoreCancelled(false)
 				.build());
 		
 		node.addListener(EventListener.builder(ItemUpdateStateEvent.class)
 				.handler(SwordBlockHandler::handleUpdateState)
-				.ignoreCancelled(false)
 				.build());
 		
 		node.addListener(EventListener.builder(PlayerSwapItemEvent.class)
 				.handler(SwordBlockHandler::handleSwapItem)
-				.ignoreCancelled(false)
 				.build());
 		
 		node.addListener(EventListener.builder(PlayerChangeHeldSlotEvent.class)
 				.handler(SwordBlockHandler::handleChangeSlot)
-				.ignoreCancelled(false)
 				.build());
 		
 		node.addListener(PlayerHandAnimationEvent.class, event -> {

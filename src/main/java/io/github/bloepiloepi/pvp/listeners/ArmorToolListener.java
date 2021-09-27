@@ -38,7 +38,7 @@ public class ArmorToolListener {
 		node.addListener(EventListener.builder(PlayerChangeHeldSlotEvent.class).handler(event ->
 				changeHandModifiers(event.getPlayer(), EquipmentSlot.MAIN_HAND,
 						event.getPlayer().getInventory().getItemStack(event.getSlot()), legacy))
-				.ignoreCancelled(false).build());
+				.build());
 		
 		return node;
 	}

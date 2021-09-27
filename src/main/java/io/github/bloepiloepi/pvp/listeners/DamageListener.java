@@ -39,7 +39,6 @@ public class DamageListener {
 		
 		node.addListener(EventListener.builder(EntityDamageEvent.class)
 				.handler(event -> handleEntityDamage(event, false))
-				.ignoreCancelled(false)
 				.build());
 		
 		return node;
@@ -53,7 +52,6 @@ public class DamageListener {
 		
 		node.addListener(EventListener.builder(EntityDamageEvent.class)
 				.handler(event -> handleEntityDamage(event, true))
-				.ignoreCancelled(false)
 				.build());
 		
 		return node;
