@@ -128,7 +128,7 @@ public class PvpExtension extends Extension {
 		AttributeInstance speed = player.getAttribute(Attribute.ATTACK_SPEED);
 		AttributeInstance damage = player.getAttribute(Attribute.ATTACK_DAMAGE);
 		if (legacyAttack) {
-			speed.setBaseValue(Float.MAX_VALUE / 2);
+			speed.setBaseValue(100);
 			damage.setBaseValue(1.0F);
 		} else {
 			speed.setBaseValue(speed.getAttribute().getDefaultValue());
