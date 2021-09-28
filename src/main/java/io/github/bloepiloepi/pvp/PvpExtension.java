@@ -23,11 +23,6 @@ import net.minestom.server.event.trait.PlayerEvent;
 import net.minestom.server.extensions.Extension;
 
 public class PvpExtension extends Extension {
-	private static final AttributeModifier LEGACY_ATTACK_SPEED = new AttributeModifier(
-			"legacy-attack",
-			Float.MAX_VALUE / 2,
-			AttributeOperation.ADDITION
-	);
 	
 	public static EventNode<EntityEvent> events() {
 		EventNode<EntityEvent> node = EventNode.type("pvp-events", EventFilter.ENTITY);
@@ -133,10 +128,10 @@ public class PvpExtension extends Extension {
 		AttributeInstance speed = player.getAttribute(Attribute.ATTACK_SPEED);
 		AttributeInstance damage = player.getAttribute(Attribute.ATTACK_DAMAGE);
 		if (legacyAttack) {
-			speed.addModifier(LEGACY_ATTACK_SPEED);
+			speed.setBaseValue(Float.MAX_VALUE / 2);
 			damage.setBaseValue(1.0F);
 		} else {
-			speed.removeModifier(LEGACY_ATTACK_SPEED);
+			speed.setBaseValue(speed.getAttribute().getDefaultValue());
 			damage.setBaseValue(damage.getAttribute().getDefaultValue());
 		}
 	}
