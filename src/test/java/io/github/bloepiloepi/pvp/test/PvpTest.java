@@ -4,7 +4,6 @@ import io.github.bloepiloepi.pvp.PvpExtension;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.events.LegacyKnockbackEvent;
 import io.github.bloepiloepi.pvp.legacy.LegacyKnockbackSettings;
-import io.github.bloepiloepi.pvp.listeners.AttackManager;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffect;
 import io.github.bloepiloepi.pvp.test.commands.Commands;
 import net.minestom.server.MinecraftServer;
@@ -12,7 +11,6 @@ import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.*;
-import net.minestom.server.entity.fakeplayer.FakePlayer;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.*;
@@ -23,7 +21,6 @@ import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.utils.time.TimeUnit;
 
 import java.util.Optional;
-import java.util.UUID;
 
 public class PvpTest {
 	public static void main(String[] args) {
