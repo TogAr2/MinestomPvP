@@ -81,7 +81,7 @@ public class AttackManager {
 	private static void spectateTick(PlayerTickEvent event) {
 		Player player = event.getPlayer();
 		Entity spectating = Tracker.spectating.get(player.getUuid());
-		if (spectating == player) return;
+		if (spectating == null || spectating == player) return;
 		
 		//This is to make sure other players don't see the player standing still while spectating
 		//And when the player stops spectating, they are at the entities position instead of their position before spectating
