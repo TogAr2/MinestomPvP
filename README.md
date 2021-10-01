@@ -4,14 +4,12 @@
 [![license](https://img.shields.io/github/license/Bloepiloepi/MinestomPvP.svg?style=flat-square)](LICENSE)
 
 MinestomPvP is an extension for Minestom.
-It tries to mimic vanilla PvP as good as possible, while being as customizable and usable as possible.
+It tries to mimic vanilla (and pre-1.9) PvP as good as possible, while also focusing on customizability and usability.
 
-It does not only provide PvP, but also everything around it, like status effects and food.
-You can choose which features you want to use and which ones to not use.
+But, MinestomPvP does not only provide PvP, it also provides everything around it (e.g., status effects and food).
+You can easily choose which features you want to use.
 
-It also has the option to use legacy (pre-1.9) pvp.
-
-**I am aware of an issue where projectile collision is not entirely accurate, since the Minestom new block api. I will implement a fix for this at some point.**
+**I am aware of an issue where projectile collision is not entirely accurate, because of the Minestom new block api. I will implement a fix for this at some point.**
 
 ## Table of Contents
 
@@ -53,13 +51,13 @@ I might change that in the future, but I'm not sure, since I don't think there i
 ## Usage
 
 You can get an `EventNode` with all PvP related events listening using `PvpExtension.events()`.
-You can add this node as a child to any other node and the pvp will work in the scope.
+By adding this node as a child to any other node, you enable pvp in that scope.
 Separated features of this extension are also available as static methods in `PvpExtension`.
 
 ### Legacy PvP
 
 You can get the `EventNode` for legacy PvP using `PvpExtension.legacyEvents()`.
-**Do not combine it with any non-legacy node, this will cause issues.**
+**Do not combine it with any non-legacy node, as this will cause issues.**
 
 To disable attack cooldown for a player and set their attack damage to the legacy value, use `PvpExtension.setLegacyAttack(player, true)`.
 To enable the cooldown again and set the attack damage to the new value, use `false` instead of `true`.
@@ -75,7 +73,7 @@ To integrate this extension into your minestom server, you may have to tweak a l
 When applying damage to an entity, use `CustomDamageType` instead of `DamageType` (except if you use the default ones: `GRAVITY`, `ON_FIRE` and `VOID`).
 If you have your own damage type, also extend `CustomDamageType` instead of `DamageType`.
 
-Potions and milk buckets are considered food: The Minestom food events are also called for drinkable items.
+Potions and milk buckets are considered food: the Minestom food events are also called for drinkable items.
 
 ### Events
 
