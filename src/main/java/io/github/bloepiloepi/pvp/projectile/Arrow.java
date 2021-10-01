@@ -93,7 +93,7 @@ public class Arrow extends AbstractArrow {
 				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.getEffect());
 				if (customPotionEffect.isInstant()) {
 					customPotionEffect.applyInstantEffect(this, null,
-							entity, potion.getAmplifier(), 1.0D);
+							entity, potion.getAmplifier(), 1.0D, legacy);
 				} else {
 					int duration = Math.max(potion.getDuration() / 8, 1);
 					byte flags = potion.getFlags();
@@ -115,7 +115,7 @@ public class Arrow extends AbstractArrow {
 					CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.getEffect());
 					if (customPotionEffect.isInstant()) {
 						customPotionEffect.applyInstantEffect(this, null,
-								entity, potion.getAmplifier(), 1.0D);
+								entity, potion.getAmplifier(), 1.0D, legacy);
 					} else {
 						byte flags = potion.getFlags();
 						entity.addEffect(new Potion(potion.getEffect(), potion.getAmplifier(),

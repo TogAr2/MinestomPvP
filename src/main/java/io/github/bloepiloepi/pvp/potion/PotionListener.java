@@ -61,7 +61,7 @@ public class PotionListener {
 					byte amplifier = potion.getPotion().getAmplifier();
 					
 					if (customPotionEffect.canApplyUpdateEffect(durationLeft, amplifier)) {
-						customPotionEffect.applyUpdateEffect((LivingEntity) entity, amplifier);
+						customPotionEffect.applyUpdateEffect((LivingEntity) entity, amplifier, legacy);
 					}
 					
 					durationLeftMap.put(potion, durationLeft - 1);
@@ -113,7 +113,7 @@ public class PotionListener {
 				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.getEffect());
 				
 				if (customPotionEffect.isInstant()) {
-					customPotionEffect.applyInstantEffect(player, player, player, potion.getAmplifier(), 1.0D);
+					customPotionEffect.applyInstantEffect(player, player, player, potion.getAmplifier(), 1.0D, legacy);
 				} else {
 					player.addEffect(potion);
 				}

@@ -51,7 +51,7 @@ public class CustomPotionEffect {
 		return this;
 	}
 	
-	public void applyUpdateEffect(LivingEntity entity, byte amplifier) {
+	public void applyUpdateEffect(LivingEntity entity, byte amplifier, boolean legacy) {
 		if (potionEffect == PotionEffect.REGENERATION) {
 			if (entity.getHealth() < entity.getMaxHealth()) {
 				entity.setHealth(entity.getHealth() + 1);
@@ -69,8 +69,7 @@ public class CustomPotionEffect {
 		
 		if (entity instanceof Player) {
 			if (potionEffect == PotionEffect.HUNGER) {
-				//TODO exhaustion value for legacy has to be 0.025
-				EntityUtils.addExhaustion((Player) entity, 0.005F * (float) (amplifier + 1));
+				EntityUtils.addExhaustion((Player) entity, legacy ? 0.025F : 0.005F * (float) (amplifier + 1));
 				return;
 			} else if (potionEffect == PotionEffect.SATURATION) {
 				if (((Player) entity).isOnline()) {
@@ -91,11 +90,11 @@ public class CustomPotionEffect {
 		}
 	}
 	
-	public void applyInstantEffect(@Nullable Entity source, @Nullable Entity attacker, LivingEntity target, byte amplifier, double proximity) {
+	public void applyInstantEffect(@Nullable Entity source, @Nullable Entity attacker, LivingEntity target, byte amplifier, double proximity, boolean legacy) {
 		EntityGroup targetGroup = EntityGroup.ofEntity(target);
 		
 		if (potionEffect != PotionEffect.INSTANT_DAMAGE && potionEffect != PotionEffect.INSTANT_HEALTH) {
-			applyUpdateEffect(target, amplifier);
+			applyUpdateEffect(target, amplifier, legacy);
 			return;
 		}
 		

@@ -79,7 +79,8 @@ public class ThrownPotion extends EntityHittableProjectile {
 			for (Potion potion : potions) {
 				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.getEffect());
 				if (customPotionEffect.isInstant()) {
-					customPotionEffect.applyInstantEffect(this, getShooter(), entity,potion.getAmplifier(), proximity);
+					customPotionEffect.applyInstantEffect(this, getShooter(),
+							entity,potion.getAmplifier(), proximity, legacy);
 				} else {
 					int duration = potion.getDuration();
 					if (legacy) duration = (int) Math.floor(duration * 0.75);
