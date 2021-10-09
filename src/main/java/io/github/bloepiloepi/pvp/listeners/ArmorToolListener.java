@@ -59,15 +59,11 @@ public class ArmorToolListener {
 		//Remove previous attribute modifiers
 		ItemStack previousStack = entity.getEquipment(slot);
 		Tool tool = Tool.fromMaterial(previousStack.getMaterial());
-		if (tool != null) {
-			removeAttributeModifiers(entity, Tool.getAttributes(tool, slot, previousStack, legacy));
-		}
+		removeAttributeModifiers(entity, Tool.getAttributes(tool, slot, previousStack, legacy));
 		
 		//Add new attribute modifiers
 		tool = Tool.fromMaterial(newItem.getMaterial());
-		if (tool != null) {
-			addAttributeModifiers(entity, Tool.getAttributes(tool, slot, newItem, legacy));
-		}
+		addAttributeModifiers(entity, Tool.getAttributes(tool, slot, newItem, legacy));
 	}
 	
 	private static void removeAttributeModifiers(LivingEntity entity, Map<Attribute, List<AttributeModifier>> modifiers) {
