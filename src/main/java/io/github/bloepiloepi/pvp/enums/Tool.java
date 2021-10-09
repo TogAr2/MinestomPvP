@@ -10,7 +10,9 @@ import net.minestom.server.item.Material;
 import net.minestom.server.item.attribute.ItemAttribute;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public enum Tool {
@@ -76,17 +78,23 @@ public enum Tool {
 		this.isAxe = isAxe;
 	}
 	
-	public Map<Attribute, AttributeModifier> getAttributes(EquipmentSlot slot, ItemStack item, boolean legacy) {
-		Map<Attribute, AttributeModifier> modifiers = new HashMap<>();
+	public static Map<Attribute, List<AttributeModifier>> getAttributes(@Nullable Tool tool, EquipmentSlot slot, ItemStack item, boolean legacy) {
+		Map<Attribute, List<AttributeModifier>> modifiers = new HashMap<>();
 		for (ItemAttribute itemAttribute : item.getMeta().getAttributes()) {
 			if (EquipmentSlot.fromAttributeSlot(itemAttribute.getSlot()) == slot) {
-				modifiers.put(itemAttribute.getAttribute(), new AttributeModifier(itemAttribute.getUuid(), itemAttribute.getInternalName(), (float) itemAttribute.getValue(), itemAttribute.getOperation()));
+				modifiers.computeIfAbsent(itemAttribute.getAttribute(), k -> new ArrayList<>())
+						.add(new AttributeModifier(itemAttribute.getUuid(), itemAttribute.getInternalName(), (float) itemAttribute.getValue(), itemAttribute.getOperation()));
 			}
 		}
 		
-		//Weapon attributes (attack damage, etc) do not apply in offhand
-		if (slot == EquipmentSlot.MAIN_HAND) {
-			modifiers.putAll(legacy ? this.legacyAttributeModifiers : this.attributeModifiers);
+		// Only add tool attributes if the material is a tool
+		if (tool != null) {
+			//Weapon attributes (attack damage, etc) do not apply in offhand
+			if (slot == EquipmentSlot.MAIN_HAND) {
+				(legacy ? tool.legacyAttributeModifiers : tool.attributeModifiers).forEach((attribute, modifier) -> {
+					modifiers.computeIfAbsent(attribute, k -> new ArrayList<>()).add(modifier);
+				});
+			}
 		}
 		
 		return modifiers;

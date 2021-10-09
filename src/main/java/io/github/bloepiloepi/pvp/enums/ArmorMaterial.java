@@ -9,10 +9,9 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.item.attribute.ItemAttribute;
 import net.minestom.server.sound.SoundEvent;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public enum ArmorMaterial {
 	LEATHER(new int[]{1, 2, 3, 1}, new int[]{1, 3, 2, 1}, SoundEvent.ITEM_ARMOR_EQUIP_LEATHER, 0.0F, 0.0F, Material.LEATHER_BOOTS, Material.LEATHER_LEGGINGS, Material.LEATHER_CHESTPLATE, Material.LEATHER_HELMET),
@@ -64,20 +63,24 @@ public enum ArmorMaterial {
 		return this.knockbackResistance;
 	}
 	
-	public Map<Attribute, AttributeModifier> getAttributes(EquipmentSlot slot, ItemStack item, boolean legacy) {
-		Map<Attribute, AttributeModifier> modifiers = new HashMap<>();
+	public static Map<Attribute, List<AttributeModifier>> getAttributes(@Nullable ArmorMaterial material, EquipmentSlot slot, ItemStack item, boolean legacy) {
+		Map<Attribute, List<AttributeModifier>> modifiers = new HashMap<>();
 		for (ItemAttribute itemAttribute : item.getMeta().getAttributes()) {
 			if (EquipmentSlot.fromAttributeSlot(itemAttribute.getSlot()) == slot) {
-				modifiers.put(itemAttribute.getAttribute(), new AttributeModifier(itemAttribute.getUuid(), itemAttribute.getInternalName(), (float) itemAttribute.getValue(), itemAttribute.getOperation()));
+				modifiers.computeIfAbsent(itemAttribute.getAttribute(), k -> new ArrayList<>())
+						.add(new AttributeModifier(itemAttribute.getUuid(), itemAttribute.getInternalName(), (float) itemAttribute.getValue(), itemAttribute.getOperation()));
 			}
 		}
 		
-		if (slot == getRequiredSlot(item.getMaterial())) {
-			UUID modifierUUID = getModifierUUID(slot);
-			modifiers.put(Attribute.ARMOR, new AttributeModifier(modifierUUID, "Armor modifier", getProtectionAmount(slot, legacy), AttributeOperation.ADDITION));
-			modifiers.put(Attribute.ARMOR_TOUGHNESS, new AttributeModifier(modifierUUID, "Armor toughness", this.toughness, AttributeOperation.ADDITION));
-			if (this.knockbackResistance > 0) {
-				modifiers.put(Attribute.KNOCKBACK_RESISTANCE, new AttributeModifier(modifierUUID, "Armor knockback resistance", this.knockbackResistance, AttributeOperation.ADDITION));
+		// Only add armor attributes if the material is armor
+		if (material != null) {
+			if (slot == getRequiredSlot(item.getMaterial())) {
+				UUID modifierUUID = getModifierUUID(slot);
+				modifiers.computeIfAbsent(Attribute.ARMOR, k -> new ArrayList<>()).add(new AttributeModifier(modifierUUID, "Armor modifier", material.getProtectionAmount(slot, legacy), AttributeOperation.ADDITION));
+				modifiers.computeIfAbsent(Attribute.ARMOR_TOUGHNESS, k -> new ArrayList<>()).add(new AttributeModifier(modifierUUID, "Armor toughness", material.toughness, AttributeOperation.ADDITION));
+				if (material.knockbackResistance > 0) {
+					modifiers.computeIfAbsent(Attribute.KNOCKBACK_RESISTANCE, k -> new ArrayList<>()).add(new AttributeModifier(modifierUUID, "Armor knockback resistance", material.knockbackResistance, AttributeOperation.ADDITION));
+				}
 			}
 		}
 		
