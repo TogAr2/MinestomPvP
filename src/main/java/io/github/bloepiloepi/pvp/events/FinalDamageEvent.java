@@ -16,6 +16,7 @@ public class FinalDamageEvent implements EntityEvent, CancellableEvent {
 	private final LivingEntity entity;
 	private final CustomDamageType damageType;
 	private float damage;
+	private int invulnerabilityTicks = 10;
 	
 	private boolean cancelled;
 	
@@ -57,6 +58,26 @@ public class FinalDamageEvent implements EntityEvent, CancellableEvent {
 	 */
 	public void setDamage(float damage) {
 		this.damage = damage;
+	}
+	
+	/**
+	 * Gets the amount of ticks the entity is invulnerable after the damage has been applied.
+	 * By default it is 10 (half a second).
+	 *
+	 * @return the amount of ticks the entity is invulnerable
+	 */
+	public int getInvulnerabilityTicks() {
+		return invulnerabilityTicks;
+	}
+	
+	/**
+	 * Sets the amount of ticks the entity is invulnerable after the damage has been applied.
+	 * By default it is 10 (half a second).
+	 *
+	 * @param invulnerabilityTicks the amount of ticks the entity is invulnerable
+	 */
+	public void setInvulnerabilityTicks(int invulnerabilityTicks) {
+		this.invulnerabilityTicks = invulnerabilityTicks;
 	}
 	
 	/**

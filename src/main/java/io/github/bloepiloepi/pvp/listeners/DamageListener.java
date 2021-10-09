@@ -122,7 +122,8 @@ public class DamageListener {
 		}
 		
 		boolean hurtSoundAndAnimation = true;
-		if (Tracker.invulnerableTime.getOrDefault(entity.getUuid(), 0) > 10.0F) {
+		float amountBeforeProcessing = amount;
+		if (Tracker.invulnerableTime.getOrDefault(entity.getUuid(), 0) > 10) {
 			float lastDamage = Tracker.lastDamageTaken.get(entity.getUuid());
 			
 			if (amount <= lastDamage) {
@@ -130,12 +131,9 @@ public class DamageListener {
 				return;
 			}
 			
-			Tracker.lastDamageTaken.put(entity.getUuid(), amount);
 			amount = applyDamage(entity, type, amount - lastDamage, legacy);
 			hurtSoundAndAnimation = false;
 		} else {
-			Tracker.lastDamageTaken.put(entity.getUuid(), amount);
-			Tracker.invulnerableTime.put(entity.getUuid(), 20);
 			amount = applyDamage(entity, type, amount, legacy);
 		}
 		
@@ -149,7 +147,11 @@ public class DamageListener {
 			return;
 		}
 		
+		Tracker.lastDamageTaken.put(entity.getUuid(), amountBeforeProcessing);
+		
 		if (hurtSoundAndAnimation) {
+			Tracker.invulnerableTime.put(entity.getUuid(), finalDamageEvent.getInvulnerabilityTicks() + 10);
+			
 			if (shield) {
 				entity.triggerStatus((byte) 29);
 			} else if (type instanceof CustomEntityDamage && ((CustomEntityDamage) type).isThorns()) {
