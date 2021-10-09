@@ -1,5 +1,6 @@
 package io.github.bloepiloepi.pvp.listeners;
 
+import io.github.bloepiloepi.pvp.events.FinalAttackEvent;
 import io.github.bloepiloepi.pvp.legacy.LegacyKnockbackSettings;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
@@ -143,6 +144,18 @@ public class AttackManager {
 			// Not sprinting required for critical in 1.9+
 			critical = critical && !player.isSprinting();
 		}
+		
+		FinalAttackEvent finalAttackEvent = new FinalAttackEvent(player, target, critical, damage, enchantedDamage);
+		EventDispatcher.call(finalAttackEvent);
+		
+		if (finalAttackEvent.isCancelled()) {
+			return;
+		}
+		
+		critical = finalAttackEvent.isCritical();
+		damage = finalAttackEvent.getBaseDamage();
+		enchantedDamage = finalAttackEvent.getEnchantsExtraDamage();
+		
 		if (critical) {
 			if (legacy) {
 				damage += ThreadLocalRandom.current().nextInt((int) (damage / 2 + 2));
