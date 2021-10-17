@@ -12,7 +12,6 @@ public class HungerManager {
 	private final Player player;
 	private float exhaustion;
 	private int foodStarvationTimer;
-	private int prevFoodLevel = 20;
 	
 	public HungerManager(Player player) {
 		this.player = player;
@@ -36,7 +35,6 @@ public class HungerManager {
 		if (!player.getGameMode().canTakeDamage()) return;
 		
 		Difficulty difficulty = MinecraftServer.getDifficulty();
-		this.prevFoodLevel = player.getFood();
 		if (this.exhaustion > 4.0F) {
 			this.exhaustion -= 4.0F;
 			if (player.getFoodSaturation() > 0.0F) {

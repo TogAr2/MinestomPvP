@@ -28,7 +28,6 @@ import java.util.concurrent.CompletableFuture;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin {
-	
 	@Shadow public abstract @NotNull UUID getUuid();
 	@Shadow protected Pos position;
 	@Shadow protected EntityType entityType;

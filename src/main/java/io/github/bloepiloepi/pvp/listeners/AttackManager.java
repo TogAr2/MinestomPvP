@@ -16,7 +16,6 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.*;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventFilter;
@@ -71,6 +70,7 @@ public class AttackManager {
 		return (float) (1.0D / player.getAttributeValue(Attribute.ATTACK_SPEED) * 20.0D);
 	}
 	
+	@SuppressWarnings("UnstableApiUsage")
 	public static float getAttackCooldownProgress(Player player, float baseTime) {
 		return MathUtils.clamp(((float) Tracker.lastAttackedTicks.get(player.getUuid()) + baseTime) / getAttackCooldownProgressPerTick(player), 0.0F, 1.0F);
 	}
@@ -125,7 +125,7 @@ public class AttackManager {
 			enchantedDamage = EnchantmentUtils.getAttackDamage(player.getItemInMainHand(), EntityGroup.DEFAULT, legacy);
 		}
 		
-		float i = getAttackCooldownProgress(player, 0.5F);
+		float i = legacy ? 1.0F : getAttackCooldownProgress(player, 0.5F);
 		damage *= 0.2F + i * i * 0.8F;
 		enchantedDamage *= i;
 		resetLastAttackedTicks(player);
@@ -168,12 +168,11 @@ public class AttackManager {
 		boolean sweeping = false;
 		//TODO formula for sweeping
 		
-		float targetHealth = 0.0F;
+		float originalHealth = 0.0F;
 		if (target instanceof LivingEntity) {
-			targetHealth = ((LivingEntity) target).getHealth();
+			originalHealth = ((LivingEntity) target).getHealth();
 		}
 		
-		Vec originalVelocity = target.getVelocity();
 		boolean damageSucceeded = EntityUtils.damage(target, CustomDamageType.player(player), damage);
 		
 		if (!damageSucceeded) {
@@ -221,18 +220,6 @@ public class AttackManager {
 			//TODO sweeping
 		}
 		
-		//if (target instanceof Player) {
-		//	EntityVelocityPacket velocityPacket = new EntityVelocityPacket();
-		//	velocityPacket.entityId = target.getEntityId();
-		//	Vector velocity = target.getVelocity().clone().multiply(8000f / MinecraftServer.TICK_PER_SECOND);
-		//	velocityPacket.velocityX = (short) velocity.getX();
-		//	velocityPacket.velocityY = (short) velocity.getY();
-		//	velocityPacket.velocityZ = (short) velocity.getZ();
-		
-		//	((Player) target).getPlayerConnection().sendPacket(velocityPacket);
-		//	target.getVelocity().copy(originalVelocity);
-		//}
-		
 		if (critical) {
 			if (!legacy) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_CRIT, Sound.Source.PLAYER, 1.0F, 1.0F);
 			
@@ -271,11 +258,11 @@ public class AttackManager {
 				EntityUtils.setOnFireForSeconds(target, fireAspect * 4);
 			}
 			
-			float n = targetHealth - ((LivingEntity) target).getHealth();
+			float damageDone = originalHealth - ((LivingEntity) target).getHealth();
 			
 			//Damage indicator particles
-			if (n > 2.0F) {
-				int count = (int) ((double) n * 0.5D);
+			if (damageDone > 2.0F) {
+				int count = (int) ((double) damageDone * 0.5D);
 				Pos targetPosition = target.getPosition();
 				ParticlePacket packet = ParticleCreator.createParticlePacket(
 						Particle.DAMAGE_INDICATOR, false,

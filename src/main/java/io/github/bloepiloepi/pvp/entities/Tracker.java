@@ -44,14 +44,6 @@ public class Tracker {
 		map.put(key, map.getOrDefault(key, 0) - amount);
 	}
 	
-	public static <K> void increaseFloat(Map<K, Float> map, K key, float amount) {
-		map.put(key, map.getOrDefault(key, 0F) + amount);
-	}
-	
-	public static <K> void decreaseFloat(Map<K, Float> map, K key, float amount) {
-		map.put(key, map.getOrDefault(key, 0F) - amount);
-	}
-	
 	public static boolean hasCooldown(Player player, Material material) {
 		Map<Material, Long> cooldownMap = cooldownEnd.get(player.getUuid());
 		

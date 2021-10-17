@@ -27,8 +27,6 @@ import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.sound.SoundEvent;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 public class DamageListener {
 	
 	public static EventNode<EntityEvent> events() {
@@ -305,8 +303,6 @@ public class DamageListener {
 		
 		return amount;
 	}
-	
-	private static final float LEGACY_REDUCTION_PER_ARMOR = 0.04F;
 	
 	public static float applyArmorToDamage(LivingEntity entity, CustomDamageType type, float amount, boolean legacy) {
 		if (!type.bypassesArmor()) {
