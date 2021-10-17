@@ -9,6 +9,7 @@ import io.github.bloepiloepi.pvp.entities.Tracker;
 import io.github.bloepiloepi.pvp.events.*;
 import io.github.bloepiloepi.pvp.utils.DamageUtils;
 import net.kyori.adventure.sound.Sound;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
@@ -26,6 +27,7 @@ import net.minestom.server.network.packet.server.play.SoundEffectPacket;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.sound.SoundEvent;
+import net.minestom.server.world.Difficulty;
 
 public class DamageListener {
 	
@@ -56,8 +58,6 @@ public class DamageListener {
 	}
 	
 	public static void handleEntityDamage(EntityDamageEvent event, boolean legacy) {
-		//TODO player has extra calculations based on difficulty
-		
 		float amount = event.getDamage();
 		
 		CustomDamageType type;
@@ -70,6 +70,21 @@ public class DamageListener {
 				type = CustomDamageType.ON_FIRE;
 			} else {
 				type = CustomDamageType.OUT_OF_WORLD;
+			}
+		}
+		
+		if (event.getEntity() instanceof Player && type.isScaledWithDifficulty()) {
+			Difficulty difficulty = MinecraftServer.getDifficulty();
+			switch (difficulty) {
+				case PEACEFUL:
+					event.setCancelled(true);
+					return;
+				case EASY:
+					amount = Math.min(amount / 2.0F + 1.0F, amount);
+					break;
+				case HARD:
+					amount = amount * 3.0F / 2.0F;
+					break;
 			}
 		}
 		
