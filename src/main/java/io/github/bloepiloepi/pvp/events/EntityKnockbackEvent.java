@@ -13,21 +13,27 @@ import org.jetbrains.annotations.NotNull;
  * You should be aware that when the attacker has a knockback weapon, this event will be called twice:
  * once for the default damage knockback, once for for the extra knockback.
  * You can determine which knockback this is by using {@code isExtraKnockback()}.
+ *
+ * When the attack was a sweeping attack, this event is also called twice for the affected entities:
+ * once for the extra sweeping knockback, once for the default knockback.
+ * You can determine if this event was the sweeping by using {@code isSweepingKnockback()}.
  */
 public class EntityKnockbackEvent implements EntityEvent, CancellableEvent {
 	
 	private final Entity entity;
 	private final Entity attacker;
 	private final boolean extraKnockback;
+	private final boolean sweepingKnockback;
 	private float strength;
 	
 	private boolean cancelled;
 	
 	public EntityKnockbackEvent(@NotNull Entity entity, @NotNull Entity attacker,
-	                            boolean extraKnockback, float strength) {
+	                            boolean extraKnockback, boolean sweepingKnockback, float strength) {
 		this.entity = entity;
 		this.attacker = attacker;
 		this.extraKnockback = extraKnockback;
+		this.sweepingKnockback = sweepingKnockback;
 		this.strength = strength;
 	}
 	
@@ -56,6 +62,16 @@ public class EntityKnockbackEvent implements EntityEvent, CancellableEvent {
 	 */
 	public boolean isExtraKnockback() {
 		return extraKnockback;
+	}
+	
+	/**
+	 * Gets whether this knockback is the extra knockback
+	 * applied to entities affected by sweeping.
+	 *
+	 * @return true if it is, false otherwise
+	 */
+	public boolean isSweepingKnockback() {
+		return sweepingKnockback;
 	}
 	
 	/**

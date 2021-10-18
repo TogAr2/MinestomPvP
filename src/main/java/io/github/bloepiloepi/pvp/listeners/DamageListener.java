@@ -206,7 +206,7 @@ public class DamageListener {
 				double finalH = h;
 				double finalI = i;
 				if (!legacy) {
-					EntityKnockbackEvent entityKnockbackEvent = new EntityKnockbackEvent(entity, directAttacker, false, 0.4F);
+					EntityKnockbackEvent entityKnockbackEvent = new EntityKnockbackEvent(entity, directAttacker, false, false, 0.4F);
 					EventDispatcher.callCancellable(entityKnockbackEvent, () -> {
 						float strength = entityKnockbackEvent.getStrength();
 						entity.takeKnockback(strength, finalH, finalI);

@@ -1,5 +1,6 @@
 package io.github.bloepiloepi.pvp.listeners;
 
+import io.github.bloepiloepi.pvp.enums.Tool;
 import io.github.bloepiloepi.pvp.events.FinalAttackEvent;
 import io.github.bloepiloepi.pvp.legacy.LegacyKnockbackSettings;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
@@ -15,8 +16,10 @@ import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.attribute.Attribute;
+import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.*;
+import net.minestom.server.entity.metadata.other.ArmorStandMeta;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventListener;
@@ -34,6 +37,7 @@ import net.minestom.server.utils.MathUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class AttackManager {
@@ -131,12 +135,12 @@ public class AttackManager {
 		resetLastAttackedTicks(player);
 		
 		boolean strongAttack = i > 0.9F;
-		boolean bl2 = false;
+		boolean sprintAttack = false;
 		int knockback = EnchantmentUtils.getKnockback(player);
 		if (player.isSprinting() && strongAttack) {
 			if (!legacy) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_KNOCKBACK, Sound.Source.PLAYER, 1.0F, 1.0F);
 			knockback++;
-			bl2 = true;
+			sprintAttack = true;
 		}
 		
 		boolean critical = strongAttack && !EntityUtils.isClimbing(player) && player.getVelocity().y() < 0 && !player.isOnGround() && !EntityUtils.hasEffect(player, PotionEffect.BLINDNESS) && player.getVehicle() == null && target instanceof LivingEntity;
@@ -145,7 +149,18 @@ public class AttackManager {
 			critical = critical && !player.isSprinting();
 		}
 		
-		FinalAttackEvent finalAttackEvent = new FinalAttackEvent(player, target, critical, damage, enchantedDamage);
+		boolean sweeping = false;
+		if (!legacy && strongAttack && !critical && !sprintAttack && player.isOnGround()) {
+			double lastMoveDistance = ((EntityAccessor) player).previousPosition().distance(player.getPosition()) * 0.6;
+			if (lastMoveDistance < player.getAttributeValue(Attribute.MOVEMENT_SPEED)) {
+				Tool tool = Tool.fromMaterial(player.getItemInMainHand().getMaterial());
+				if (tool != null && tool.isSword()) {
+					sweeping = true;
+				}
+			}
+		}
+		
+		FinalAttackEvent finalAttackEvent = new FinalAttackEvent(player, target, critical, sweeping, damage, enchantedDamage);
 		EventDispatcher.call(finalAttackEvent);
 		
 		if (finalAttackEvent.isCancelled()) {
@@ -153,6 +168,7 @@ public class AttackManager {
 		}
 		
 		critical = finalAttackEvent.isCritical();
+		sweeping = finalAttackEvent.isSweeping();
 		damage = finalAttackEvent.getBaseDamage();
 		enchantedDamage = finalAttackEvent.getEnchantsExtraDamage();
 		
@@ -165,8 +181,6 @@ public class AttackManager {
 		}
 		
 		damage += enchantedDamage;
-		boolean sweeping = false;
-		//TODO formula for sweeping
 		
 		float originalHealth = 0.0F;
 		if (target instanceof LivingEntity) {
@@ -182,7 +196,7 @@ public class AttackManager {
 		
 		if (knockback > 0) {
 			if (!legacy) {
-				EntityKnockbackEvent entityKnockbackEvent = new EntityKnockbackEvent(target, player, true, knockback * 0.5F);
+				EntityKnockbackEvent entityKnockbackEvent = new EntityKnockbackEvent(target, player, true, false, knockback * 0.5F);
 				EventDispatcher.callCancellable(entityKnockbackEvent, () -> {
 					float strength = entityKnockbackEvent.getStrength();
 					if (target instanceof LivingEntity) {
@@ -217,7 +231,38 @@ public class AttackManager {
 		}
 		
 		if (sweeping) {
-			//TODO sweeping
+			float sweepingDamage = 1.0F + EnchantmentUtils.getSweepingMultiplier(player) * damage;
+			BoundingBox boundingBox = target.getBoundingBox().expand(1.0D, 0.25D, 1.0D);
+			Objects.requireNonNull(target.getInstance()).getEntities().stream()
+					.filter(boundingBox::intersect).filter(entity -> entity instanceof LivingEntity)
+					.map(entity -> (LivingEntity) entity).forEach(entity -> {
+						if (entity == target) return;
+						if (entity == player) return;
+						if (entity.getEntityMeta() instanceof ArmorStandMeta) return;
+						if (entity.getTeam() == player.getTeam()) return;
+						
+						if (player.getPosition().distanceSquared(entity.getPosition()) < 9.0) {
+							EntityKnockbackEvent entityKnockbackEvent = new EntityKnockbackEvent(entity, player, false, true, 0.4F);
+							EventDispatcher.callCancellable(entityKnockbackEvent, () -> {
+								float strength = entityKnockbackEvent.getStrength();
+								entity.takeKnockback(strength, Math.sin(player.getPosition().yaw() * 0.017453292F), -Math.cos(player.getPosition().yaw() * 0.017453292F));
+							});
+							entity.damage(CustomDamageType.player(player), sweepingDamage);
+						}
+					});
+			
+			SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_SWEEP, Sound.Source.PLAYER, 1.0F, 1.0F);
+			Pos pos = player.getPosition();
+			double x = -Math.sin(Math.toRadians(pos.yaw()));
+			double z = Math.cos(Math.toRadians(pos.yaw()));
+			
+			ParticlePacket packet = ParticleCreator.createParticlePacket(
+					Particle.SWEEP_ATTACK, false,
+					pos.x() + x, EntityUtils.getBodyY(player, 0.5), pos.z() + z,
+					(float) x, 0, (float) z,
+					0, 0, null);
+			
+			player.sendPacketToViewersAndSelf(packet);
 		}
 		
 		if (critical) {
@@ -233,6 +278,7 @@ public class AttackManager {
 			if (strongAttack) {
 				if (!legacy) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_STRONG, Sound.Source.PLAYER, 1.0F, 1.0F);
 			} else {
+				//noinspection ConstantConditions
 				if (!legacy) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_WEAK, Sound.Source.PLAYER, 1.0F, 1.0F);
 			}
 		}
@@ -268,7 +314,7 @@ public class AttackManager {
 						Particle.DAMAGE_INDICATOR, false,
 						targetPosition.x(), EntityUtils.getBodyY(target, 0.5), targetPosition.z(),
 						0.1F, 0F, 0.1F,
-						0.2F, count, (writer) -> {});
+						0.2F, count, null);
 				
 				target.sendPacketToViewersAndSelf(packet);
 			}

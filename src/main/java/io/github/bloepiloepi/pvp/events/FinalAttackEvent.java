@@ -10,17 +10,20 @@ public class FinalAttackEvent implements EntityEvent, CancellableEvent {
 	private final Entity entity;
 	private final Entity target;
 	
-	private boolean crit;
+	private boolean critical;
+	private boolean sweeping;
 	private float baseDamage;
 	private float enchantsExtraDamage;
 	
 	private boolean cancelled;
 	
 	public FinalAttackEvent(@NotNull Entity entity, @NotNull Entity target,
-	                        boolean crit, float baseDamage, float enchantsExtraDamage) {
+	                        boolean critical, boolean sweeping,
+	                        float baseDamage, float enchantsExtraDamage) {
 		this.entity = entity;
 		this.target = target;
-		this.crit = crit;
+		this.critical = critical;
+		this.sweeping = sweeping;
 		this.baseDamage = baseDamage;
 		this.enchantsExtraDamage = enchantsExtraDamage;
 	}
@@ -40,7 +43,7 @@ public class FinalAttackEvent implements EntityEvent, CancellableEvent {
 	 * @return whether the attack was critical or not
 	 */
 	public boolean isCritical() {
-		return crit;
+		return critical;
 	}
 	
 	/**
@@ -49,7 +52,25 @@ public class FinalAttackEvent implements EntityEvent, CancellableEvent {
 	 * @param crit whether the attack was critical or not
 	 */
 	public void setCritical(boolean crit) {
-		this.crit = crit;
+		this.critical = crit;
+	}
+	
+	/**
+	 * Gets whether the attack was sweeping.
+	 *
+	 * @return whether the attack as sweeping or not
+	 */
+	public boolean isSweeping() {
+		return sweeping;
+	}
+	
+	/**
+	 * Sets whether the attack was sweeping.
+	 *
+	 * @param sweeping whether the attack was sweeping or not
+	 */
+	public void setSweeping(boolean sweeping) {
+		this.sweeping = sweeping;
 	}
 	
 	/**

@@ -16,12 +16,12 @@ import java.util.List;
 import java.util.Map;
 
 public enum Tool {
-	WOODEN_SWORD(ToolMaterial.WOOD, 3, 4.0F, -2.4F),
-	STONE_SWORD(ToolMaterial.STONE, 3, 4.0F, -2.4F),
-	IRON_SWORD(ToolMaterial.IRON, 3, 4.0F, -2.4F),
-	DIAMOND_SWORD(ToolMaterial.DIAMOND, 3, 4.0F, -2.4F),
-	GOLDEN_SWORD(ToolMaterial.GOLD, 3, 4.0F, -2.4F),
-	NETHERITE_SWORD(ToolMaterial.NETHERITE, 3, 4.0F, -2.4F),
+	WOODEN_SWORD(ToolMaterial.WOOD, 3, 4.0F, -2.4F, false, true),
+	STONE_SWORD(ToolMaterial.STONE, 3, 4.0F, -2.4F, false, true),
+	IRON_SWORD(ToolMaterial.IRON, 3, 4.0F, -2.4F, false, true),
+	DIAMOND_SWORD(ToolMaterial.DIAMOND, 3, 4.0F, -2.4F, false, true),
+	GOLDEN_SWORD(ToolMaterial.GOLD, 3, 4.0F, -2.4F, false, true),
+	NETHERITE_SWORD(ToolMaterial.NETHERITE, 3, 4.0F, -2.4F, false, true),
 	
 	WOODEN_SHOVEL(ToolMaterial.WOOD, 1.5F, 1.0F, -3.0F),
 	STONE_SHOVEL(ToolMaterial.STONE, 1.5F, 1.0F, -3.0F),
@@ -37,12 +37,12 @@ public enum Tool {
 	GOLDEN_PICKAXE(ToolMaterial.GOLD, 1, 2.0F, -2.8F),
 	NETHERITE_PICKAXE(ToolMaterial.NETHERITE, 1, 2.0F, -2.8F),
 	
-	WOODEN_AXE(ToolMaterial.WOOD, 6.0F, 3.0F, -3.2F, true),
-	STONE_AXE(ToolMaterial.STONE, 7.0F, 3.0F, -3.2F, true),
-	IRON_AXE(ToolMaterial.IRON, 6.0F, 3.0F, -3.1F, true),
-	DIAMOND_AXE(ToolMaterial.DIAMOND, 5.0F, 3.0F, -3.0F, true),
-	GOLDEN_AXE(ToolMaterial.GOLD, 6.0F, 3.0F, -3.0F, true),
-	NETHERITE_AXE(ToolMaterial.NETHERITE, 5.0F, 3.0F, -3.0F, true),
+	WOODEN_AXE(ToolMaterial.WOOD, 6.0F, 3.0F, -3.2F, true, false),
+	STONE_AXE(ToolMaterial.STONE, 7.0F, 3.0F, -3.2F, true, false),
+	IRON_AXE(ToolMaterial.IRON, 6.0F, 3.0F, -3.1F, true, false),
+	DIAMOND_AXE(ToolMaterial.DIAMOND, 5.0F, 3.0F, -3.0F, true, false),
+	GOLDEN_AXE(ToolMaterial.GOLD, 6.0F, 3.0F, -3.0F, true, false),
+	NETHERITE_AXE(ToolMaterial.NETHERITE, 5.0F, 3.0F, -3.0F, true, false),
 	
 	// Attack damage for hoes is negative to disable the ToolMaterial attack damage
 	WOODEN_HOE(ToolMaterial.WOOD, 0, 0, -3.0F),
@@ -58,6 +58,7 @@ public enum Tool {
 	
 	private final Material material;
 	private boolean isAxe = false;
+	private boolean isSword = false;
 	
 	private final Map<Attribute, AttributeModifier> attributeModifiers = new HashMap<>();
 	private final Map<Attribute, AttributeModifier> legacyAttributeModifiers = new HashMap<>();
@@ -73,9 +74,10 @@ public enum Tool {
 		this.legacyAttributeModifiers.put(Attribute.ATTACK_DAMAGE, new AttributeModifier(ModifierUUID.ATTACK_DAMAGE_MODIFIER_ID, "Tool modifier", finalLegacyAttackDamage, AttributeOperation.ADDITION));
 	}
 	
-	Tool(@Nullable ToolMaterial toolMaterial, float attackDamage, float legacyAttackDamage, float attackSpeed, boolean isAxe) {
+	Tool(@Nullable ToolMaterial toolMaterial, float attackDamage, float legacyAttackDamage, float attackSpeed, boolean isAxe, boolean isSword) {
 		this(toolMaterial, attackDamage, legacyAttackDamage, attackSpeed);
 		this.isAxe = isAxe;
+		this.isSword = isSword;
 	}
 	
 	public static Map<Attribute, List<AttributeModifier>> getAttributes(@Nullable Tool tool, EquipmentSlot slot, ItemStack item, boolean legacy) {
@@ -102,6 +104,10 @@ public enum Tool {
 	
 	public boolean isAxe() {
 		return isAxe;
+	}
+	
+	public boolean isSword() {
+		return isSword;
 	}
 	
 	public static Tool fromMaterial(Material material) {
