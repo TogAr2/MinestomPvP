@@ -1,6 +1,7 @@
 package io.github.bloepiloepi.pvp;
 
 import io.github.bloepiloepi.pvp.enchantment.CustomEnchantments;
+import io.github.bloepiloepi.pvp.entities.ArrowPickup;
 import io.github.bloepiloepi.pvp.entities.Tracker;
 import io.github.bloepiloepi.pvp.food.FoodListener;
 import io.github.bloepiloepi.pvp.legacy.SwordBlockHandler;
@@ -143,10 +144,12 @@ public class PvpExtension extends Extension {
 		CustomPotionTypes.registerAll();
 		
 		Tracker.register(getEventNode());
+		
+		ArrowPickup.init();
 	}
 	
 	@Override
 	public void terminate() {
-	
+		ArrowPickup.stop();
 	}
 }
