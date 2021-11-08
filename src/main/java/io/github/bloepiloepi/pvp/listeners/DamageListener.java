@@ -34,8 +34,11 @@ public class DamageListener {
 	public static EventNode<EntityEvent> events() {
 		EventNode<EntityEvent> node = EventNode.type("damage-events", EventFilter.ENTITY);
 		
-		node.addListener(PlayerTickEvent.class, event ->
-				Tracker.hungerManager.get(event.getPlayer().getUuid()).update(false));
+		node.addListener(PlayerTickEvent.class, event -> {
+			if (event.getPlayer().isOnline()) {
+				Tracker.hungerManager.get(event.getPlayer().getUuid()).update(false);
+			}
+		});
 		
 		node.addListener(EventListener.builder(EntityDamageEvent.class)
 				.handler(event -> handleEntityDamage(event, false))
@@ -47,8 +50,11 @@ public class DamageListener {
 	public static EventNode<EntityEvent> legacyEvents() {
 		EventNode<EntityEvent> node = EventNode.type("legacy-damage-events", EventFilter.ENTITY);
 		
-		node.addListener(PlayerTickEvent.class, event ->
-				Tracker.hungerManager.get(event.getPlayer().getUuid()).update(true));
+		node.addListener(PlayerTickEvent.class, event -> {
+			if (event.getPlayer().isOnline()) {
+				Tracker.hungerManager.get(event.getPlayer().getUuid()).update(true);
+			}
+		});
 		
 		node.addListener(EventListener.builder(EntityDamageEvent.class)
 				.handler(event -> handleEntityDamage(event, true))
