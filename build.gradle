@@ -1,6 +1,9 @@
 plugins {
     id 'java'
+    id 'maven-publish'
 }
+
+sourceCompatibility = 17
 
 group 'io.github.bloepiloepi'
 version '1.0'
@@ -22,4 +25,12 @@ java {
 dependencies {
     compileOnly 'com.github.Minestom:Minestom:c5f4ce8515'
     testImplementation 'com.github.Minestom:Minestom:c5f4ce8515'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
 }
