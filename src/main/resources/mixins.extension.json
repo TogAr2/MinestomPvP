@@ -7,8 +7,7 @@
   "mixins": [
     "EntityAccessor",
     "EntityMixin",
-    "EntityProjectileMixin",
-    "LivingEntityMixin",
+
     "PlayerAccessor",
     "PlayerInventoryMixin",
     "PlayerMixin",
