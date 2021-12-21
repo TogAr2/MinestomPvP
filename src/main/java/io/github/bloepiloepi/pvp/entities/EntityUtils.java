@@ -4,7 +4,6 @@ import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.enchantment.enchantments.ProtectionEnchantment;
 import io.github.bloepiloepi.pvp.enums.Tool;
-import io.github.bloepiloepi.pvp.mixins.LivingEntityAccessor;
 import io.github.bloepiloepi.pvp.projectile.Arrow;
 import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.text.Component;
@@ -68,13 +67,10 @@ public class EntityUtils {
 		// Do not start fire event if the fire needs to be removed (< 0 duration)
 		if (duration.toMillis() > 0) {
 			EventDispatcher.callCancellable(entityFireEvent, () -> {
-				final long fireTime = entityFireEvent.getFireTime(TimeUnit.MILLISECOND);
 				entity.setOnFire(true);
-				Tracker.fireExtinguishTime.put(entity.getUuid(), System.currentTimeMillis() + fireTime);
 			});
-		} else {
-			Tracker.fireExtinguishTime.put(entity.getUuid(), System.currentTimeMillis());
 		}
+		// Tracker.fireExtinguishTime is updated by event listener
 	}
 	
 	public static void setOnFireForSeconds(Entity entity, int seconds) {
@@ -87,8 +83,7 @@ public class EntityUtils {
 		}
 		int millis = ticks * MinecraftServer.TICK_MS;
 		
-		long fireExtinguishTime = living ? ((LivingEntityAccessor) livingEntity).fireExtinguishTime() :
-				Tracker.fireExtinguishTime.getOrDefault(entity.getUuid(), 0L);
+		long fireExtinguishTime = Tracker.fireExtinguishTime.getOrDefault(entity.getUuid(), 0L);
 		if (System.currentTimeMillis() + millis > fireExtinguishTime) {
 			setFireForDuration(entity, millis, TimeUnit.MILLISECOND);
 		}

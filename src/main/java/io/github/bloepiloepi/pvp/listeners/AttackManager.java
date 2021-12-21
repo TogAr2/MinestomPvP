@@ -25,6 +25,7 @@ import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityAttackEvent;
+import net.minestom.server.event.entity.EntityFireEvent;
 import net.minestom.server.event.player.*;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.network.packet.server.play.EntityAnimationPacket;
@@ -34,6 +35,7 @@ import net.minestom.server.particle.ParticleCreator;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.utils.MathUtils;
+import net.minestom.server.utils.time.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +61,10 @@ public class AttackManager {
 				}
 			}).build());
 		}
+		
+		node.addListener(EntityFireEvent.class, event -> {
+			Tracker.fireExtinguishTime.put(event.getEntity().getUuid(), System.currentTimeMillis() + event.getFireTime(TimeUnit.MILLISECOND));
+		});
 		
 		return node;
 	}
