@@ -30,11 +30,6 @@ public class DemoGenerator implements ChunkGenerator {
 	}
 	
 	@Override
-	public void fillBiomes(@NotNull Biome[] biomes, int chunkX, int chunkZ) {
-		Arrays.fill(biomes, Biome.PLAINS);
-	}
-	
-	@Override
 	public @Nullable List<ChunkPopulator> getPopulators() {
 		return null;
 	}

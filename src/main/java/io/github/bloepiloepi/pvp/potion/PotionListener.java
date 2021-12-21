@@ -53,12 +53,12 @@ public class PotionListener {
 			Entity entity = event.getEntity();
 			
 			for (TimedPotion potion : entity.getActiveEffects()) {
-				durationLeftMap.putIfAbsent(potion, potion.getPotion().getDuration() - 1);
+				durationLeftMap.putIfAbsent(potion, potion.getPotion().duration() - 1);
 				int durationLeft = durationLeftMap.get(potion);
 				
 				if (durationLeft > 0) {
-					CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.getPotion().getEffect());
-					byte amplifier = potion.getPotion().getAmplifier();
+					CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.getPotion().effect());
+					byte amplifier = potion.getPotion().amplifier();
 					
 					if (customPotionEffect.canApplyUpdateEffect(durationLeft, amplifier)) {
 						customPotionEffect.applyUpdateEffect((LivingEntity) entity, amplifier, legacy);
@@ -75,8 +75,8 @@ public class PotionListener {
 		node.addListener(EntityPotionAddEvent.class, event -> {
 			if (!(event.getEntity() instanceof LivingEntity)) return;
 			
-			CustomPotionEffect customPotionEffect = CustomPotionEffects.get(event.getPotion().getEffect());
-			customPotionEffect.onApplied((LivingEntity) event.getEntity(), event.getPotion().getAmplifier(), legacy);
+			CustomPotionEffect customPotionEffect = CustomPotionEffects.get(event.getPotion().effect());
+			customPotionEffect.onApplied((LivingEntity) event.getEntity(), event.getPotion().amplifier(), legacy);
 			
 			updatePotionVisibility((LivingEntity) event.getEntity());
 		});
@@ -84,8 +84,8 @@ public class PotionListener {
 		node.addListener(EntityPotionRemoveEvent.class, event -> {
 			if (!(event.getEntity() instanceof LivingEntity)) return;
 			
-			CustomPotionEffect customPotionEffect = CustomPotionEffects.get(event.getPotion().getEffect());
-			customPotionEffect.onRemoved((LivingEntity) event.getEntity(), event.getPotion().getAmplifier(), legacy);
+			CustomPotionEffect customPotionEffect = CustomPotionEffects.get(event.getPotion().effect());
+			customPotionEffect.onRemoved((LivingEntity) event.getEntity(), event.getPotion().amplifier(), legacy);
 			
 			//Delay update 1 tick because we need to have the removing effect removed
 			MinecraftServer.getSchedulerManager().buildTask(() ->
@@ -110,10 +110,10 @@ public class PotionListener {
 			
 			//Apply the potions
 			for (Potion potion : potions) {
-				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.getEffect());
+				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.effect());
 				
 				if (customPotionEffect.isInstant()) {
-					customPotionEffect.applyInstantEffect(player, player, player, potion.getAmplifier(), 1.0D, legacy);
+					customPotionEffect.applyInstantEffect(player, player, player, potion.amplifier(), 1.0D, legacy);
 				} else {
 					player.addEffect(potion);
 				}
@@ -198,7 +198,7 @@ public class PotionListener {
 		if (effects.isEmpty()) return true;
 		
 		for (TimedPotion potion : effects) {
-			if (!isAmbient(potion.getPotion().getFlags())) {
+			if (!potion.getPotion().isAmbient()) {
 				return false;
 			}
 		}
@@ -226,10 +226,10 @@ public class PotionListener {
 		int totalAmplifier = 0;
 		
 		for (Potion potion : effects) {
-			if (PotionListener.hasParticles(potion.getFlags())) {
-				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.getEffect());
+			if (potion.hasParticles()) {
+				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.effect());
 				int color = customPotionEffect.getColor();
-				int amplifier = potion.getAmplifier() + 1;
+				int amplifier = potion.amplifier() + 1;
 				r += (float) (amplifier * (color >> 16 & 255)) / 255.0F;
 				g += (float) (amplifier * (color >> 8 & 255)) / 255.0F;
 				b += (float) (amplifier * (color & 255)) / 255.0F;
@@ -263,24 +263,29 @@ public class PotionListener {
 		}
 		
 		potions.addAll(customEffects.stream().map((customPotion) ->
-				new Potion(Objects.requireNonNull(PotionEffect.fromId(customPotion.getId())),
-						customPotion.getAmplifier(), customPotion.getDuration(),
-						customPotion.showParticles(), customPotion.showIcon(),
-						customPotion.isAmbient()))
+				new Potion(Objects.requireNonNull(PotionEffect.fromId(customPotion.id())),
+						customPotion.amplifier(), customPotion.duration(),
+						createFlags(
+								customPotion.isAmbient(),
+								customPotion.showParticles(),
+								customPotion.showIcon()
+						)))
 				.collect(Collectors.toList()));
 		
 		return potions;
 	}
 	
-	public static boolean isAmbient(byte flags) {
-		return (flags & 0x01) > 0;
-	}
-	
-	public static boolean hasParticles(byte flags) {
-		return (flags & 0x02) > 0;
-	}
-	
-	public static boolean hasIcon(byte flags) {
-		return (flags & 0x04) > 0;
+	public static byte createFlags(boolean ambient, boolean particles, boolean icon) {
+		byte flags = 0;
+		if (ambient) {
+			flags = (byte) (flags | 0x01);
+		}
+		if (particles) {
+			flags = (byte) (flags | 0x02);
+		}
+		if (icon) {
+			flags = (byte) (flags | 0x04);
+		}
+		return flags;
 	}
 }

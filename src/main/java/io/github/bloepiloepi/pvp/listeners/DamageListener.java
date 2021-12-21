@@ -251,10 +251,11 @@ public class DamageListener {
 				soundCategory = Sound.Source.HOSTILE;
 			}
 			
-			SoundEffectPacket damageSoundPacket =
-					SoundEffectPacket.create(soundCategory, sound,
-							entity.getPosition(),
-							1.0f, 1.0f);
+			SoundEffectPacket damageSoundPacket = new SoundEffectPacket(
+					sound, soundCategory,
+					entity.getPosition(),
+					1.0f, 1.0f
+			);
 			entity.sendPacketToViewersAndSelf(damageSoundPacket);
 		}
 		
@@ -327,7 +328,7 @@ public class DamageListener {
 		} else {
 			int k;
 			if (EntityUtils.hasEffect(entity, PotionEffect.RESISTANCE)) {
-				k = (EntityUtils.getEffect(entity, PotionEffect.RESISTANCE).getAmplifier() + 1) * 5;
+				k = (EntityUtils.getEffect(entity, PotionEffect.RESISTANCE).amplifier() + 1) * 5;
 				int j = 25 - k;
 				float f = amount * (float) j;
 				amount = Math.max(f / 25.0F, 0.0F);

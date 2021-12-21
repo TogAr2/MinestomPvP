@@ -77,11 +77,7 @@ public class Tracker {
 	}
 	
 	public static void onCooldown(Player player, Material material, int duration) {
-		SetCooldownPacket packet = new SetCooldownPacket();
-		packet.itemId = material.id();
-		packet.cooldownTicks = duration;
-		
-		player.getPlayerConnection().sendPacket(packet);
+		player.getPlayerConnection().sendPacket(new SetCooldownPacket(material.id(), duration));
 	}
 	
 	public static void register(EventNode<? super EntityEvent> eventNode) {

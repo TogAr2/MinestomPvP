@@ -13,11 +13,7 @@ public class EffectManager {
 	
 	public static void sendNearby(@NotNull Instance instance, @NotNull Effects effect,
 	                              int x, int y, int z, int data, double distance, boolean global) {
-		EffectPacket packet = new EffectPacket();
-		packet.effectId = effect.getId();
-		packet.position = new Pos(x, y, z);
-		packet.data = data;
-		packet.disableRelativeVolume = global;
+		EffectPacket packet = new EffectPacket(effect.getId(), new Pos(x, y, z), data, global);
 		
 		double distanceSquared = distance * distance;
 		PacketUtils.sendGroupedPacket(instance.getPlayers(), packet, player -> {
@@ -32,10 +28,7 @@ public class EffectManager {
 	
 	public static void sendGameState(@NotNull Player player,
 	                                 @NotNull ChangeGameStatePacket.Reason reason, float value) {
-		ChangeGameStatePacket packet = new ChangeGameStatePacket();
-		packet.reason = reason;
-		packet.value = value;
-		
+		ChangeGameStatePacket packet = new ChangeGameStatePacket(reason, value);
 		player.getPlayerConnection().sendPacket(packet);
 	}
 }

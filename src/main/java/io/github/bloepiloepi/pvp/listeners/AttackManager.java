@@ -260,10 +260,7 @@ public class AttackManager {
 		if (critical) {
 			if (!legacy) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_CRIT, Sound.Source.PLAYER, 1.0F, 1.0F);
 			
-			EntityAnimationPacket packet = new EntityAnimationPacket();
-			packet.entityId = target.getEntityId();
-			packet.animation = EntityAnimationPacket.Animation.CRITICAL_EFFECT;
-			player.sendPacketToViewersAndSelf(new EntityAnimationPacket());
+			player.sendPacketToViewersAndSelf(new EntityAnimationPacket(target.getEntityId(), EntityAnimationPacket.Animation.CRITICAL_EFFECT));
 		}
 		
 		if (!critical && !sweeping) {
@@ -276,10 +273,7 @@ public class AttackManager {
 		}
 		
 		if (enchantedDamage > 0.0F) {
-			EntityAnimationPacket packet = new EntityAnimationPacket();
-			packet.entityId = target.getEntityId();
-			packet.animation = EntityAnimationPacket.Animation.MAGICAL_CRITICAL_EFFECT;
-			player.sendPacketToViewersAndSelf(new EntityAnimationPacket());
+			player.sendPacketToViewersAndSelf(new EntityAnimationPacket(target.getEntityId(), EntityAnimationPacket.Animation.MAGICAL_CRITICAL_EFFECT));
 		}
 		
 		if (target instanceof LivingEntity) {

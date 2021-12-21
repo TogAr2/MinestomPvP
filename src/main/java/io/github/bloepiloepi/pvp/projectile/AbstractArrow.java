@@ -114,8 +114,7 @@ public abstract class AbstractArrow extends EntityHittableProjectile {
 					EntityUtils.setOnFireForSeconds(entity, 5);
 				}
 				
-				if (entity instanceof LivingEntity) {
-					LivingEntity living = (LivingEntity) entity;
+				if (entity instanceof LivingEntity living) {
 					if (getPiercingLevel() <= 0) {
 						living.setArrowCount(living.getArrowCount() + 1);
 					}
@@ -133,8 +132,7 @@ public abstract class AbstractArrow extends EntityHittableProjectile {
 						}
 					}
 					
-					if (shooter instanceof LivingEntity) {
-						LivingEntity livingShooter = (LivingEntity) shooter;
+					if (shooter instanceof LivingEntity livingShooter) {
 						EnchantmentUtils.onUserDamaged(living, livingShooter);
 						EnchantmentUtils.onTargetDamaged(livingShooter, living);
 					}
@@ -199,14 +197,11 @@ public abstract class AbstractArrow extends EntityHittableProjectile {
 			return false;
 		}
 		
-		switch (pickupMode) {
-			case ALLOWED:
-				return true;
-			case CREATIVE_ONLY:
-				return player.isCreative();
-			default:
-				return false;
-		}
+		return switch (pickupMode) {
+			case ALLOWED -> true;
+			case CREATIVE_ONLY -> player.isCreative();
+			default -> false;
+		};
 	}
 	
 	public boolean pickup(Player player) {
@@ -260,10 +255,6 @@ public abstract class AbstractArrow extends EntityHittableProjectile {
 	
 	public void setPiercingLevel(byte piercingLevel) {
 		((AbstractArrowMeta) getEntityMeta()).setPiercingLevel(piercingLevel);
-	}
-	
-	public boolean shouldRemove() {
-		return super.shouldRemove();
 	}
 	
 	public enum PickupMode {

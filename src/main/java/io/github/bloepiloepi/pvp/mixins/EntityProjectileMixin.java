@@ -154,8 +154,7 @@ public abstract class EntityProjectileMixin extends Entity {
 				LivingEntity victim = (LivingEntity) victimOptional.get();
 				boolean shouldRemove = true;
 				
-				if ((Object) this instanceof EntityHittableProjectile) {
-					EntityHittableProjectile hittable = (EntityHittableProjectile) (Object) this;
+				if ((Object) this instanceof EntityHittableProjectile hittable) {
 					shouldRemove = false;
 					
 					if (hittable.shouldCallHit()) {

@@ -78,7 +78,7 @@ public class PvpTest {
 			PvpExtension.setLegacyAttack(event.getPlayer(), true);
 			
 			event.getPlayer().setPermissionLevel(4);
-			event.getPlayer().addEffect(new Potion(PotionEffect.RESISTANCE, (byte) 4, CustomPotionEffect.PERMANENT, false, false));
+			event.getPlayer().addEffect(new Potion(PotionEffect.RESISTANCE, (byte) 4, CustomPotionEffect.PERMANENT));
 		});
 		
 		MinecraftServer.getGlobalEventHandler().addListener(PlayerStartFlyingEvent.class,

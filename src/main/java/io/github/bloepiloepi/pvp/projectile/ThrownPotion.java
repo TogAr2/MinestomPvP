@@ -77,20 +77,17 @@ public class ThrownPotion extends EntityHittableProjectile {
 			double proximity = entity == hitEntity ? 1.0D : (1.0D - Math.sqrt(distanceSquared) / 4.0D);
 			
 			for (Potion potion : potions) {
-				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.getEffect());
+				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.effect());
 				if (customPotionEffect.isInstant()) {
 					customPotionEffect.applyInstantEffect(this, getShooter(),
-							entity,potion.getAmplifier(), proximity, legacy);
+							entity,potion.amplifier(), proximity, legacy);
 				} else {
-					int duration = potion.getDuration();
+					int duration = potion.duration();
 					if (legacy) duration = (int) Math.floor(duration * 0.75);
 					duration = (int) (proximity * (double) duration + 0.5D);
 					
 					if (duration > 20) {
-						byte flags = potion.getFlags();
-						entity.addEffect(new Potion(potion.getEffect(), potion.getAmplifier(), duration,
-								PotionListener.hasParticles(flags), PotionListener.hasIcon(flags),
-								PotionListener.isAmbient(flags)));
+						entity.addEffect(new Potion(potion.effect(), potion.amplifier(), duration, potion.flags()));
 					}
 				}
 			}

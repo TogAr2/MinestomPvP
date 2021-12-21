@@ -40,12 +40,12 @@ import java.util.function.Predicate;
 public class EntityUtils {
 	
 	public static boolean hasEffect(Entity entity, PotionEffect type) {
-		return entity.getActiveEffects().stream().anyMatch((effect) -> effect.getPotion().getEffect() == type);
+		return entity.getActiveEffects().stream().anyMatch((effect) -> effect.getPotion().effect() == type);
 	}
 	
 	public static Potion getEffect(Entity entity, PotionEffect type) {
 		for (TimedPotion potion : entity.getActiveEffects()) {
-			if (potion.getPotion().getEffect() == type) {
+			if (potion.getPotion().effect() == type) {
 				return potion.getPotion();
 			}
 		}
@@ -224,7 +224,7 @@ public class EntityUtils {
 	
 	public static boolean hasPotionEffect(LivingEntity entity, PotionEffect effect) {
 		return entity.getActiveEffects().stream()
-				.map((potion) -> potion.getPotion().getEffect())
+				.map((potion) -> potion.getPotion().effect())
 				.anyMatch((potionEffect) -> potionEffect == effect);
 	}
 	
