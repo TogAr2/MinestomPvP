@@ -31,33 +31,17 @@ import net.minestom.server.world.Difficulty;
 
 public class DamageListener {
 	
-	public static EventNode<EntityEvent> events() {
-		EventNode<EntityEvent> node = EventNode.type("damage-events", EventFilter.ENTITY);
+	public static EventNode<EntityEvent> events(boolean legacy) {
+		EventNode<EntityEvent> node = EventNode.type((legacy ? "legacy-" : "") + "damage-events", EventFilter.ENTITY);
 		
 		node.addListener(PlayerTickEvent.class, event -> {
 			if (event.getPlayer().isOnline()) {
-				Tracker.hungerManager.get(event.getPlayer().getUuid()).update(false);
+				Tracker.hungerManager.get(event.getPlayer().getUuid()).update(legacy);
 			}
 		});
 		
 		node.addListener(EventListener.builder(EntityDamageEvent.class)
-				.handler(event -> handleEntityDamage(event, false))
-				.build());
-		
-		return node;
-	}
-	
-	public static EventNode<EntityEvent> legacyEvents() {
-		EventNode<EntityEvent> node = EventNode.type("legacy-damage-events", EventFilter.ENTITY);
-		
-		node.addListener(PlayerTickEvent.class, event -> {
-			if (event.getPlayer().isOnline()) {
-				Tracker.hungerManager.get(event.getPlayer().getUuid()).update(true);
-			}
-		});
-		
-		node.addListener(EventListener.builder(EntityDamageEvent.class)
-				.handler(event -> handleEntityDamage(event, true))
+				.handler(event -> handleEntityDamage(event, legacy))
 				.build());
 		
 		return node;
@@ -82,15 +66,12 @@ public class DamageListener {
 		if (event.getEntity() instanceof Player && type.isScaledWithDifficulty()) {
 			Difficulty difficulty = MinecraftServer.getDifficulty();
 			switch (difficulty) {
-				case PEACEFUL:
+				case PEACEFUL -> {
 					event.setCancelled(true);
 					return;
-				case EASY:
-					amount = Math.min(amount / 2.0F + 1.0F, amount);
-					break;
-				case HARD:
-					amount = amount * 3.0F / 2.0F;
-					break;
+				}
+				case EASY -> amount = Math.min(amount / 2.0F + 1.0F, amount);
+				case HARD -> amount = amount * 3.0F / 2.0F;
 			}
 		}
 		

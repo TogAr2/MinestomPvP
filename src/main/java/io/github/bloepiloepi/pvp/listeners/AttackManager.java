@@ -43,29 +43,22 @@ import java.util.concurrent.ThreadLocalRandom;
 public class AttackManager {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AttackManager.class);
 	
-	public static EventNode<EntityEvent> events() {
+	public static EventNode<EntityEvent> events(boolean legacy) {
 		EventNode<EntityEvent> node = EventNode.type("attack-events", EventFilter.ENTITY);
 		
-		node.addListener(EntityAttackEvent.class, event -> entityHit(event.getEntity(), event.getTarget(), false));
+		node.addListener(EntityAttackEvent.class, event -> entityHit(event.getEntity(), event.getTarget(), legacy));
 		node.addListener(PlayerTickEvent.class, AttackManager::spectateTick);
 		
-		node.addListener(EventListener.builder(PlayerHandAnimationEvent.class).handler(event ->
-				resetLastAttackedTicks(event.getPlayer())).build());
-		
-		node.addListener(EventListener.builder(PlayerChangeHeldSlotEvent.class).handler(event -> {
-			if (!event.getPlayer().getItemInMainHand().isSimilar(event.getPlayer().getInventory().getItemStack(event.getSlot()))) {
-				resetLastAttackedTicks(event.getPlayer());
-			}
-		}).build());
-		
-		return node;
-	}
-	
-	public static EventNode<EntityEvent> legacyEvents() {
-		EventNode<EntityEvent> node = EventNode.type("legacy-attack-events", EventFilter.ENTITY);
-		
-		node.addListener(EntityAttackEvent.class, event -> entityHit(event.getEntity(), event.getTarget(), true));
-		node.addListener(PlayerTickEvent.class, AttackManager::spectateTick);
+		if (!legacy) {
+			node.addListener(EventListener.builder(PlayerHandAnimationEvent.class).handler(event ->
+					resetLastAttackedTicks(event.getPlayer())).build());
+			
+			node.addListener(EventListener.builder(PlayerChangeHeldSlotEvent.class).handler(event -> {
+				if (!event.getPlayer().getItemInMainHand().isSimilar(event.getPlayer().getInventory().getItemStack(event.getSlot()))) {
+					resetLastAttackedTicks(event.getPlayer());
+				}
+			}).build());
+		}
 		
 		return node;
 	}
@@ -100,8 +93,7 @@ public class AttackManager {
 	
 	private static void entityHit(Entity entity, Entity target, boolean legacy) {
 		if (target == null) return;
-		if (!(entity instanceof Player)) return;
-		Player player = (Player) entity;
+		if (!(entity instanceof Player player)) return;
 		if (player.isDead()) return;
 		if (entity.getDistanceSquared(target) >= 36.0D) return;
 		

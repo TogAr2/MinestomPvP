@@ -41,8 +41,8 @@ public class PvpExtension extends Extension {
 	public static EventNode<EntityEvent> legacyEvents() {
 		EventNode<EntityEvent> node = EventNode.type("legacy-pvp-events", EventFilter.ENTITY);
 		
-		node.addChild(AttackManager.legacyEvents());
-		node.addChild(DamageListener.legacyEvents());
+		node.addChild(AttackManager.events(true));
+		node.addChild(DamageListener.events(true));
 		node.addChild(ArmorToolListener.events(true));
 		node.addChild(FoodListener.events(true));
 		node.addChild(PotionListener.events(true));
@@ -60,7 +60,7 @@ public class PvpExtension extends Extension {
 	 * @return The EventNode with attack events
 	 */
 	public static EventNode<EntityEvent> attackEvents() {
-		return AttackManager.events();
+		return AttackManager.events(false);
 	}
 	
 	/**
@@ -72,7 +72,7 @@ public class PvpExtension extends Extension {
 	 * @return The EventNode with damage events
 	 */
 	public static EventNode<EntityEvent> damageEvents() {
-		return DamageListener.events();
+		return DamageListener.events(false);
 	}
 	
 	/**
