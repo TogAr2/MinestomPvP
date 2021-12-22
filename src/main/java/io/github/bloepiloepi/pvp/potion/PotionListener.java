@@ -288,4 +288,9 @@ public class PotionListener {
 		}
 		return flags;
 	}
+	
+	private static final byte DEFAULT_FLAGS = createFlags(false, true, true);
+	public static byte defaultFlags() {
+		return DEFAULT_FLAGS;
+	}
 }

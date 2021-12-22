@@ -4,6 +4,7 @@ import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.enchantment.enchantments.ProtectionEnchantment;
 import io.github.bloepiloepi.pvp.enums.Tool;
+import io.github.bloepiloepi.pvp.potion.PotionListener;
 import io.github.bloepiloepi.pvp.projectile.Arrow;
 import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.text.Component;
@@ -49,7 +50,7 @@ public class EntityUtils {
 			}
 		}
 		
-		return new Potion(type, (byte) 0, 0);
+		return new Potion(type, (byte) 0, 0, PotionListener.defaultFlags());
 	}
 	
 	public static void setFireForDuration(Entity entity, int duration, TemporalUnit temporalUnit) {
@@ -268,6 +269,7 @@ public class EntityUtils {
 		
 		boolean success = false;
 		int lowestY = to.blockY();
+		if (lowestY == 0) lowestY++;
 		while (lowestY > instance.getDimensionType().getMinY()) {
 			Block block = instance.getBlock(to.blockX(), lowestY - 1, to.blockZ());
 			if (!block.isAir() && !block.isLiquid()) {

@@ -2,6 +2,7 @@ package io.github.bloepiloepi.pvp.enchantment.enchantments;
 
 import io.github.bloepiloepi.pvp.enchantment.CustomEnchantment;
 import io.github.bloepiloepi.pvp.entities.EntityGroup;
+import io.github.bloepiloepi.pvp.potion.PotionListener;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
@@ -37,7 +38,7 @@ public class DamageEnchantment extends CustomEnchantment {
 			LivingEntity livingEntity = (LivingEntity) target;
 			if (type == Type.ARTHROPODS && EntityGroup.ofEntity(livingEntity) == EntityGroup.ARTHROPOD) {
 				int i = 20 + ThreadLocalRandom.current().nextInt(10 * level);
-				livingEntity.addEffect(new Potion(PotionEffect.SLOWNESS, (byte) 3, i));
+				livingEntity.addEffect(new Potion(PotionEffect.SLOWNESS, (byte) 3, i, PotionListener.defaultFlags()));
 			}
 		}
 	}

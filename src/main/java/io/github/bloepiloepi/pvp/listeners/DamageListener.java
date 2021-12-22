@@ -7,6 +7,7 @@ import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
 import io.github.bloepiloepi.pvp.events.*;
+import io.github.bloepiloepi.pvp.potion.PotionListener;
 import io.github.bloepiloepi.pvp.utils.DamageUtils;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
@@ -284,9 +285,9 @@ public class DamageListener {
 		if (hasTotem) {
 			entity.setHealth(1.0F);
 			entity.clearEffects();
-			entity.addEffect(new Potion(PotionEffect.REGENERATION, (byte) 1, 900));
-			entity.addEffect(new Potion(PotionEffect.ABSORPTION, (byte) 1, 100));
-			entity.addEffect(new Potion(PotionEffect.FIRE_RESISTANCE, (byte) 0, 800));
+			entity.addEffect(new Potion(PotionEffect.REGENERATION, (byte) 1, 900, PotionListener.defaultFlags()));
+			entity.addEffect(new Potion(PotionEffect.ABSORPTION, (byte) 1, 100, PotionListener.defaultFlags()));
+			entity.addEffect(new Potion(PotionEffect.FIRE_RESISTANCE, (byte) 0, 800, PotionListener.defaultFlags()));
 			
 			//Totem particles
 			entity.triggerStatus((byte) 35);
