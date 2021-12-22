@@ -1,8 +1,10 @@
 package io.github.bloepiloepi.pvp.mixins;
 
 import io.github.bloepiloepi.pvp.entities.Tracker;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
@@ -13,6 +15,7 @@ import net.minestom.server.entity.metadata.monster.PiglinMeta;
 import net.minestom.server.entity.metadata.monster.zombie.ZombieMeta;
 import net.minestom.server.entity.metadata.other.ArmorStandMeta;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.utils.player.PlayerUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,7 +42,35 @@ public abstract class EntityMixin {
 	@Shadow public abstract boolean isOnFire();
 	@Shadow public abstract void setOnFire(boolean fire);
 	
+	@Shadow public abstract void setVelocity(@NotNull Vec velocity);
+	
+	@Shadow protected Vec velocity;
+	@Shadow protected boolean onGround;
 	private double eyeHeight;
+	
+	/**
+	 * This knockback formula accurately represents vanilla knockback, which does apply to players
+	 * The issue is that it doesn't apply to Minestom entities,
+	 * probably because their physics are handled differently
+	 */
+	@Inject(method = "takeKnockback", at = @At("HEAD"), cancellable = true)
+	public void takeKnockback(final float strength, final double x, final double z, CallbackInfo ci) {
+		// Only use this formula if the entity is a remote player
+		if (PlayerUtils.isSocketClient((Entity) (Object) this)) {
+			if (strength > 0) {
+				float strengthFactor = strength * MinecraftServer.TICK_PER_SECOND;
+				final Vec velocityModifier = new Vec(x, z)
+						.normalize()
+						.mul(strengthFactor);
+				setVelocity(new Vec(velocity.x() / 2d - velocityModifier.x(),
+						onGround ? Math.min(.4d * MinecraftServer.TICK_PER_SECOND, velocity.y() / 2d + strengthFactor) : velocity.y(),
+						velocity.z() / 2d - velocityModifier.z()
+				));
+			}
+			
+			ci.cancel();
+		}
+	}
 	
 	@Inject(method = "<init>(Lnet/minestom/server/entity/EntityType;Ljava/util/UUID;)V", at = @At("TAIL"))
 	private void onInit(@NotNull EntityType entityType, @NotNull UUID uuid, CallbackInfo ci) {

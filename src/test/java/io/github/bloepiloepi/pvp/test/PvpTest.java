@@ -2,6 +2,7 @@ package io.github.bloepiloepi.pvp.test;
 
 import io.github.bloepiloepi.pvp.PvpExtension;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
+import io.github.bloepiloepi.pvp.events.EntityKnockbackEvent;
 import io.github.bloepiloepi.pvp.events.LegacyKnockbackEvent;
 import io.github.bloepiloepi.pvp.legacy.LegacyKnockbackSettings;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffect;
@@ -43,42 +44,40 @@ public class PvpTest {
 			MinecraftServer.getSchedulerManager().buildTask(() -> {
 				Optional<Player> player = MinecraftServer.getConnectionManager()
 						.getOnlinePlayers().stream()
-						.filter(p -> p.getDistanceSquared(entity) < 9)
+						.filter(p -> p.getDistanceSquared(entity) < 6)
 						.findAny();
 				
 				if (player.isPresent()) {
 					if (!player.get().damage(CustomDamageType.mob(entity), 1.0F))
 						return;
 					
-					LegacyKnockbackEvent legacyKnockbackEvent = new LegacyKnockbackEvent(player.get(), entity, true);
-					EventDispatcher.callCancellable(legacyKnockbackEvent, () -> {
-						LegacyKnockbackSettings settings = legacyKnockbackEvent.getSettings();
-						
-						player.get().setVelocity(player.get().getVelocity().add(
-								-Math.sin(entity.getPosition().yaw() * 3.1415927F / 180.0F) * 1 * settings.getExtraHorizontal(),
-								settings.getExtraVertical(),
-								Math.cos(entity.getPosition().yaw() * 3.1415927F / 180.0F) * 1 * settings.getExtraHorizontal()
-						));
+//					LegacyKnockbackEvent legacyKnockbackEvent = new LegacyKnockbackEvent(player.get(), entity, true);
+//					EventDispatcher.callCancellable(legacyKnockbackEvent, () -> {
+//						LegacyKnockbackSettings settings = legacyKnockbackEvent.getSettings();
+//
+//						player.get().setVelocity(player.get().getVelocity().add(
+//								-Math.sin(entity.getPosition().yaw() * 3.1415927F / 180.0F) * 1 * settings.getExtraHorizontal(),
+//								settings.getExtraVertical(),
+//								Math.cos(entity.getPosition().yaw() * 3.1415927F / 180.0F) * 1 * settings.getExtraHorizontal()
+//						));
+//					});
+					EntityKnockbackEvent entityKnockbackEvent = new EntityKnockbackEvent(player.get(), entity, true, false, 1 * 0.5F);
+					EventDispatcher.callCancellable(entityKnockbackEvent, () -> {
+						float strength = entityKnockbackEvent.getStrength();
+						player.get().takeKnockback(strength, Math.sin(entity.getPosition().yaw() * 0.017453292F), -Math.cos(entity.getPosition().yaw() * 0.017453292F));
 					});
 				}
 				
 				event.getPlayer().setFood(20);
 			}).repeat(3, TimeUnit.SERVER_TICK).schedule();
-			
-			Optional<Player> player2 = MinecraftServer.getConnectionManager()
-					.getOnlinePlayers().stream()
-					.filter(p -> p.getDistanceSquared(entity) < 49)
-					.findAny();
-			
-			player2.ifPresent(player -> entity.setVelocity(Vec.fromPoint(player.getPosition().sub(entity.getPosition()).div(1))));
 		});
 		
 		MinecraftServer.getGlobalEventHandler().addListener(PlayerSpawnEvent.class, event -> {
 			event.getPlayer().setGameMode(GameMode.CREATIVE);
-			PvpExtension.setLegacyAttack(event.getPlayer(), true);
+			//PvpExtension.setLegacyAttack(event.getPlayer(), true);
 			
 			event.getPlayer().setPermissionLevel(4);
-			event.getPlayer().addEffect(new Potion(PotionEffect.RESISTANCE, (byte) 4, CustomPotionEffect.PERMANENT));
+			event.getPlayer().addEffect(new Potion(PotionEffect.REGENERATION, (byte) 10, CustomPotionEffect.PERMANENT));
 		});
 		
 		MinecraftServer.getGlobalEventHandler().addListener(PlayerStartFlyingEvent.class,
@@ -97,7 +96,7 @@ public class PvpTest {
 				event -> event.setSettings(settings));
 		
 		GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-		eventHandler.addChild(PvpExtension.legacyEvents());
+		eventHandler.addChild(PvpExtension.events());
 		
 		Commands.init();
 		
