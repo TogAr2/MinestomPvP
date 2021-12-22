@@ -198,9 +198,9 @@ public class AttackManager {
 				EventDispatcher.callCancellable(entityKnockbackEvent, () -> {
 					float strength = entityKnockbackEvent.getStrength();
 					if (target instanceof LivingEntity) {
-						target.takeKnockback(strength, Math.sin(player.getPosition().yaw() * 0.017453292F), -Math.cos(player.getPosition().yaw() * 0.017453292F));
+						target.takeKnockback(strength, Math.sin(Math.toRadians(player.getPosition().yaw())), -Math.cos(Math.toRadians(player.getPosition().yaw())));
 					} else {
-						target.setVelocity(target.getVelocity().add(-Math.sin(player.getPosition().yaw() * 0.017453292F) * strength, 0.1D, Math.cos(player.getPosition().yaw() * 0.017453292F) * strength));
+						target.setVelocity(target.getVelocity().add(-Math.sin(Math.toRadians(player.getPosition().yaw())) * strength, 0.1D, Math.cos(Math.toRadians(player.getPosition().yaw())) * strength));
 					}
 				});
 			} else {
@@ -215,11 +215,10 @@ public class AttackManager {
 				LegacyKnockbackEvent legacyKnockbackEvent = new LegacyKnockbackEvent(target, player, true);
 				EventDispatcher.callCancellable(legacyKnockbackEvent, () -> {
 					LegacyKnockbackSettings settings = legacyKnockbackEvent.getSettings();
-					
 					target.setVelocity(target.getVelocity().add(
-							-Math.sin(player.getPosition().yaw() * 3.1415927F / 180.0F) * finalKnockback * settings.getExtraHorizontal(),
+							-Math.sin(player.getPosition().yaw() * Math.PI / 180.0F) * finalKnockback * settings.getExtraHorizontal(),
 							settings.getExtraVertical(),
-							Math.cos(player.getPosition().yaw() * 3.1415927F / 180.0F) * finalKnockback * settings.getExtraHorizontal()
+							Math.cos(player.getPosition().yaw() * Math.PI / 180.0F) * finalKnockback * settings.getExtraHorizontal()
 					));
 				});
 			}
@@ -243,7 +242,7 @@ public class AttackManager {
 							EntityKnockbackEvent entityKnockbackEvent = new EntityKnockbackEvent(entity, player, false, true, 0.4F);
 							EventDispatcher.callCancellable(entityKnockbackEvent, () -> {
 								float strength = entityKnockbackEvent.getStrength();
-								entity.takeKnockback(strength, Math.sin(player.getPosition().yaw() * 0.017453292F), -Math.cos(player.getPosition().yaw() * 0.017453292F));
+								entity.takeKnockback(strength, Math.sin(Math.toRadians(player.getPosition().yaw())), -Math.cos(Math.toRadians(player.getPosition().yaw())));
 							});
 							entity.damage(CustomDamageType.player(player), sweepingDamage);
 						}

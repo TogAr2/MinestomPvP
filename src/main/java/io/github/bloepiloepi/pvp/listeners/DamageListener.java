@@ -183,7 +183,7 @@ public class DamageListener {
 				double h = attacker.getPosition().x() - entity.getPosition().x();
 				
 				double i;
-				for(i = attacker.getPosition().z() - entity.getPosition().z(); h * h + i * i < 1.0E-4D; i = (Math.random() - Math.random()) * 0.01D) {
+				for(i = attacker.getPosition().z() - entity.getPosition().z(); h * h + i * i < 0.0001; i = (Math.random() - Math.random()) * 0.01D) {
 					h = (Math.random() - Math.random()) * 0.01D;
 				}
 				
