@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Class that allows to instantiate entities with projectile-like physics handling.
+ * Stolen from <a href="https://github.com/Minestom/Minestom/pull/496/">Pull Request #496</a> and edited
  */
 public class CustomEntityProjectile extends Entity {
 	
@@ -139,14 +139,16 @@ public class CustomEntityProjectile extends Entity {
 		final Pos posNow = getPosition();
 		final State state = hitAnticipation ? guessNextState(posNow) : getState(posBefore, posNow, true);
 		if (state == State.Flying) {
-			Vec direction = getVelocity().normalize();
-			double dx = direction.x();
-			double dy = direction.y();
-			double dz = direction.z();
-			setView(
-					(float) Math.toDegrees(Math.atan2(dx, dz)),
-					(float) Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz)))
-			);
+			if (hasVelocity()) {
+				Vec direction = getVelocity().normalize();
+				double dx = direction.x();
+				double dy = direction.y();
+				double dz = direction.z();
+				setView(
+						(float) Math.toDegrees(Math.atan2(dx, dz)),
+						(float) Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz)))
+				);
+			}
 			
 			if (!super.onGround) {
 				return;
@@ -182,7 +184,11 @@ public class CustomEntityProjectile extends Entity {
 	@SuppressWarnings("ConstantConditions")
 	private State getState(Pos pos, Pos posNow, boolean shouldTeleport) {
 		if (pos.samePoint(posNow)) {
-			return State.StuckInBlock;
+			if (instance.getBlock(posNow).isSolid()) {
+				return State.StuckInBlock;
+			} else {
+				return State.Flying;
+			}
 		}
 		
 		Instance instance = getInstance();
