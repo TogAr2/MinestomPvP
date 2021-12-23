@@ -139,6 +139,15 @@ public class CustomEntityProjectile extends Entity {
 		final Pos posNow = getPosition();
 		final State state = hitAnticipation ? guessNextState(posNow) : getState(posBefore, posNow, true);
 		if (state == State.Flying) {
+			Vec direction = getVelocity().normalize();
+			double dx = direction.x();
+			double dy = direction.y();
+			double dz = direction.z();
+			setView(
+					(float) Math.toDegrees(Math.atan2(dx, dz)),
+					(float) Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz)))
+			);
+			
 			if (!super.onGround) {
 				return;
 			}

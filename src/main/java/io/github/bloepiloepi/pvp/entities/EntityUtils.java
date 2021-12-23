@@ -297,14 +297,6 @@ public class EntityUtils {
 		return true;
 	}
 	
-	public static void updateProjectileRotation(EntityProjectile projectile) {
-		Vec velocity = projectile.getVelocity();
-		double xz = Math.sqrt(velocity.x() * velocity.x() + velocity.z() * velocity.z());
-		float yaw = (float) Math.toDegrees(Math.atan2(velocity.y(), xz));
-		float pitch = (float) Math.toDegrees(Math.atan2(velocity.x(), velocity.z()));
-		projectile.teleport(projectile.getPosition().withYaw(yaw).withPitch(pitch));
-	}
-	
 	public static Component getName(Entity entity) {
 		HoverEvent<HoverEvent.ShowEntity> hoverEvent = HoverEvent.showEntity(entity.getEntityType().key(), entity.getUuid());
 		if (entity instanceof Player) {
