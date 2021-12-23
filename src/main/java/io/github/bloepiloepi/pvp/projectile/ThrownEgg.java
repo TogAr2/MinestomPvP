@@ -9,21 +9,26 @@ import net.minestom.server.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ThrownEgg extends EntityHittableProjectile {
+public class ThrownEgg extends CustomEntityProjectile implements ItemHoldingProjectile {
 	
 	public ThrownEgg(@Nullable Entity shooter) {
-		super(shooter, EntityType.EGG);
+		super(shooter, EntityType.EGG, true);
 	}
 	
 	@Override
-	protected boolean onHit(@Nullable Entity entity) {
+	public void onHit(Entity entity) {
 		triggerStatus((byte) 3); // Egg particles
 		
-		if (entity != null) {
-			EntityUtils.damage(entity, CustomDamageType.thrown(this, getShooter()), 0.0F);
-		}
+		EntityUtils.damage(entity, CustomDamageType.thrown(this, getShooter()), 0.0F);
 		
-		return true;
+		remove();
+	}
+	
+	@Override
+	public void onStuck() {
+		triggerStatus((byte) 3); // Egg particles
+		
+		remove();
 	}
 	
 	@Override

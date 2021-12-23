@@ -16,19 +16,15 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class ThrownEnderpearl extends EntityHittableProjectile {
+public class ThrownEnderpearl extends CustomEntityProjectile implements ItemHoldingProjectile {
+	private Pos prevPos = Pos.ZERO;
 	
 	public ThrownEnderpearl(@Nullable Entity shooter) {
-		super(shooter, EntityType.ENDER_PEARL);
+		super(shooter, EntityType.ENDER_PEARL, false);
 	}
 	
-	@Override
-	protected boolean onHit(@Nullable Entity entity) {
-		if (entity != null) {
-			EntityUtils.damage(entity, CustomDamageType.thrown(this, getShooter()), 0.0F);
-		}
-		
-		Pos position = getPosition();
+	private void teleportOwner() {
+		Pos position = prevPos;
 		ThreadLocalRandom random = ThreadLocalRandom.current();
 		
 		for (int i = 0; i < 32; i++) {
@@ -41,7 +37,7 @@ public class ThrownEnderpearl extends EntityHittableProjectile {
 			sendPacketToViewersAndSelf(packet);
 		}
 		
-		if (isRemoved()) return false;
+		if (isRemoved()) return;
 		
 		Entity shooter = getShooter();
 		if (shooter != null) {
@@ -49,9 +45,7 @@ public class ThrownEnderpearl extends EntityHittableProjectile {
 			position = position.withPitch(shooterPos.pitch()).withYaw(shooterPos.yaw());
 		}
 		
-		if (shooter instanceof Player) {
-			Player player = (Player) shooter;
-			
+		if (shooter instanceof Player player) {
 			if (player.isOnline() && player.getInstance() == getInstance()
 					&& player.getEntityMeta().getBedInWhichSleepingPosition() == null) {
 				if (player.getVehicle() != null) {
@@ -67,8 +61,20 @@ public class ThrownEnderpearl extends EntityHittableProjectile {
 			shooter.teleport(position);
 			//TODO set falldistance to 0
 		}
+	}
+	
+	@Override
+	public void onHit(Entity entity) {
+		EntityUtils.damage(entity, CustomDamageType.thrown(this, getShooter()), 0.0F);
 		
-		return true;
+		teleportOwner();
+		remove();
+	}
+	
+	@Override
+	public void onStuck() {
+		teleportOwner();
+		remove();
 	}
 	
 	@Override
@@ -77,6 +83,7 @@ public class ThrownEnderpearl extends EntityHittableProjectile {
 		if (shooter instanceof Player && ((Player) shooter).isDead()) {
 			remove();
 		} else {
+			prevPos = getPosition();
 			super.tick(time);
 		}
 	}

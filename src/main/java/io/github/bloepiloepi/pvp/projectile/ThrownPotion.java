@@ -23,16 +23,27 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class ThrownPotion extends EntityHittableProjectile {
+public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingProjectile {
 	private final boolean legacy;
 	
 	public ThrownPotion(@Nullable Entity shooter, boolean legacy) {
-		super(shooter, EntityType.POTION);
+		super(shooter, EntityType.POTION, true);
 		this.legacy = legacy;
 	}
 	
 	@Override
-	protected boolean onHit(@Nullable Entity entity) {
+	public void onHit(Entity entity) {
+		splash(entity);
+		remove();
+	}
+	
+	@Override
+	public void onStuck() {
+		splash(null);
+		remove();
+	}
+	
+	public void splash(@Nullable Entity entity) {
 		ItemStack item = getItem();
 		
 		PotionMeta meta = (PotionMeta) item.getMeta();
@@ -51,11 +62,9 @@ public class ThrownPotion extends EntityHittableProjectile {
 		Effects effect = CustomPotionType.hasInstantEffect(potions) ? Effects.INSTANT_SPLASH : Effects.SPLASH_POTION;
 		EffectManager.sendNearby(
 				Objects.requireNonNull(getInstance()), effect, position.blockX(),
-				position.blockY(), position.blockZ(), PotionListener.getColor(item, legacy),
+				position.blockY() + 1, position.blockZ(), PotionListener.getColor(item, legacy),
 				64.0D, false
 		);
-		
-		return true;
 	}
 	
 	private void applySplash(List<Potion> potions, @Nullable Entity hitEntity) {
@@ -99,6 +108,7 @@ public class ThrownPotion extends EntityHittableProjectile {
 		return ((ThrownPotionMeta) getEntityMeta()).getItem();
 	}
 	
+	@Override
 	public void setItem(@NotNull ItemStack item) {
 		((ThrownPotionMeta) getEntityMeta()).setItem(item);
 	}

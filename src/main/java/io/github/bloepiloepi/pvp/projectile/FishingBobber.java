@@ -23,7 +23,7 @@ public class FishingBobber extends CustomEntityProjectile {
 	private State state = State.IN_AIR;
 	
 	public FishingBobber(@Nullable Entity shooter, boolean legacy) {
-		super(shooter, EntityType.FISHING_BOBBER);
+		super(shooter, EntityType.FISHING_BOBBER, false);
 		this.legacy = legacy;
 		setOwnerEntity(shooter);
 		

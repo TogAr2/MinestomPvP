@@ -59,7 +59,4 @@ public abstract class EntityHittableProjectile extends EntityProjectile {
 	public void onStuck() {
 		remove();
 	}
-	
-	public void setItem(@NotNull ItemStack item) {
-	}
 }

@@ -7,6 +7,7 @@ import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.metadata.ProjectileMeta;
+import net.minestom.server.entity.metadata.arrow.AbstractArrowMeta;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.entity.EntityDamageEvent;
@@ -31,6 +32,7 @@ public class CustomEntityProjectile extends Entity {
 	
 	private final Entity shooter;
 	private final @Nullable Predicate<Entity> victimsPredicate;
+	private final boolean hitAnticipation;
 	
 	/**
 	 * Constructs new projectile.
@@ -40,10 +42,11 @@ public class CustomEntityProjectile extends Entity {
 	 * @param victimsPredicate if this projectile must not be able to hit entities, leave this null;
 	 *                         otherwise it's a predicate for those entities that may be hit by that projectile.
 	 */
-	public CustomEntityProjectile(@Nullable Entity shooter, @NotNull EntityType entityType, @Nullable Predicate<Entity> victimsPredicate) {
+	public CustomEntityProjectile(@Nullable Entity shooter, @NotNull EntityType entityType, @Nullable Predicate<Entity> victimsPredicate, boolean hitAnticipation) {
 		super(entityType);
 		this.shooter = shooter;
 		this.victimsPredicate = victimsPredicate;
+		this.hitAnticipation = hitAnticipation;
 		setup();
 	}
 	
@@ -53,8 +56,8 @@ public class CustomEntityProjectile extends Entity {
 	 * @param shooter    shooter of the projectile: may be null.
 	 * @param entityType type of the projectile.
 	 */
-	public CustomEntityProjectile(@Nullable Entity shooter, @NotNull EntityType entityType) {
-		this(shooter, entityType, entity -> entity instanceof LivingEntity);
+	public CustomEntityProjectile(@Nullable Entity shooter, @NotNull EntityType entityType, boolean hitAnticipation) {
+		this(shooter, entityType, entity -> entity instanceof LivingEntity, hitAnticipation);
 	}
 	
 	private void setup() {
@@ -134,7 +137,7 @@ public class CustomEntityProjectile extends Entity {
 		final Pos posBefore = getPosition();
 		super.tick(time);
 		final Pos posNow = getPosition();
-		final State state = getState(posBefore, posNow);
+		final State state = hitAnticipation ? guessNextState(posNow) : getState(posBefore, posNow, true);
 		if (state == State.Flying) {
 			if (!super.onGround) {
 				return;
@@ -156,6 +159,10 @@ public class CustomEntityProjectile extends Entity {
 		}
 	}
 	
+	private State guessNextState(Pos posNow) {
+		return getState(posNow, posNow.add(getVelocity().mul(0.06).asPosition()), false);
+	}
+	
 	/**
 	 * Checks whether a projectile is stuck in block / hit an entity.
 	 *
@@ -164,7 +171,7 @@ public class CustomEntityProjectile extends Entity {
 	 * @return current state of the projectile.
 	 */
 	@SuppressWarnings("ConstantConditions")
-	private State getState(Pos pos, Pos posNow) {
+	private State getState(Pos pos, Pos posNow, boolean shouldTeleport) {
 		if (pos.samePoint(posNow)) {
 			return State.StuckInBlock;
 		}
@@ -189,7 +196,7 @@ public class CustomEntityProjectile extends Entity {
 				pos = pos.add(direction);
 			}
 			if (instance.getBlock(pos).isSolid()) {
-				teleport(pos);
+				if (shouldTeleport) teleport(pos);
 				return State.StuckInBlock;
 			}
 			if (victimsPredicate == null) {
@@ -211,7 +218,7 @@ public class CustomEntityProjectile extends Entity {
               We won't check collisions with self for first ticks of projectile's life, because it spawns in the
               shooter and will immediately be triggered by him.
              */
-			if (getAliveTicks() < 3) {
+			if (getAliveTicks() < 6) {
 				victims = victims.filter(entity -> entity != getShooter());
 			}
 			Optional<Entity> victim = victims.findAny();
@@ -228,14 +235,7 @@ public class CustomEntityProjectile extends Entity {
 		State StuckInBlock = new State() {
 		};
 		
-		final class HitEntity implements State {
-			
-			private final Entity entity;
-			
-			public HitEntity(Entity entity) {
-				this.entity = entity;
-			}
-		}
+		record HitEntity(Entity entity) implements State {}
 	}
 	
 	public static class EntityArrow extends CustomEntityProjectile {
@@ -249,7 +249,7 @@ public class CustomEntityProjectile extends Entity {
 		 *                         otherwise it's a predicate for those entities that may be hit by that arrow.
 		 */
 		public EntityArrow(@Nullable Entity shooter, boolean isSpectral, @Nullable Predicate<LivingEntity> victimsPredicate) {
-			super(shooter, isSpectral ? EntityType.SPECTRAL_ARROW : EntityType.ARROW, cast(victimsPredicate));
+			super(shooter, isSpectral ? EntityType.SPECTRAL_ARROW : EntityType.ARROW, cast(victimsPredicate), false);
 		}
 		
 		/**
@@ -259,7 +259,7 @@ public class CustomEntityProjectile extends Entity {
 		 * @param isSpectral whether this arrow is a spectral or a regular one.
 		 */
 		public EntityArrow(@Nullable Entity shooter, boolean isSpectral) {
-			super(shooter, isSpectral ? EntityType.SPECTRAL_ARROW : EntityType.ARROW);
+			super(shooter, isSpectral ? EntityType.SPECTRAL_ARROW : EntityType.ARROW, false);
 		}
 		
 		private static @Nullable Predicate<Entity> cast(@Nullable Predicate<LivingEntity> livingEntityPredicate) {
@@ -274,6 +274,10 @@ public class CustomEntityProjectile extends Entity {
 			final LivingEntity casted = (LivingEntity) entity;
 			casted.setArrowCount(casted.getArrowCount() + 1);
 			EventDispatcher.call(new EntityAttackEvent(this, casted));
+			
+			if (((AbstractArrowMeta) getEntityMeta()).getPiercingLevel() <= 0) {
+				remove();
+			}
 		}
 	}
 }
