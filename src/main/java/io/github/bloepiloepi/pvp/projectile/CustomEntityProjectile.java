@@ -1,5 +1,7 @@
 package io.github.bloepiloepi.pvp.projectile;
 
+import io.github.bloepiloepi.pvp.events.ProjectileHitEvent.ProjectileBlockHitEvent;
+import io.github.bloepiloepi.pvp.events.ProjectileHitEvent.ProjectileEntityHitEvent;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -7,9 +9,7 @@ import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.metadata.ProjectileMeta;
-import net.minestom.server.entity.metadata.arrow.AbstractArrowMeta;
 import net.minestom.server.event.EventDispatcher;
-import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.entity.EntityDamageEvent;
 import net.minestom.server.event.entity.EntityShootEvent;
 import net.minestom.server.instance.Chunk;
@@ -165,8 +165,12 @@ public class CustomEntityProjectile extends Entity {
 			sendPacketToViewersAndSelf(getVelocityPacket());
 			setNoGravity(true);
 			onStuck();
+			
+			EventDispatcher.call(new ProjectileBlockHitEvent(this));
 		} else {
-			onHit(((State.HitEntity) state).entity);
+			Entity entity = ((State.HitEntity) state).entity;
+			ProjectileEntityHitEvent event = new ProjectileEntityHitEvent(this, entity);
+			EventDispatcher.callCancellable(event, () -> onHit(entity));
 		}
 	}
 	
@@ -251,48 +255,5 @@ public class CustomEntityProjectile extends Entity {
 		};
 		
 		record HitEntity(Entity entity) implements State {}
-	}
-	
-	public static class EntityArrow extends CustomEntityProjectile {
-		
-		/**
-		 * Constructs new arrow.
-		 *
-		 * @param shooter          shooter of the arrow: may be null.
-		 * @param isSpectral       whether this arrow is a spectral or a regular one.
-		 * @param victimsPredicate if this arrow must not be able to hit entities, leave this null;
-		 *                         otherwise it's a predicate for those entities that may be hit by that arrow.
-		 */
-		public EntityArrow(@Nullable Entity shooter, boolean isSpectral, @Nullable Predicate<LivingEntity> victimsPredicate) {
-			super(shooter, isSpectral ? EntityType.SPECTRAL_ARROW : EntityType.ARROW, cast(victimsPredicate), false);
-		}
-		
-		/**
-		 * Constructs new arrow that can hit living entities.
-		 *
-		 * @param shooter    shooter of the arrow: may be null.
-		 * @param isSpectral whether this arrow is a spectral or a regular one.
-		 */
-		public EntityArrow(@Nullable Entity shooter, boolean isSpectral) {
-			super(shooter, isSpectral ? EntityType.SPECTRAL_ARROW : EntityType.ARROW, false);
-		}
-		
-		private static @Nullable Predicate<Entity> cast(@Nullable Predicate<LivingEntity> livingEntityPredicate) {
-			if (livingEntityPredicate == null) {
-				return null;
-			}
-			return entity -> entity instanceof LivingEntity && livingEntityPredicate.test((LivingEntity) entity);
-		}
-		
-		@Override
-		public void onHit(Entity entity) {
-			final LivingEntity casted = (LivingEntity) entity;
-			casted.setArrowCount(casted.getArrowCount() + 1);
-			EventDispatcher.call(new EntityAttackEvent(this, casted));
-			
-			if (((AbstractArrowMeta) getEntityMeta()).getPiercingLevel() <= 0) {
-				remove();
-			}
-		}
 	}
 }
