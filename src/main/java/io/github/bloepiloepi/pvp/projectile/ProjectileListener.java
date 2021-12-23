@@ -200,7 +200,7 @@ public class ProjectileListener {
 		}).filter(event -> event.getItemStack().getMaterial() == Material.CROSSBOW).build());
 		
 		node.addListener(PlayerItemAnimationEvent.class, event -> {
-			if (event.getArmAnimationType() == PlayerItemAnimationEvent.ItemAnimationType.BOW) {
+			if (event.getItemAnimationType() == PlayerItemAnimationEvent.ItemAnimationType.BOW) {
 				if (!event.getPlayer().isCreative()
 						&& EntityUtils.getProjectile(event.getPlayer(), Arrow.ARROW_PREDICATE).first().isAir()) {
 					event.setCancelled(true);

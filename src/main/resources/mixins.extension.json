@@ -7,7 +7,6 @@
   "mixins": [
     "EntityAccessor",
     "EntityMixin",
-    "EntityPropertiesPacketMixin",
     "PlayerAccessor",
     "PlayerInventoryMixin",
     "PlayerMixin",

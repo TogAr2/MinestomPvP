@@ -10,7 +10,6 @@ import io.github.bloepiloepi.pvp.test.commands.Commands;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.*;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.GlobalEventHandler;
