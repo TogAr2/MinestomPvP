@@ -29,6 +29,8 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 	public ThrownPotion(@Nullable Entity shooter, boolean legacy) {
 		super(shooter, EntityType.POTION, true);
 		this.legacy = legacy;
+		
+		setGravity(getGravityDragPerTick(), 0.05);
 	}
 	
 	@Override

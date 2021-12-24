@@ -152,11 +152,11 @@ public class PotionListener {
 		ThrownPotion thrownPotion = new ThrownPotion(player, legacy);
 		thrownPotion.setItem(stack);
 		
-		Pos position = player.getPosition().add(0D, player.getEyeHeight(), 0D);
+		Pos position = player.getPosition().add(0D, player.getEyeHeight() - 0.1, 0D);
 		thrownPotion.setInstance(Objects.requireNonNull(player.getInstance()), position);
 		
 		Vec direction = position.direction();
-		position = position.add(direction.x(), direction.y(), direction.z());
+		position = position.add(direction.x(), direction.y() + 0.2, direction.z());
 		
 		thrownPotion.shoot(position, 0.5, 1.0);
 		
