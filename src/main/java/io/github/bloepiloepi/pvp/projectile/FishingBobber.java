@@ -21,6 +21,7 @@ public class FishingBobber extends CustomEntityProjectile {
 	private int stuckTime;
 	private Entity hooked;
 	private State state = State.IN_AIR;
+	private Pos prevPos = Pos.ZERO;
 	
 	public FishingBobber(@Nullable Entity shooter, boolean legacy) {
 		super(shooter, EntityType.FISHING_BOBBER, false);
@@ -28,6 +29,12 @@ public class FishingBobber extends CustomEntityProjectile {
 		setOwnerEntity(shooter);
 		
 		if (legacy) setGravity(getGravityDragPerTick(), 0.04);
+	}
+	
+	@Override
+	public void tick(long time) {
+		prevPos = getPosition();
+		super.tick(time);
 	}
 	
 	@Override
@@ -74,6 +81,7 @@ public class FishingBobber extends CustomEntityProjectile {
 	
 	@Override
 	public void onHit(Entity entity) {
+		if (hooked != null) return;
 		setHookedEntity(entity);
 		
 		if (legacy) {
@@ -81,9 +89,12 @@ public class FishingBobber extends CustomEntityProjectile {
 					&& (player == getShooter() || player.getGameMode() == GameMode.CREATIVE))
 				return;
 			
+			Pos posNow = this.position;
+			this.position = prevPos;
 			if (EntityUtils.damage(entity, CustomDamageType.GENERIC, 0)) {
 				entity.setVelocity(calculateLegacyKnockback(entity.getVelocity(), entity.getPosition()));
 			}
+			this.position = posNow;
 		}
 	}
 	

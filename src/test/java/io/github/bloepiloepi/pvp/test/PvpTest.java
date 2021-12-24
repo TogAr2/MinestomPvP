@@ -15,6 +15,7 @@ import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.*;
 import net.minestom.server.extras.lan.OpenToLAN;
+import net.minestom.server.extras.velocity.VelocityProxy;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
@@ -25,6 +26,7 @@ import java.util.Optional;
 public class PvpTest {
 	public static void main(String[] args) {
 		MinecraftServer server = MinecraftServer.init();
+		VelocityProxy.enable("tj7MulOtnIDe");
 		
 		Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer();
 		instance.setChunkGenerator(new DemoGenerator());
@@ -73,7 +75,7 @@ public class PvpTest {
 		
 		MinecraftServer.getGlobalEventHandler().addListener(PlayerSpawnEvent.class, event -> {
 			event.getPlayer().setGameMode(GameMode.CREATIVE);
-			//PvpExtension.setLegacyAttack(event.getPlayer(), true);
+			PvpExtension.setLegacyAttack(event.getPlayer(), true);
 			
 			event.getPlayer().setPermissionLevel(4);
 			event.getPlayer().addEffect(new Potion(PotionEffect.REGENERATION, (byte) 10, CustomPotionEffect.PERMANENT));
@@ -95,7 +97,7 @@ public class PvpTest {
 				event -> event.setSettings(settings));
 		
 		GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-		eventHandler.addChild(PvpExtension.events());
+		eventHandler.addChild(PvpExtension.legacyEvents());
 		
 		Commands.init();
 		
