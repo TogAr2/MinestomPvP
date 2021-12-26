@@ -39,8 +39,6 @@ public abstract class EntityMixin {
 	@Shadow @NotNull public abstract Entity.@NotNull Pose getPose();
 	@Shadow @NotNull public abstract EntityMeta getEntityMeta();
 	@Shadow public abstract @Nullable Instance getInstance();
-	@Shadow public abstract boolean isOnFire();
-	@Shadow public abstract void setOnFire(boolean fire);
 	
 	@Shadow public abstract void setVelocity(@NotNull Vec velocity);
 	

@@ -5,8 +5,7 @@
   "target": "@env(DEFAULT)",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-
-    "PlayerAccessor",
+    
     "PlayerInventoryMixin",
     "PlayerMixin",
     "UseItemListenerMixin"

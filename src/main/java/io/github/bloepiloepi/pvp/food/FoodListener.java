@@ -2,7 +2,6 @@ package io.github.bloepiloepi.pvp.food;
 
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
-import io.github.bloepiloepi.pvp.mixins.PlayerAccessor;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.sound.Sound;
@@ -134,7 +133,7 @@ public class FoodListener {
 		FoodComponent component = FoodComponents.fromMaterial(stack.getMaterial());
 		
 		long useTime = getUseTime(component);
-		long usedDuration = System.currentTimeMillis() - ((PlayerAccessor) player).getStartEatingTime();
+		long usedDuration = System.currentTimeMillis() - Tracker.itemUseStartTime.get(player.getUuid());
 		long usedTicks = usedDuration / MinecraftServer.TICK_MS;
 		long remainingUseTicks = useTime - usedTicks;
 		
