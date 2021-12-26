@@ -49,6 +49,9 @@ public class DamageListener {
 	}
 	
 	public static void handleEntityDamage(EntityDamageEvent event, boolean legacy) {
+		event.setAnimation(false);
+		event.setSound(null);
+		
 		float amount = event.getDamage();
 		
 		CustomDamageType type;

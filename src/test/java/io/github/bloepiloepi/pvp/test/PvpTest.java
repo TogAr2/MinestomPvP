@@ -26,7 +26,7 @@ import java.util.Optional;
 public class PvpTest {
 	public static void main(String[] args) {
 		MinecraftServer server = MinecraftServer.init();
-		VelocityProxy.enable("tj7MulOtnIDe");
+		//VelocityProxy.enable("tj7MulOtnIDe");
 		
 		Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer();
 		instance.setChunkGenerator(new DemoGenerator());

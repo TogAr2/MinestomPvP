@@ -132,8 +132,8 @@ public class PvpExtension extends Extension {
 			speed.setBaseValue(100);
 			damage.setBaseValue(1.0F);
 		} else {
-			speed.setBaseValue(speed.getAttribute().getDefaultValue());
-			damage.setBaseValue(damage.getAttribute().getDefaultValue());
+			speed.setBaseValue(speed.getAttribute().defaultValue());
+			damage.setBaseValue(damage.getAttribute().defaultValue());
 		}
 	}
 	
