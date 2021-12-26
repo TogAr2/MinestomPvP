@@ -7,7 +7,9 @@ import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.*;
+import net.minestom.server.event.entity.EntityFireEvent;
 import net.minestom.server.event.entity.EntityTickEvent;
+import net.minestom.server.event.instance.RemoveEntityFromInstanceEvent;
 import net.minestom.server.event.player.*;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.instance.block.Block;
@@ -150,6 +152,13 @@ public class Tracker {
 						.getBlock(player.getPosition()));
 			}
 		});
+		
+		node.addListener(EntityFireEvent.class, event ->
+				Tracker.fireExtinguishTime.put(event.getEntity().getUuid(),
+						System.currentTimeMillis() + event.getFireTime(TimeUnit.MILLISECOND)));
+		
+		node.addListener(RemoveEntityFromInstanceEvent.class, event ->
+				Tracker.fireExtinguishTime.remove(event.getEntity().getUuid()));
 		
 		MinecraftServer.getSchedulerManager()
 				.buildTask(Tracker::updateCooldown)

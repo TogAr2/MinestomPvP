@@ -103,22 +103,6 @@ public abstract class EntityMixin {
 		return eyeHeight;
 	}
 	
-	@Inject(method = "tick", at = @At("HEAD"))
-	private void onTick(long time, CallbackInfo ci) {
-		if (getInstance() == null) return;
-		
-		if (isOnFire() && Tracker.fireExtinguishTime.containsKey(getUuid())) {
-			if (time > Tracker.fireExtinguishTime.get(getUuid())) {
-				setOnFire(false);
-			}
-		}
-	}
-	
-	@Inject(method = "remove", at = @At("TAIL"))
-	private void onRemove(CallbackInfo ci) {
-		Tracker.fireExtinguishTime.remove(getUuid());
-	}
-	
 	@SuppressWarnings("ConstantConditions")
 	private double getNewEyeHeight(Entity.Pose pose) {
 		if ((Object) this instanceof LivingEntity) {

@@ -26,6 +26,7 @@ import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.entity.EntityFireEvent;
+import net.minestom.server.event.instance.RemoveEntityFromInstanceEvent;
 import net.minestom.server.event.player.*;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.network.packet.server.play.EntityAnimationPacket;
@@ -61,10 +62,6 @@ public class AttackManager {
 				}
 			}).build());
 		}
-		
-		node.addListener(EntityFireEvent.class, event -> {
-			Tracker.fireExtinguishTime.put(event.getEntity().getUuid(), System.currentTimeMillis() + event.getFireTime(TimeUnit.MILLISECOND));
-		});
 		
 		return node;
 	}
