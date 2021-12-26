@@ -121,8 +121,32 @@ public class Tracker {
 			Tracker.lastSwingTime.remove(uuid);
 		});
 		
-		node.addListener(PlayerTickEvent.class, event ->
-				Tracker.increaseInt(Tracker.lastAttackedTicks, event.getPlayer().getUuid(), 1));
+		node.addListener(PlayerTickEvent.class, event -> {
+			Player player = event.getPlayer();
+			UUID uuid = player.getUuid();
+			Tracker.increaseInt(Tracker.lastAttackedTicks, uuid, 1);
+			
+			if (player.isOnGround()) {
+				Tracker.lastClimbedBlock.remove(uuid);
+			}
+			
+			if (player.isDead()) {
+				Tracker.combatManager.get(uuid).recheckStatus();
+			}
+			if (player.getAliveTicks() % 20 == 0 && player.isOnline()) {
+				Tracker.combatManager.get(uuid).recheckStatus();
+			}
+			
+			if (Tracker.lastDamagedBy.containsKey(uuid)) {
+				LivingEntity lastDamagedBy = Tracker.lastDamagedBy.get(uuid);
+				if (lastDamagedBy.isDead()) {
+					Tracker.lastDamagedBy.remove(uuid);
+				} else if (System.currentTimeMillis() - Tracker.lastDamageTime.get(uuid) > 5000) {
+					// After 5 seconds of no attack the last damaged by does not count anymore
+					Tracker.lastDamagedBy.remove(uuid);
+				}
+			}
+		});
 		
 		node.addListener(EntityTickEvent.class, event -> {
 			if (Tracker.invulnerableTime.getOrDefault(event.getEntity().getUuid(), 0) > 0) {

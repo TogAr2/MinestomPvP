@@ -91,6 +91,7 @@ public class AttackManager {
 		if (player.getEntityMeta().isSneaking() || spectating.isRemoved()
 				|| (spectating instanceof LivingEntity && ((LivingEntity) spectating).isDead())) {
 			event.getPlayer().stopSpectating();
+			Tracker.spectating.remove(event.getPlayer().getUuid());
 		}
 	}
 	
@@ -112,7 +113,10 @@ public class AttackManager {
 	public static void performAttack(Player player, Entity target, boolean legacy) {
 		if (player.getGameMode() == GameMode.SPECTATOR) {
 			PlayerSpectateEvent playerSpectateEvent = new PlayerSpectateEvent(player, target);
-			EventDispatcher.callCancellable(playerSpectateEvent, () -> player.spectate(target));
+			EventDispatcher.callCancellable(playerSpectateEvent, () -> {
+				player.spectate(target);
+				Tracker.spectating.put(player.getUuid(), target);
+			});
 			return;
 		}
 		
