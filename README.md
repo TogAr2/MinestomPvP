@@ -9,8 +9,6 @@ It tries to mimic vanilla (and pre-1.9) PvP as good as possible, while also focu
 But, MinestomPvP does not only provide PvP, it also provides everything around it (e.g., status effects and food).
 You can easily choose which features you want to use.
 
-**I am aware of an issue where projectile collision is not entirely accurate, because of the Minestom new block api. I will implement a fix for this at some point.**
-
 ## Table of Contents
 
 - [Features](#features)
@@ -43,10 +41,7 @@ Currently, most vanilla PvP features are supported.
 - Lingering potions
 - Fall damage
 - Fireworks (for crossbows)
-
-Also, projectiles are a little bit of a mess right now.
-I might change that in the future, but I'm not sure, since I don't think there is a better way.
-(As a user you will probably not notice this, they do work as intended.)
+- Projectile collision might need some improvements (which is a Minestom issue too)
 
 ## Usage
 
