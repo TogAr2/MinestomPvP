@@ -11,7 +11,6 @@ import io.github.bloepiloepi.pvp.entities.Tracker;
 import io.github.bloepiloepi.pvp.events.EntityKnockbackEvent;
 import io.github.bloepiloepi.pvp.events.LegacyKnockbackEvent;
 import io.github.bloepiloepi.pvp.events.PlayerSpectateEvent;
-import io.github.bloepiloepi.pvp.mixins.EntityAccessor;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
@@ -25,8 +24,6 @@ import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityAttackEvent;
-import net.minestom.server.event.entity.EntityFireEvent;
-import net.minestom.server.event.instance.RemoveEntityFromInstanceEvent;
 import net.minestom.server.event.player.*;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.network.packet.server.play.EntityAnimationPacket;
@@ -36,10 +33,10 @@ import net.minestom.server.particle.ParticleCreator;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.utils.MathUtils;
-import net.minestom.server.utils.time.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Field;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -150,12 +147,20 @@ public class AttackManager {
 		
 		boolean sweeping = false;
 		if (!legacy && strongAttack && !critical && !sprintAttack && player.isOnGround()) {
-			double lastMoveDistance = ((EntityAccessor) player).previousPosition().distance(player.getPosition()) * 0.6;
-			if (lastMoveDistance < player.getAttributeValue(Attribute.MOVEMENT_SPEED)) {
-				Tool tool = Tool.fromMaterial(player.getItemInMainHand().getMaterial());
-				if (tool != null && tool.isSword()) {
-					sweeping = true;
+			// Use reflection to get previousPosition field
+			try {
+				Field field = Entity.class.getDeclaredField("previousPosition");
+				field.setAccessible(true);
+				Pos previousPosition = (Pos) field.get(player);
+				double lastMoveDistance = previousPosition.distance(player.getPosition()) * 0.6;
+				if (lastMoveDistance < player.getAttributeValue(Attribute.MOVEMENT_SPEED)) {
+					Tool tool = Tool.fromMaterial(player.getItemInMainHand().getMaterial());
+					if (tool != null && tool.isSword()) {
+						sweeping = true;
+					}
 				}
+			} catch (NoSuchFieldException | IllegalAccessException e) {
+				e.printStackTrace();
 			}
 		}
 		
@@ -224,7 +229,14 @@ public class AttackManager {
 				});
 			}
 			
-			((EntityAccessor) player).velocity(player.getVelocity().mul(0.6D, 1.0D, 0.6D));
+			try {
+				Field field = Entity.class.getDeclaredField("velocity");
+				field.setAccessible(true);
+				field.set(player, player.getVelocity().mul(0.6D, 1.0D, 0.6D));
+			} catch (NoSuchFieldException | IllegalAccessException e) {
+				e.printStackTrace();
+			}
+			
 			player.setSprinting(false);
 		}
 		
