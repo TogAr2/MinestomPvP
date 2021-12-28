@@ -1,6 +1,5 @@
 {
   "entrypoint": "io.github.bloepiloepi.pvp.PvpExtension",
   "name": "PvpExtension",
-  "mixinConfig": "mixins.extension.json",
   "version": "1"
 }

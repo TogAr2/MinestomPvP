@@ -14,8 +14,6 @@ import io.github.bloepiloepi.pvp.potion.item.CustomPotionTypes;
 import io.github.bloepiloepi.pvp.projectile.ProjectileListener;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeInstance;
-import net.minestom.server.attribute.AttributeModifier;
-import net.minestom.server.attribute.AttributeOperation;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
