@@ -45,9 +45,19 @@ Currently, most vanilla PvP features are supported.
 
 ## Usage
 
+One way to use this extension is by simply putting the jar inside your servers extensions folder.
+This will apply PvP mechanics to your whole server.
+
+But you can also choose to (and this is the preferred option for most servers) use the jar file as a library.
+In this case, you can choose where to apply the PvP mechanics and customize them.
 You can get an `EventNode` with all PvP related events listening using `PvpExtension.events()`.
 By adding this node as a child to any other node, you enable pvp in that scope.
 Separated features of this extension are also available as static methods in `PvpExtension`.
+
+Example (adds PvP to the global event handler, so everywhere):
+```java
+MinecraftServer.getGlobalEventHandler().addChild(PvpExtension.events());
+```
 
 ### Legacy PvP
 
