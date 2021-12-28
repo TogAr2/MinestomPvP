@@ -59,6 +59,8 @@ Example (adds PvP to the global event handler, so everywhere):
 MinecraftServer.getGlobalEventHandler().addChild(PvpExtension.events());
 ```
 
+The rest of this readme assumes you are using the extension as a library.
+
 ### Legacy PvP
 
 You can get the `EventNode` for legacy PvP using `PvpExtension.legacyEvents()`.
