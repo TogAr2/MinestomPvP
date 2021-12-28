@@ -22,6 +22,10 @@ import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.event.trait.PlayerEvent;
 import net.minestom.server.extensions.Extension;
+import net.minestom.server.item.Material;
+import net.minestom.server.registry.Registry;
+
+import java.lang.reflect.Field;
 
 public class PvpExtension extends Extension {
 	
@@ -146,6 +150,15 @@ public class PvpExtension extends Extension {
 		Tracker.register(getEventNode());
 		
 		ArrowPickup.init();
+		
+		try {
+			Field isFood = Registry.MaterialEntry.class.getDeclaredField("isFood");
+			isFood.setAccessible(true);
+			isFood.set(Material.POTION.registry(), true);
+			isFood.set(Material.MILK_BUCKET.registry(), true);
+		} catch (NoSuchFieldException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Override

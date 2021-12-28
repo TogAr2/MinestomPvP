@@ -38,7 +38,7 @@ public class FoodListener {
 			
 			event.setEatingTime((long) getUseTime(foodComponent) * MinecraftServer.TICK_MS);
 		}).filter(event -> event.getFoodItem().getMaterial().isFood()
-				|| event.getFoodItem().getMaterial() == Material.MILK_BUCKET) //May also be a potion
+				&& event.getFoodItem().getMaterial() != Material.POTION)
 				.build());
 		
 		node.addListener(EventListener.builder(PlayerEatEvent.class).handler(event -> {
@@ -80,7 +80,7 @@ public class FoodListener {
 				}
 			}
 		}).filter(event -> event.getFoodItem().getMaterial().isFood()
-				|| event.getFoodItem().getMaterial() == Material.MILK_BUCKET).build()); //May also be a potion
+				&& event.getFoodItem().getMaterial() != Material.POTION).build()); //May also be a potion
 		
 		node.addListener(PlayerTickEvent.class, event -> {
 			Player player = event.getPlayer();
