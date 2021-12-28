@@ -12,6 +12,7 @@ import io.github.bloepiloepi.pvp.potion.PotionListener;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffects;
 import io.github.bloepiloepi.pvp.potion.item.CustomPotionTypes;
 import io.github.bloepiloepi.pvp.projectile.ProjectileListener;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeInstance;
 import net.minestom.server.entity.Player;
@@ -141,11 +142,25 @@ public class PvpExtension extends Extension {
 	
 	@Override
 	public void initialize() {
+		init();
+		
+		getEventNode().addChild(events());
+	}
+	
+	@Override
+	public void terminate() {
+		ArrowPickup.stop();
+	}
+	
+	/**
+	 * Initialize the PvP extension.
+	 */
+	public static void init() {
 		CustomEnchantments.registerAll();
 		CustomPotionEffects.registerAll();
 		CustomPotionTypes.registerAll();
 		
-		Tracker.register(getEventNode());
+		Tracker.register(MinecraftServer.getGlobalEventHandler());
 		
 		ArrowPickup.init();
 		
@@ -157,10 +172,5 @@ public class PvpExtension extends Extension {
 		} catch (NoSuchFieldException | IllegalAccessException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	@Override
-	public void terminate() {
-		ArrowPickup.stop();
 	}
 }
