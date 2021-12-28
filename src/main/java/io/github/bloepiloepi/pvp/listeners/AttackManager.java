@@ -299,7 +299,7 @@ public class AttackManager {
 			float damageDone = originalHealth - ((LivingEntity) target).getHealth();
 			
 			//Damage indicator particles
-			if (damageDone > 2.0F) {
+			if (!legacy && damageDone > 2.0F) {
 				int count = (int) ((double) damageDone * 0.5D);
 				Pos targetPosition = target.getPosition();
 				ParticlePacket packet = ParticleCreator.createParticlePacket(
