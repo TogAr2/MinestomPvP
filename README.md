@@ -92,12 +92,10 @@ It is possible to add your own features to this extension. For example, you can 
 You can use the class `Tool`, which contains all tools and their properties (not all properties are currently included, will change soon).
 The same applies for `ToolMaterial` (wood, stone, ...) and `ArmorMaterial`.
 
-For further customization, it is always possible to use events or, if really necessary, a mixin.
-
 ## Contributing
 
 You can contribute in multiple ways.
-If you have an issue or have a great idea, you can open an issue.
+If you have an issue or a great idea, you can open an issue.
 You may also open a new pull request if you have made something for this project and you think it will fit in well.
 
 If anything does not integrate with your project, you can also open an issue (or submit a pull request).
