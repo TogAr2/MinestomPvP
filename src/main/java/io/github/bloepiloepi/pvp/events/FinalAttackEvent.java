@@ -5,6 +5,16 @@ import net.minestom.server.event.trait.CancellableEvent;
 import net.minestom.server.event.trait.EntityEvent;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Gets called when a player attacks an entity.
+ * This event can be used to set a few variables:<br>
+ * - sprint attack<br>
+ * - critical attack<br>
+ * - sweeping attack<br>
+ * - base damage of the attack<br>
+ * - enchantment extra damage of the attack<br>
+ * - whether the attack sounds should be played<br>
+ */
 public class FinalAttackEvent implements EntityEvent, CancellableEvent {
 	
 	private final Entity entity;
