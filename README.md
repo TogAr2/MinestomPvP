@@ -53,9 +53,11 @@ In this case, you can choose where to apply the PvP mechanics and customize them
 You can get an `EventNode` with all PvP related events listening using `PvpExtension.events()`.
 By adding this node as a child to any other node, you enable pvp in that scope.
 Separated features of this extension are also available as static methods in `PvpExtension`.
+You also have to call `PvpExtension.init()` before doing anything else.
 
 Example (adds PvP to the global event handler, so everywhere):
 ```java
+PvpExtension.init();
 MinecraftServer.getGlobalEventHandler().addChild(PvpExtension.events());
 ```
 
