@@ -131,13 +131,8 @@ public class AttackManager {
 		resetLastAttackedTicks(player);
 		
 		boolean strongAttack = i > 0.9F;
-		boolean sprintAttack = false;
+		boolean sprintAttack = player.isSprinting() && strongAttack;
 		int knockback = EnchantmentUtils.getKnockback(player);
-		if (player.isSprinting() && strongAttack) {
-			if (!legacy) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_KNOCKBACK, Sound.Source.PLAYER, 1.0F, 1.0F);
-			knockback++;
-			sprintAttack = true;
-		}
 		
 		boolean critical = strongAttack && !EntityUtils.isClimbing(player) && player.getVelocity().y() < 0 && !player.isOnGround() && !EntityUtils.hasEffect(player, PotionEffect.BLINDNESS) && player.getVehicle() == null && target instanceof LivingEntity;
 		if (!legacy) {
@@ -164,17 +159,23 @@ public class AttackManager {
 			}
 		}
 		
-		FinalAttackEvent finalAttackEvent = new FinalAttackEvent(player, target, critical, sweeping, damage, enchantedDamage);
+		FinalAttackEvent finalAttackEvent = new FinalAttackEvent(player, target, sprintAttack, critical, sweeping, damage, enchantedDamage, !legacy);
 		EventDispatcher.call(finalAttackEvent);
 		
 		if (finalAttackEvent.isCancelled()) {
 			return;
 		}
 		
+		sprintAttack = finalAttackEvent.isSprint();
 		critical = finalAttackEvent.isCritical();
 		sweeping = finalAttackEvent.isSweeping();
 		damage = finalAttackEvent.getBaseDamage();
 		enchantedDamage = finalAttackEvent.getEnchantsExtraDamage();
+		
+		if (sprintAttack) {
+			if (finalAttackEvent.hasAttackSounds()) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_KNOCKBACK, Sound.Source.PLAYER, 1.0F, 1.0F);
+			knockback++;
+		}
 		
 		if (critical) {
 			if (legacy) {
@@ -194,7 +195,7 @@ public class AttackManager {
 		boolean damageSucceeded = EntityUtils.damage(target, CustomDamageType.player(player), damage);
 		
 		if (!damageSucceeded) {
-			if (!legacy) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_NODAMAGE, Sound.Source.PLAYER, 1.0F, 1.0F);
+			if (finalAttackEvent.hasAttackSounds()) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_NODAMAGE, Sound.Source.PLAYER, 1.0F, 1.0F);
 			return;
 		}
 		
@@ -261,7 +262,7 @@ public class AttackManager {
 						}
 					});
 			
-			SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_SWEEP, Sound.Source.PLAYER, 1.0F, 1.0F);
+			if (finalAttackEvent.hasAttackSounds()) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_SWEEP, Sound.Source.PLAYER, 1.0F, 1.0F);
 			Pos pos = player.getPosition();
 			double x = -Math.sin(Math.toRadians(pos.yaw()));
 			double z = Math.cos(Math.toRadians(pos.yaw()));
@@ -276,17 +277,17 @@ public class AttackManager {
 		}
 		
 		if (critical) {
-			if (!legacy) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_CRIT, Sound.Source.PLAYER, 1.0F, 1.0F);
+			if (finalAttackEvent.hasAttackSounds()) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_CRIT, Sound.Source.PLAYER, 1.0F, 1.0F);
 			
 			player.sendPacketToViewersAndSelf(new EntityAnimationPacket(target.getEntityId(), EntityAnimationPacket.Animation.CRITICAL_EFFECT));
 		}
 		
 		if (!critical && !sweeping) {
 			if (strongAttack) {
-				if (!legacy) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_STRONG, Sound.Source.PLAYER, 1.0F, 1.0F);
+				if (finalAttackEvent.hasAttackSounds()) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_STRONG, Sound.Source.PLAYER, 1.0F, 1.0F);
 			} else {
 				//noinspection ConstantConditions
-				if (!legacy) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_WEAK, Sound.Source.PLAYER, 1.0F, 1.0F);
+				if (finalAttackEvent.hasAttackSounds()) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_WEAK, Sound.Source.PLAYER, 1.0F, 1.0F);
 			}
 		}
 		

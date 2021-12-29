@@ -10,22 +10,27 @@ public class FinalAttackEvent implements EntityEvent, CancellableEvent {
 	private final Entity entity;
 	private final Entity target;
 	
+	private boolean sprint;
 	private boolean critical;
 	private boolean sweeping;
 	private float baseDamage;
 	private float enchantsExtraDamage;
+	private boolean attackSounds;
 	
 	private boolean cancelled;
 	
 	public FinalAttackEvent(@NotNull Entity entity, @NotNull Entity target,
-	                        boolean critical, boolean sweeping,
-	                        float baseDamage, float enchantsExtraDamage) {
+	                        boolean sprint, boolean critical, boolean sweeping,
+	                        float baseDamage, float enchantsExtraDamage,
+	                        boolean attackSounds) {
 		this.entity = entity;
 		this.target = target;
+		this.sprint = sprint;
 		this.critical = critical;
 		this.sweeping = sweeping;
 		this.baseDamage = baseDamage;
 		this.enchantsExtraDamage = enchantsExtraDamage;
+		this.attackSounds = attackSounds;
 	}
 	
 	@Override
@@ -35,6 +40,24 @@ public class FinalAttackEvent implements EntityEvent, CancellableEvent {
 	
 	public @NotNull Entity getTarget() {
 		return target;
+	}
+	
+	/**
+	 * Gets whether the attack was a sprint attack.
+	 *
+	 * @return whether the attack was a sprint attack or not
+	 */
+	public boolean isSprint() {
+		return sprint;
+	}
+	
+	/**
+	 * Sets whether the attack was a sprint attack.
+	 *
+	 * @param sprint whether the attack was a sprint attack or not
+	 */
+	public void setSprint(boolean sprint) {
+		this.sprint = sprint;
 	}
 	
 	/**
@@ -112,6 +135,25 @@ public class FinalAttackEvent implements EntityEvent, CancellableEvent {
 	 */
 	public void setEnchantsExtraDamage(float enchantsExtraDamage) {
 		this.enchantsExtraDamage = enchantsExtraDamage;
+	}
+	
+	/**
+	 * Gets whether the 1.9+ attack sounds should be played.
+	 *
+	 * @return whether the attack sounds should be played
+	 */
+	public boolean hasAttackSounds() {
+		return attackSounds;
+	}
+	
+	/**
+	 * Sets whether the 1.9+ attack sounds should be played.
+	 * This also works for legacy.
+	 *
+	 * @param attackSounds whether the attack sounds should be played
+	 */
+	public void setAttackSounds(boolean attackSounds) {
+		this.attackSounds = attackSounds;
 	}
 	
 	@Override
