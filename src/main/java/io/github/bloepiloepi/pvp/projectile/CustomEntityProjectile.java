@@ -2,6 +2,7 @@ package io.github.bloepiloepi.pvp.projectile;
 
 import io.github.bloepiloepi.pvp.events.ProjectileHitEvent.ProjectileBlockHitEvent;
 import io.github.bloepiloepi.pvp.events.ProjectileHitEvent.ProjectileEntityHitEvent;
+import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -231,7 +232,7 @@ public class CustomEntityProjectile extends Entity {
 			}
 			
 			final Pos finalPos = pos;
-			Stream<Entity> victims = entities.stream().filter(entity -> entity.getBoundingBox().intersect(finalPos));
+			Stream<Entity> victims = entities.stream().filter(entity -> intersect(entity.getBoundingBox(), this.getBoundingBox(), finalPos));
 
             /*
               We won't check collisions with self for first ticks of projectile's life, because it spawns in the
@@ -246,6 +247,37 @@ public class CustomEntityProjectile extends Entity {
 			}
 		}
 		return State.Flying;
+	}
+	
+	public boolean intersect(@NotNull BoundingBox boundingBox, @NotNull BoundingBox selfBb, @NotNull Pos pos) {
+		// Check if the boundingBox intersects with the selfBb at position pos
+		return (boundingBox.getMinX() <= getMaxX(selfBb, pos) && boundingBox.getMaxX() >= getMinX(selfBb, pos)) &&
+				(boundingBox.getMinY() <= getMaxY(selfBb, pos) && boundingBox.getMaxY() >= getMinY(selfBb, pos)) &&
+				(boundingBox.getMinZ() <= getMaxZ(selfBb, pos) && boundingBox.getMaxZ() >= getMinZ(selfBb, pos));
+	}
+	
+	public double getMinX(@NotNull BoundingBox boundingBox, @NotNull Pos pos) {
+		return pos.x() - (boundingBox.getWidth() / 2);
+	}
+	
+	public double getMaxX(@NotNull BoundingBox boundingBox, @NotNull Pos pos) {
+		return pos.x() + (boundingBox.getWidth() / 2);
+	}
+	
+	public double getMinY(@NotNull BoundingBox boundingBox, @NotNull Pos pos) {
+		return pos.y();
+	}
+	
+	public double getMaxY(@NotNull BoundingBox boundingBox, @NotNull Pos pos) {
+		return pos.y() + boundingBox.getHeight();
+	}
+	
+	public double getMinZ(@NotNull BoundingBox boundingBox, @NotNull Pos pos) {
+		return pos.z() - (boundingBox.getDepth() / 2);
+	}
+	
+	public double getMaxZ(@NotNull BoundingBox boundingBox, @NotNull Pos pos) {
+		return pos.z() + (boundingBox.getDepth() / 2);
 	}
 	
 	private interface State {

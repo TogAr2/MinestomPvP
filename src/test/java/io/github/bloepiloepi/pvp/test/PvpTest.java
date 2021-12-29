@@ -26,6 +26,7 @@ import java.util.Optional;
 public class PvpTest {
 	public static void main(String[] args) {
 		MinecraftServer server = MinecraftServer.init();
+		PvpExtension.init();
 		//VelocityProxy.enable("tj7MulOtnIDe");
 		
 		Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer();
