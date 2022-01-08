@@ -2,7 +2,7 @@ package io.github.bloepiloepi.pvp.events;
 
 import net.minestom.server.entity.Entity;
 import net.minestom.server.event.trait.CancellableEvent;
-import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
  * - enchantment extra damage of the attack<br>
  * - whether the attack sounds should be played<br>
  */
-public class FinalAttackEvent implements EntityEvent, CancellableEvent {
+public class FinalAttackEvent implements EntityInstanceEvent, CancellableEvent {
 	
 	private final Entity entity;
 	private final Entity target;

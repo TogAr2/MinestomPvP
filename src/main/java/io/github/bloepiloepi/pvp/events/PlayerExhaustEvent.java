@@ -2,6 +2,7 @@ package io.github.bloepiloepi.pvp.events;
 
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.trait.CancellableEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.event.trait.PlayerEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
  * Called when a players exhaustion level changes.
  * This is used to determine when their food level should change.
  */
-public class PlayerExhaustEvent implements PlayerEvent, CancellableEvent {
+public class PlayerExhaustEvent implements PlayerEvent, EntityInstanceEvent, CancellableEvent {
 	
 	private final Player player;
 	private float amount;

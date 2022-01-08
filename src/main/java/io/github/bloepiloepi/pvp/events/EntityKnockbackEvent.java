@@ -2,7 +2,7 @@ package io.github.bloepiloepi.pvp.events;
 
 import net.minestom.server.entity.Entity;
 import net.minestom.server.event.trait.CancellableEvent;
-import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
  * once for the extra sweeping knockback, once for the default knockback.
  * You can determine if this event was the sweeping by using {@code isSweepingKnockback()}.
  */
-public class EntityKnockbackEvent implements EntityEvent, CancellableEvent {
+public class EntityKnockbackEvent implements EntityInstanceEvent, CancellableEvent {
 	
 	private final Entity entity;
 	private final Entity attacker;

@@ -5,13 +5,13 @@ import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.trait.CancellableEvent;
-import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Called when a player picks up an arrow.
  */
-public class PickupArrowEvent implements EntityEvent, CancellableEvent {
+public class PickupArrowEvent implements EntityInstanceEvent, CancellableEvent {
 	
 	private final Player player;
 	private final AbstractArrow arrowEntity;

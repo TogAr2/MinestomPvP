@@ -3,7 +3,7 @@ package io.github.bloepiloepi.pvp.events;
 import io.github.bloepiloepi.pvp.projectile.CustomEntityProjectile;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.event.trait.CancellableEvent;
-import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
  * <br>
  * Note: this event is called BEFORE the actual hit (when in front of the hit position).
  */
-public abstract class ProjectileHitEvent implements EntityEvent {
+public abstract class ProjectileHitEvent implements EntityInstanceEvent {
 	
 	private final CustomEntityProjectile projectile;
 	

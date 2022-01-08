@@ -2,14 +2,14 @@ package io.github.bloepiloepi.pvp.events;
 
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.event.trait.CancellableEvent;
-import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Called when an entity blocks damage using a shield.
  * This event can be used to set the resulting damage.
  */
-public class DamageBlockEvent implements EntityEvent, CancellableEvent {
+public class DamageBlockEvent implements EntityInstanceEvent, CancellableEvent {
 	
 	private final LivingEntity entity;
 	private final float damage;
