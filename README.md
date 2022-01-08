@@ -94,6 +94,7 @@ This extension provides several events:
 - `PickupArrowEvent`: cancellable, called when a player picks up an arrow.
 - `PlayerExhaustEvent`: cancellable, called when a players exhaustion level changes.
 - `PlayerSpectateEvent`: cancellable, called when a spectator tries to spectate an entity by attacking it.
+- `PotionVisibilityEvent`: cancellable, called when an entities potion state (ambient, particle color and invisibility) is updated.
 - `ProjectileBlockHitEvent`: called when a projectile hits a block.
 - `ProjectileEntityHitEvent`: cancellable, called when a projectile hits an entity.
 - `TotemUseEvent`: cancellable, called when a totem prevents an entity from dying.
