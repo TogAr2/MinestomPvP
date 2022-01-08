@@ -50,6 +50,7 @@ public class PotionVisibilityEvent implements EntityInstanceEvent, CancellableEv
 	
 	/**
 	 * Gets the potion particle color.
+	 * Will be 0 for no potion particles.
 	 *
 	 * @return the potion color
 	 */
@@ -59,6 +60,7 @@ public class PotionVisibilityEvent implements EntityInstanceEvent, CancellableEv
 	
 	/**
 	 * Sets the potion particle color.
+	 * Set to 0 to disable potion particles.
 	 *
 	 * @param color the potion color
 	 */

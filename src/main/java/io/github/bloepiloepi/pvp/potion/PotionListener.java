@@ -1,6 +1,7 @@
 package io.github.bloepiloepi.pvp.potion;
 
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
+import io.github.bloepiloepi.pvp.events.PotionVisibilityEvent;
 import io.github.bloepiloepi.pvp.food.FoodListener;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffect;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffects;
@@ -170,28 +171,35 @@ public class PotionListener {
 	}
 	
 	public static void updatePotionVisibility(LivingEntity entity) {
-		LivingEntityMeta meta = (LivingEntityMeta) entity.getEntityMeta();
+		boolean ambient;
+		int color;
+		boolean invisible;
 		
-		if (entity instanceof Player) {
-			if (((Player) entity).getGameMode() == GameMode.SPECTATOR) {
-				meta.setPotionEffectAmbient(false);
-				meta.setPotionEffectColor(0);
-				meta.setInvisible(true);
-				
-				return;
+		if (entity instanceof Player player && player.getGameMode() == GameMode.SPECTATOR) {
+			ambient = false;
+			color = 0;
+			invisible = true;
+		} else {
+			Collection<TimedPotion> effects = entity.getActiveEffects();
+			if (effects.isEmpty()) {
+				ambient = false;
+				color = 0;
+				invisible = false;
+			} else {
+				ambient = containsOnlyAmbientEffects(effects);
+				color = getPotionColor(effects.stream().map(TimedPotion::getPotion).collect(Collectors.toList()));
+				invisible = EntityUtils.hasPotionEffect(entity, PotionEffect.INVISIBILITY);
 			}
 		}
 		
-		Collection<TimedPotion> effects = entity.getActiveEffects();
-		if (effects.isEmpty()) {
-			meta.setPotionEffectAmbient(false);
-			meta.setPotionEffectColor(0);
-			meta.setInvisible(false);
-		} else {
-			meta.setPotionEffectAmbient(containsOnlyAmbientEffects(effects));
-			meta.setPotionEffectColor(getPotionColor(effects.stream().map(TimedPotion::getPotion).collect(Collectors.toList())));
-			meta.setInvisible(EntityUtils.hasPotionEffect(entity, PotionEffect.INVISIBILITY));
-		}
+		PotionVisibilityEvent potionVisibilityEvent = new PotionVisibilityEvent(entity, ambient, color, invisible);
+		EventDispatcher.callCancellable(potionVisibilityEvent, () -> {
+			LivingEntityMeta meta = (LivingEntityMeta) entity.getEntityMeta();
+			
+			meta.setPotionEffectAmbient(potionVisibilityEvent.isAmbient());
+			meta.setPotionEffectColor(potionVisibilityEvent.getColor());
+			meta.setInvisible(potionVisibilityEvent.isInvisible());
+		});
 	}
 	
 	private static boolean containsOnlyAmbientEffects(Collection<TimedPotion> effects) {
