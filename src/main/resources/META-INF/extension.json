@@ -1,5 +1,5 @@
 {
   "entrypoint": "io.github.bloepiloepi.pvp.PvpExtension",
   "name": "PvpExtension",
-  "version": "1"
+  "version": "1.0.0"
 }
