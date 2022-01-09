@@ -83,9 +83,9 @@ public enum Tool {
 	public static Map<Attribute, List<AttributeModifier>> getAttributes(@Nullable Tool tool, EquipmentSlot slot, ItemStack item, boolean legacy) {
 		Map<Attribute, List<AttributeModifier>> modifiers = new HashMap<>();
 		for (ItemAttribute itemAttribute : item.getMeta().getAttributes()) {
-			if (EquipmentSlot.fromAttributeSlot(itemAttribute.getSlot()) == slot) {
-				modifiers.computeIfAbsent(itemAttribute.getAttribute(), k -> new ArrayList<>())
-						.add(new AttributeModifier(itemAttribute.getUuid(), itemAttribute.getInternalName(), (float) itemAttribute.getValue(), itemAttribute.getOperation()));
+			if (EquipmentSlot.fromAttributeSlot(itemAttribute.slot()) == slot) {
+				modifiers.computeIfAbsent(itemAttribute.attribute(), k -> new ArrayList<>())
+						.add(new AttributeModifier(itemAttribute.uuid(), itemAttribute.name(), (float) itemAttribute.amount(), itemAttribute.operation()));
 			}
 		}
 		

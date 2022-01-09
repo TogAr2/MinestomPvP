@@ -12,16 +12,19 @@ import io.github.bloepiloepi.pvp.potion.PotionListener;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffects;
 import io.github.bloepiloepi.pvp.potion.item.CustomPotionTypes;
 import io.github.bloepiloepi.pvp.projectile.ProjectileListener;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeInstance;
-import net.minestom.server.attribute.AttributeModifier;
-import net.minestom.server.attribute.AttributeOperation;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.event.trait.PlayerEvent;
 import net.minestom.server.extensions.Extension;
+import net.minestom.server.item.Material;
+import net.minestom.server.registry.Registry;
+
+import java.lang.reflect.Field;
 
 public class PvpExtension extends Extension {
 	
@@ -41,8 +44,8 @@ public class PvpExtension extends Extension {
 	public static EventNode<EntityEvent> legacyEvents() {
 		EventNode<EntityEvent> node = EventNode.type("legacy-pvp-events", EventFilter.ENTITY);
 		
-		node.addChild(AttackManager.legacyEvents());
-		node.addChild(DamageListener.legacyEvents());
+		node.addChild(AttackManager.events(true));
+		node.addChild(DamageListener.events(true));
 		node.addChild(ArmorToolListener.events(true));
 		node.addChild(FoodListener.events(true));
 		node.addChild(PotionListener.events(true));
@@ -60,7 +63,7 @@ public class PvpExtension extends Extension {
 	 * @return The EventNode with attack events
 	 */
 	public static EventNode<EntityEvent> attackEvents() {
-		return AttackManager.events();
+		return AttackManager.events(false);
 	}
 	
 	/**
@@ -72,7 +75,7 @@ public class PvpExtension extends Extension {
 	 * @return The EventNode with damage events
 	 */
 	public static EventNode<EntityEvent> damageEvents() {
-		return DamageListener.events();
+		return DamageListener.events(false);
 	}
 	
 	/**
@@ -132,24 +135,42 @@ public class PvpExtension extends Extension {
 			speed.setBaseValue(100);
 			damage.setBaseValue(1.0F);
 		} else {
-			speed.setBaseValue(speed.getAttribute().getDefaultValue());
-			damage.setBaseValue(damage.getAttribute().getDefaultValue());
+			speed.setBaseValue(speed.getAttribute().defaultValue());
+			damage.setBaseValue(damage.getAttribute().defaultValue());
 		}
 	}
 	
 	@Override
 	public void initialize() {
-		CustomEnchantments.registerAll();
-		CustomPotionEffects.registerAll();
-		CustomPotionTypes.registerAll();
+		init();
 		
-		Tracker.register(getEventNode());
-		
-		ArrowPickup.init();
+		getEventNode().addChild(events());
 	}
 	
 	@Override
 	public void terminate() {
 		ArrowPickup.stop();
+	}
+	
+	/**
+	 * Initialize the PvP extension.
+	 */
+	public static void init() {
+		CustomEnchantments.registerAll();
+		CustomPotionEffects.registerAll();
+		CustomPotionTypes.registerAll();
+		
+		Tracker.register(MinecraftServer.getGlobalEventHandler());
+		
+		ArrowPickup.init();
+		
+		try {
+			Field isFood = Registry.MaterialEntry.class.getDeclaredField("isFood");
+			isFood.setAccessible(true);
+			isFood.set(Material.POTION.registry(), true);
+			isFood.set(Material.MILK_BUCKET.registry(), true);
+		} catch (NoSuchFieldException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
 	}
 }

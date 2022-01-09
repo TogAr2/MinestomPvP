@@ -26,8 +26,7 @@ public class ArmorToolListener {
 		EventNode<EntityEvent> node = EventNode.type("armor-tool-events", EventFilter.ENTITY);
 		
 		node.addListener(EntityEquipEvent.class, event -> {
-			if (!(event.getEntity() instanceof LivingEntity)) return;
-			LivingEntity livingEntity = (LivingEntity) event.getEntity();
+			if (!(event.getEntity() instanceof LivingEntity livingEntity)) return;
 			
 			if (event.getSlot().isArmor()) {
 				changeArmorModifiers(livingEntity, event.getSlot(), event.getEquippedItem(), legacy);

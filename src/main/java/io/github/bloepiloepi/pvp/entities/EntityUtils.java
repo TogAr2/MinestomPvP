@@ -4,7 +4,7 @@ import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.enchantment.enchantments.ProtectionEnchantment;
 import io.github.bloepiloepi.pvp.enums.Tool;
-import io.github.bloepiloepi.pvp.mixins.LivingEntityAccessor;
+import io.github.bloepiloepi.pvp.potion.PotionListener;
 import io.github.bloepiloepi.pvp.projectile.Arrow;
 import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.text.Component;
@@ -40,17 +40,17 @@ import java.util.function.Predicate;
 public class EntityUtils {
 	
 	public static boolean hasEffect(Entity entity, PotionEffect type) {
-		return entity.getActiveEffects().stream().anyMatch((effect) -> effect.getPotion().getEffect() == type);
+		return entity.getActiveEffects().stream().anyMatch((effect) -> effect.getPotion().effect() == type);
 	}
 	
 	public static Potion getEffect(Entity entity, PotionEffect type) {
 		for (TimedPotion potion : entity.getActiveEffects()) {
-			if (potion.getPotion().getEffect() == type) {
+			if (potion.getPotion().effect() == type) {
 				return potion.getPotion();
 			}
 		}
 		
-		return new Potion(type, (byte) 0, 0);
+		return new Potion(type, (byte) 0, 0, PotionListener.defaultFlags());
 	}
 	
 	public static void setFireForDuration(Entity entity, int duration, TemporalUnit temporalUnit) {
@@ -68,13 +68,10 @@ public class EntityUtils {
 		// Do not start fire event if the fire needs to be removed (< 0 duration)
 		if (duration.toMillis() > 0) {
 			EventDispatcher.callCancellable(entityFireEvent, () -> {
-				final long fireTime = entityFireEvent.getFireTime(TimeUnit.MILLISECOND);
 				entity.setOnFire(true);
-				Tracker.fireExtinguishTime.put(entity.getUuid(), System.currentTimeMillis() + fireTime);
 			});
-		} else {
-			Tracker.fireExtinguishTime.put(entity.getUuid(), System.currentTimeMillis());
 		}
+		// Tracker.fireExtinguishTime is updated by event listener
 	}
 	
 	public static void setOnFireForSeconds(Entity entity, int seconds) {
@@ -87,8 +84,7 @@ public class EntityUtils {
 		}
 		int millis = ticks * MinecraftServer.TICK_MS;
 		
-		long fireExtinguishTime = living ? ((LivingEntityAccessor) livingEntity).fireExtinguishTime() :
-				Tracker.fireExtinguishTime.getOrDefault(entity.getUuid(), 0L);
+		long fireExtinguishTime = Tracker.fireExtinguishTime.getOrDefault(entity.getUuid(), 0L);
 		if (System.currentTimeMillis() + millis > fireExtinguishTime) {
 			setFireForDuration(entity, millis, TimeUnit.MILLISECOND);
 		}
@@ -224,7 +220,7 @@ public class EntityUtils {
 	
 	public static boolean hasPotionEffect(LivingEntity entity, PotionEffect effect) {
 		return entity.getActiveEffects().stream()
-				.map((potion) -> potion.getPotion().getEffect())
+				.map((potion) -> potion.getPotion().effect())
 				.anyMatch((potionEffect) -> potionEffect == effect);
 	}
 	
@@ -273,6 +269,7 @@ public class EntityUtils {
 		
 		boolean success = false;
 		int lowestY = to.blockY();
+		if (lowestY == 0) lowestY++;
 		while (lowestY > instance.getDimensionType().getMinY()) {
 			Block block = instance.getBlock(to.blockX(), lowestY - 1, to.blockZ());
 			if (!block.isAir() && !block.isLiquid()) {
@@ -298,14 +295,6 @@ public class EntityUtils {
 		}
 		
 		return true;
-	}
-	
-	public static void updateProjectileRotation(EntityProjectile projectile) {
-		Vec velocity = projectile.getVelocity();
-		double xz = Math.sqrt(velocity.x() * velocity.x() + velocity.z() * velocity.z());
-		float yaw = (float) Math.toDegrees(Math.atan2(velocity.y(), xz));
-		float pitch = (float) Math.toDegrees(Math.atan2(velocity.x(), velocity.z()));
-		projectile.teleport(projectile.getPosition().withYaw(yaw).withPitch(pitch));
 	}
 	
 	public static Component getName(Entity entity) {

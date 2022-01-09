@@ -3,13 +3,14 @@ package io.github.bloepiloepi.pvp.events;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.trait.CancellableEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.event.trait.PlayerEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Called when a spectator tries to spectate an entity by attacking it.
  */
-public class PlayerSpectateEvent implements PlayerEvent, CancellableEvent {
+public class PlayerSpectateEvent implements PlayerEvent, EntityInstanceEvent, CancellableEvent {
 	
 	private final Player player;
 	private final Entity target;

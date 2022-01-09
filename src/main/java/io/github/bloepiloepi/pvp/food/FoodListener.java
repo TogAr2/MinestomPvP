@@ -2,7 +2,6 @@ package io.github.bloepiloepi.pvp.food;
 
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
-import io.github.bloepiloepi.pvp.mixins.PlayerAccessor;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.sound.Sound;
@@ -39,7 +38,7 @@ public class FoodListener {
 			
 			event.setEatingTime((long) getUseTime(foodComponent) * MinecraftServer.TICK_MS);
 		}).filter(event -> event.getFoodItem().getMaterial().isFood()
-				|| event.getFoodItem().getMaterial() == Material.MILK_BUCKET) //May also be a potion
+				&& event.getFoodItem().getMaterial() != Material.POTION)
 				.build());
 		
 		node.addListener(EventListener.builder(PlayerEatEvent.class).handler(event -> {
@@ -81,7 +80,7 @@ public class FoodListener {
 				}
 			}
 		}).filter(event -> event.getFoodItem().getMaterial().isFood()
-				|| event.getFoodItem().getMaterial() == Material.MILK_BUCKET).build()); //May also be a potion
+				&& event.getFoodItem().getMaterial() != Material.POTION).build()); //May also be a potion
 		
 		node.addListener(PlayerTickEvent.class, event -> {
 			Player player = event.getPlayer();
@@ -134,7 +133,7 @@ public class FoodListener {
 		FoodComponent component = FoodComponents.fromMaterial(stack.getMaterial());
 		
 		long useTime = getUseTime(component);
-		long usedDuration = System.currentTimeMillis() - ((PlayerAccessor) player).getStartEatingTime();
+		long usedDuration = System.currentTimeMillis() - Tracker.itemUseStartTime.get(player.getUuid());
 		long usedTicks = usedDuration / MinecraftServer.TICK_MS;
 		long remainingUseTicks = useTime - usedTicks;
 		

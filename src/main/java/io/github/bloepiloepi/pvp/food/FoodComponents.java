@@ -2,6 +2,7 @@ package io.github.bloepiloepi.pvp.food;
 
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
+import io.github.bloepiloepi.pvp.potion.PotionListener;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
@@ -30,7 +31,7 @@ public class FoodComponents {
 	public static final FoodComponent BEETROOT_SOUP = createSoup(6, Material.BEETROOT_SOUP);
 	public static final FoodComponent BREAD = (new FoodComponent.Builder()).hunger(5).saturationModifier(0.6F).build(Material.BREAD);
 	public static final FoodComponent CARROT = (new FoodComponent.Builder()).hunger(3).saturationModifier(0.6F).build(Material.CARROT);
-	public static final FoodComponent CHICKEN = (new FoodComponent.Builder()).hunger(2).saturationModifier(0.3F).statusEffect(new Potion(PotionEffect.HUNGER, (byte) 0, 600), 0.3F).meat().build(Material.CHICKEN);
+	public static final FoodComponent CHICKEN = (new FoodComponent.Builder()).hunger(2).saturationModifier(0.3F).statusEffect(new Potion(PotionEffect.HUNGER, (byte) 0, 600, PotionListener.defaultFlags()), 0.3F).meat().build(Material.CHICKEN);
 	public static final FoodComponent CHORUS_FRUIT = createChorusFruit();
 	public static final FoodComponent COD = (new FoodComponent.Builder()).hunger(2).saturationModifier(0.1F).build(Material.COD);
 	public static final FoodComponent COOKED_BEEF = (new FoodComponent.Builder()).hunger(8).saturationModifier(0.8F).meat().build(Material.COOKED_BEEF);
@@ -42,23 +43,23 @@ public class FoodComponents {
 	public static final FoodComponent COOKED_SALMON = (new FoodComponent.Builder()).hunger(6).saturationModifier(0.8F).build(Material.COOKED_SALMON);
 	public static final FoodComponent COOKIE = (new FoodComponent.Builder()).hunger(2).saturationModifier(0.1F).build(Material.COOKIE);
 	public static final FoodComponent DRIED_KELP = (new FoodComponent.Builder()).hunger(1).saturationModifier(0.3F).snack().build(Material.DRIED_KELP);
-	public static final FoodComponent ENCHANTED_GOLDEN_APPLE = (new FoodComponent.Builder()).hunger(4).saturationModifier(1.2F).statusEffect(new Potion(PotionEffect.REGENERATION, (byte) 1, 400), 1.0F).statusEffect(new Potion(PotionEffect.RESISTANCE, (byte) 0, 6000), 1.0F).statusEffect(new Potion(PotionEffect.FIRE_RESISTANCE, (byte) 0, 6000), 1.0F).statusEffect(new Potion(PotionEffect.ABSORPTION, (byte) 3, 2400), 1.0F).alwaysEdible().build(Material.ENCHANTED_GOLDEN_APPLE);
-	public static final FoodComponent GOLDEN_APPLE = (new FoodComponent.Builder()).hunger(4).saturationModifier(1.2F).statusEffect(new Potion(PotionEffect.REGENERATION, (byte) 1, 100), 1.0F).statusEffect(new Potion(PotionEffect.ABSORPTION, (byte) 0, 2400), 1.0F).alwaysEdible().build(Material.GOLDEN_APPLE);
+	public static final FoodComponent ENCHANTED_GOLDEN_APPLE = (new FoodComponent.Builder()).hunger(4).saturationModifier(1.2F).statusEffect(new Potion(PotionEffect.REGENERATION, (byte) 1, 400, PotionListener.defaultFlags()), 1.0F).statusEffect(new Potion(PotionEffect.RESISTANCE, (byte) 0, 6000, PotionListener.defaultFlags()), 1.0F).statusEffect(new Potion(PotionEffect.FIRE_RESISTANCE, (byte) 0, 6000, PotionListener.defaultFlags()), 1.0F).statusEffect(new Potion(PotionEffect.ABSORPTION, (byte) 3, 2400, PotionListener.defaultFlags()), 1.0F).alwaysEdible().build(Material.ENCHANTED_GOLDEN_APPLE);
+	public static final FoodComponent GOLDEN_APPLE = (new FoodComponent.Builder()).hunger(4).saturationModifier(1.2F).statusEffect(new Potion(PotionEffect.REGENERATION, (byte) 1, 100, PotionListener.defaultFlags()), 1.0F).statusEffect(new Potion(PotionEffect.ABSORPTION, (byte) 0, 2400, PotionListener.defaultFlags()), 1.0F).alwaysEdible().build(Material.GOLDEN_APPLE);
 	public static final FoodComponent GOLDEN_CARROT = (new FoodComponent.Builder()).hunger(6).saturationModifier(1.2F).build(Material.GOLDEN_CARROT);
 	public static final FoodComponent HONEY_BOTTLE = (new FoodComponent.Builder()).hunger(6).saturationModifier(0.1F).drink().onEat((player, stack) -> player.removeEffect(PotionEffect.POISON)).turnsInto(Material.GLASS_BOTTLE).build(Material.HONEY_BOTTLE);
 	public static final FoodComponent MELON_SLICE = (new FoodComponent.Builder()).hunger(2).saturationModifier(0.3F).build(Material.MELON_SLICE);
 	public static final FoodComponent MUSHROOM_STEW = createSoup(6, Material.MUSHROOM_STEW);
 	public static final FoodComponent MUTTON = (new FoodComponent.Builder()).hunger(2).saturationModifier(0.3F).meat().build(Material.MUTTON);
-	public static final FoodComponent POISONOUS_POTATO = (new FoodComponent.Builder()).hunger(2).saturationModifier(0.3F).statusEffect(new Potion(PotionEffect.POISON, (byte) 0, 100), 0.6F).build(Material.POISONOUS_POTATO);
+	public static final FoodComponent POISONOUS_POTATO = (new FoodComponent.Builder()).hunger(2).saturationModifier(0.3F).statusEffect(new Potion(PotionEffect.POISON, (byte) 0, 100, PotionListener.defaultFlags()), 0.6F).build(Material.POISONOUS_POTATO);
 	public static final FoodComponent PORKCHOP = (new FoodComponent.Builder()).hunger(3).saturationModifier(0.3F).meat().build(Material.PORKCHOP);
 	public static final FoodComponent POTATO = (new FoodComponent.Builder()).hunger(1).saturationModifier(0.3F).build(Material.POTATO);
-	public static final FoodComponent PUFFERFISH = (new FoodComponent.Builder()).hunger(1).saturationModifier(0.1F).statusEffect(new Potion(PotionEffect.POISON, (byte) 3, 1200), 1.0F).statusEffect(new Potion(PotionEffect.HUNGER, (byte) 2, 300), 1.0F).statusEffect(new Potion(PotionEffect.NAUSEA, (byte) 0, 300), 1.0F).build(Material.PUFFERFISH);
+	public static final FoodComponent PUFFERFISH = (new FoodComponent.Builder()).hunger(1).saturationModifier(0.1F).statusEffect(new Potion(PotionEffect.POISON, (byte) 3, 1200, PotionListener.defaultFlags()), 1.0F).statusEffect(new Potion(PotionEffect.HUNGER, (byte) 2, 300, PotionListener.defaultFlags()), 1.0F).statusEffect(new Potion(PotionEffect.NAUSEA, (byte) 0, 300, PotionListener.defaultFlags()), 1.0F).build(Material.PUFFERFISH);
 	public static final FoodComponent PUMPKIN_PIE = (new FoodComponent.Builder()).hunger(8).saturationModifier(0.3F).build(Material.PUMPKIN_PIE);
 	public static final FoodComponent RABBIT = (new FoodComponent.Builder()).hunger(3).saturationModifier(0.3F).meat().build(Material.RABBIT);
 	public static final FoodComponent RABBIT_STEW = createSoup(10, Material.RABBIT_STEW);
-	public static final FoodComponent ROTTEN_FLESH = (new FoodComponent.Builder()).hunger(4).saturationModifier(0.1F).statusEffect(new Potion(PotionEffect.HUNGER, (byte) 0, 600), 0.8F).meat().build(Material.ROTTEN_FLESH);
+	public static final FoodComponent ROTTEN_FLESH = (new FoodComponent.Builder()).hunger(4).saturationModifier(0.1F).statusEffect(new Potion(PotionEffect.HUNGER, (byte) 0, 600, PotionListener.defaultFlags()), 0.8F).meat().build(Material.ROTTEN_FLESH);
 	public static final FoodComponent SALMON = (new FoodComponent.Builder()).hunger(2).saturationModifier(0.1F).build(Material.SALMON);
-	public static final FoodComponent SPIDER_EYE = (new FoodComponent.Builder()).hunger(2).saturationModifier(0.8F).statusEffect(new Potion(PotionEffect.POISON, (byte) 0, 100), 1.0F).build(Material.SPIDER_EYE);
+	public static final FoodComponent SPIDER_EYE = (new FoodComponent.Builder()).hunger(2).saturationModifier(0.8F).statusEffect(new Potion(PotionEffect.POISON, (byte) 0, 100, PotionListener.defaultFlags()), 1.0F).build(Material.SPIDER_EYE);
 	public static final FoodComponent SUSPICIOUS_STEW = createSuspiciousStew();
 	public static final FoodComponent SWEET_BERRIES = (new FoodComponent.Builder()).hunger(2).saturationModifier(0.1F).build(Material.SWEET_BERRIES);
 	public static final FoodComponent GLOW_BERRIES = (new FoodComponent.Builder()).hunger(2).saturationModifier(0.1F).build(Material.GLOW_BERRIES);
@@ -95,7 +96,7 @@ public class FoodComponents {
 					if (effectId != null) {
 						PotionEffect potionEffect = PotionEffect.fromId(effectId);
 						if (potionEffect != null) {
-							player.addEffect(new Potion(potionEffect, (byte) 0, duration));
+							player.addEffect(new Potion(potionEffect, (byte) 0, duration, PotionListener.defaultFlags()));
 						}
 					}
 				}

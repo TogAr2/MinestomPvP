@@ -9,7 +9,7 @@ It tries to mimic vanilla (and pre-1.9) PvP as good as possible, while also focu
 But, MinestomPvP does not only provide PvP, it also provides everything around it (e.g., status effects and food).
 You can easily choose which features you want to use.
 
-**I am aware of an issue where projectile collision is not entirely accurate, because of the Minestom new block api. I will implement a fix for this at some point.**
+The maven repository is available on [jitpack](https://jitpack.io/#Bloepiloepi/MinestomPvP).
 
 ## Table of Contents
 
@@ -43,16 +43,27 @@ Currently, most vanilla PvP features are supported.
 - Lingering potions
 - Fall damage
 - Fireworks (for crossbows)
-
-Also, projectiles are a little bit of a mess right now.
-I might change that in the future, but I'm not sure, since I don't think there is a better way.
-(As a user you will probably not notice this, they do work as intended.)
+- Projectile collision might need some improvements (which is a Minestom issue too)
 
 ## Usage
 
+One way to use this extension is by simply putting the jar inside your servers extensions folder.
+This will apply PvP mechanics to your whole server.
+
+But you can also choose to (and this is the preferred option for most servers) use the jar file as a library.
+In this case, you can choose where to apply the PvP mechanics and customize them.
 You can get an `EventNode` with all PvP related events listening using `PvpExtension.events()`.
 By adding this node as a child to any other node, you enable pvp in that scope.
 Separated features of this extension are also available as static methods in `PvpExtension`.
+You also have to call `PvpExtension.init()` before doing anything else.
+
+Example (adds PvP to the global event handler, so everywhere):
+```java
+PvpExtension.init();
+MinecraftServer.getGlobalEventHandler().addChild(PvpExtension.events());
+```
+
+The rest of this readme assumes you are using the extension as a library.
 
 ### Legacy PvP
 
@@ -81,11 +92,13 @@ This extension provides several events:
 
 - `DamageBlockEvent`: cancellable, called when an entity blocks damage using a shield. This event can be used to set the remaining damage.
 - `EntityKnockbackEvent`: cancellable, called when an entity gets knocked back by another entity. Gets called twice for weapons with the knockback enchantment (once for default damage knockback, once for the extra knockback). This event can be used to set the knockback strength.
+- `FinalAttackEvent`: cancellable, called when a player attacks an entity. This event can be used to set a few variables like sprint, critical, sweeping, etc.
 - `FinalDamageEvent`: cancellable, called when the final damage calculation (including armor and effects) is completed. This event should be used instead of `EntityDamageEvent`, unless you want to detect how much damage was originally dealt.
 - `LegacyKnockbackEvent`: cancellable, called when an entity gets knocked back by another entity using legacy pvp. Same applies as for `EntityKnockbackEvent`. This event can be used to change the knockback settings.
 - `PickupArrowEvent`: cancellable, called when a player picks up an arrow.
 - `PlayerExhaustEvent`: cancellable, called when a players exhaustion level changes.
 - `PlayerSpectateEvent`: cancellable, called when a spectator tries to spectate an entity by attacking it.
+- `PotionVisibilityEvent`: cancellable, called when an entities potion state (ambient, particle color and invisibility) is updated.
 - `ProjectileBlockHitEvent`: called when a projectile hits a block.
 - `ProjectileEntityHitEvent`: cancellable, called when a projectile hits an entity.
 - `TotemUseEvent`: cancellable, called when a totem prevents an entity from dying.
@@ -97,12 +110,10 @@ It is possible to add your own features to this extension. For example, you can 
 You can use the class `Tool`, which contains all tools and their properties (not all properties are currently included, will change soon).
 The same applies for `ToolMaterial` (wood, stone, ...) and `ArmorMaterial`.
 
-For further customization, it is always possible to use events or, if really necessary, a mixin.
-
 ## Contributing
 
 You can contribute in multiple ways.
-If you have an issue or have a great idea, you can open an issue.
+If you have an issue or a great idea, you can open an issue.
 You may also open a new pull request if you have made something for this project and you think it will fit in well.
 
 If anything does not integrate with your project, you can also open an issue (or submit a pull request).

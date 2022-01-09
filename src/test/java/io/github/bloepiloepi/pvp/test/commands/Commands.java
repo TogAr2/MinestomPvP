@@ -11,5 +11,6 @@ public class Commands {
 		commandManager.register(new NickCommand());
 		commandManager.register(new SkinCommand());
 		commandManager.register(new DamageCommand());
+		commandManager.register(new ClearCommand());
 	}
 }

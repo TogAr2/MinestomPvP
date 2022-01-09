@@ -1,51 +1,44 @@
 package io.github.bloepiloepi.pvp.events;
 
-import io.github.bloepiloepi.pvp.projectile.EntityHittableProjectile;
-import net.minestom.server.coordinate.Pos;
+import io.github.bloepiloepi.pvp.projectile.CustomEntityProjectile;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.event.trait.CancellableEvent;
-import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Called when an {@link io.github.bloepiloepi.pvp.projectile.EntityHittableProjectile} hits an entity or a block.
+ * Called when an {@link io.github.bloepiloepi.pvp.projectile.CustomEntityProjectile} hits an entity or a block.
  * <br>
  * Note: this event is called BEFORE the actual hit (when in front of the hit position).
  */
-public abstract class ProjectileHitEvent implements EntityEvent {
+public abstract class ProjectileHitEvent implements EntityInstanceEvent {
 	
-	private final EntityHittableProjectile projectile;
+	private final CustomEntityProjectile projectile;
 	
-	public ProjectileHitEvent(@NotNull EntityHittableProjectile projectile) {
+	public ProjectileHitEvent(@NotNull CustomEntityProjectile projectile) {
 		this.projectile = projectile;
 	}
 	
 	@Override
-	public @NotNull EntityHittableProjectile getEntity() {
+	public @NotNull CustomEntityProjectile getEntity() {
 		return projectile;
 	}
 	
 	/**
-	 * Called when a {@link io.github.bloepiloepi.pvp.projectile.EntityHittableProjectile} hits a block.
+	 * Called when a {@link io.github.bloepiloepi.pvp.projectile.CustomEntityProjectile} hits a block.
 	 * <br>
-	 * Note: this event is called BEFORE the actual hit (when in front of the hit position).
+	 * Note: for snowballs, eggs and splash potions, this event is called BEFORE the actual hit
+	 * (when in front of the hit position).
 	 */
 	public static class ProjectileBlockHitEvent extends ProjectileHitEvent {
 		
-		private final Pos position;
-		
-		public ProjectileBlockHitEvent(@NotNull EntityHittableProjectile projectile, @NotNull Pos position) {
+		public ProjectileBlockHitEvent(@NotNull CustomEntityProjectile projectile) {
 			super(projectile);
-			this.position = position;
-		}
-		
-		public Pos getPosition() {
-			return position;
 		}
 	}
 	
 	/**
-	 * Called when a {@link io.github.bloepiloepi.pvp.projectile.EntityHittableProjectile} hits an entity.
+	 * Called when a {@link io.github.bloepiloepi.pvp.projectile.CustomEntityProjectile} hits an entity.
 	 * Cancelling will make the projectile go through (the event will be called a few more times in this case).
 	 * <br>
 	 * Note: this event is called BEFORE the actual hit (when in front of the hit position).
@@ -55,7 +48,7 @@ public abstract class ProjectileHitEvent implements EntityEvent {
 		private final Entity hitEntity;
 		private boolean cancelled;
 		
-		public ProjectileEntityHitEvent(@NotNull EntityHittableProjectile projectile, @NotNull Entity hitEntity) {
+		public ProjectileEntityHitEvent(@NotNull CustomEntityProjectile projectile, @NotNull Entity hitEntity) {
 			super(projectile);
 			this.hitEntity = hitEntity;
 		}

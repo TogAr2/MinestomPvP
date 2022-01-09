@@ -45,7 +45,7 @@ public class CustomPotionType {
 		if (effects.isEmpty()) return false;
 		
 		for (Potion potion : effects) {
-			if (CustomPotionEffects.get(potion.getEffect()).isInstant()) {
+			if (CustomPotionEffects.get(potion.effect()).isInstant()) {
 				return true;
 			}
 		}

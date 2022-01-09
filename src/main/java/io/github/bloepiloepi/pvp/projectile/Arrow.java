@@ -90,16 +90,13 @@ public class Arrow extends AbstractArrow {
 		CustomPotionType customPotionType = CustomPotionTypes.get(potion.getPotionType());
 		if (customPotionType != null) {
 			for (Potion potion : legacy ? customPotionType.getLegacyEffects() : customPotionType.getEffects()) {
-				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.getEffect());
+				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.effect());
 				if (customPotionEffect.isInstant()) {
 					customPotionEffect.applyInstantEffect(this, null,
-							entity, potion.getAmplifier(), 1.0D, legacy);
+							entity, potion.amplifier(), 1.0D, legacy);
 				} else {
-					int duration = Math.max(potion.getDuration() / 8, 1);
-					byte flags = potion.getFlags();
-					entity.addEffect(new Potion(potion.getEffect(), potion.getAmplifier(), duration,
-							PotionListener.hasParticles(flags), PotionListener.hasIcon(flags),
-							PotionListener.isAmbient(flags)));
+					int duration = Math.max(potion.duration() / 8, 1);
+					entity.addEffect(new Potion(potion.effect(), potion.amplifier(), duration, potion.flags()));
 				}
 			}
 		}
@@ -107,20 +104,21 @@ public class Arrow extends AbstractArrow {
 		if (potion.getCustomPotionEffects().isEmpty()) return;
 		
 		potion.getCustomPotionEffects().stream().map(customPotion ->
-				new Potion(Objects.requireNonNull(PotionEffect.fromId(customPotion.getId())),
-						customPotion.getAmplifier(), customPotion.getDuration(),
-						customPotion.showParticles(), customPotion.showIcon(),
-						customPotion.isAmbient()))
+				new Potion(Objects.requireNonNull(PotionEffect.fromId(customPotion.id())),
+						customPotion.amplifier(), customPotion.duration(),
+						PotionListener.createFlags(
+								customPotion.isAmbient(),
+								customPotion.showParticles(),
+								customPotion.showIcon()
+						)))
 				.forEach(potion -> {
-					CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.getEffect());
+					CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.effect());
 					if (customPotionEffect.isInstant()) {
 						customPotionEffect.applyInstantEffect(this, null,
-								entity, potion.getAmplifier(), 1.0D, legacy);
+								entity, potion.amplifier(), 1.0D, legacy);
 					} else {
-						byte flags = potion.getFlags();
-						entity.addEffect(new Potion(potion.getEffect(), potion.getAmplifier(),
-								potion.getDuration(), PotionListener.hasParticles(flags),
-								PotionListener.hasIcon(flags), PotionListener.isAmbient(flags)));
+						entity.addEffect(new Potion(potion.effect(), potion.amplifier(),
+								potion.duration(), potion.flags()));
 					}
 				});
 	}

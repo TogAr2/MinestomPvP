@@ -33,7 +33,7 @@ public class ArrowPickup {
 						if (!entity2.isViewer(player))
 							continue;
 						
-						if (arrow.shouldRemove() || arrow.isRemoveScheduled() || !arrow.canBePickedUp(player))
+						if (arrow.isRemoved() || !arrow.canBePickedUp(player))
 							continue;
 						
 						BoundingBox arrowBoundingBox = arrow.getBoundingBox();

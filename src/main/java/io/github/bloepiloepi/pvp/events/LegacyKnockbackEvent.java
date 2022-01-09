@@ -3,7 +3,7 @@ package io.github.bloepiloepi.pvp.events;
 import io.github.bloepiloepi.pvp.legacy.LegacyKnockbackSettings;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.event.trait.CancellableEvent;
-import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
  * once for the default damage knockback, once for for the extra knockback.
  * You can determine which knockback this is by using {@code isExtraKnockback()}.
  */
-public class LegacyKnockbackEvent implements EntityEvent, CancellableEvent {
+public class LegacyKnockbackEvent implements EntityInstanceEvent, CancellableEvent {
 	
 	private final Entity entity;
 	private final Entity attacker;

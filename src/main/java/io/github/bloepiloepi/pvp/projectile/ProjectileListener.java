@@ -132,7 +132,7 @@ public class ProjectileListener {
 			boolean enderpearl = stack.getMaterial() == Material.ENDER_PEARL;
 			
 			SoundEvent soundEvent;
-			EntityHittableProjectile projectile;
+			CustomEntityProjectile projectile;
 			if (snowball) {
 				soundEvent = SoundEvent.ENTITY_SNOWBALL_THROW;
 				projectile = new Snowball(player);
@@ -144,7 +144,7 @@ public class ProjectileListener {
 				projectile = new ThrownEgg(player);
 			}
 			
-			projectile.setItem(stack);
+			((ItemHoldingProjectile) projectile).setItem(stack);
 			
 			ThreadLocalRandom random = ThreadLocalRandom.current();
 			SoundManager.sendToAround(player, soundEvent,
@@ -200,7 +200,7 @@ public class ProjectileListener {
 		}).filter(event -> event.getItemStack().getMaterial() == Material.CROSSBOW).build());
 		
 		node.addListener(PlayerItemAnimationEvent.class, event -> {
-			if (event.getArmAnimationType() == PlayerItemAnimationEvent.ItemAnimationType.BOW) {
+			if (event.getItemAnimationType() == PlayerItemAnimationEvent.ItemAnimationType.BOW) {
 				if (!event.getPlayer().isCreative()
 						&& EntityUtils.getProjectile(event.getPlayer(), Arrow.ARROW_PREDICATE).first().isAir()) {
 					event.setCancelled(true);

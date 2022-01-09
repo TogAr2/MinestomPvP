@@ -1,5 +1,6 @@
 package io.github.bloepiloepi.pvp.projectile;
 
+import io.github.bloepiloepi.pvp.potion.PotionListener;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
@@ -32,6 +33,6 @@ public class SpectralArrow extends AbstractArrow {
 	
 	@Override
 	protected void onHurt(LivingEntity entity) {
-		entity.addEffect(new Potion(PotionEffect.GLOWING, (byte) 0, duration));
+		entity.addEffect(new Potion(PotionEffect.GLOWING, (byte) 0, duration, PotionListener.defaultFlags()));
 	}
 }

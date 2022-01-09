@@ -3,13 +3,13 @@ package io.github.bloepiloepi.pvp.events;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.trait.CancellableEvent;
-import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Called when a totem prevents an entity from dying.
  */
-public class TotemUseEvent implements EntityEvent, CancellableEvent {
+public class TotemUseEvent implements EntityInstanceEvent, CancellableEvent {
 	
 	private final LivingEntity entity;
 	private final Player.Hand hand;

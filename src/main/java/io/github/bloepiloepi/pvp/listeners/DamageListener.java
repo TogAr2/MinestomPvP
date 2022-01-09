@@ -7,6 +7,7 @@ import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
 import io.github.bloepiloepi.pvp.events.*;
+import io.github.bloepiloepi.pvp.potion.PotionListener;
 import io.github.bloepiloepi.pvp.utils.DamageUtils;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
@@ -31,39 +32,26 @@ import net.minestom.server.world.Difficulty;
 
 public class DamageListener {
 	
-	public static EventNode<EntityEvent> events() {
-		EventNode<EntityEvent> node = EventNode.type("damage-events", EventFilter.ENTITY);
+	public static EventNode<EntityEvent> events(boolean legacy) {
+		EventNode<EntityEvent> node = EventNode.type((legacy ? "legacy-" : "") + "damage-events", EventFilter.ENTITY);
 		
 		node.addListener(PlayerTickEvent.class, event -> {
-			if (event.getPlayer().isOnline()) {
-				Tracker.hungerManager.get(event.getPlayer().getUuid()).update(false);
+			if (Tracker.hungerManager.containsKey(event.getPlayer().getUuid())) {
+				Tracker.hungerManager.get(event.getPlayer().getUuid()).update(legacy);
 			}
 		});
 		
 		node.addListener(EventListener.builder(EntityDamageEvent.class)
-				.handler(event -> handleEntityDamage(event, false))
-				.build());
-		
-		return node;
-	}
-	
-	public static EventNode<EntityEvent> legacyEvents() {
-		EventNode<EntityEvent> node = EventNode.type("legacy-damage-events", EventFilter.ENTITY);
-		
-		node.addListener(PlayerTickEvent.class, event -> {
-			if (event.getPlayer().isOnline()) {
-				Tracker.hungerManager.get(event.getPlayer().getUuid()).update(true);
-			}
-		});
-		
-		node.addListener(EventListener.builder(EntityDamageEvent.class)
-				.handler(event -> handleEntityDamage(event, true))
+				.handler(event -> handleEntityDamage(event, legacy))
 				.build());
 		
 		return node;
 	}
 	
 	public static void handleEntityDamage(EntityDamageEvent event, boolean legacy) {
+		event.setAnimation(false);
+		event.setSound(null);
+		
 		float amount = event.getDamage();
 		
 		CustomDamageType type;
@@ -82,15 +70,12 @@ public class DamageListener {
 		if (event.getEntity() instanceof Player && type.isScaledWithDifficulty()) {
 			Difficulty difficulty = MinecraftServer.getDifficulty();
 			switch (difficulty) {
-				case PEACEFUL:
+				case PEACEFUL -> {
 					event.setCancelled(true);
 					return;
-				case EASY:
-					amount = Math.min(amount / 2.0F + 1.0F, amount);
-					break;
-				case HARD:
-					amount = amount * 3.0F / 2.0F;
-					break;
+				}
+				case EASY -> amount = Math.min(amount / 2.0F + 1.0F, amount);
+				case HARD -> amount = amount * 3.0F / 2.0F;
 			}
 		}
 		
@@ -201,7 +186,7 @@ public class DamageListener {
 				double h = attacker.getPosition().x() - entity.getPosition().x();
 				
 				double i;
-				for(i = attacker.getPosition().z() - entity.getPosition().z(); h * h + i * i < 1.0E-4D; i = (Math.random() - Math.random()) * 0.01D) {
+				for(i = attacker.getPosition().z() - entity.getPosition().z(); h * h + i * i < 0.0001; i = (Math.random() - Math.random()) * 0.01D) {
 					h = (Math.random() - Math.random()) * 0.01D;
 				}
 				
@@ -270,10 +255,11 @@ public class DamageListener {
 				soundCategory = Sound.Source.HOSTILE;
 			}
 			
-			SoundEffectPacket damageSoundPacket =
-					SoundEffectPacket.create(soundCategory, sound,
-							entity.getPosition(),
-							1.0f, 1.0f);
+			SoundEffectPacket damageSoundPacket = new SoundEffectPacket(
+					sound, soundCategory,
+					entity.getPosition(),
+					1.0f, 1.0f
+			);
 			entity.sendPacketToViewersAndSelf(damageSoundPacket);
 		}
 		
@@ -302,9 +288,9 @@ public class DamageListener {
 		if (hasTotem) {
 			entity.setHealth(1.0F);
 			entity.clearEffects();
-			entity.addEffect(new Potion(PotionEffect.REGENERATION, (byte) 1, 900));
-			entity.addEffect(new Potion(PotionEffect.ABSORPTION, (byte) 1, 100));
-			entity.addEffect(new Potion(PotionEffect.FIRE_RESISTANCE, (byte) 0, 800));
+			entity.addEffect(new Potion(PotionEffect.REGENERATION, (byte) 1, 900, PotionListener.defaultFlags()));
+			entity.addEffect(new Potion(PotionEffect.ABSORPTION, (byte) 1, 100, PotionListener.defaultFlags()));
+			entity.addEffect(new Potion(PotionEffect.FIRE_RESISTANCE, (byte) 0, 800, PotionListener.defaultFlags()));
 			
 			//Totem particles
 			entity.triggerStatus((byte) 35);
@@ -346,7 +332,7 @@ public class DamageListener {
 		} else {
 			int k;
 			if (EntityUtils.hasEffect(entity, PotionEffect.RESISTANCE)) {
-				k = (EntityUtils.getEffect(entity, PotionEffect.RESISTANCE).getAmplifier() + 1) * 5;
+				k = (EntityUtils.getEffect(entity, PotionEffect.RESISTANCE).amplifier() + 1) * 5;
 				int j = 25 - k;
 				float f = amount * (float) j;
 				amount = Math.max(f / 25.0F, 0.0F);

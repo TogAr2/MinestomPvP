@@ -23,16 +23,29 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class ThrownPotion extends EntityHittableProjectile {
+public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingProjectile {
 	private final boolean legacy;
 	
 	public ThrownPotion(@Nullable Entity shooter, boolean legacy) {
-		super(shooter, EntityType.POTION);
+		super(shooter, EntityType.POTION, true);
 		this.legacy = legacy;
+		
+		setGravity(getGravityDragPerTick(), 0.05);
 	}
 	
 	@Override
-	protected boolean onHit(@Nullable Entity entity) {
+	public void onHit(Entity entity) {
+		splash(entity);
+		remove();
+	}
+	
+	@Override
+	public void onStuck() {
+		splash(null);
+		remove();
+	}
+	
+	public void splash(@Nullable Entity entity) {
 		ItemStack item = getItem();
 		
 		PotionMeta meta = (PotionMeta) item.getMeta();
@@ -51,11 +64,9 @@ public class ThrownPotion extends EntityHittableProjectile {
 		Effects effect = CustomPotionType.hasInstantEffect(potions) ? Effects.INSTANT_SPLASH : Effects.SPLASH_POTION;
 		EffectManager.sendNearby(
 				Objects.requireNonNull(getInstance()), effect, position.blockX(),
-				position.blockY(), position.blockZ(), PotionListener.getColor(item, legacy),
+				position.blockY() + 1, position.blockZ(), PotionListener.getColor(item, legacy),
 				64.0D, false
 		);
-		
-		return true;
 	}
 	
 	private void applySplash(List<Potion> potions, @Nullable Entity hitEntity) {
@@ -77,20 +88,17 @@ public class ThrownPotion extends EntityHittableProjectile {
 			double proximity = entity == hitEntity ? 1.0D : (1.0D - Math.sqrt(distanceSquared) / 4.0D);
 			
 			for (Potion potion : potions) {
-				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.getEffect());
+				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.effect());
 				if (customPotionEffect.isInstant()) {
 					customPotionEffect.applyInstantEffect(this, getShooter(),
-							entity,potion.getAmplifier(), proximity, legacy);
+							entity,potion.amplifier(), proximity, legacy);
 				} else {
-					int duration = potion.getDuration();
+					int duration = potion.duration();
 					if (legacy) duration = (int) Math.floor(duration * 0.75);
 					duration = (int) (proximity * (double) duration + 0.5D);
 					
 					if (duration > 20) {
-						byte flags = potion.getFlags();
-						entity.addEffect(new Potion(potion.getEffect(), potion.getAmplifier(), duration,
-								PotionListener.hasParticles(flags), PotionListener.hasIcon(flags),
-								PotionListener.isAmbient(flags)));
+						entity.addEffect(new Potion(potion.effect(), potion.amplifier(), duration, potion.flags()));
 					}
 				}
 			}
@@ -102,6 +110,7 @@ public class ThrownPotion extends EntityHittableProjectile {
 		return ((ThrownPotionMeta) getEntityMeta()).getItem();
 	}
 	
+	@Override
 	public void setItem(@NotNull ItemStack item) {
 		((ThrownPotionMeta) getEntityMeta()).setItem(item);
 	}

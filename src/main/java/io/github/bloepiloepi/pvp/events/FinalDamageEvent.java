@@ -4,14 +4,14 @@ import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.trait.CancellableEvent;
-import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * The damage event containing the final damage, calculation of armor and effects included.
  * This event should be used, unless you want to detect how much damage was originally dealt.
  */
-public class FinalDamageEvent implements EntityEvent, CancellableEvent {
+public class FinalDamageEvent implements EntityInstanceEvent, CancellableEvent {
 	
 	private final LivingEntity entity;
 	private final CustomDamageType damageType;

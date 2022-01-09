@@ -14,16 +14,17 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class FishingBobber extends EntityHittableProjectile {
+public class FishingBobber extends CustomEntityProjectile {
 	public static final Map<UUID, FishingBobber> fishingBobbers = new ConcurrentHashMap<>();
 	
 	private final boolean legacy;
 	private int stuckTime;
 	private Entity hooked;
 	private State state = State.IN_AIR;
+	private Pos prevPos = Pos.ZERO;
 	
 	public FishingBobber(@Nullable Entity shooter, boolean legacy) {
-		super(shooter, EntityType.FISHING_BOBBER);
+		super(shooter, EntityType.FISHING_BOBBER, false);
 		this.legacy = legacy;
 		setOwnerEntity(shooter);
 		
@@ -31,12 +32,17 @@ public class FishingBobber extends EntityHittableProjectile {
 	}
 	
 	@Override
+	public void tick(long time) {
+		prevPos = getPosition();
+		super.tick(time);
+	}
+	
+	@Override
 	public void update(long time) {
-		if (!(getShooter() instanceof Player)) {
+		if (!(getShooter() instanceof Player shooter)) {
 			remove();
 			return;
 		}
-		Player shooter = (Player) getShooter();
 		if (shouldStopFishing(shooter)) return;
 		
 		if (onGround) {
@@ -54,7 +60,6 @@ public class FishingBobber extends EntityHittableProjectile {
 				velocity = Vec.ZERO;
 				setNoGravity(true);
 				state = State.HOOKED_ENTITY;
-				return;
 			}
 		} else {
 			if (state == State.HOOKED_ENTITY) {
@@ -65,40 +70,33 @@ public class FishingBobber extends EntityHittableProjectile {
 						state = State.IN_AIR;
 					} else {
 						Pos hookedPos = hooked.getPosition();
-						teleport(hookedPos.add(0, EntityUtils.getBodyY(hooked, 0.8), 0));
+						teleport(hookedPos.withY(EntityUtils.getBodyY(hooked, 0.8)));
 					}
 				}
-				
+			}
+		}
+		
+		//EntityUtils.updateProjectileRotation(this);
+	}
+	
+	@Override
+	public void onHit(Entity entity) {
+		if (hooked != null) return;
+		setHookedEntity(entity);
+		
+		if (legacy) {
+			if (entity instanceof Player player
+					&& (player == getShooter() || player.getGameMode() == GameMode.CREATIVE))
 				return;
-			}
-		}
-		
-		EntityUtils.updateProjectileRotation(this);
-	}
-	
-	@Override
-	protected boolean onHit(@Nullable Entity entity) {
-		if (entity != null) {
-			setHookedEntity(entity);
 			
-			if (legacy) {
-				if (entity instanceof Player) {
-					Player player = (Player) entity;
-					if (player == getShooter() || player.getGameMode() == GameMode.CREATIVE)
-						return false;
-				}
-				
-				if (EntityUtils.damage(entity, CustomDamageType.GENERIC, 0)) {
-					entity.setVelocity(calculateLegacyKnockback(entity.getVelocity(), entity.getPosition()));
-				}
+			Pos posNow = this.position;
+			this.position = prevPos;
+			if (EntityUtils.damage(entity, CustomDamageType.GENERIC, 0)) {
+				entity.setVelocity(calculateLegacyKnockback(entity.getVelocity(), entity.getPosition()));
 			}
+			this.position = posNow;
 		}
-		
-		return false;
 	}
-	
-	@Override
-	public void onStuck() {}
 	
 	private void setHookedEntity(@Nullable Entity entity) {
 		this.hooked = entity;
@@ -123,8 +121,7 @@ public class FishingBobber extends EntityHittableProjectile {
 	}
 	
 	public int retrieve() {
-		if (!(getShooter() instanceof Player)) return 0;
-		Player shooter = (Player) getShooter();
+		if (!(getShooter() instanceof Player shooter)) return 0;
 		if (shouldStopFishing(shooter)) return 0;
 		
 		int durability = 0;

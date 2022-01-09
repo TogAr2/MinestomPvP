@@ -229,10 +229,7 @@ public class CombatManager {
 	}
 	
 	private void onLeaveCombat() {
-		EndCombatEventPacket packet = new EndCombatEventPacket();
-		packet.entityId = getKillerId();
-		packet.duration = (int) (getCombatDuration() / MinecraftServer.TICK_MS);
-		
-		player.getPlayerConnection().sendPacket(packet);
+		int duration = (int) (getCombatDuration() / MinecraftServer.TICK_MS);
+		player.getPlayerConnection().sendPacket(new EndCombatEventPacket(duration, getKillerId()));
 	}
 }
