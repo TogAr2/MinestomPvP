@@ -9,6 +9,8 @@ It tries to mimic vanilla (and pre-1.9) PvP as good as possible, while also focu
 But, MinestomPvP does not only provide PvP, it also provides everything around it (e.g., status effects and food).
 You can easily choose which features you want to use.
 
+The maven repository is available on [jitpack](https://jitpack.io/#Bloepiloepi/MinestomPvP).
+
 ## Table of Contents
 
 - [Features](#features)
