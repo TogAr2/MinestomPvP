@@ -3,6 +3,7 @@ package io.github.bloepiloepi.pvp.projectile;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
+import io.github.bloepiloepi.pvp.utils.ItemUtils;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.sound.Sound;
@@ -10,6 +11,7 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
+import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventFilter;
@@ -47,7 +49,8 @@ public class ProjectileListener {
 			
 			if (FishingBobber.fishingBobbers.containsKey(player.getUuid())) {
 				int durability = FishingBobber.fishingBobbers.get(player.getUuid()).retrieve();
-				//TODO damage fishing rod
+				ItemUtils.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
+						EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, durability);
 				
 				SoundManager.sendToAround(player, SoundEvent.ENTITY_FISHING_BOBBER_RETRIEVE, Sound.Source.NEUTRAL,
 						1.0F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
@@ -283,7 +286,8 @@ public class ProjectileListener {
 				EntityUtils.setOnFireForSeconds(arrow, 100);
 			}
 			
-			//TODO damage bow item
+			ItemUtils.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
+					EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, 1);
 			
 			boolean reallyInfinite = infinite && projectile.getMaterial() == Material.ARROW;
 			if (reallyInfinite || player.isCreative()
@@ -408,16 +412,12 @@ public class ProjectileListener {
 	}
 	
 	public static SoundEvent getCrossbowStartSound(int quickCharge) {
-		switch (quickCharge) {
-			case 1:
-				return SoundEvent.ITEM_CROSSBOW_QUICK_CHARGE_1;
-			case 2:
-				return SoundEvent.ITEM_CROSSBOW_QUICK_CHARGE_2;
-			case 3:
-				return SoundEvent.ITEM_CROSSBOW_QUICK_CHARGE_3;
-			default:
-				return SoundEvent.ITEM_CROSSBOW_LOADING_START;
-		}
+		return switch (quickCharge) {
+			case 1 -> SoundEvent.ITEM_CROSSBOW_QUICK_CHARGE_1;
+			case 2 -> SoundEvent.ITEM_CROSSBOW_QUICK_CHARGE_2;
+			case 3 -> SoundEvent.ITEM_CROSSBOW_QUICK_CHARGE_3;
+			default -> SoundEvent.ITEM_CROSSBOW_LOADING_START;
+		};
 	}
 	
 	public static ItemStack loadCrossbowProjectiles(Player player, ItemStack stack) {
@@ -498,7 +498,8 @@ public class ProjectileListener {
 		
 		arrow.shoot(position, power, spread);
 		
-		//TODO damage crossbow
+		ItemUtils.damageEquipment(player, hand == Player.Hand.MAIN ?
+				EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, firework ? 3 : 1);
 		
 		SoundManager.sendToAround(player, SoundEvent.ITEM_CROSSBOW_SHOOT, Sound.Source.PLAYER, 1.0F, soundPitch);
 	}

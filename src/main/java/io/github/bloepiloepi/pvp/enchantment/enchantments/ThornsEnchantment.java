@@ -3,6 +3,7 @@ package io.github.bloepiloepi.pvp.enchantment.enchantments;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.enchantment.CustomEnchantment;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
+import io.github.bloepiloepi.pvp.utils.ItemUtils;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.item.Enchantment;
@@ -28,7 +29,9 @@ public class ThornsEnchantment extends CustomEnchantment {
 			attacker.damage(CustomDamageType.thorns(user), getDamageAmount(level, random));
 		}
 		
-		//TODO damage equipment
+		if (entry != null) {
+			ItemUtils.damageEquipment(user, entry.getKey(), 2);
+		}
 	}
 	
 	private static boolean shouldDamageAttacker(int level, ThreadLocalRandom random) {

@@ -9,6 +9,8 @@ import io.github.bloepiloepi.pvp.entities.Tracker;
 import io.github.bloepiloepi.pvp.events.*;
 import io.github.bloepiloepi.pvp.potion.PotionListener;
 import io.github.bloepiloepi.pvp.utils.DamageUtils;
+import io.github.bloepiloepi.pvp.utils.ItemUtils;
+import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
@@ -18,6 +20,7 @@ import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
+import net.minestom.server.entity.metadata.LivingEntityMeta;
 import net.minestom.server.event.*;
 import net.minestom.server.event.entity.EntityDamageEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
@@ -29,6 +32,8 @@ import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.world.Difficulty;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public class DamageListener {
 	
@@ -86,7 +91,7 @@ public class DamageListener {
 		}
 		
 		if (type.damagesHelmet() && !entity.getEquipment(EquipmentSlot.HELMET).isAir()) {
-			//TODO damage helmet item
+			ItemUtils.damageArmor(entity, type, amount, EquipmentSlot.HELMET);
 			amount *= 0.75F;
 		}
 		
@@ -108,9 +113,22 @@ public class DamageListener {
 			DamageBlockEvent damageBlockEvent = new DamageBlockEvent(entity, amount, resultingDamage);
 			EventDispatcher.call(damageBlockEvent);
 			
-			//TODO damage shield item
-			
 			if (!damageBlockEvent.isCancelled()) {
+				if (amount >= 3) {
+					int shieldDamage = 1 + (int) Math.floor(amount);
+					Player.Hand hand = EntityUtils.getActiveHand(entity);
+					ItemUtils.damageEquipment(entity, hand == Player.Hand.MAIN ? EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, shieldDamage);
+					
+					if (entity.getItemInHand(hand).isAir()) {
+						((LivingEntityMeta) entity.getEntityMeta()).setHandActive(false);
+						SoundManager.sendToAround(
+								entity instanceof Player player ? player : null, entity,
+								SoundEvent.ITEM_SHIELD_BREAK, Sound.Source.PLAYER,
+								0.8F, 0.8F + ThreadLocalRandom.current().nextFloat() * 0.4F
+						);
+					}
+				}
+				
 				amount = damageBlockEvent.getResultingDamage();
 				
 				if (!legacy) {
