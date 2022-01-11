@@ -11,6 +11,7 @@ import io.github.bloepiloepi.pvp.entities.Tracker;
 import io.github.bloepiloepi.pvp.events.EntityKnockbackEvent;
 import io.github.bloepiloepi.pvp.events.LegacyKnockbackEvent;
 import io.github.bloepiloepi.pvp.events.PlayerSpectateEvent;
+import io.github.bloepiloepi.pvp.utils.ItemUtils;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
@@ -301,7 +302,11 @@ public class AttackManager {
 		
 		EnchantmentUtils.onTargetDamaged(player, target);
 		//TODO target and user damaged should also work when non-player mob attacks (mobs, arrows, trident)
-		//TODO damage itemstack
+		
+		Tool tool = Tool.fromMaterial(player.getItemInMainHand().getMaterial());
+		if (tool != null) {
+			ItemUtils.damageEquipment(player, EquipmentSlot.MAIN_HAND, (tool.isSword() || tool == Tool.TRIDENT) ? 1 : 2);
+		}
 		
 		if (target instanceof LivingEntity) {
 			int fireAspect = EnchantmentUtils.getFireAspect(player);

@@ -92,6 +92,7 @@ This extension provides several events:
 
 - `DamageBlockEvent`: cancellable, called when an entity blocks damage using a shield. This event can be used to set the remaining damage.
 - `EntityKnockbackEvent`: cancellable, called when an entity gets knocked back by another entity. Gets called twice for weapons with the knockback enchantment (once for default damage knockback, once for the extra knockback). This event can be used to set the knockback strength.
+- `EquipmentDamageEvent`: cancellable, called when an item in an equipment slot gets damaged.
 - `FinalAttackEvent`: cancellable, called when a player attacks an entity. This event can be used to set a few variables like sprint, critical, sweeping, etc.
 - `FinalDamageEvent`: cancellable, called when the final damage calculation (including armor and effects) is completed. This event should be used instead of `EntityDamageEvent`, unless you want to detect how much damage was originally dealt.
 - `LegacyKnockbackEvent`: cancellable, called when an entity gets knocked back by another entity using legacy pvp. Same applies as for `EntityKnockbackEvent`. This event can be used to change the knockback settings.

@@ -102,7 +102,8 @@ public class EnchantmentUtils {
 		return 1.0F - 1.0F / (float) (i + 1);
 	}
 	
-	public static boolean shouldPreventStackWithUnbreakingDamage(ItemStack item, int unbreakingLevel, ThreadLocalRandom random) {
+	public static boolean shouldPreventStackWithUnbreakingDamage(ItemStack item, int unbreakingLevel) {
+		ThreadLocalRandom random = ThreadLocalRandom.current();
 		if (ArmorMaterial.fromMaterial(item.getMaterial()) != null && random.nextFloat() < 0.6F) {
 			return false;
 		} else {
