@@ -23,6 +23,7 @@ import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
 import net.minestom.server.event.*;
 import net.minestom.server.event.entity.EntityDamageEvent;
+import net.minestom.server.event.entity.EntityDeathEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.item.ItemStack;
@@ -279,6 +280,14 @@ public class DamageListener {
 					1.0f, 1.0f
 			);
 			entity.sendPacketToViewersAndSelf(damageSoundPacket);
+		}
+		
+		if (!event.isCancelled()) {
+			EntityPreDeathEvent entityPreDeathEvent = new EntityPreDeathEvent(entity, type);
+			EventDispatcher.call(entityPreDeathEvent);
+			if (entityPreDeathEvent.isCancelled()) {
+				event.setCancelled(true);
+			}
 		}
 		
 		event.setDamage(amount);
