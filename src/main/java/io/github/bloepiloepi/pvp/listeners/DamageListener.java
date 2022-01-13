@@ -249,6 +249,7 @@ public class DamageListener {
 		
 		SoundEvent sound = null;
 		
+		boolean death = false;
 		float totalHealth = entity.getHealth() + (entity instanceof Player ? ((Player) entity).getAdditionalHearts() : 0);
 		if (totalHealth - amount <= 0) {
 			boolean totem = totemProtection(entity, type);
@@ -258,6 +259,7 @@ public class DamageListener {
 			} else if (hurtSoundAndAnimation) {
 				//Death sound
 				sound = type.getDeathSound(entity);
+				death = true;
 			}
 		} else if (hurtSoundAndAnimation) {
 			//Damage sound
@@ -282,7 +284,7 @@ public class DamageListener {
 			entity.sendPacketToViewersAndSelf(damageSoundPacket);
 		}
 		
-		if (!event.isCancelled()) {
+		if (death && !event.isCancelled()) {
 			EntityPreDeathEvent entityPreDeathEvent = new EntityPreDeathEvent(entity, type);
 			EventDispatcher.call(entityPreDeathEvent);
 			if (entityPreDeathEvent.isCancelled()) {
