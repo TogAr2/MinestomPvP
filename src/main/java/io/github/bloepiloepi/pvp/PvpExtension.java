@@ -16,6 +16,7 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeInstance;
 import net.minestom.server.entity.Player;
+import net.minestom.server.event.Event;
 import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityEvent;
@@ -142,7 +143,7 @@ public class PvpExtension extends Extension {
 	
 	@Override
 	public LoadStatus initialize() {
-		init();
+		eventNode().addChild(init());
 		
 		eventNode().addChild(events());
 
@@ -157,12 +158,15 @@ public class PvpExtension extends Extension {
 	/**
 	 * Initialize the PvP extension.
 	 */
-	public static void init() {
+	public static EventNode<Event> init() {
+
+		EventNode<Event> eventNode = EventNode.all("minestomPVPEvent");
+
 		CustomEnchantments.registerAll();
 		CustomPotionEffects.registerAll();
 		CustomPotionTypes.registerAll();
 		
-		Tracker.register(MinecraftServer.getGlobalEventHandler());
+		Tracker.register(eventNode);
 		
 		ArrowPickup.init();
 		
@@ -174,5 +178,7 @@ public class PvpExtension extends Extension {
 		} catch (NoSuchFieldException | IllegalAccessException e) {
 			e.printStackTrace();
 		}
+
+		return eventNode;
 	}
 }

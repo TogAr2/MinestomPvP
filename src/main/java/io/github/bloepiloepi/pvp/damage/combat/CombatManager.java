@@ -12,6 +12,7 @@ import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.network.packet.server.play.EndCombatEventPacket;
 import net.minestom.server.network.packet.server.play.EnterCombatEventPacket;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ public class CombatManager {
 	private boolean takingDamage;
 	private String nextFallLocation;
 	
-	public CombatManager(Player player) {
+	public CombatManager(@NotNull Player player) {
 		this.player = player;
 	}
 	
