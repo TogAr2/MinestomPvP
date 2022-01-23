@@ -215,6 +215,10 @@ public class CustomEntityProjectile extends Entity {
 			} else {
 				pos = pos.add(direction);
 			}
+			if (!instance.isChunkLoaded(pos)) {
+				remove();
+				return State.Flying;
+			}
 			if (instance.getBlock(pos).isSolid()) {
 				if (shouldTeleport) teleport(pos);
 				return State.StuckInBlock;

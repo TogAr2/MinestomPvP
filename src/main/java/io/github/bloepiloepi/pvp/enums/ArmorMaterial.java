@@ -87,6 +87,26 @@ public enum ArmorMaterial {
 		return modifiers;
 	}
 	
+	public static Map<Attribute, List<UUID>> getAttributeIds(@Nullable ArmorMaterial material, EquipmentSlot slot, ItemStack item) {
+		Map<Attribute, List<UUID>> modifiers = new HashMap<>();
+		for (ItemAttribute itemAttribute : item.getMeta().getAttributes()) {
+			if (EquipmentSlot.fromAttributeSlot(itemAttribute.slot()) == slot) {
+				modifiers.computeIfAbsent(itemAttribute.attribute(), k -> new ArrayList<>()).add(itemAttribute.uuid());
+			}
+		}
+		
+		if (material != null) {
+			if (slot == getRequiredSlot(item.getMaterial())) {
+				UUID modifierUUID = getModifierUUID(slot);
+				modifiers.computeIfAbsent(Attribute.ARMOR, k -> new ArrayList<>()).add(modifierUUID);
+				modifiers.computeIfAbsent(Attribute.ARMOR_TOUGHNESS, k -> new ArrayList<>()).add(modifierUUID);
+				modifiers.computeIfAbsent(Attribute.KNOCKBACK_RESISTANCE, k -> new ArrayList<>()).add(modifierUUID);
+			}
+		}
+		
+		return modifiers;
+	}
+	
 	public static EquipmentSlot getRequiredSlot(Material material) {
 		EquipmentSlot slot = material.registry().equipmentSlot();
 		return slot == null ? EquipmentSlot.HELMET : slot;

@@ -10,10 +10,7 @@ import net.minestom.server.item.Material;
 import net.minestom.server.item.attribute.ItemAttribute;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public enum Tool {
 	WOODEN_SWORD(ToolMaterial.WOOD, 3, 4.0F, -2.4F, false, true),
@@ -96,6 +93,24 @@ public enum Tool {
 				(legacy ? tool.legacyAttributeModifiers : tool.attributeModifiers).forEach((attribute, modifier) -> {
 					modifiers.computeIfAbsent(attribute, k -> new ArrayList<>()).add(modifier);
 				});
+			}
+		}
+		
+		return modifiers;
+	}
+	
+	public static Map<Attribute, List<UUID>> getAttributeIds(@Nullable Tool tool, EquipmentSlot slot, ItemStack item) {
+		Map<Attribute, List<UUID>> modifiers = new HashMap<>();
+		for (ItemAttribute itemAttribute : item.getMeta().getAttributes()) {
+			if (EquipmentSlot.fromAttributeSlot(itemAttribute.slot()) == slot) {
+				modifiers.computeIfAbsent(itemAttribute.attribute(), k -> new ArrayList<>()).add(itemAttribute.uuid());
+			}
+		}
+		
+		if (tool != null) {
+			if (slot == EquipmentSlot.MAIN_HAND) {
+				modifiers.computeIfAbsent(Attribute.ATTACK_DAMAGE, k -> new ArrayList<>()).add(ModifierUUID.ATTACK_DAMAGE_MODIFIER_ID);
+				modifiers.computeIfAbsent(Attribute.ATTACK_SPEED, k -> new ArrayList<>()).add(ModifierUUID.ATTACK_SPEED_MODIFIER_ID);
 			}
 		}
 		

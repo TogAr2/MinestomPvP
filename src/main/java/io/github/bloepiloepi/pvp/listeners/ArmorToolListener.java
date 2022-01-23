@@ -47,7 +47,7 @@ public class ArmorToolListener {
 		//Remove previous armor
 		ItemStack previousStack = entity.getEquipment(slot);
 		ArmorMaterial material = ArmorMaterial.fromMaterial(previousStack.getMaterial());
-		removeAttributeModifiers(entity, ArmorMaterial.getAttributes(material, slot, previousStack, legacy));
+		removeAttributeModifiers(entity, ArmorMaterial.getAttributeIds(material, slot, previousStack));
 		
 		//Add new armor
 		material = ArmorMaterial.fromMaterial(newItem.getMaterial());
@@ -58,22 +58,19 @@ public class ArmorToolListener {
 		//Remove previous attribute modifiers
 		ItemStack previousStack = entity.getEquipment(slot);
 		Tool tool = Tool.fromMaterial(previousStack.getMaterial());
-		removeAttributeModifiers(entity, Tool.getAttributes(tool, slot, previousStack, legacy));
+		removeAttributeModifiers(entity, Tool.getAttributeIds(tool, slot, previousStack));
 		
 		//Add new attribute modifiers
 		tool = Tool.fromMaterial(newItem.getMaterial());
 		addAttributeModifiers(entity, Tool.getAttributes(tool, slot, newItem, legacy));
 	}
 	
-	private static void removeAttributeModifiers(LivingEntity entity, Map<Attribute, List<AttributeModifier>> modifiers) {
-		for (Map.Entry<Attribute, List<AttributeModifier>> entry : modifiers.entrySet()) {
+	private static void removeAttributeModifiers(LivingEntity entity, Map<Attribute, List<UUID>> modifiers) {
+		for (Map.Entry<Attribute, List<UUID>> entry : modifiers.entrySet()) {
 			AttributeInstance attribute = entity.getAttribute(entry.getKey());
 			List<AttributeModifier> toRemove = new ArrayList<>();
 			
-			List<UUID> idsToRemove = new ArrayList<>();
-			for (AttributeModifier modifier : entry.getValue()) {
-				idsToRemove.add(modifier.getId());
-			}
+			List<UUID> idsToRemove = entry.getValue();
 			
 			attribute.getModifiers().forEach((modifier) -> {
 				if (idsToRemove.contains(modifier.getId())) {
