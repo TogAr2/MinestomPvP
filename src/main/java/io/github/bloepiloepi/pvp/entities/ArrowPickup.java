@@ -36,8 +36,8 @@ public class ArrowPickup {
 						if (arrow.isRemoved() || !arrow.canBePickedUp(player))
 							continue;
 						
-						BoundingBox arrowBoundingBox = arrow.getBoundingBox();
-						if (player.getBoundingBox().expand(1, 0.5f, 1).intersect(arrowBoundingBox)) {
+						if (player.getBoundingBox().expand(1, 0.5f, 1)
+								.intersectEntity(player.getPosition(), arrow)) {
 							PickupArrowEvent event = new PickupArrowEvent(player, arrow);
 							EventDispatcher.callCancellable(event, () -> {
 								if (arrow.pickup(player)) {

@@ -1,6 +1,5 @@
 package io.github.bloepiloepi.pvp.potion.item;
 
-import com.google.common.collect.ImmutableList;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffects;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionType;
@@ -15,11 +14,11 @@ public class CustomPotionType {
 	
 	public CustomPotionType(PotionType potionType, Potion... effects) {
 		this.potionType = potionType;
-		this.effects = ImmutableList.copyOf(effects);
+		this.effects = List.of(effects);
 	}
 	
 	public CustomPotionType legacy(Potion... effects) {
-		legacyEffects = ImmutableList.copyOf(effects);
+		legacyEffects = List.of(effects);
 		return this;
 	}
 	
