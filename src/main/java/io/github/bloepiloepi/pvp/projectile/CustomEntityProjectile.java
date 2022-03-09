@@ -218,7 +218,8 @@ public class CustomEntityProjectile extends Entity {
 				remove();
 				return State.Flying;
 			}
-			if (instance.getBlock(pos).isSolid()) {
+			Point blockPos = new Pos(pos.blockX(), pos.blockY(), pos.blockZ());
+			if (instance.getBlock(pos).registry().collisionShape().intersectBox(position.sub(blockPos), getBoundingBox())) {
 				if (shouldTeleport) teleport(pos);
 				return State.StuckInBlock;
 			}
