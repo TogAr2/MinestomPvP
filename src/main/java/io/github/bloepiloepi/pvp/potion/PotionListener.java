@@ -96,24 +96,31 @@ public class PotionListener {
 		});
 		
 		node.addListener(EntityPotionAddEvent.class, event -> {
-			if (!(event.getEntity() instanceof LivingEntity)) return;
+			if (!(event.getEntity() instanceof LivingEntity entity)) return;
+			Map<PotionEffect, Integer> potionMap = durationLeftMap.get(entity.getUuid());
+			if (potionMap == null) {
+				potionMap = new ConcurrentHashMap<>();
+				durationLeftMap.put(entity.getUuid(), potionMap);
+			}
+			potionMap.putIfAbsent(event.getPotion().effect(), event.getPotion().duration() - 1);
 			
 			CustomPotionEffect customPotionEffect = CustomPotionEffects.get(event.getPotion().effect());
-			customPotionEffect.onApplied((LivingEntity) event.getEntity(), event.getPotion().amplifier(), legacy);
+			customPotionEffect.onApplied(entity, event.getPotion().amplifier(), legacy);
 			
-			updatePotionVisibility((LivingEntity) event.getEntity());
+			updatePotionVisibility(entity);
 		});
 		
 		node.addListener(EntityPotionRemoveEvent.class, event -> {
-			if (!(event.getEntity() instanceof LivingEntity)) return;
+			if (!(event.getEntity() instanceof LivingEntity entity)) return;
 			
 			CustomPotionEffect customPotionEffect = CustomPotionEffects.get(event.getPotion().effect());
-			customPotionEffect.onRemoved((LivingEntity) event.getEntity(), event.getPotion().amplifier(), legacy);
+			customPotionEffect.onRemoved(entity, event.getPotion().amplifier(), legacy);
 			
 			//Delay update 1 tick because we need to have the removing effect removed
-			MinecraftServer.getSchedulerManager().buildTask(() ->
-					updatePotionVisibility((LivingEntity) event.getEntity())
-			).delay(1, TimeUnit.SERVER_TICK).schedule();
+			MinecraftServer.getSchedulerManager()
+					.buildTask(() -> updatePotionVisibility(entity))
+					.delay(1, TimeUnit.SERVER_TICK)
+					.schedule();
 		});
 		
 		node.addListener(EntityDeathEvent.class, event ->
