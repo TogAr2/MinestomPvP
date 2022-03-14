@@ -61,6 +61,10 @@ public class PotionListener {
 		node.addListener(EntityTickEvent.class, event -> {
 			if (!(event.getEntity() instanceof LivingEntity entity)) return;
 			Map<PotionEffect, Integer> potionMap = durationLeftMap.get(entity.getUuid());
+			if (potionMap == null) {
+				potionMap = new ConcurrentHashMap<>();
+				durationLeftMap.put(entity.getUuid(), potionMap);
+			}
 			
 			for (TimedPotion potion : entity.getActiveEffects()) {
 				potionMap.putIfAbsent(potion.getPotion().effect(), potion.getPotion().duration() - 1);
