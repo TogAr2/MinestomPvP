@@ -102,7 +102,7 @@ public class PotionListener {
 				potionMap = new ConcurrentHashMap<>();
 				durationLeftMap.put(entity.getUuid(), potionMap);
 			}
-			potionMap.putIfAbsent(event.getPotion().effect(), event.getPotion().duration() - 1);
+			potionMap.put(event.getPotion().effect(), event.getPotion().duration());
 			
 			CustomPotionEffect customPotionEffect = CustomPotionEffects.get(event.getPotion().effect());
 			customPotionEffect.onApplied(entity, event.getPotion().amplifier(), legacy);
