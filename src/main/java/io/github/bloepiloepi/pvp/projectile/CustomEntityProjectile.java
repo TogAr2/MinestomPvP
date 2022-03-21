@@ -175,7 +175,7 @@ public class CustomEntityProjectile extends Entity {
 	}
 	
 	private State guessNextState(Pos posNow) {
-		return getState(posNow, posNow.add(getVelocity().mul(0.06).asPosition()), false);
+		return getState(posNow, posNow.add(getVelocity().mul(0.06)), false);
 	}
 	
 	/**
@@ -219,7 +219,7 @@ public class CustomEntityProjectile extends Entity {
 				return State.Flying;
 			}
 			Point blockPos = new Pos(pos.blockX(), pos.blockY(), pos.blockZ());
-			if (instance.getBlock(pos).registry().collisionShape().intersectBox(position.sub(blockPos), getBoundingBox())) {
+			if (instance.getBlock(pos).registry().collisionShape().intersectBox(pos.sub(blockPos), getBoundingBox())) {
 				if (shouldTeleport) teleport(pos);
 				return State.StuckInBlock;
 			}
