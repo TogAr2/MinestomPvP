@@ -1,6 +1,5 @@
 package io.github.bloepiloepi.pvp.enchantment;
 
-import com.google.common.collect.Lists;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.entities.EntityGroup;
 import io.github.bloepiloepi.pvp.enums.ArmorMaterial;
@@ -53,7 +52,7 @@ public class EnchantmentUtils {
 			return null;
 		}
 		
-		List<Map.Entry<EquipmentSlot, ItemStack>> possibleStacks = Lists.newArrayList();
+		List<Map.Entry<EquipmentSlot, ItemStack>> possibleStacks = new ArrayList<>();
 		
 		for (Map.Entry<EquipmentSlot, ItemStack> entry : equipmentMap.entrySet()) {
 			ItemStack itemStack = entry.getValue();

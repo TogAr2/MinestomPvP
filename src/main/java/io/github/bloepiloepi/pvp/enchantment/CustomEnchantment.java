@@ -1,6 +1,5 @@
 package io.github.bloepiloepi.pvp.enchantment;
 
-import com.google.common.collect.Maps;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.entities.EntityGroup;
 import net.minestom.server.entity.Entity;
@@ -9,6 +8,7 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.item.Enchantment;
 import net.minestom.server.item.ItemStack;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class CustomEnchantment {
@@ -25,7 +25,7 @@ public class CustomEnchantment {
 	}
 	
 	public Map<EquipmentSlot, ItemStack> getEquipment(LivingEntity entity) {
-		Map<EquipmentSlot, ItemStack> map = Maps.newEnumMap(EquipmentSlot.class);
+		Map<EquipmentSlot, ItemStack> map = new HashMap<>();
 		
 		for (EquipmentSlot slot : this.slotTypes) {
 			ItemStack itemStack = entity.getEquipment(slot);

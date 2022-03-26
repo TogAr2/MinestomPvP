@@ -246,7 +246,8 @@ public class AttackManager {
 			float sweepingDamage = 1.0F + EnchantmentUtils.getSweepingMultiplier(player) * damage;
 			BoundingBox boundingBox = target.getBoundingBox().expand(1.0D, 0.25D, 1.0D);
 			Objects.requireNonNull(target.getInstance()).getEntities().stream()
-					.filter(boundingBox::intersect).filter(entity -> entity instanceof LivingEntity)
+					.filter(entity -> boundingBox.intersectEntity(target.getPosition(), entity))
+					.filter(entity -> entity instanceof LivingEntity)
 					.map(entity -> (LivingEntity) entity).forEach(entity -> {
 						if (entity == target) return;
 						if (entity == player) return;

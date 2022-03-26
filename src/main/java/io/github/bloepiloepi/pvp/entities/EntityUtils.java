@@ -215,7 +215,7 @@ public class EntityUtils {
 	}
 	
 	public static double getBodyY(Entity entity, double heightScale) {
-		return entity.getPosition().y() + entity.getBoundingBox().getHeight() * heightScale;
+		return entity.getPosition().y() + entity.getBoundingBox().height() * heightScale;
 	}
 	
 	public static boolean hasPotionEffect(LivingEntity entity, PotionEffect effect) {

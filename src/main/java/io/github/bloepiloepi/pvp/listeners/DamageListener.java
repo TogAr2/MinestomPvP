@@ -41,12 +41,6 @@ public class DamageListener {
 	public static EventNode<EntityEvent> events(boolean legacy) {
 		EventNode<EntityEvent> node = EventNode.type((legacy ? "legacy-" : "") + "damage-events", EventFilter.ENTITY);
 		
-		node.addListener(PlayerTickEvent.class, event -> {
-			if (Tracker.hungerManager.containsKey(event.getPlayer().getUuid())) {
-				Tracker.hungerManager.get(event.getPlayer().getUuid()).update(legacy);
-			}
-		});
-		
 		node.addListener(EventListener.builder(EntityDamageEvent.class)
 				.handler(event -> handleEntityDamage(event, legacy))
 				.build());

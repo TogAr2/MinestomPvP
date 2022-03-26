@@ -72,7 +72,8 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 	private void applySplash(List<Potion> potions, @Nullable Entity hitEntity) {
 		BoundingBox boundingBox = getBoundingBox().expand(8.0D, 4.0D, 8.0D);
 		List<LivingEntity> entities = Objects.requireNonNull(getInstance()).getEntities().stream()
-				.filter(boundingBox::intersect).filter(entity -> entity instanceof LivingEntity)
+				.filter(entity -> boundingBox.intersectEntity(getPosition(), entity))
+				.filter(entity -> entity instanceof LivingEntity)
 				.map(entity -> (LivingEntity) entity).collect(Collectors.toList());
 		
 		if (hitEntity instanceof LivingEntity && !entities.contains(hitEntity))

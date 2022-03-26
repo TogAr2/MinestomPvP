@@ -26,6 +26,12 @@ public class FoodListener {
 	public static EventNode<PlayerEvent> events(boolean legacy) {
 		EventNode<PlayerEvent> node = EventNode.type("food-events", EventFilter.PLAYER);
 		
+		node.addListener(PlayerTickEvent.class, event -> {
+			if (Tracker.hungerManager.containsKey(event.getPlayer().getUuid())) {
+				Tracker.hungerManager.get(event.getPlayer().getUuid()).update(legacy);
+			}
+		});
+		
 		node.addListener(EventListener.builder(PlayerPreEatEvent.class).handler(event -> {
 			FoodComponent foodComponent = FoodComponents.fromMaterial(event.getFoodItem().getMaterial());
 			

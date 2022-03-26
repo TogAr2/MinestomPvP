@@ -21,6 +21,8 @@ import net.minestom.server.event.entity.EntityDeathEvent;
 import net.minestom.server.event.entity.EntityPotionAddEvent;
 import net.minestom.server.event.entity.EntityPotionRemoveEvent;
 import net.minestom.server.event.entity.EntityTickEvent;
+import net.minestom.server.event.instance.AddEntityToInstanceEvent;
+import net.minestom.server.event.instance.RemoveEntityFromInstanceEvent;
 import net.minestom.server.event.player.PlayerEatEvent;
 import net.minestom.server.event.player.PlayerPreEatEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
@@ -43,55 +45,82 @@ import java.util.stream.Collectors;
 public class PotionListener {
 	private static final ItemStack GLASS_BOTTLE = ItemStack.of(Material.GLASS_BOTTLE);
 	
-	private static final Map<TimedPotion, Integer> durationLeftMap = new ConcurrentHashMap<>();
+	private static final Map<UUID, Map<PotionEffect, Integer>> durationLeftMap = new ConcurrentHashMap<>();
 	
 	public static EventNode<EntityEvent> events(boolean legacy) {
 		EventNode<EntityEvent> node = EventNode.type("potion-events", EventFilter.ENTITY);
 		
+		node.addListener(AddEntityToInstanceEvent.class, event -> {
+			if (event.getEntity() instanceof LivingEntity)
+				durationLeftMap.put(event.getEntity().getUuid(), new ConcurrentHashMap<>());
+		});
+		
+		node.addListener(RemoveEntityFromInstanceEvent.class, event ->
+				durationLeftMap.remove(event.getEntity().getUuid()));
+		
 		node.addListener(EntityTickEvent.class, event -> {
-			if (!(event.getEntity() instanceof LivingEntity)) return;
-			
-			Entity entity = event.getEntity();
+			if (!(event.getEntity() instanceof LivingEntity entity)) return;
+			Map<PotionEffect, Integer> potionMap = durationLeftMap.get(entity.getUuid());
+			if (potionMap == null) {
+				potionMap = new ConcurrentHashMap<>();
+				durationLeftMap.put(entity.getUuid(), potionMap);
+			}
 			
 			for (TimedPotion potion : entity.getActiveEffects()) {
-				durationLeftMap.putIfAbsent(potion, potion.getPotion().duration() - 1);
-				int durationLeft = durationLeftMap.get(potion);
+				potionMap.putIfAbsent(potion.getPotion().effect(), potion.getPotion().duration() - 1);
+				int durationLeft = potionMap.get(potion.getPotion().effect());
 				
 				if (durationLeft > 0) {
 					CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.getPotion().effect());
 					byte amplifier = potion.getPotion().amplifier();
 					
 					if (customPotionEffect.canApplyUpdateEffect(durationLeft, amplifier)) {
-						customPotionEffect.applyUpdateEffect((LivingEntity) entity, amplifier, legacy);
+						customPotionEffect.applyUpdateEffect(entity, amplifier, legacy);
 					}
 					
-					durationLeftMap.put(potion, durationLeft - 1);
+					potionMap.put(potion.getPotion().effect(), durationLeft - 1);
 				}
 			}
 			
 			//TODO keep track of underlying potions with longer duration
-			durationLeftMap.keySet().removeIf(potion -> !entity.getActiveEffects().contains(potion));
+			if (potionMap.size() != entity.getActiveEffects().size()) {
+				List<PotionEffect> toRemove = new ArrayList<>();
+				for (PotionEffect effect : potionMap.keySet()) {
+					if (!EntityUtils.hasPotionEffect(entity, effect))
+						toRemove.add(effect);
+				}
+				for (PotionEffect effect : toRemove) {
+					potionMap.remove(effect);
+				}
+			}
 		});
 		
 		node.addListener(EntityPotionAddEvent.class, event -> {
-			if (!(event.getEntity() instanceof LivingEntity)) return;
+			if (!(event.getEntity() instanceof LivingEntity entity)) return;
+			Map<PotionEffect, Integer> potionMap = durationLeftMap.get(entity.getUuid());
+			if (potionMap == null) {
+				potionMap = new ConcurrentHashMap<>();
+				durationLeftMap.put(entity.getUuid(), potionMap);
+			}
+			potionMap.put(event.getPotion().effect(), event.getPotion().duration());
 			
 			CustomPotionEffect customPotionEffect = CustomPotionEffects.get(event.getPotion().effect());
-			customPotionEffect.onApplied((LivingEntity) event.getEntity(), event.getPotion().amplifier(), legacy);
+			customPotionEffect.onApplied(entity, event.getPotion().amplifier(), legacy);
 			
-			updatePotionVisibility((LivingEntity) event.getEntity());
+			updatePotionVisibility(entity);
 		});
 		
 		node.addListener(EntityPotionRemoveEvent.class, event -> {
-			if (!(event.getEntity() instanceof LivingEntity)) return;
+			if (!(event.getEntity() instanceof LivingEntity entity)) return;
 			
 			CustomPotionEffect customPotionEffect = CustomPotionEffects.get(event.getPotion().effect());
-			customPotionEffect.onRemoved((LivingEntity) event.getEntity(), event.getPotion().amplifier(), legacy);
+			customPotionEffect.onRemoved(entity, event.getPotion().amplifier(), legacy);
 			
 			//Delay update 1 tick because we need to have the removing effect removed
-			MinecraftServer.getSchedulerManager().buildTask(() ->
-					updatePotionVisibility((LivingEntity) event.getEntity())
-			).delay(1, TimeUnit.SERVER_TICK).schedule();
+			MinecraftServer.getSchedulerManager()
+					.buildTask(() -> updatePotionVisibility(entity))
+					.delay(1, TimeUnit.SERVER_TICK)
+					.schedule();
 		});
 		
 		node.addListener(EntityDeathEvent.class, event ->
@@ -277,8 +306,7 @@ public class PotionListener {
 								customPotion.isAmbient(),
 								customPotion.showParticles(),
 								customPotion.showIcon()
-						)))
-				.collect(Collectors.toList()));
+						))).toList());
 		
 		return potions;
 	}

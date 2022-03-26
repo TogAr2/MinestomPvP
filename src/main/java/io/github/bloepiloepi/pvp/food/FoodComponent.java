@@ -1,12 +1,12 @@
 package io.github.bloepiloepi.pvp.food;
 
-import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.Pair;
 import net.minestom.server.entity.Player;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.potion.Potion;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -92,7 +92,7 @@ public class FoodComponent {
 		private boolean drink;
 		private Material turnsInto;
 		private BiConsumer<Player, ItemStack> onEat;
-		private final List<Pair<Potion, Float>> statusEffects = Lists.newArrayList();
+		private final List<Pair<Potion, Float>> statusEffects = new ArrayList<>();
 		
 		public FoodComponent.Builder hunger(int hunger) {
 			this.hunger = hunger;
