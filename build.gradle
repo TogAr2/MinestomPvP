@@ -23,8 +23,8 @@ java {
 }
 
 dependencies {
-    compileOnly 'com.github.Minestom:Minestom:3fbdf4f22a'
-    testImplementation 'com.github.Minestom:Minestom:3fbdf4f22a'
+    compileOnly 'com.github.Minestom:Minestom:4e6c92e2c5'
+    testImplementation 'com.github.Minestom:Minestom:4e6c92e2c5'
 }
 
 publishing {
