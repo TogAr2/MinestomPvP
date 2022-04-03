@@ -24,7 +24,7 @@ public class PickupArrowEvent implements EntityInstanceEvent, CancellableEvent {
 	}
 	
 	@NotNull
-	public LivingEntity getPlayer() {
+	public Player getPlayer() {
 		return player;
 	}
 	
