@@ -250,10 +250,12 @@ public class DamageListener {
 			
 			if (totem) {
 				event.setCancelled(true);
-			} else if (hurtSoundAndAnimation) {
-				//Death sound
-				sound = type.getDeathSound(entity);
+			} else {
 				death = true;
+				if (hurtSoundAndAnimation) {
+					//Death sound
+					sound = type.getDeathSound(entity);
+				}
 			}
 		} else if (hurtSoundAndAnimation) {
 			//Damage sound
