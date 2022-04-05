@@ -3,15 +3,22 @@ package io.github.bloepiloepi.pvp.entities;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.collision.CollisionUtils;
 import net.minestom.server.collision.PhysicsResult;
+import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
+import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.instance.Chunk;
+import net.minestom.server.network.packet.server.play.*;
 import net.minestom.server.network.player.PlayerConnection;
+import net.minestom.server.utils.PacketUtils;
 import net.minestom.server.utils.chunk.ChunkUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -113,5 +120,62 @@ public class CustomPlayer extends Player {
 		if (hasVelocity || gravityTickCount > 0) {
 			sendPacketToViewers(getVelocityPacket());
 		}
+	}
+	
+	private static Method refreshCoordinate = null;
+	private static Field lastAbsoluteSynchronizationTime = null;
+	
+	static {
+		try {
+			refreshCoordinate = Entity.class.getDeclaredMethod("refreshCoordinate", Point.class);
+			lastAbsoluteSynchronizationTime = Entity.class.getDeclaredField("lastAbsoluteSynchronizationTime");
+			refreshCoordinate.setAccessible(true);
+			lastAbsoluteSynchronizationTime.setAccessible(true);
+		} catch (NoSuchMethodException | NoSuchFieldException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void refreshPosition(@NotNull final Pos newPosition, boolean ignoreView) {
+		final var previousPosition = this.position;
+		final Pos position = ignoreView ? previousPosition.withCoord(newPosition) : newPosition;
+		if (position.equals(lastSyncedPosition)) return;
+		this.position = position;
+		this.previousPosition = previousPosition;
+		if (!position.samePoint(previousPosition)) {
+			try {
+				refreshCoordinate.invoke(this, position);
+			} catch (IllegalAccessException | InvocationTargetException e) {
+				e.printStackTrace();
+			}
+		}
+		// Update viewers
+		final boolean viewChange = !position.sameView(lastSyncedPosition);
+		final double distanceX = Math.abs(position.x() - lastSyncedPosition.x());
+		final double distanceY = Math.abs(position.y() - lastSyncedPosition.y());
+		final double distanceZ = Math.abs(position.z() - lastSyncedPosition.z());
+		final boolean positionChange = (distanceX + distanceY + distanceZ) > 0;
+		
+		final Chunk chunk = getChunk();
+		assert chunk != null;
+		if (distanceX > 8 || distanceY > 8 || distanceZ > 8) {
+			PacketUtils.prepareViewablePacket(chunk, new EntityTeleportPacket(getEntityId(), position, isOnGround()), this);
+			try {
+				lastAbsoluteSynchronizationTime.set(this, System.currentTimeMillis());
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
+		} else if (positionChange && viewChange) {
+			PacketUtils.prepareViewablePacket(chunk, EntityPositionAndRotationPacket.getPacket(getEntityId(), position,
+					lastSyncedPosition, isOnGround()), this);
+			// Fix head rotation
+			PacketUtils.prepareViewablePacket(chunk, new EntityHeadLookPacket(getEntityId(), position.yaw()), this);
+		} else if (positionChange) {
+			PacketUtils.prepareViewablePacket(chunk, EntityPositionPacket.getPacket(getEntityId(), position, lastSyncedPosition, onGround), this);
+		} else if (viewChange) {
+			PacketUtils.prepareViewablePacket(chunk, new EntityHeadLookPacket(getEntityId(), position.yaw()), this);
+			PacketUtils.prepareViewablePacket(chunk, new EntityRotationPacket(getEntityId(), position.yaw(), position.pitch(), onGround), this);
+		}
+		this.lastSyncedPosition = position;
 	}
 }
