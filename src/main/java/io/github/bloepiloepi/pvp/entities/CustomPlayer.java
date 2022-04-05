@@ -12,6 +12,7 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.instance.Chunk;
 import net.minestom.server.network.packet.server.play.*;
 import net.minestom.server.network.player.PlayerConnection;
+import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.utils.PacketUtils;
 import net.minestom.server.utils.chunk.ChunkUtils;
 import org.jetbrains.annotations.NotNull;
@@ -36,6 +37,24 @@ public class CustomPlayer extends Player {
 		
 		customVelocityTick();
 		super.tick(time);
+	}
+	
+	protected double getJumpVelocity() {
+		return 0.42;
+	}
+	
+	public double getJumpBoostVelocityModifier() {
+		return EntityUtils.hasEffect(this, PotionEffect.JUMP_BOOST) ?
+				(0.1 * (EntityUtils.getEffect(this, PotionEffect.JUMP_BOOST).amplifier() + 1)) : 0.0;
+	}
+	
+	public void jump() {
+		double yVel = this.getJumpVelocity() + this.getJumpBoostVelocityModifier();
+		velocity = velocity.withY(yVel);
+		if (this.isSprinting()) {
+			double angle = position.yaw() * (Math.PI / 180);
+			velocity = velocity.add(-Math.sin(angle) * 0.2, 0, Math.cos(angle) * 0.2);
+		}
 	}
 	
 	private void customVelocityTick() {
