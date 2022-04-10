@@ -143,9 +143,9 @@ public class CustomPlayer extends Player {
 			
 			if (EntityUtils.hasEffect(this, PotionEffect.LEVITATION)) {
 				velocity = velocity.withY(
-						(0.05 * (double)
+						((0.05 * (double)
 								(EntityUtils.getEffect(this, PotionEffect.LEVITATION).amplifier() + 1)
-						- (velocity.y() / tps)) * 0.2
+						- (velocity.y() / tps)) * 0.2) * tps
 				);
 			}
 		}
