@@ -69,9 +69,14 @@ public class CustomPlayer extends Player {
 		}
 		final float tps = MinecraftServer.TICK_PER_SECOND;
 		final Vec currentVelocity = getVelocity();
+		
+		double gravity = ((noGravity || isFlying()) ? 0 : gravityAcceleration);
+		if (currentVelocity.y() < 0 && EntityUtils.hasEffect(this, PotionEffect.SLOW_FALLING))
+			gravity = 0.01;
+		
 		final Vec deltaPos = new Vec(
 				currentVelocity.x() / tps,
-				currentVelocity.y() / tps - (noGravity ? 0 : gravityAcceleration),
+				currentVelocity.y() / tps - gravity,
 				currentVelocity.z() / tps
 		);
 		
@@ -130,11 +135,19 @@ public class CustomPlayer extends Player {
 					// Apply drag
 					.apply((x, y, z) -> new Vec(
 							x * drag,
-							!noGravity ? y * (1 - gravityDragPerTick) : y,
+							!noGravity ? y * (isFlying() ? 0.6 : (1 - gravityDragPerTick)) : y,
 							z * drag
 					))
 					// Prevent infinitely decreasing velocity
 					.apply(Vec.Operator.EPSILON);
+			
+			if (EntityUtils.hasEffect(this, PotionEffect.LEVITATION)) {
+				velocity = velocity.withY(
+						(0.05 * (double)
+								(EntityUtils.getEffect(this, PotionEffect.LEVITATION).amplifier() + 1)
+						- (velocity.y() / tps)) * 0.2
+				);
+			}
 		}
 		// Verify if velocity packet has to be sent
 		if (hasVelocity || gravityTickCount > 0) {
