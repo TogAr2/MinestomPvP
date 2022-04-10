@@ -49,11 +49,12 @@ public class CustomPlayer extends Player {
 	}
 	
 	public void jump() {
+		int tps = MinecraftServer.TICK_PER_SECOND;
 		double yVel = this.getJumpVelocity() + this.getJumpBoostVelocityModifier();
-		velocity = velocity.withY(yVel);
+		velocity = velocity.withY(yVel * tps);
 		if (this.isSprinting()) {
 			double angle = position.yaw() * (Math.PI / 180);
-			velocity = velocity.add(-Math.sin(angle) * 0.2, 0, Math.cos(angle) * 0.2);
+			velocity = velocity.add(-Math.sin(angle) * 0.2 * tps, 0, Math.cos(angle) * 0.2 * tps);
 		}
 	}
 	
