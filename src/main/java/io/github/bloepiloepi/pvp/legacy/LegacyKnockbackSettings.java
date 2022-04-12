@@ -14,7 +14,7 @@ public record LegacyKnockbackSettings(double horizontal, double vertical,
 	
 	public LegacyKnockbackSettings(double horizontal, double vertical, double verticalLimit,
 	                               double extraHorizontal, double extraVertical) {
-		double tps = MinecraftServer.TICK_PER_SECOND * 0.8;
+		int tps = MinecraftServer.TICK_PER_SECOND;
 		this.horizontal = horizontal * tps;
 		this.vertical = vertical * tps;
 		this.verticalLimit = verticalLimit * tps;

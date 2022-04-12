@@ -88,10 +88,10 @@ public class PvpTest {
 				event -> event.getPlayer().setNoGravity(false));
 		
 		LegacyKnockbackSettings settings = LegacyKnockbackSettings.builder()
-				.horizontal(0.4)
+				.horizontal(0.35)
 				.vertical(0.4)
 				.verticalLimit(0.4)
-				.extraHorizontal(0.48)
+				.extraHorizontal(0.45)
 				.extraVertical(0.1)
 				.build();
 		MinecraftServer.getGlobalEventHandler().addListener(LegacyKnockbackEvent.class,
