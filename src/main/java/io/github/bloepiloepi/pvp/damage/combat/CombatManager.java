@@ -75,8 +75,7 @@ public class CombatManager {
 		recheckStatus();
 		prepareForDamage();
 		
-		//TODO falldistance
-		CombatEntry entry = new CombatEntry(damageType, damage, nextFallLocation, 0);
+		CombatEntry entry = new CombatEntry(damageType, damage, nextFallLocation, Tracker.fallDistance.get(player.getUuid()));
 		entries.add(entry);
 		
 		lastDamageTime = System.currentTimeMillis();
@@ -163,13 +162,13 @@ public class CombatManager {
 		CombatEntry mostDamageEntry = null;
 		CombatEntry highestFallEntry = null;
 		float mostDamage = 0.0F;
-		float highestFall = 0.0F;
+		double highestFall = 0.0F;
 		
 		for (int i = 0; i < entries.size(); i++) {
 			CombatEntry entry = entries.get(i);
 			
 			if ((entry.damageType() == CustomDamageType.FALL || entry.damageType().isOutOfWorld())
-					&& entry.getFallDistance() > 0.0F && (mostDamageEntry == null || entry.getFallDistance() > highestFall)) {
+					&& entry.getFallDistance() > 0.0 && (mostDamageEntry == null || entry.getFallDistance() > highestFall)) {
 				if (i > 0) {
 					mostDamageEntry = entries.get(i - 1);
 				} else {
@@ -185,7 +184,7 @@ public class CombatManager {
 			}
 		}
 		
-		if (highestFall > 5.0F && mostDamageEntry != null) {
+		if (highestFall > 5.0 && mostDamageEntry != null) {
 			return mostDamageEntry;
 		} else if (mostDamage > 5.0F) {
 			return highestFallEntry;

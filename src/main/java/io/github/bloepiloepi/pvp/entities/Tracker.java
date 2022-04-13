@@ -37,6 +37,7 @@ public class Tracker {
 	public static final Map<UUID, ItemStack> blockReplacementItem = new HashMap<>();
 	public static final Map<UUID, Boolean> blockingSword = new HashMap<>();
 	public static final Map<UUID, Long> lastSwingTime = new HashMap<>();
+	public static final Map<UUID, Double> fallDistance = new HashMap<>();
 	
 	public static <K> void increaseInt(Map<K, Integer> map, K key, int amount) {
 		map.put(key, map.getOrDefault(key, 0) + amount);
@@ -78,6 +79,7 @@ public class Tracker {
 		});
 	}
 	
+	@SuppressWarnings("UnstableApiUsage")
 	public static void onCooldown(Player player, Material material, int duration) {
 		player.getPlayerConnection().sendPacket(new SetCooldownPacket(material.id(), duration));
 	}
@@ -98,6 +100,7 @@ public class Tracker {
 			Tracker.combatManager.put(uuid, new CombatManager(event.getPlayer()));
 			Tracker.blockingSword.put(uuid, false);
 			Tracker.lastSwingTime.put(uuid, 0L);
+			Tracker.fallDistance.put(uuid, 0.0);
 		});
 		
 		node.addListener(PlayerDisconnectEvent.class, event -> {
@@ -119,6 +122,7 @@ public class Tracker {
 			Tracker.blockReplacementItem.remove(uuid);
 			Tracker.blockingSword.remove(uuid);
 			Tracker.lastSwingTime.remove(uuid);
+			Tracker.fallDistance.remove(uuid);
 		});
 		
 		node.addListener(PlayerTickEvent.class, event -> {
@@ -174,6 +178,7 @@ public class Tracker {
 			if (EntityUtils.isClimbing(player)) {
 				lastClimbedBlock.put(player.getUuid(), Objects.requireNonNull(player.getInstance())
 						.getBlock(player.getPosition()));
+				fallDistance.put(player.getUuid(), 0.0);
 			}
 		});
 		
