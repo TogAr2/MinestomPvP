@@ -100,16 +100,16 @@ public class CombatManager {
 		CombatEntry lastEntry = entries.get(entries.size() - 1);
 		
 		boolean fall = false;
-		if (lastEntry.getDamageType() == CustomDamageType.FALL) {
+		if (lastEntry.damageType() == CustomDamageType.FALL) {
 			heaviestFall = getHeaviestFall();
 			fall = heaviestFall != null;
 		}
 		
 		if (!fall) {
-			return lastEntry.getDamageType().getDeathMessage(player);
+			return lastEntry.damageType().getDeathMessage(player);
 		}
 		
-		if (heaviestFall.getDamageType() == CustomDamageType.FALL || heaviestFall.getDamageType() == CustomDamageType.OUT_OF_WORLD) {
+		if (heaviestFall.damageType() == CustomDamageType.FALL || heaviestFall.damageType() == CustomDamageType.OUT_OF_WORLD) {
 			return Component.translatable("death.fell.accident." + heaviestFall.getMessageFallLocation(), getEntityName());
 		}
 		
@@ -143,12 +143,12 @@ public class CombatManager {
 		
 		for (CombatEntry entry : entries) {
 			Entity attacker = entry.getAttacker();
-			if (attacker instanceof Player && (player == null || entry.getDamage() > playerDamage)) {
+			if (attacker instanceof Player && (player == null || entry.damage() > playerDamage)) {
 				player = (Player) attacker;
-				playerDamage = entry.getDamage();
-			} else if (attacker instanceof LivingEntity && (entity == null || entry.getDamage() <= livingDamage)) {
+				playerDamage = entry.damage();
+			} else if (attacker instanceof LivingEntity && (entity == null || entry.damage() <= livingDamage)) {
 				entity = (LivingEntity) attacker;
-				livingDamage = entry.getDamage();
+				livingDamage = entry.damage();
 			}
 		}
 		
@@ -168,7 +168,7 @@ public class CombatManager {
 		for (int i = 0; i < entries.size(); i++) {
 			CombatEntry entry = entries.get(i);
 			
-			if ((entry.getDamageType() == CustomDamageType.FALL || entry.getDamageType().isOutOfWorld())
+			if ((entry.damageType() == CustomDamageType.FALL || entry.damageType().isOutOfWorld())
 					&& entry.getFallDistance() > 0.0F && (mostDamageEntry == null || entry.getFallDistance() > highestFall)) {
 				if (i > 0) {
 					mostDamageEntry = entries.get(i - 1);
@@ -179,15 +179,15 @@ public class CombatManager {
 				highestFall = entry.getFallDistance();
 			}
 			
-			if (entry.getFallLocation() != null && (highestFallEntry == null || entry.getDamage() > mostDamage)) {
+			if (entry.fallLocation() != null && (highestFallEntry == null || entry.damage() > mostDamage)) {
 				highestFallEntry = entry;
-				mostDamage = entry.getDamage();
+				mostDamage = entry.damage();
 			}
 		}
 		
 		if (highestFall > 5.0F && mostDamageEntry != null) {
 			return mostDamageEntry;
-		} else if (mostDamage > 5.0F && highestFallEntry != null) {
+		} else if (mostDamage > 5.0F) {
 			return highestFallEntry;
 		} else {
 			return null;
@@ -224,10 +224,12 @@ public class CombatManager {
 		return EntityUtils.getName(player);
 	}
 	
+	@SuppressWarnings("UnstableApiUsage")
 	private void onEnterCombat() {
 		player.getPlayerConnection().sendPacket(new EnterCombatEventPacket());
 	}
 	
+	@SuppressWarnings("UnstableApiUsage")
 	private void onLeaveCombat() {
 		int duration = (int) (getCombatDuration() / MinecraftServer.TICK_MS);
 		player.getPlayerConnection().sendPacket(new EndCombatEventPacket(duration, getKillerId()));
