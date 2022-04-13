@@ -182,6 +182,8 @@ public class Tracker {
 			}
 		});
 		
+		node.addListener(PlayerSpawnEvent.class, event -> fallDistance.put(event.getPlayer().getUuid(), 0.0));
+		
 		node.addListener(EntityFireEvent.class, event ->
 				Tracker.fireExtinguishTime.put(event.getEntity().getUuid(),
 						System.currentTimeMillis() + event.getFireTime(TimeUnit.MILLISECOND)));
