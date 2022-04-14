@@ -56,6 +56,11 @@ public class DamageListener {
 			double dy = event.getNewPosition().y() - player.getPosition().y();
 			Double fallDistance = Tracker.fallDistance.get(player.getUuid());
 			
+			if (player.isFlying()) {
+				Tracker.fallDistance.put(player.getUuid(), 0.0);
+				return;
+			}
+			
 			//TODO fix onGround
 			if (fallDistance > 3.0 && player.isOnGround()) {
 				Block block = Objects.requireNonNull(player.getInstance()).getBlock(getLandingPos(player, event.getNewPosition()));
