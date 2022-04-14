@@ -2,6 +2,7 @@ package io.github.bloepiloepi.pvp.projectile;
 
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
+import io.github.bloepiloepi.pvp.entities.Tracker;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
@@ -53,13 +54,12 @@ public class ThrownEnderpearl extends CustomEntityProjectile implements ItemHold
 				}
 				
 				player.teleport(position);
-				//TODO set falldistance to 0
+				Tracker.fallDistance.put(player.getUuid(), 0.0);
 				
 				player.damage(CustomDamageType.FALL, 5.0F);
 			}
 		} else if (shooter != null) {
 			shooter.teleport(position);
-			//TODO set falldistance to 0
 		}
 	}
 	
