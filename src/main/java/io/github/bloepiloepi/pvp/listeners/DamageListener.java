@@ -309,6 +309,9 @@ public class DamageListener {
 						entity.setVelocity(newVelocity);
 					});
 				}
+			} else if (type != CustomDamageType.DROWN && (!shield || amount > 0.0F)) {
+				// Update velocity
+				entity.setVelocity(entity.getVelocity());
 			}
 		}
 		
