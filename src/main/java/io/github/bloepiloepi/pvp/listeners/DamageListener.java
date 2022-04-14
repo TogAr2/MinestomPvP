@@ -76,9 +76,6 @@ public class DamageListener {
 			}
 			
 			if (player.isOnGround()) {
-				if (fallDistance > 0) {
-					System.out.println("fallDistance " + fallDistance);
-				}
 				Tracker.fallDistance.put(player.getUuid(), 0.0);
 				
 				if (!player.getGameMode().canTakeDamage()) return;
@@ -87,7 +84,6 @@ public class DamageListener {
 					SoundEvent sound = damage > 4 ? SoundEvent.ENTITY_PLAYER_BIG_FALL : SoundEvent.ENTITY_PLAYER_SMALL_FALL;
 					SoundManager.sendToAround(player, player, sound, Sound.Source.PLAYER, 1.0f, 1.0f);
 					
-					System.out.println("damage " + damage);
 					player.damage(CustomDamageType.FALL, damage);
 				}
 			} else if (dy < 0) {
