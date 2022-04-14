@@ -56,7 +56,7 @@ public class DamageListener {
 			double dy = event.getNewPosition().y() - player.getPosition().y();
 			Double fallDistance = Tracker.fallDistance.get(player.getUuid());
 			
-			if (player.isFlying()) {
+			if (player.isFlying() || dy > 0) {
 				Tracker.fallDistance.put(player.getUuid(), 0.0);
 				return;
 			}
