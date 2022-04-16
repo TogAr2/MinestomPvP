@@ -108,8 +108,8 @@ public class FishingBobber extends CustomEntityProjectile {
 	}
 	
 	private boolean shouldStopFishing(Player player) {
-		boolean main = player.getItemInMainHand().getMaterial() == Material.FISHING_ROD;
-		boolean off = player.getItemInOffHand().getMaterial() == Material.FISHING_ROD;
+		boolean main = player.getItemInMainHand().material() == Material.FISHING_ROD;
+		boolean off = player.getItemInOffHand().material() == Material.FISHING_ROD;
 		if (player.isRemoved() || player.isDead() || (!main && !off)
 				|| (!legacy && getDistanceSquared(player) > 1024)) {
 			setOwnerEntity(null);

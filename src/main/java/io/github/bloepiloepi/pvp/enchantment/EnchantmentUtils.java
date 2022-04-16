@@ -22,7 +22,7 @@ public class EnchantmentUtils {
 	
 	public static short getLevel(Enchantment enchantment, ItemStack stack) {
 		if (stack.isAir()) return 0;
-		Map<Enchantment, Short> enchantmentMap = stack.getMeta().getEnchantmentMap();
+		Map<Enchantment, Short> enchantmentMap = stack.meta().getEnchantmentMap();
 		if (enchantmentMap.containsKey(enchantment)) return (short) MathUtils.clamp(enchantmentMap.get(enchantment), 0, 255);
 		return 0;
 	}
@@ -68,11 +68,11 @@ public class EnchantmentUtils {
 	
 	private static void forEachEnchantment(BiConsumer<CustomEnchantment, Short> consumer, ItemStack stack) {
 		if (!stack.isAir()) {
-			Set<Enchantment> enchantments = stack.getMeta().getEnchantmentMap().keySet();
+			Set<Enchantment> enchantments = stack.meta().getEnchantmentMap().keySet();
 			
 			for(Enchantment enchantment : enchantments) {
 				CustomEnchantment customEnchantment = CustomEnchantments.get(enchantment);
-				consumer.accept(customEnchantment, stack.getMeta().getEnchantmentMap().get(enchantment));
+				consumer.accept(customEnchantment, stack.meta().getEnchantmentMap().get(enchantment));
 			}
 		}
 	}
@@ -103,7 +103,7 @@ public class EnchantmentUtils {
 	
 	public static boolean shouldPreventStackWithUnbreakingDamage(ItemStack item, int unbreakingLevel) {
 		ThreadLocalRandom random = ThreadLocalRandom.current();
-		if (ArmorMaterial.fromMaterial(item.getMaterial()) != null && random.nextFloat() < 0.6F) {
+		if (ArmorMaterial.fromMaterial(item.material()) != null && random.nextFloat() < 0.6F) {
 			return false;
 		} else {
 			return random.nextInt(unbreakingLevel + 1) > 0;

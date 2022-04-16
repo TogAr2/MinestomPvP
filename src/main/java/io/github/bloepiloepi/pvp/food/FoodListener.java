@@ -33,7 +33,7 @@ public class FoodListener {
 		});
 		
 		node.addListener(EventListener.builder(PlayerPreEatEvent.class).handler(event -> {
-			FoodComponent foodComponent = FoodComponents.fromMaterial(event.getFoodItem().getMaterial());
+			FoodComponent foodComponent = FoodComponents.fromMaterial(event.getFoodItem().material());
 			
 			//If no food, or if the players hunger is full and the food is not always edible, cancel
 			if (foodComponent == null || (!event.getPlayer().isCreative()
@@ -43,22 +43,22 @@ public class FoodListener {
 			}
 			
 			event.setEatingTime((long) getUseTime(foodComponent) * MinecraftServer.TICK_MS);
-		}).filter(event -> event.getFoodItem().getMaterial().isFood()
-				&& event.getFoodItem().getMaterial() != Material.POTION)
+		}).filter(event -> event.getFoodItem().material().isFood()
+				&& event.getFoodItem().material() != Material.POTION)
 				.build());
 		
 		node.addListener(EventListener.builder(PlayerEatEvent.class).handler(event -> {
 			Player player = event.getPlayer();
 			ItemStack stack = event.getFoodItem();
-			Tracker.hungerManager.get(player.getUuid()).eat(stack.getMaterial());
+			Tracker.hungerManager.get(player.getUuid()).eat(stack.material());
 			
-			FoodComponent component = FoodComponents.fromMaterial(stack.getMaterial());
+			FoodComponent component = FoodComponents.fromMaterial(stack.material());
 			assert component != null;
 			ThreadLocalRandom random = ThreadLocalRandom.current();
 			
 			triggerEatSounds(player, component);
 			
-			if (!component.isDrink() || event.getFoodItem().getMaterial() == Material.HONEY_BOTTLE) {
+			if (!component.isDrink() || event.getFoodItem().material() == Material.HONEY_BOTTLE) {
 				SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_BURP, Sound.Source.PLAYER,
 						0.5F, random.nextFloat() * 0.1F + 0.9F);
 			}
@@ -75,18 +75,18 @@ public class FoodListener {
 			
 			if (!player.isCreative()) {
 				if (component.hasTurnsInto()) {
-					if (stack.getAmount() == 1) {
+					if (stack.amount() == 1) {
 						player.setItemInHand(event.getHand(), component.getTurnsInto());
 					} else {
-						player.setItemInHand(event.getHand(), stack.withAmount(stack.getAmount() - 1));
+						player.setItemInHand(event.getHand(), stack.withAmount(stack.amount() - 1));
 						player.getInventory().addItemStack(component.getTurnsInto());
 					}
 				} else {
-					event.getPlayer().setItemInHand(event.getHand(), stack.withAmount(stack.getAmount() - 1));
+					event.getPlayer().setItemInHand(event.getHand(), stack.withAmount(stack.amount() - 1));
 				}
 			}
-		}).filter(event -> event.getFoodItem().getMaterial().isFood()
-				&& event.getFoodItem().getMaterial() != Material.POTION).build()); //May also be a potion
+		}).filter(event -> event.getFoodItem().material().isFood()
+				&& event.getFoodItem().material() != Material.POTION).build()); //May also be a potion
 		
 		node.addListener(PlayerTickEvent.class, event -> {
 			Player player = event.getPlayer();
@@ -136,7 +136,7 @@ public class FoodListener {
 	public static void eatSounds(Player player) {
 		ItemStack stack = player.getItemInHand(Objects.requireNonNull(player.getEatingHand()));
 		
-		FoodComponent component = FoodComponents.fromMaterial(stack.getMaterial());
+		FoodComponent component = FoodComponents.fromMaterial(stack.material());
 		
 		long useTime = getUseTime(component);
 		long usedDuration = System.currentTimeMillis() - Tracker.itemUseStartTime.get(player.getUuid());

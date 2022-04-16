@@ -159,13 +159,13 @@ public class Tracker {
 		});
 		
 		node.addListener(PlayerUseItemEvent.class, event -> {
-			if (Tracker.hasCooldown(event.getPlayer(), event.getItemStack().getMaterial())) {
+			if (Tracker.hasCooldown(event.getPlayer(), event.getItemStack().material())) {
 				event.setCancelled(true);
 			}
 		});
 		
 		node.addListener(PlayerPreEatEvent.class, event -> {
-			if (Tracker.hasCooldown(event.getPlayer(), event.getFoodItem().getMaterial())) {
+			if (Tracker.hasCooldown(event.getPlayer(), event.getFoodItem().material())) {
 				event.setCancelled(true);
 			}
 		});

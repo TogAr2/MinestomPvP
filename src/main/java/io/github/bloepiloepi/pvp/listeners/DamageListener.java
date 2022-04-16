@@ -61,8 +61,7 @@ public class DamageListener {
 				return;
 			}
 			
-			//TODO fix onGround
-			if (fallDistance > 3.0 && player.isOnGround()) {
+			if (fallDistance > 3.0 && event.isOnGround()) {
 				Block block = Objects.requireNonNull(player.getInstance()).getBlock(getLandingPos(player, event.getNewPosition()));
 				if (!block.isAir()) {
 					double damageDistance = Math.ceil(fallDistance - 3.0);
@@ -80,7 +79,7 @@ public class DamageListener {
 				}
 			}
 			
-			if (player.isOnGround()) {
+			if (event.isOnGround()) {
 				Tracker.fallDistance.put(player.getUuid(), 0.0);
 				
 				if (!player.getGameMode().canTakeDamage()) return;
@@ -378,14 +377,14 @@ public class DamageListener {
 		
 		for (Player.Hand hand : Player.Hand.values()) {
 			ItemStack stack = entity.getItemInHand(hand);
-			if (stack.getMaterial() == Material.TOTEM_OF_UNDYING) {
+			if (stack.material() == Material.TOTEM_OF_UNDYING) {
 				TotemUseEvent totemUseEvent = new TotemUseEvent(entity, hand);
 				EventDispatcher.call(totemUseEvent);
 				
 				if (totemUseEvent.isCancelled()) continue;
 				
 				hasTotem = true;
-				entity.setItemInHand(hand, stack.withAmount(stack.getAmount() - 1));
+				entity.setItemInHand(hand, stack.withAmount(stack.amount() - 1));
 				break;
 			}
 		}
