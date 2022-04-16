@@ -224,9 +224,9 @@ public class AttackManager {
 				EventDispatcher.callCancellable(legacyKnockbackEvent, () -> {
 					LegacyKnockbackSettings settings = legacyKnockbackEvent.getSettings();
 					target.setVelocity(target.getVelocity().add(
-							-Math.sin(player.getPosition().yaw() * Math.PI / 180.0F) * finalKnockback * settings.getExtraHorizontal(),
-							settings.getExtraVertical(),
-							Math.cos(player.getPosition().yaw() * Math.PI / 180.0F) * finalKnockback * settings.getExtraHorizontal()
+							-Math.sin(player.getPosition().yaw() * Math.PI / 180.0F) * finalKnockback * settings.extraHorizontal(),
+							settings.extraVertical(),
+							Math.cos(player.getPosition().yaw() * Math.PI / 180.0F) * finalKnockback * settings.extraHorizontal()
 					));
 				});
 			}

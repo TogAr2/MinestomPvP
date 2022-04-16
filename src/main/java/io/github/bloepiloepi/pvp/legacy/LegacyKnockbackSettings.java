@@ -14,32 +14,12 @@ public record LegacyKnockbackSettings(double horizontal, double vertical,
 	
 	public LegacyKnockbackSettings(double horizontal, double vertical, double verticalLimit,
 	                               double extraHorizontal, double extraVertical) {
-		int tps = MinecraftServer.TICK_PER_SECOND;
-		this.horizontal = horizontal * tps;
-		this.vertical = vertical * tps;
-		this.verticalLimit = verticalLimit * tps;
-		this.extraHorizontal = extraHorizontal * tps;
-		this.extraVertical = extraVertical * tps;
-	}
-	
-	public double getHorizontal() {
-		return horizontal;
-	}
-	
-	public double getVertical() {
-		return vertical;
-	}
-	
-	public double getVerticalLimit() {
-		return verticalLimit;
-	}
-	
-	public double getExtraHorizontal() {
-		return extraHorizontal;
-	}
-	
-	public double getExtraVertical() {
-		return extraVertical;
+		double multiplier = MinecraftServer.TICK_PER_SECOND;
+		this.horizontal = horizontal * multiplier;
+		this.vertical = vertical * multiplier * 0.8;
+		this.verticalLimit = verticalLimit * multiplier * 0.8;
+		this.extraHorizontal = extraHorizontal * multiplier;
+		this.extraVertical = extraVertical * multiplier * 0.8;
 	}
 	
 	public static Builder builder() {
