@@ -56,8 +56,13 @@ public class DamageListener {
 			double dy = event.getNewPosition().y() - player.getPosition().y();
 			Double fallDistance = Tracker.fallDistance.get(player.getUuid());
 			
-			if (player.isFlying() || dy > 0) {
+			if (player.isFlying() || EntityUtils.hasEffect(player, PotionEffect.LEVITATION)
+					|| EntityUtils.hasEffect(player, PotionEffect.SLOW_FALLING) || dy > 0) {
 				Tracker.fallDistance.put(player.getUuid(), 0.0);
+				return;
+			}
+			if (player.isFlyingWithElytra() && player.getVelocity().y() > -0.5) {
+				Tracker.fallDistance.put(player.getUuid(), 1.0);
 				return;
 			}
 			
