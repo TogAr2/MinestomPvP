@@ -150,7 +150,7 @@ public class AttackManager {
 				Pos previousPosition = (Pos) field.get(player);
 				double lastMoveDistance = previousPosition.distance(player.getPosition()) * 0.6;
 				if (lastMoveDistance < player.getAttributeValue(Attribute.MOVEMENT_SPEED)) {
-					Tool tool = Tool.fromMaterial(player.getItemInMainHand().getMaterial());
+					Tool tool = Tool.fromMaterial(player.getItemInMainHand().material());
 					if (tool != null && tool.isSword()) {
 						sweeping = true;
 					}
@@ -304,7 +304,7 @@ public class AttackManager {
 		EnchantmentUtils.onTargetDamaged(player, target);
 		//TODO target and user damaged should also work when non-player mob attacks (mobs, arrows, trident)
 		
-		Tool tool = Tool.fromMaterial(player.getItemInMainHand().getMaterial());
+		Tool tool = Tool.fromMaterial(player.getItemInMainHand().material());
 		if (tool != null) {
 			ItemUtils.damageEquipment(player, EquipmentSlot.MAIN_HAND, (tool.isSword() || tool == Tool.TRIDENT) ? 1 : 2);
 		}

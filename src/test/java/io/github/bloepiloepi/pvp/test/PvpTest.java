@@ -15,7 +15,6 @@ import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.*;
 import net.minestom.server.extras.lan.OpenToLAN;
-import net.minestom.server.extras.velocity.VelocityProxy;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
@@ -81,11 +80,6 @@ public class PvpTest {
 			event.getPlayer().setPermissionLevel(4);
 			event.getPlayer().addEffect(new Potion(PotionEffect.REGENERATION, (byte) 10, CustomPotionEffect.PERMANENT));
 		});
-		
-		MinecraftServer.getGlobalEventHandler().addListener(PlayerStartFlyingEvent.class,
-				event -> event.getPlayer().setNoGravity(true));
-		MinecraftServer.getGlobalEventHandler().addListener(PlayerStopFlyingEvent.class,
-				event -> event.getPlayer().setNoGravity(false));
 		
 		LegacyKnockbackSettings settings = LegacyKnockbackSettings.builder()
 				.horizontal(0.35)

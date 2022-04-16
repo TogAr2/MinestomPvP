@@ -14,6 +14,8 @@ import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
+import net.minestom.server.coordinate.Point;
+import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
@@ -23,17 +25,21 @@ import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
 import net.minestom.server.event.*;
 import net.minestom.server.event.entity.EntityDamageEvent;
-import net.minestom.server.event.entity.EntityDeathEvent;
-import net.minestom.server.event.player.PlayerTickEvent;
+import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.gamedata.tags.Tag;
+import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.play.SoundEffectPacket;
+import net.minestom.server.particle.Particle;
+import net.minestom.server.particle.ParticleCreator;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.world.Difficulty;
 
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class DamageListener {
@@ -45,7 +51,77 @@ public class DamageListener {
 				.handler(event -> handleEntityDamage(event, legacy))
 				.build());
 		
+		node.addListener(PlayerMoveEvent.class, event -> {
+			Player player = event.getPlayer();
+			double dy = event.getNewPosition().y() - player.getPosition().y();
+			Double fallDistance = Tracker.fallDistance.get(player.getUuid());
+			
+			if (player.isFlying() || dy > 0) {
+				Tracker.fallDistance.put(player.getUuid(), 0.0);
+				return;
+			}
+			
+			if (fallDistance > 3.0 && event.isOnGround()) {
+				Block block = Objects.requireNonNull(player.getInstance()).getBlock(getLandingPos(player, event.getNewPosition()));
+				if (!block.isAir()) {
+					double damageDistance = Math.ceil(fallDistance - 3.0);
+					double d = Math.min(0.2 + damageDistance / 15.0, 2.5);
+					int particleCount = (int) (150 * d);
+					
+					player.sendPacketToViewersAndSelf(ParticleCreator.createParticlePacket(
+							Particle.BLOCK,
+							false,
+							event.getNewPosition().x(), event.getNewPosition().y(), event.getNewPosition().z(),
+							0, 0, 0,
+							0.15f, particleCount,
+							writer -> writer.writeVarInt(block.stateId())
+					));
+				}
+			}
+			
+			if (event.isOnGround()) {
+				Tracker.fallDistance.put(player.getUuid(), 0.0);
+				
+				if (!player.getGameMode().canTakeDamage()) return;
+				int damage = getFallDamage(player, fallDistance);
+				if (damage > 0) {
+					SoundEvent sound = damage > 4 ? SoundEvent.ENTITY_PLAYER_BIG_FALL : SoundEvent.ENTITY_PLAYER_SMALL_FALL;
+					SoundManager.sendToAround(player, player, sound, Sound.Source.PLAYER, 1.0f, 1.0f);
+					
+					player.damage(CustomDamageType.FALL, damage);
+				}
+			} else if (dy < 0) {
+				Tracker.fallDistance.put(player.getUuid(), fallDistance - dy);
+			}
+		});
+		
 		return node;
+	}
+	
+	private static int getFallDamage(Player player, double fallDistance) {
+		float reduce = EntityUtils.hasEffect(player, PotionEffect.JUMP_BOOST)
+				? EntityUtils.getEffect(player, PotionEffect.JUMP_BOOST).amplifier() + 1
+				: 0;
+		return (int) Math.ceil(fallDistance - 3.0 - reduce);
+	}
+	
+	private static Point getLandingPos(Player player, Pos position) {
+		position = position.add(0, -0.2, 0);
+		if (Objects.requireNonNull(player.getInstance()).getBlock(position).isAir()) {
+			position = position.add(0, -1, 0);
+			Block block = player.getInstance().getBlock(position);
+			Tag fences = MinecraftServer.getTagManager().getTag(Tag.BasicType.BLOCKS, "minecraft:fences");
+			Tag walls = MinecraftServer.getTagManager().getTag(Tag.BasicType.BLOCKS, "minecraft:walls");
+			Tag fenceGates = MinecraftServer.getTagManager().getTag(Tag.BasicType.BLOCKS, "minecraft:fence_gates");
+			assert fences != null;
+			assert walls != null;
+			assert fenceGates != null;
+			if (fences.contains(block.namespace()) || walls.contains(block.namespace()) || fenceGates.contains(block.namespace())) {
+				return position;
+			}
+		}
+		
+		return position;
 	}
 	
 	public static void handleEntityDamage(EntityDamageEvent event, boolean legacy) {
@@ -233,6 +309,9 @@ public class DamageListener {
 						entity.setVelocity(newVelocity);
 					});
 				}
+			} else if (type != CustomDamageType.DROWN && (!shield || amount > 0.0F)) {
+				// Update velocity
+				entity.setVelocity(entity.getVelocity());
 			}
 		}
 		
@@ -298,14 +377,14 @@ public class DamageListener {
 		
 		for (Player.Hand hand : Player.Hand.values()) {
 			ItemStack stack = entity.getItemInHand(hand);
-			if (stack.getMaterial() == Material.TOTEM_OF_UNDYING) {
+			if (stack.material() == Material.TOTEM_OF_UNDYING) {
 				TotemUseEvent totemUseEvent = new TotemUseEvent(entity, hand);
 				EventDispatcher.call(totemUseEvent);
 				
 				if (totemUseEvent.isCancelled()) continue;
 				
 				hasTotem = true;
-				entity.setItemInHand(hand, stack.withAmount(stack.getAmount() - 1));
+				entity.setItemInHand(hand, stack.withAmount(stack.amount() - 1));
 				break;
 			}
 		}

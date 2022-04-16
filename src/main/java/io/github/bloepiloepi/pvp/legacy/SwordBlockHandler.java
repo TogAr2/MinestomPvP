@@ -72,14 +72,14 @@ public class SwordBlockHandler {
 	}
 	
 	private static void handleUpdateState(ItemUpdateStateEvent event) {
-		if (event.getHand() == Player.Hand.OFF && event.getItemStack().getMaterial() == Material.SHIELD) {
+		if (event.getHand() == Player.Hand.OFF && event.getItemStack().material() == Material.SHIELD) {
 			unblock(event.getPlayer());
 		}
 	}
 	
 	private static void handleSwapItem(PlayerSwapItemEvent event) {
 		Player player = event.getPlayer();
-		if (player.getItemInOffHand().getMaterial() == Material.SHIELD
+		if (player.getItemInOffHand().material() == Material.SHIELD
 				&& Tracker.blockingSword.get(player.getUuid())) {
 			event.setCancelled(true);
 		}
@@ -87,13 +87,13 @@ public class SwordBlockHandler {
 	
 	private static void handleChangeSlot(PlayerChangeHeldSlotEvent event) {
 		Player player = event.getPlayer();
-		if (player.getItemInOffHand().getMaterial() == Material.SHIELD
+		if (player.getItemInOffHand().material() == Material.SHIELD
 				&& Tracker.blockingSword.get(player.getUuid())) {
 			unblock(player);
 		}
 	}
 	
 	private static boolean isSword(ItemStack stack) {
-		return stack.getMaterial().registry().translationKey().contains("sword");
+		return stack.material().registry().translationKey().contains("sword");
 	}
 }

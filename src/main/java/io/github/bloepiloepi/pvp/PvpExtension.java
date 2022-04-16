@@ -68,7 +68,7 @@ public class PvpExtension extends Extension {
 	
 	/**
 	 * Creates an EventNode with damage events.
-	 * This includes armor, shields and damage invulnerability.
+	 * This includes armor, shields, damage invulnerability, and fall damage.
 	 * (This only reduces damage based on armor attribute,
 	 * to change that attribute for different types of armor you need #armorToolEvents().
 	 *

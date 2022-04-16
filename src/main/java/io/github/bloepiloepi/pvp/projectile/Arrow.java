@@ -25,11 +25,11 @@ import java.util.function.Predicate;
 public class Arrow extends AbstractArrow {
 	public static final ItemStack DEFAULT_ARROW = ItemStack.of(Material.ARROW);
 	public static final Predicate<ItemStack> ARROW_PREDICATE = stack ->
-			stack.getMaterial() == Material.ARROW
-			|| stack.getMaterial() == Material.SPECTRAL_ARROW
-			|| stack.getMaterial() == Material.TIPPED_ARROW;
+			stack.material() == Material.ARROW
+			|| stack.material() == Material.SPECTRAL_ARROW
+			|| stack.material() == Material.TIPPED_ARROW;
 	public static final Predicate<ItemStack> ARROW_OR_FIREWORK_PREDICATE = ARROW_PREDICATE.or(stack ->
-			stack.getMaterial() == Material.FIREWORK_ROCKET);
+			stack.material() == Material.FIREWORK_ROCKET);
 	
 	private final boolean legacy;
 	private PotionMeta potion;
@@ -41,12 +41,12 @@ public class Arrow extends AbstractArrow {
 	}
 	
 	public void inheritEffects(ItemStack stack) {
-		if (stack.getMaterial() == Material.TIPPED_ARROW) {
-			PotionType potionType = ((PotionMeta) stack.getMeta()).getPotionType();
-			List<net.minestom.server.potion.CustomPotionEffect> customEffects =
-					((PotionMeta) stack.getMeta()).getCustomPotionEffects();
+		if (stack.material() == Material.TIPPED_ARROW) {
+			PotionMeta potionMeta = new PotionMeta(stack.meta());
+			PotionType potionType = potionMeta.getPotionType();
+			List<net.minestom.server.potion.CustomPotionEffect> customEffects = potionMeta.getCustomPotionEffects();
+			Color color = potionMeta.getColor();
 			
-			Color color = ((PotionMeta) stack.getMeta()).getColor();
 			if (color == null) {
 				fixedColor = false;
 				if (potionType == PotionType.EMPTY && customEffects.isEmpty()) {
@@ -62,12 +62,12 @@ public class Arrow extends AbstractArrow {
 			
 			PotionMeta.Builder builder = new PotionMeta.Builder().effects(customEffects);
 			if (potionType != null) builder.potionType(potionType);
-			potion = builder.build();
-		} else if (stack.getMaterial() == Material.ARROW) {
+			potion = new PotionMeta(builder);
+		} else if (stack.material() == Material.ARROW) {
 			fixedColor = false;
 			setColor(-1);
 			
-			potion = new PotionMeta.Builder().potionType(PotionType.EMPTY).build();
+			potion = new PotionMeta(new PotionMeta.Builder().potionType(PotionType.EMPTY));
 		}
 	}
 	
@@ -81,7 +81,7 @@ public class Arrow extends AbstractArrow {
 			fixedColor = false;
 			setColor(-1);
 			
-			potion = new PotionMeta.Builder().potionType(PotionType.EMPTY).build();
+			potion = new PotionMeta(new PotionMeta.Builder().potionType(PotionType.EMPTY));
 		}
 	}
 	
@@ -129,9 +129,7 @@ public class Arrow extends AbstractArrow {
 			return DEFAULT_ARROW;
 		}
 		
-		return ItemStack.builder(Material.TIPPED_ARROW).meta(meta0 -> {
-			PotionMeta.Builder meta = (PotionMeta.Builder) meta0;
-			
+		return ItemStack.builder(Material.TIPPED_ARROW).meta(PotionMeta.class, meta -> {
 			if (potion.getPotionType() != null && potion.getPotionType() != PotionType.EMPTY) {
 				meta.potionType(potion.getPotionType());
 			}
@@ -141,8 +139,6 @@ public class Arrow extends AbstractArrow {
 			if (fixedColor) {
 				meta.color(new Color(getColor()));
 			}
-			
-			return meta;
 		}).build();
 	}
 	
