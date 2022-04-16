@@ -92,15 +92,12 @@ public class FinalDamageEvent implements EntityInstanceEvent, CancellableEvent {
 		float remainingDamage = damage;
 		
 		// Additional hearts support
-		if (entity instanceof Player) {
-			final Player player = (Player) entity;
+		if (entity instanceof final Player player) {
 			final float additionalHearts = player.getAdditionalHearts();
 			if (additionalHearts > 0) {
 				if (remainingDamage > additionalHearts) {
 					remainingDamage -= additionalHearts;
-					player.setAdditionalHearts(0);
 				} else {
-					player.setAdditionalHearts(additionalHearts - remainingDamage);
 					remainingDamage = 0;
 				}
 			}

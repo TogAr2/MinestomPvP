@@ -372,7 +372,14 @@ public class DamageListener {
 			}
 		}
 		
-		event.setDamage(amount);
+		// The Minestom damage method should return false if there was no hurt animation,
+		// because otherwise the AttackManager will deal extra knockback
+		if (!event.isCancelled() && !hurtSoundAndAnimation) {
+			event.setCancelled(true);
+			damageManually(entity, event.getDamage());
+		} else {
+			event.setDamage(amount);
+		}
 	}
 	
 	public static boolean totemProtection(LivingEntity entity, CustomDamageType type) {
@@ -470,5 +477,24 @@ public class DamageListener {
 				return amount;
 			}
 		}
+	}
+	
+	public static void damageManually(LivingEntity entity, float damage) {
+		// Additional hearts support
+		if (entity instanceof Player player) {
+			final float additionalHearts = player.getAdditionalHearts();
+			if (additionalHearts > 0) {
+				if (damage > additionalHearts) {
+					damage -= additionalHearts;
+					player.setAdditionalHearts(0);
+				} else {
+					player.setAdditionalHearts(additionalHearts - damage);
+					damage = 0;
+				}
+			}
+		}
+		
+		// Set the final entity health
+		entity.setHealth(entity.getHealth() - damage);
 	}
 }
