@@ -56,8 +56,13 @@ public class DamageListener {
 			double dy = event.getNewPosition().y() - player.getPosition().y();
 			Double fallDistance = Tracker.fallDistance.get(player.getUuid());
 			
-			if (player.isFlying() || dy > 0) {
+			if (player.isFlying() || EntityUtils.hasEffect(player, PotionEffect.LEVITATION)
+					|| EntityUtils.hasEffect(player, PotionEffect.SLOW_FALLING) || dy > 0) {
 				Tracker.fallDistance.put(player.getUuid(), 0.0);
+				return;
+			}
+			if (player.isFlyingWithElytra() && player.getVelocity().y() > -0.5) {
+				Tracker.fallDistance.put(player.getUuid(), 1.0);
 				return;
 			}
 			
@@ -367,7 +372,14 @@ public class DamageListener {
 			}
 		}
 		
-		event.setDamage(amount);
+		// The Minestom damage method should return false if there was no hurt animation,
+		// because otherwise the AttackManager will deal extra knockback
+		if (!event.isCancelled() && !hurtSoundAndAnimation) {
+			event.setCancelled(true);
+			damageManually(entity, event.getDamage());
+		} else {
+			event.setDamage(amount);
+		}
 	}
 	
 	public static boolean totemProtection(LivingEntity entity, CustomDamageType type) {
@@ -465,5 +477,24 @@ public class DamageListener {
 				return amount;
 			}
 		}
+	}
+	
+	public static void damageManually(LivingEntity entity, float damage) {
+		// Additional hearts support
+		if (entity instanceof Player player) {
+			final float additionalHearts = player.getAdditionalHearts();
+			if (additionalHearts > 0) {
+				if (damage > additionalHearts) {
+					damage -= additionalHearts;
+					player.setAdditionalHearts(0);
+				} else {
+					player.setAdditionalHearts(additionalHearts - damage);
+					damage = 0;
+				}
+			}
+		}
+		
+		// Set the final entity health
+		entity.setHealth(entity.getHealth() - damage);
 	}
 }
