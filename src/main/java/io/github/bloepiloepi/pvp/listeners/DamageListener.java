@@ -376,7 +376,7 @@ public class DamageListener {
 		// because otherwise the AttackManager will deal extra knockback
 		if (!event.isCancelled() && !hurtSoundAndAnimation) {
 			event.setCancelled(true);
-			damageManually(entity, event.getDamage());
+			damageManually(entity, amount);
 		} else {
 			event.setDamage(amount);
 		}
