@@ -52,10 +52,12 @@ This will apply PvP mechanics to your whole server.
 
 But you can also choose to (and this is the preferred option for most servers) use the jar file as a library.
 In this case, you can choose where to apply the PvP mechanics and customize them.
-You can get an `EventNode` with all PvP related events listening using `PvpExtension.events()`.
+
+Before doing anything else, you should call `PvpExtension.init()`. This will make sure everything is registered correctly.
+After you've initialized the extension, you can get an `EventNode` with all PvP related events listening using `PvpExtension.events()`.
 By adding this node as a child to any other node, you enable pvp in that scope.
+
 Separated features of this extension are also available as static methods in `PvpExtension`.
-You also have to call `PvpExtension.init()` before doing anything else.
 
 Example (adds PvP to the global event handler, so everywhere):
 ```java
@@ -88,7 +90,7 @@ Potions and milk buckets are considered food: the Minestom food events are also 
 
 ### Experimental branch
 
-If you do not use a custom player implementation, you might want to use the experimental branch, which is made for better velocity and knockback.
+If you do not use a custom player implementation, you might want to use the experimental branch: `velocity-experiment`, which is made for better velocity and knockback.
 
 ### Events
 
