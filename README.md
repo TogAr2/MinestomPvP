@@ -37,11 +37,11 @@ Currently, most vanilla PvP features are supported.
 - Fishing rods (only hooking entities or legacy knockback, not fishing)
 - Other projectiles (potions, snowballs, eggs, ender pearls)
 - All enchantments possible with the above features (this includes protection, sharpness, knockback, ...)
+- Fall damage
 
 ## Plans
 
 - Lingering potions
-- Fall damage
 - Fireworks (for crossbows)
 - Projectile collision might need some improvements (which is a Minestom issue too)
 
@@ -85,6 +85,10 @@ When applying damage to an entity, use `CustomDamageType` instead of `DamageType
 If you have your own damage type, also extend `CustomDamageType` instead of `DamageType`.
 
 Potions and milk buckets are considered food: the Minestom food events are also called for drinkable items.
+
+### Experimental branch
+
+If you do not use a custom player implementation, you might want to use the experimental branch, which is made for better velocity and knockback.
 
 ### Events
 
