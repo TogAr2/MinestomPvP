@@ -128,7 +128,7 @@ public class CustomPlayer extends Player {
 			@SuppressWarnings("ConstantConditions")
 			final double airDrag = this instanceof LivingEntity ? 0.91 : 0.98;
 			final double drag = this.onGround ?
-					finalChunk.getBlock(position).registry().friction() : airDrag;
+					finalChunk.getBlock(position).registry().friction() * airDrag : airDrag;
 			this.velocity = newVelocity
 					// Convert from block/tick to block/sec
 					.mul(tps)

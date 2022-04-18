@@ -501,15 +501,15 @@ public class DamageListener {
 	public static void takeKnockback(LivingEntity entity, float strength, final double x, final double z) {
 		strength *= 1 - entity.getAttributeValue(Attribute.KNOCKBACK_RESISTANCE);
 		if (strength > 0) {
-			int tps = MinecraftServer.TICK_PER_SECOND;
-			final Vec velocityModifier = new Vec(x, z)
-					.normalize()
-					.mul(strength);
-			Vec velocity = entity.getVelocity().div(tps);
+			strength *= MinecraftServer.TICK_PER_SECOND;
+			final Vec velocityModifier = new Vec(x, z).normalize().mul(strength);
+			final double verticalLimit = .4d * MinecraftServer.TICK_PER_SECOND;
+			
+			Vec velocity = entity.getVelocity();
 			entity.setVelocity(new Vec(velocity.x() / 2d - velocityModifier.x(),
-					entity.isOnGround() ? Math.min(.4d, velocity.y() / 2d + strength) : velocity.y(),
+					entity.isOnGround() ? Math.min(verticalLimit, velocity.y() / 2d + strength) : velocity.y(),
 					velocity.z() / 2d - velocityModifier.z()
-			).mul(tps));
+			));
 		}
 	}
 }
