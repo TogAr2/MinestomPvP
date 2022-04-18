@@ -294,7 +294,7 @@ public class DamageListener {
 					EntityKnockbackEvent entityKnockbackEvent = new EntityKnockbackEvent(entity, directAttacker, false, false, 0.4F);
 					EventDispatcher.callCancellable(entityKnockbackEvent, () -> {
 						float strength = entityKnockbackEvent.getStrength();
-						entity.takeKnockback(strength, finalH, finalI);
+						takeKnockback(entity, strength, finalH, finalI);
 					});
 				} else {
 					double magnitude = Math.sqrt(h * h + i * i);
@@ -496,5 +496,20 @@ public class DamageListener {
 		
 		// Set the final entity health
 		entity.setHealth(entity.getHealth() - damage);
+	}
+	
+	public static void takeKnockback(LivingEntity entity, float strength, final double x, final double z) {
+		strength *= 1 - entity.getAttributeValue(Attribute.KNOCKBACK_RESISTANCE);
+		if (strength > 0) {
+			int tps = MinecraftServer.TICK_PER_SECOND;
+			final Vec velocityModifier = new Vec(x, z)
+					.normalize()
+					.mul(strength);
+			Vec velocity = entity.getVelocity().div(tps);
+			entity.setVelocity(new Vec(velocity.x() / 2d - velocityModifier.x(),
+					entity.isOnGround() ? Math.min(.4d, velocity.y() / 2d + strength) : velocity.y(),
+					velocity.z() / 2d - velocityModifier.z()
+			).mul(tps));
+		}
 	}
 }

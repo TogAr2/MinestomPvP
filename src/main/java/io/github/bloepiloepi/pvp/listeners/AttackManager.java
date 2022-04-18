@@ -205,8 +205,8 @@ public class AttackManager {
 				EntityKnockbackEvent entityKnockbackEvent = new EntityKnockbackEvent(target, player, true, false, knockback * 0.5F);
 				EventDispatcher.callCancellable(entityKnockbackEvent, () -> {
 					float strength = entityKnockbackEvent.getStrength();
-					if (target instanceof LivingEntity) {
-						target.takeKnockback(strength, Math.sin(Math.toRadians(player.getPosition().yaw())), -Math.cos(Math.toRadians(player.getPosition().yaw())));
+					if (target instanceof LivingEntity living) {
+						DamageListener.takeKnockback(living, strength, Math.sin(Math.toRadians(player.getPosition().yaw())), -Math.cos(Math.toRadians(player.getPosition().yaw())));
 					} else {
 						target.setVelocity(target.getVelocity().add(-Math.sin(Math.toRadians(player.getPosition().yaw())) * strength, 0.1D, Math.cos(Math.toRadians(player.getPosition().yaw())) * strength));
 					}
@@ -252,13 +252,12 @@ public class AttackManager {
 						if (entity == target) return;
 						if (entity == player) return;
 						if (entity.getEntityMeta() instanceof ArmorStandMeta) return;
-						if (entity.getTeam() == player.getTeam()) return;
 						
 						if (player.getPosition().distanceSquared(entity.getPosition()) < 9.0) {
 							EntityKnockbackEvent entityKnockbackEvent = new EntityKnockbackEvent(entity, player, false, true, 0.4F);
 							EventDispatcher.callCancellable(entityKnockbackEvent, () -> {
 								float strength = entityKnockbackEvent.getStrength();
-								entity.takeKnockback(strength, Math.sin(Math.toRadians(player.getPosition().yaw())), -Math.cos(Math.toRadians(player.getPosition().yaw())));
+								DamageListener.takeKnockback(entity, strength, Math.sin(Math.toRadians(player.getPosition().yaw())), -Math.cos(Math.toRadians(player.getPosition().yaw())));
 							});
 							entity.damage(CustomDamageType.player(player), sweepingDamage);
 						}

@@ -85,7 +85,7 @@ public class CustomPlayer extends Player {
 		if (this.hasPhysics) {
 			final var physicsResult = CollisionUtils.handlePhysics(this, deltaPos, lastPhysicsResult);
 			this.lastPhysicsResult = physicsResult;
-			this.onGround = physicsResult.isOnGround();
+			//this.onGround = physicsResult.isOnGround();
 			newPosition = physicsResult.newPosition();
 			newVelocity = physicsResult.newVelocity();
 		} else {
