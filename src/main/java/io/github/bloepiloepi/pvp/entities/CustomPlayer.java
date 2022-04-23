@@ -1,7 +1,6 @@
 package io.github.bloepiloepi.pvp.entities;
 
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.collision.PhysicsResult;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
@@ -39,6 +38,11 @@ public class CustomPlayer extends Player {
 		}
 	}
 	
+	public void afterSprintAttack() {
+		velocity = velocity.mul(0.6, 1, 0.6);
+	}
+	
+	@SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
 	@Override
 	protected void updateVelocity(boolean wasOnGround, Pos positionBeforeMove, Vec newVelocity) {
 		final double tps = MinecraftServer.TICK_PER_SECOND;

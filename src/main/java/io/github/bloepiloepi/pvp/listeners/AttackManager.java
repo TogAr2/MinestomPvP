@@ -1,5 +1,6 @@
 package io.github.bloepiloepi.pvp.listeners;
 
+import io.github.bloepiloepi.pvp.entities.CustomPlayer;
 import io.github.bloepiloepi.pvp.enums.Tool;
 import io.github.bloepiloepi.pvp.events.FinalAttackEvent;
 import io.github.bloepiloepi.pvp.legacy.LegacyKnockbackSettings;
@@ -231,12 +232,8 @@ public class AttackManager {
 				});
 			}
 			
-			try {
-				Field field = Entity.class.getDeclaredField("velocity");
-				field.setAccessible(true);
-				field.set(player, player.getVelocity().mul(0.6D, 1.0D, 0.6D));
-			} catch (NoSuchFieldException | IllegalAccessException e) {
-				e.printStackTrace();
+			if (player instanceof CustomPlayer custom) {
+				custom.afterSprintAttack();
 			}
 			
 			player.setSprinting(false);
@@ -287,7 +284,6 @@ public class AttackManager {
 			if (strongAttack) {
 				if (finalAttackEvent.hasAttackSounds()) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_STRONG, Sound.Source.PLAYER, 1.0F, 1.0F);
 			} else {
-				//noinspection ConstantConditions
 				if (finalAttackEvent.hasAttackSounds()) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_WEAK, Sound.Source.PLAYER, 1.0F, 1.0F);
 			}
 		}
