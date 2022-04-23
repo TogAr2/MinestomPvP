@@ -1,6 +1,7 @@
 package io.github.bloepiloepi.pvp;
 
 import io.github.bloepiloepi.pvp.enchantment.CustomEnchantments;
+import io.github.bloepiloepi.pvp.entities.CustomPlayer;
 import io.github.bloepiloepi.pvp.entities.Tracker;
 import io.github.bloepiloepi.pvp.food.FoodListener;
 import io.github.bloepiloepi.pvp.legacy.SwordBlockHandler;
@@ -159,6 +160,7 @@ public class PvpExtension extends Extension {
 		CustomPotionTypes.registerAll();
 		
 		Tracker.register(MinecraftServer.getGlobalEventHandler());
+		MinecraftServer.getConnectionManager().setPlayerProvider(CustomPlayer::new);
 		
 		try {
 			Field isFood = Registry.MaterialEntry.class.getDeclaredField("isFood");

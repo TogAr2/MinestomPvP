@@ -32,9 +32,9 @@ public class ItemUtils {
 			}
 			
 			newAmount -= preventAmount;
-			if (newAmount <= 0) return meta;
+			if (newAmount <= 0) return;
 			
-			return meta.damage(stack.meta().getDamage() + newAmount);
+			meta.damage(stack.meta().getDamage() + newAmount);
 		});
 	}
 	

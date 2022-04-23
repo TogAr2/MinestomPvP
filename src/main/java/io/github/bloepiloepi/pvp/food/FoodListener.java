@@ -1,5 +1,6 @@
 package io.github.bloepiloepi.pvp.food;
 
+import io.github.bloepiloepi.pvp.entities.CustomPlayer;
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
@@ -113,6 +114,9 @@ public class FoodListener {
 				} else {
 					EntityUtils.addExhaustion(player, legacy ? 0.2F : 0.05F);
 				}
+				
+				if (player instanceof CustomPlayer custom)
+					custom.jump(); //Velocity change
 			}
 			
 			if (player.isOnGround()) {

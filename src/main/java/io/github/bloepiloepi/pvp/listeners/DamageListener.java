@@ -303,13 +303,13 @@ public class DamageListener {
 						LegacyKnockbackSettings settings = legacyKnockbackEvent.getSettings();
 						Vec newVelocity = entity.getVelocity();
 						
-						double horizontal = settings.getHorizontal();
+						double horizontal = settings.horizontal();
 						newVelocity = newVelocity.withX((newVelocity.x() / 2) - (finalH / magnitude * horizontal));
-						newVelocity = newVelocity.withY((newVelocity.y() / 2) + settings.getVertical());
+						newVelocity = newVelocity.withY((newVelocity.y() / 2) + settings.vertical());
 						newVelocity = newVelocity.withZ((newVelocity.z() / 2) - (finalI / magnitude * horizontal));
 						
-						if (newVelocity.y() > settings.getVerticalLimit())
-							newVelocity = newVelocity.withY(settings.getVerticalLimit());
+						if (newVelocity.y() > settings.verticalLimit())
+							newVelocity = newVelocity.withY(settings.verticalLimit());
 						
 						entity.setVelocity(newVelocity);
 					});
