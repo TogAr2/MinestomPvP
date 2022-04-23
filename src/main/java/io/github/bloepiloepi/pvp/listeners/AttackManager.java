@@ -194,6 +194,10 @@ public class AttackManager {
 			originalHealth = ((LivingEntity) target).getHealth();
 		}
 		
+		if (legacy && player instanceof CustomPlayer custom) {
+			custom.afterSprintAttack();
+		}
+		
 		boolean damageSucceeded = EntityUtils.damage(target, CustomDamageType.player(player), damage);
 		
 		if (!damageSucceeded) {
@@ -232,7 +236,7 @@ public class AttackManager {
 				});
 			}
 			
-			if (player instanceof CustomPlayer custom) {
+			if (!legacy && player instanceof CustomPlayer custom) {
 				custom.afterSprintAttack();
 			}
 			
