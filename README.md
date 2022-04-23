@@ -88,9 +88,7 @@ If you have your own damage type, also extend `CustomDamageType` instead of `Dam
 
 Potions and milk buckets are considered food: the Minestom food events are also called for drinkable items.
 
-### Experimental branch
-
-If you do not use a custom player implementation, you might want to use the experimental branch: `velocity-experiment`, which is made for better velocity and knockback.
+The extension uses a custom player implementation, if you use one, it is recommended to extend `CustomPlayer`.
 
 ### Events
 
