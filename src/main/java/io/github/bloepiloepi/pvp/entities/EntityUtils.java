@@ -153,7 +153,7 @@ public class EntityUtils {
 		if (applyKnockback) {
 			Pos entityPos = entity.getPosition();
 			Pos attackerPos = attacker.getPosition();
-			DamageListener.takeKnockback(attacker, 0.5F, attackerPos.x() - entityPos.x(), attackerPos.z() - entityPos.z());
+			attacker.takeKnockback(0.5F, attackerPos.x() - entityPos.x(), attackerPos.z() - entityPos.z());
 		}
 		
 		if (!(entity instanceof Player)) return;

@@ -66,7 +66,7 @@ public class PvpTest {
 					EntityKnockbackEvent entityKnockbackEvent = new EntityKnockbackEvent(player.get(), entity, true, false, 1 * 0.5F);
 					EventDispatcher.callCancellable(entityKnockbackEvent, () -> {
 						float strength = entityKnockbackEvent.getStrength();
-						DamageListener.takeKnockback(player.get(), strength, Math.sin(Math.toRadians(entity.getPosition().yaw())), -Math.cos(Math.toRadians(entity.getPosition().yaw())));
+						player.get().takeKnockback(strength, Math.sin(Math.toRadians(entity.getPosition().yaw())), -Math.cos(Math.toRadians(entity.getPosition().yaw())));
 					});
 				}
 				
