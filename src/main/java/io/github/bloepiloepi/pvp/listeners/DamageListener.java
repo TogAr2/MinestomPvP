@@ -240,6 +240,11 @@ public class DamageListener {
 		
 		amount = finalDamageEvent.getDamage();
 		
+		//Projectiles can deal 0 damage just to have knockback
+		if ((amount != 0.0F || type.isProjectile()) && entity instanceof Player) {
+			Tracker.combatManager.get(entity.getUuid()).recordDamage(type, amount);
+		}
+		
 		if ((finalDamageEvent.getDamage() <= 0.0F && !legacy) || finalDamageEvent.isCancelled()) {
 			event.setCancelled(true);
 			return;
@@ -421,7 +426,6 @@ public class DamageListener {
 		
 		if (amount != 0.0F && entity instanceof Player) {
 			EntityUtils.addExhaustion((Player) entity, type.getExhaustion() * (legacy ? 3 : 1));
-			Tracker.combatManager.get(entity.getUuid()).recordDamage(type, amount);
 		}
 		
 		return amount;
