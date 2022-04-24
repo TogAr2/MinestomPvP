@@ -125,6 +125,11 @@ public class Tracker {
 			Tracker.fallDistance.remove(uuid);
 		});
 		
+		node.addListener(PlayerSpawnEvent.class, event -> {
+			CombatManager combatManager = Tracker.combatManager.get(event.getPlayer().getUuid());
+			if (combatManager != null) combatManager.reset();
+		});
+		
 		node.addListener(PlayerTickEvent.class, event -> {
 			Player player = event.getPlayer();
 			UUID uuid = player.getUuid();

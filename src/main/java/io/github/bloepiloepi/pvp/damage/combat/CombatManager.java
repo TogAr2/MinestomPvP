@@ -201,17 +201,21 @@ public class CombatManager {
 		// Check if combat should end
 		int idleMillis = inCombat ? 300 * MinecraftServer.TICK_MS : 100 * MinecraftServer.TICK_MS;
 		if (takingDamage && (player.isDead() || System.currentTimeMillis() - lastDamageTime > idleMillis)) {
-			boolean wasInCombat = inCombat;
-			takingDamage = false;
-			inCombat = false;
+			reset();
 			combatEndTime = System.currentTimeMillis();
-			
-			if (wasInCombat) {
-				onLeaveCombat();
-			}
-			
-			entries.clear();
 		}
+	}
+	
+	public void reset() {
+		boolean wasInCombat = inCombat;
+		takingDamage = false;
+		inCombat = false;
+		
+		if (wasInCombat) {
+			onLeaveCombat();
+		}
+		
+		entries.clear();
 	}
 	
 	public int getKillerId() {
