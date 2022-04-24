@@ -26,13 +26,14 @@ public class FinalAttackEvent implements EntityInstanceEvent, CancellableEvent {
 	private float baseDamage;
 	private float enchantsExtraDamage;
 	private boolean attackSounds;
+	private boolean playSoundsOnFail;
 	
 	private boolean cancelled;
 	
 	public FinalAttackEvent(@NotNull Entity entity, @NotNull Entity target,
 	                        boolean sprint, boolean critical, boolean sweeping,
 	                        float baseDamage, float enchantsExtraDamage,
-	                        boolean attackSounds) {
+	                        boolean attackSounds, boolean playSoundsOnFail) {
 		this.entity = entity;
 		this.target = target;
 		this.sprint = sprint;
@@ -164,6 +165,30 @@ public class FinalAttackEvent implements EntityInstanceEvent, CancellableEvent {
 	 */
 	public void setAttackSounds(boolean attackSounds) {
 		this.attackSounds = attackSounds;
+	}
+	
+	/**
+	 * Gets whether the 1.9+ attack sounds should be played if the damage failed.
+	 * This only applies if hasAttackSounds() is true.
+	 *
+	 * If this is true, the only sounds that may be played are knockback and nodamage.
+	 *
+	 * @return whether the attack sounds should be played if the damage failed
+	 */
+	public boolean playSoundsOnFail() {
+		return playSoundsOnFail;
+	}
+	
+	/**
+	 * Sets whether the 1.9+ attack sounds should be played if the damage failed.
+	 * This only applies if hasAttackSounds() is true.
+	 *
+	 * If this is true, the only sounds that may be played are knockback and nodamage.
+	 *
+	 * @param playSoundsOnFail whether the attack sounds should be played if the damage failed
+	 */
+	public void setPlaySoundsOnFail(boolean playSoundsOnFail) {
+		this.playSoundsOnFail = playSoundsOnFail;
 	}
 	
 	@Override
