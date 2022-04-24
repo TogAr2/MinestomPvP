@@ -158,7 +158,7 @@ public class CombatManager {
 		return entity;
 	}
 	
-	private @Nullable CombatEntry getHeaviestFall() {
+	public @Nullable CombatEntry getHeaviestFall() {
 		CombatEntry mostDamageEntry = null;
 		CombatEntry highestFallEntry = null;
 		float mostDamage = 0.0F;
@@ -232,5 +232,37 @@ public class CombatManager {
 	private void onLeaveCombat() {
 		int duration = (int) (getCombatDuration() / MinecraftServer.TICK_MS);
 		player.getPlayerConnection().sendPacket(new EndCombatEventPacket(duration, getKillerId()));
+	}
+	
+	public List<CombatEntry> getEntries() {
+		return entries;
+	}
+	
+	public Player getPlayer() {
+		return player;
+	}
+	
+	public long getLastDamageTime() {
+		return lastDamageTime;
+	}
+	
+	public long getCombatStartTime() {
+		return combatStartTime;
+	}
+	
+	public long getCombatEndTime() {
+		return combatEndTime;
+	}
+	
+	public boolean isInCombat() {
+		return inCombat;
+	}
+	
+	public boolean isTakingDamage() {
+		return takingDamage;
+	}
+	
+	public String getNextFallLocation() {
+		return nextFallLocation;
 	}
 }
