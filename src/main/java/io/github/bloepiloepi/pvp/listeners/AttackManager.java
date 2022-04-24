@@ -161,7 +161,7 @@ public class AttackManager {
 			}
 		}
 		
-		FinalAttackEvent finalAttackEvent = new FinalAttackEvent(player, target, sprintAttack, critical, sweeping, damage, enchantedDamage, !legacy);
+		FinalAttackEvent finalAttackEvent = new FinalAttackEvent(player, target, sprintAttack, critical, sweeping, damage, enchantedDamage, !legacy, true);
 		EventDispatcher.call(finalAttackEvent);
 		
 		if (finalAttackEvent.isCancelled()) {
@@ -173,11 +173,6 @@ public class AttackManager {
 		sweeping = finalAttackEvent.isSweeping();
 		damage = finalAttackEvent.getBaseDamage();
 		enchantedDamage = finalAttackEvent.getEnchantsExtraDamage();
-		
-		if (sprintAttack) {
-			if (finalAttackEvent.hasAttackSounds()) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_KNOCKBACK, Sound.Source.PLAYER, 1.0F, 1.0F);
-			knockback++;
-		}
 		
 		if (critical) {
 			if (legacy) {
@@ -200,8 +195,20 @@ public class AttackManager {
 		
 		boolean damageSucceeded = EntityUtils.damage(target, CustomDamageType.player(player), damage);
 		
+		if (sprintAttack) {
+			if (finalAttackEvent.hasAttackSounds()) {
+				if (damageSucceeded || finalAttackEvent.playSoundsOnFail()) {
+					SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_KNOCKBACK, Sound.Source.PLAYER, 1.0F, 1.0F);
+				}
+			}
+			
+			knockback++;
+		}
+		
 		if (!damageSucceeded) {
-			if (finalAttackEvent.hasAttackSounds()) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_NODAMAGE, Sound.Source.PLAYER, 1.0F, 1.0F);
+			if (finalAttackEvent.hasAttackSounds() && finalAttackEvent.playSoundsOnFail()) {
+				SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_NODAMAGE, Sound.Source.PLAYER, 1.0F, 1.0F);
+			}
 			return;
 		}
 		
