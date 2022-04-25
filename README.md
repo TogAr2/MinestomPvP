@@ -102,7 +102,8 @@ This extension provides several events:
 - `FinalDamageEvent`: cancellable, called when the final damage calculation (including armor and effects) is completed. This event should be used instead of `EntityDamageEvent`, unless you want to detect how much damage was originally dealt.
 - `LegacyKnockbackEvent`: cancellable, called when an entity gets knocked back by another entity using legacy pvp. Same applies as for `EntityKnockbackEvent`. This event can be used to change the knockback settings.
 - `PickupArrowEvent`: cancellable, called when a player picks up an arrow.
-- `PlayerExhaustEvent`: cancellable, called when a players exhaustion level changes.
+- `PlayerExhaustEvent`: cancellable, called when a players' exhaustion level changes.
+- `PlayerRegenerateEvent`: cancellable, called when a player naturally regenerates health.
 - `PlayerSpectateEvent`: cancellable, called when a spectator tries to spectate an entity by attacking it.
 - `PotionVisibilityEvent`: cancellable, called when an entities potion state (ambient, particle color and invisibility) is updated.
 - `ProjectileBlockHitEvent`: called when a projectile hits a block.
