@@ -1,12 +1,12 @@
 package io.github.bloepiloepi.pvp.listeners;
 
-import io.github.bloepiloepi.pvp.legacy.LegacyKnockbackSettings;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.damage.CustomEntityDamage;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
 import io.github.bloepiloepi.pvp.entities.Tracker;
 import io.github.bloepiloepi.pvp.events.*;
+import io.github.bloepiloepi.pvp.legacy.LegacyKnockbackSettings;
 import io.github.bloepiloepi.pvp.potion.PotionListener;
 import io.github.bloepiloepi.pvp.utils.DamageUtils;
 import io.github.bloepiloepi.pvp.utils.ItemUtils;
@@ -23,7 +23,10 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
-import net.minestom.server.event.*;
+import net.minestom.server.event.EventDispatcher;
+import net.minestom.server.event.EventFilter;
+import net.minestom.server.event.EventListener;
+import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityDamageEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.event.trait.EntityEvent;
@@ -240,12 +243,12 @@ public class DamageListener {
 		
 		amount = finalDamageEvent.getDamage();
 		
-		//Projectiles can deal 0 damage just to have knockback
-		if ((amount != 0.0F || type.isProjectile()) && entity instanceof Player) {
+		boolean register = legacy || finalDamageEvent.getDamage() > 0.0F;
+		if (register && entity instanceof Player) {
 			Tracker.combatManager.get(entity.getUuid()).recordDamage(type, amount);
 		}
 		
-		if ((finalDamageEvent.getDamage() <= 0.0F && !legacy) || finalDamageEvent.isCancelled()) {
+		if (!register || finalDamageEvent.isCancelled()) {
 			event.setCancelled(true);
 			return;
 		}
