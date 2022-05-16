@@ -1,14 +1,16 @@
 package io.github.bloepiloepi.pvp.food;
 
-import io.github.bloepiloepi.pvp.entities.CustomPlayer;
 import io.github.bloepiloepi.pvp.entities.EntityUtils;
+import io.github.bloepiloepi.pvp.entities.PvpPlayer;
 import io.github.bloepiloepi.pvp.entities.Tracker;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
-import net.minestom.server.event.*;
+import net.minestom.server.event.EventFilter;
+import net.minestom.server.event.EventListener;
+import net.minestom.server.event.EventNode;
 import net.minestom.server.event.player.*;
 import net.minestom.server.event.trait.PlayerEvent;
 import net.minestom.server.instance.block.Block;
@@ -115,7 +117,7 @@ public class FoodListener {
 					EntityUtils.addExhaustion(player, legacy ? 0.2F : 0.05F);
 				}
 				
-				if (player instanceof CustomPlayer custom)
+				if (player instanceof PvpPlayer custom)
 					custom.jump(); //Velocity change
 			}
 			

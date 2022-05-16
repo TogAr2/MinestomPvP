@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
-public class CustomPlayer extends Player {
+public class CustomPlayer extends Player implements PvpPlayer {
 	
 	public CustomPlayer(@NotNull UUID uuid, @NotNull String username, @NotNull PlayerConnection playerConnection) {
 		super(uuid, username, playerConnection);
@@ -27,7 +27,8 @@ public class CustomPlayer extends Player {
 		return EntityUtils.hasEffect(this, PotionEffect.JUMP_BOOST) ?
 				(0.1 * (EntityUtils.getEffect(this, PotionEffect.JUMP_BOOST).amplifier() + 1)) : 0.0;
 	}
-	
+
+	@Override
 	public void jump() {
 		int tps = MinecraftServer.TICK_PER_SECOND;
 		double yVel = getJumpVelocity() + getJumpBoostVelocityModifier();
@@ -37,7 +38,8 @@ public class CustomPlayer extends Player {
 			velocity = velocity.add(-Math.sin(angle) * 0.2 * tps, 0, Math.cos(angle) * 0.2 * tps);
 		}
 	}
-	
+
+	@Override
 	public void afterSprintAttack() {
 		velocity = velocity.mul(0.6, 1, 0.6);
 	}
