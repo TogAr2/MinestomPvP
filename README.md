@@ -94,7 +94,9 @@ Potions and milk buckets are considered food: the Minestom food events are also 
 The extension uses a custom player implementation, if you use one, it is recommended to extend `CustomPlayer`. If you for some reason can't, make sure to implement `PvpPlayer`. The implementation is registered inside `PvpExtension.init()`, so register yours after the call.
 
 To allow explosions, you have to register `PvpExplosionSupplier` to every instance in which they are used.
-`instance.setExplosionSupplier(PvpExplosionSupplier.INSTANCE);`
+```
+instance.setExplosionSupplier(PvpExplosionSupplier.INSTANCE);
+```
 
 ### Events
 
