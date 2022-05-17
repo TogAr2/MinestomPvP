@@ -121,7 +121,12 @@ public class ExplosionListener {
 	}
 	
 	public static void primeTnt(Instance instance, Point blockPosition, @Nullable LivingEntity causingEntity) {
+		primeTnt(instance, blockPosition, causingEntity, 80);
+	}
+	
+	public static void primeTnt(Instance instance, Point blockPosition, @Nullable LivingEntity causingEntity, int fuse) {
 		TntEntity entity = new TntEntity(causingEntity);
+		if (fuse != 80) entity.setFuse(fuse);
 		entity.setInstance(instance, blockPosition.add(0.5, 0, 0.5));
 		SoundManager.sendToAround(
 				instance, entity.getPosition(),

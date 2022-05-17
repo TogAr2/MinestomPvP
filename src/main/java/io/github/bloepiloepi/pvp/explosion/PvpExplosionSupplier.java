@@ -26,7 +26,7 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-public record PvpExplosionSupplier(@NotNull Instance instance) implements ExplosionSupplier {
+public final class PvpExplosionSupplier implements ExplosionSupplier {
 	
 	@Override
 	public Explosion createExplosion(float centerX, float centerY, float centerZ,
@@ -35,7 +35,7 @@ public record PvpExplosionSupplier(@NotNull Instance instance) implements Explos
 			private final Map<Player, Vec> playerKnockback = new HashMap<>();
 			
 			@Override
-			protected List<Point> prepare(Instance world) {
+			protected List<Point> prepare(Instance instance) {
 				List<Point> blocks = new ArrayList<>();
 				ThreadLocalRandom random = ThreadLocalRandom.current();
 				
@@ -62,7 +62,7 @@ public record PvpExplosionSupplier(@NotNull Instance instance) implements Explos
 									float strengthLeft = this.getStrength() * (0.7F + random.nextFloat() * 0.6F);
 									for (; strengthLeft > 0.0F; strengthLeft -= 0.225F) {
 										Vec position = new Vec(centerX, centerY, centerZ);
-										Block block = world.getBlock(position);
+										Block block = instance.getBlock(position);
 										
 										if (!block.isAir()) {
 											double explosionResistance = block.registry().explosionResistance();
@@ -109,19 +109,10 @@ public record PvpExplosionSupplier(@NotNull Instance instance) implements Explos
 				
 				Vec src = new Vec(getCenterX(), getCenterY() - (explosionBox.height() / 2), getCenterZ());
 				
-				Set<Entity> entities = world.getEntities().stream()
+				Set<Entity> entities = instance.getEntities().stream()
 						.filter(entity -> explosionBox.intersectEntity(src, entity))
 						.collect(Collectors.toSet());
 				Vec centerPoint = new Vec(this.getCenterX(), this.getCenterY(), this.getCenterZ());
-				
-				LivingEntity causingEntity = null;
-				if (additionalData != null && additionalData.contains("causingEntity")) {
-					UUID causingUuid = UUID.fromString(Objects.requireNonNull(additionalData.getString("causingEntity")));
-					causingEntity = (LivingEntity) world.getEntities().stream()
-							.filter(entity -> entity instanceof LivingEntity
-									&& entity.getUuid().equals(causingUuid))
-							.findAny().orElse(null);
-				}
 				
 				boolean anchor = false;
 				if (additionalData != null && additionalData.contains("anchor")) {
@@ -129,11 +120,8 @@ public record PvpExplosionSupplier(@NotNull Instance instance) implements Explos
 				}
 				
 				CustomDamageType damageType = anchor ? CustomDamageType.invalidRespawnPointExplosion()
-						: CustomDamageType.explosion(this, causingEntity);
-				for (Entity en : entities) {
-					if (!(en instanceof LivingEntity entity))
-						continue;
-					
+						: CustomDamageType.explosion(this, getCausingEntity(instance));
+				for (Entity entity : entities) {
 					double currentStrength = entity.getPosition().distance(centerPoint) / strength;
 					if (currentStrength <= 1.0D) {
 						double dx = entity.getPosition().x() - this.getCenterX();
@@ -149,9 +137,11 @@ public record PvpExplosionSupplier(@NotNull Instance instance) implements Explos
 							currentStrength = (1.0D - currentStrength) * exposure;
 							float damage = (float) ((currentStrength * currentStrength + currentStrength)
 									/ 2.0D * 7.0D * strength + 1.0D);
-							entity.damage(damageType, damage);
-							
-							double knockback = EnchantmentUtils.getExplosionKnockback(entity, currentStrength);
+							double knockback = currentStrength;
+							if (entity instanceof LivingEntity living) {
+								living.damage(damageType, damage);
+								knockback = EnchantmentUtils.getExplosionKnockback(living, currentStrength);
+							}
 							
 							Vec knockbackVec = new Vec(
 									dx * knockback,
@@ -183,6 +173,10 @@ public record PvpExplosionSupplier(@NotNull Instance instance) implements Explos
 				byte[] records = new byte[3 * blocks.size()];
 				for (int i = 0; i < blocks.size(); i++) {
 					final var pos = blocks.get(i);
+					if (instance.getBlock(pos).compare(Block.TNT)) {
+						ExplosionListener.primeTnt(instance, pos, getCausingEntity(instance),
+								ThreadLocalRandom.current().nextInt(20) + 10);
+					}
 					instance.setBlock(pos, Block.AIR);
 					final byte x = (byte) (pos.x() - Math.floor(getCenterX()));
 					final byte y = (byte) (pos.y() - Math.floor(getCenterY()));
@@ -217,6 +211,19 @@ public record PvpExplosionSupplier(@NotNull Instance instance) implements Explos
 				}
 				
 				postSend(instance, blocks);
+			}
+			
+			private LivingEntity getCausingEntity(Instance instance) {
+				LivingEntity causingEntity = null;
+				if (additionalData != null && additionalData.contains("causingEntity")) {
+					UUID causingUuid = UUID.fromString(Objects.requireNonNull(additionalData.getString("causingEntity")));
+					causingEntity = (LivingEntity) instance.getEntities().stream()
+							.filter(entity -> entity instanceof LivingEntity
+									&& entity.getUuid().equals(causingUuid))
+							.findAny().orElse(null);
+				}
+				
+				return causingEntity;
 			}
 		};
 	}
