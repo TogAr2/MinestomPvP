@@ -125,10 +125,10 @@ public class EntityUtils {
 	}
 	
 	public static boolean isBlocking(LivingEntity entity) {
-		LivingEntityMeta meta = (LivingEntityMeta) entity.getEntityMeta();
-		
-		if (meta.isHandActive()) {
-			return entity.getItemInHand(meta.getActiveHand()).material() == Material.SHIELD;
+		if (entity.getEntityMeta() instanceof LivingEntityMeta meta) {
+			if (meta.isHandActive()) {
+				return entity.getItemInHand(meta.getActiveHand()).material() == Material.SHIELD;
+			}
 		}
 		
 		return false;
