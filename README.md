@@ -38,6 +38,9 @@ Currently, most vanilla PvP features are supported.
 - Other projectiles (potions, snowballs, eggs, ender pearls)
 - All enchantments possible with the above features (this includes protection, sharpness, knockback, ...)
 - Fall damage
+- End Crystals
+- TNT
+- Respawn Anchors (Explosion Only)
 
 ## Plans
 
