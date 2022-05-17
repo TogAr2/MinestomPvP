@@ -27,6 +27,10 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public final class PvpExplosionSupplier implements ExplosionSupplier {
+	public static final PvpExplosionSupplier INSTANCE = new PvpExplosionSupplier();
+	
+	private PvpExplosionSupplier() {
+	}
 	
 	@Override
 	public Explosion createExplosion(float centerX, float centerY, float centerZ,

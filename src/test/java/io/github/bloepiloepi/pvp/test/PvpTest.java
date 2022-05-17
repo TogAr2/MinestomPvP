@@ -97,7 +97,7 @@ public class PvpTest {
 //		MinecraftServer.getGlobalEventHandler().addListener(LegacyKnockbackEvent.class,
 //				event -> event.setSettings(settings));
 		
-		instance.setExplosionSupplier(new PvpExplosionSupplier());
+		instance.setExplosionSupplier(PvpExplosionSupplier.INSTANCE);
 		
 		GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
 		eventHandler.addChild(PvpExtension.legacyEvents());
