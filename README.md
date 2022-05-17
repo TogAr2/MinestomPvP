@@ -88,7 +88,7 @@ If you have your own damage type, also extend `CustomDamageType` instead of `Dam
 
 Potions and milk buckets are considered food: the Minestom food events are also called for drinkable items.
 
-The extension uses a custom player implementation, if you use one, it is recommended to extend `CustomPlayer`.
+The extension uses a custom player implementation, if you use one, it is recommended to extend `CustomPlayer`. If you for some reason can't, make sure to implement `PvpPlayer`. The implementation is registered inside `PvpExtension.init()`, so register yours after the call.
 
 ### Events
 
