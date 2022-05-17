@@ -5,6 +5,7 @@ import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entity.PvpPlayer;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.collision.BoundingBox;
+import net.minestom.server.collision.CollisionUtils;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
@@ -138,7 +139,7 @@ public record PvpExplosionSupplier(@NotNull Instance instance) implements Explos
 							dx /= distance;
 							dy /= distance;
 							dz /= distance;
-							double exposure = 1; /*TODO getExposure(centerPoint, entity)*/
+							double exposure = getExposure(centerPoint, entity);
 							currentStrength = (1.0D - currentStrength) * exposure;
 							float damage = (float) ((currentStrength * currentStrength + currentStrength)
 									/ 2.0D * 7.0D * strength + 1.0D);
@@ -212,5 +213,42 @@ public record PvpExplosionSupplier(@NotNull Instance instance) implements Explos
 				postSend(instance, blocks);
 			}
 		};
+	}
+	
+	public static double getExposure(Point center, Entity entity) {
+		BoundingBox box = entity.getBoundingBox();
+		double xStep = 1 / (box.width() * 2 + 1);
+		double yStep = 1 / (box.height() * 2 + 1);
+		double zStep = 1 / (box.depth() * 2 + 1);
+		double g = (1 - Math.floor(1 / xStep) * xStep) / 2;
+		double h = (1 - Math.floor(1 / zStep) * zStep) / 2;
+		if (xStep < 0 || yStep < 0 || zStep < 0) return 0;
+		
+		int exposedCount = 0;
+		int rayCount = 0;
+		double dx = 0;
+		while (dx <= 1) {
+			double dy = 0;
+			while (dy <= 1) {
+				double dz = 0;
+				while (dz <= 1) {
+					double rayX = box.minX() + dx * box.width();
+					double rayY = box.minY() + dy * box.height();
+					double rayZ = box.minZ() + dz * box.depth();
+					Point point = new Vec(rayX + g, rayY, rayZ + h);
+					if (noBlocking(entity.getInstance(), point, center)) exposedCount++;
+					rayCount++;
+					dz += zStep;
+				}
+				dy += yStep;
+			}
+			dx += xStep;
+		}
+		
+		return exposedCount / (double) rayCount;
+	}
+	
+	public static boolean noBlocking(Instance instance, Point start, Point end) {
+		return CollisionUtils.isLineOfSightReachingShape(instance, null, start, end, new BoundingBox(1, 1, 1));
 	}
 }
