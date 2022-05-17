@@ -34,6 +34,7 @@ public class PvpExtension extends Extension {
 		
 		node.addChild(attackEvents());
 		node.addChild(damageEvents());
+		node.addChild(explosionEvents());
 		node.addChild(armorToolEvents());
 		node.addChild(foodEvents());
 		node.addChild(potionEvents());
