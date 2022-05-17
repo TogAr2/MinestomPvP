@@ -10,6 +10,7 @@ import net.minestom.server.event.player.PlayerUseItemOnBlockEvent;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.item.Material;
 
 public class ExplosionListener {
 	
@@ -17,6 +18,7 @@ public class ExplosionListener {
 		EventNode<EntityEvent> node = EventNode.type("explosion-events", EventFilter.ENTITY);
 		
 		node.addListener(PlayerUseItemOnBlockEvent.class, event -> {
+			if (event.getItemStack().material() != Material.END_CRYSTAL) return;
 			Instance instance = event.getInstance();
 			Block block = instance.getBlock(event.getPosition());
 			if (!block.compare(Block.OBSIDIAN) && !block.compare(Block.BEDROCK)) return;
