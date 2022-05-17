@@ -1,10 +1,13 @@
 package io.github.bloepiloepi.pvp.explosion;
 
+import io.github.bloepiloepi.pvp.utils.ItemUtils;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.entity.Entity;
+import net.minestom.server.entity.EquipmentSlot;
+import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
@@ -16,12 +19,36 @@ import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.sound.SoundEvent;
+import org.jetbrains.annotations.Nullable;
 import org.jglrxavpok.hephaistos.nbt.NBT;
 
 public class ExplosionListener {
 	
 	public static EventNode<EntityEvent> events() {
 		EventNode<EntityEvent> node = EventNode.type("explosion-events", EventFilter.ENTITY);
+		
+		node.addListener(PlayerUseItemOnBlockEvent.class, event -> {
+			ItemStack stack = event.getItemStack();
+			Instance instance = event.getInstance();
+			Point position = event.getPosition();
+			Player player = event.getPlayer();
+			
+			if (stack.material() != Material.FLINT_AND_STEEL && stack.material() != Material.FIRE_CHARGE) return;
+			Block block = instance.getBlock(position);
+			if (!block.compare(Block.TNT)) return;
+			
+			primeTnt(instance, position, player);
+			instance.setBlock(position, Block.AIR);
+			
+			if (!player.isCreative()) {
+				if (stack.material() == Material.FLINT_AND_STEEL) {
+					ItemUtils.damageEquipment(player, event.getHand() == Player.Hand.MAIN
+							? EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, 1);
+				} else {
+					player.setItemInHand(event.getHand(), stack.consume(1));
+				}
+			}
+		});
 		
 		node.addListener(PlayerUseItemOnBlockEvent.class, event -> {
 			if (event.getItemStack().material() != Material.END_CRYSTAL) return;
@@ -91,5 +118,16 @@ public class ExplosionListener {
 		});
 		
 		return node;
+	}
+	
+	public static void primeTnt(Instance instance, Point blockPosition, @Nullable LivingEntity causingEntity) {
+		TntEntity entity = new TntEntity(causingEntity);
+		entity.setInstance(instance, blockPosition.add(0.5, 0, 0.5));
+		SoundManager.sendToAround(
+				instance, entity.getPosition(),
+				SoundEvent.ENTITY_TNT_PRIMED,
+				Sound.Source.BLOCK,
+				1.0f, 1.0f
+		);
 	}
 }
