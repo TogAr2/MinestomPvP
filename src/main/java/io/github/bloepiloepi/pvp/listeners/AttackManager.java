@@ -2,7 +2,7 @@ package io.github.bloepiloepi.pvp.listeners;
 
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
-import io.github.bloepiloepi.pvp.entity.CustomPlayer;
+import io.github.bloepiloepi.pvp.entities.PvpPlayer;
 import io.github.bloepiloepi.pvp.entity.EntityGroup;
 import io.github.bloepiloepi.pvp.entity.EntityUtils;
 import io.github.bloepiloepi.pvp.entity.Tracker;
@@ -191,7 +191,7 @@ public class AttackManager {
 			originalHealth = ((LivingEntity) target).getHealth();
 		}
 		
-		if (legacy && player instanceof CustomPlayer custom) {
+		if (legacy && player instanceof PvpPlayer custom) {
 			custom.afterSprintAttack();
 		}
 		
@@ -245,7 +245,7 @@ public class AttackManager {
 				});
 			}
 			
-			if (!legacy && player instanceof CustomPlayer custom) {
+			if (!legacy && player instanceof PvpPlayer custom) {
 				custom.afterSprintAttack();
 			}
 			

@@ -1,5 +1,6 @@
 package io.github.bloepiloepi.pvp.entity;
 
+import io.github.bloepiloepi.pvp.entities.PvpPlayer;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -13,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
-public class CustomPlayer extends Player {
+public class CustomPlayer extends Player implements PvpPlayer {
 	
 	public CustomPlayer(@NotNull UUID uuid, @NotNull String username, @NotNull PlayerConnection playerConnection) {
 		super(uuid, username, playerConnection);
@@ -28,6 +29,7 @@ public class CustomPlayer extends Player {
 				(0.1 * (EntityUtils.getEffect(this, PotionEffect.JUMP_BOOST).amplifier() + 1)) : 0.0;
 	}
 	
+	@Override
 	public void jump() {
 		int tps = MinecraftServer.TICK_PER_SECOND;
 		double yVel = getJumpVelocity() + getJumpBoostVelocityModifier();
@@ -38,6 +40,7 @@ public class CustomPlayer extends Player {
 		}
 	}
 	
+	@Override
 	public void afterSprintAttack() {
 		velocity = velocity.mul(0.6, 1, 0.6);
 	}
