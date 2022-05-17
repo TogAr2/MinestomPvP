@@ -1,6 +1,5 @@
 package io.github.bloepiloepi.pvp.explosion;
 
-import io.github.bloepiloepi.pvp.entities.CrystalEntity;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.collision.BoundingBox;

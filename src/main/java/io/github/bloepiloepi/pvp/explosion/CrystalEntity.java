@@ -1,4 +1,4 @@
-package io.github.bloepiloepi.pvp.entities;
+package io.github.bloepiloepi.pvp.explosion;
 
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import net.minestom.server.entity.EntityType;
