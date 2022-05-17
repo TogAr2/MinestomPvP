@@ -45,8 +45,8 @@ public class CustomPlayer extends Player implements PvpPlayer {
 	}
 	
 	@Override
-	public void addVelocity(Vec velocity) {
-		setVelocity(getVelocity().add(velocity));
+	public void addVelocity(Vec add) {
+		velocity = velocity.add(add);
 	}
 	
 	@SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
