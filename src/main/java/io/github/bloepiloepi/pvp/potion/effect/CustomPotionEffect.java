@@ -1,9 +1,9 @@
 package io.github.bloepiloepi.pvp.potion.effect;
 
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
-import io.github.bloepiloepi.pvp.entities.EntityGroup;
-import io.github.bloepiloepi.pvp.entities.EntityUtils;
-import io.github.bloepiloepi.pvp.entities.Tracker;
+import io.github.bloepiloepi.pvp.entity.EntityGroup;
+import io.github.bloepiloepi.pvp.entity.EntityUtils;
+import io.github.bloepiloepi.pvp.entity.Tracker;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeInstance;
 import net.minestom.server.attribute.AttributeModifier;

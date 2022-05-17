@@ -1,7 +1,7 @@
 package io.github.bloepiloepi.pvp.damage;
 
-import io.github.bloepiloepi.pvp.entities.EntityUtils;
-import io.github.bloepiloepi.pvp.entities.Tracker;
+import io.github.bloepiloepi.pvp.entity.EntityUtils;
+import io.github.bloepiloepi.pvp.entity.Tracker;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;

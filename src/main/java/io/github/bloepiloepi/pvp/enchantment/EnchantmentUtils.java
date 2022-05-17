@@ -1,7 +1,7 @@
 package io.github.bloepiloepi.pvp.enchantment;
 
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
-import io.github.bloepiloepi.pvp.entities.EntityGroup;
+import io.github.bloepiloepi.pvp.entity.EntityGroup;
 import io.github.bloepiloepi.pvp.enums.ArmorMaterial;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;

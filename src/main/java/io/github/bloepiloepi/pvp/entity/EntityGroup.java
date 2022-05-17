@@ -1,4 +1,4 @@
-package io.github.bloepiloepi.pvp.entities;
+package io.github.bloepiloepi.pvp.entity;
 
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;

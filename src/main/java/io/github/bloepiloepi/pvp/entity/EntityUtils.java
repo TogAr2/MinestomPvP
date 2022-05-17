@@ -1,10 +1,9 @@
-package io.github.bloepiloepi.pvp.entities;
+package io.github.bloepiloepi.pvp.entity;
 
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.enchantment.enchantments.ProtectionEnchantment;
 import io.github.bloepiloepi.pvp.enums.Tool;
-import io.github.bloepiloepi.pvp.listeners.DamageListener;
 import io.github.bloepiloepi.pvp.potion.PotionListener;
 import io.github.bloepiloepi.pvp.projectile.Arrow;
 import it.unimi.dsi.fastutil.Pair;

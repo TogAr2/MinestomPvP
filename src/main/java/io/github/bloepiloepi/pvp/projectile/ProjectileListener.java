@@ -1,8 +1,8 @@
 package io.github.bloepiloepi.pvp.projectile;
 
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
-import io.github.bloepiloepi.pvp.entities.EntityUtils;
-import io.github.bloepiloepi.pvp.entities.Tracker;
+import io.github.bloepiloepi.pvp.entity.EntityUtils;
+import io.github.bloepiloepi.pvp.entity.Tracker;
 import io.github.bloepiloepi.pvp.utils.ItemUtils;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import it.unimi.dsi.fastutil.Pair;
@@ -23,7 +23,9 @@ import net.minestom.server.event.player.PlayerItemAnimationEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.event.trait.PlayerEvent;
-import net.minestom.server.item.*;
+import net.minestom.server.item.Enchantment;
+import net.minestom.server.item.ItemStack;
+import net.minestom.server.item.Material;
 import net.minestom.server.item.metadata.CrossbowMeta;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;

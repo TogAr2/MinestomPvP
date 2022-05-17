@@ -1,6 +1,6 @@
 package io.github.bloepiloepi.pvp.legacy;
 
-import io.github.bloepiloepi.pvp.entities.Tracker;
+import io.github.bloepiloepi.pvp.entity.Tracker;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventListener;

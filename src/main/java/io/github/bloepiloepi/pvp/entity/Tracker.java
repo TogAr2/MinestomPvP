@@ -1,4 +1,4 @@
-package io.github.bloepiloepi.pvp.entities;
+package io.github.bloepiloepi.pvp.entity;
 
 import io.github.bloepiloepi.pvp.damage.combat.CombatManager;
 import io.github.bloepiloepi.pvp.food.HungerManager;
@@ -6,7 +6,8 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
-import net.minestom.server.event.*;
+import net.minestom.server.event.EventFilter;
+import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityFireEvent;
 import net.minestom.server.event.entity.EntityTickEvent;
 import net.minestom.server.event.instance.RemoveEntityFromInstanceEvent;

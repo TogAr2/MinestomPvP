@@ -1,6 +1,6 @@
 package io.github.bloepiloepi.pvp.potion;
 
-import io.github.bloepiloepi.pvp.entities.EntityUtils;
+import io.github.bloepiloepi.pvp.entity.EntityUtils;
 import io.github.bloepiloepi.pvp.events.PotionVisibilityEvent;
 import io.github.bloepiloepi.pvp.food.FoodListener;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffect;
@@ -13,10 +13,14 @@ import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
-import net.minestom.server.entity.*;
+import net.minestom.server.entity.GameMode;
+import net.minestom.server.entity.LivingEntity;
+import net.minestom.server.entity.Player;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
-import net.minestom.server.event.*;
+import net.minestom.server.event.EventDispatcher;
+import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventListener;
+import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityDeathEvent;
 import net.minestom.server.event.entity.EntityPotionAddEvent;
 import net.minestom.server.event.entity.EntityPotionRemoveEvent;

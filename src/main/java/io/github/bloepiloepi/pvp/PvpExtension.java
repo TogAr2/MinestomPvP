@@ -1,8 +1,8 @@
 package io.github.bloepiloepi.pvp;
 
 import io.github.bloepiloepi.pvp.enchantment.CustomEnchantments;
-import io.github.bloepiloepi.pvp.entities.CustomPlayer;
-import io.github.bloepiloepi.pvp.entities.Tracker;
+import io.github.bloepiloepi.pvp.entity.CustomPlayer;
+import io.github.bloepiloepi.pvp.entity.Tracker;
 import io.github.bloepiloepi.pvp.food.FoodListener;
 import io.github.bloepiloepi.pvp.legacy.SwordBlockHandler;
 import io.github.bloepiloepi.pvp.listeners.ArmorToolListener;

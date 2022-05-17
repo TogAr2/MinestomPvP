@@ -2,7 +2,7 @@ package io.github.bloepiloepi.pvp.projectile;
 
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
-import io.github.bloepiloepi.pvp.entities.EntityUtils;
+import io.github.bloepiloepi.pvp.entity.EntityUtils;
 import io.github.bloepiloepi.pvp.events.PickupArrowEvent;
 import io.github.bloepiloepi.pvp.utils.EffectManager;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
