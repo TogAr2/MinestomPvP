@@ -1,7 +1,7 @@
 package io.github.bloepiloepi.pvp.food;
 
-import io.github.bloepiloepi.pvp.entities.PvpPlayer;
 import io.github.bloepiloepi.pvp.entity.EntityUtils;
+import io.github.bloepiloepi.pvp.entity.PvpPlayer;
 import io.github.bloepiloepi.pvp.entity.Tracker;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import it.unimi.dsi.fastutil.Pair;

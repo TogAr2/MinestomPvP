@@ -1,6 +1,5 @@
 package io.github.bloepiloepi.pvp.entity;
 
-import io.github.bloepiloepi.pvp.entities.PvpPlayer;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
