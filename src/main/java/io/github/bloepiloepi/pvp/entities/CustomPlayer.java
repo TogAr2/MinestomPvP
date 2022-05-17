@@ -19,7 +19,10 @@ public class CustomPlayer extends Player implements PvpPlayer {
 		super(uuid, username, playerConnection);
 	}
 
-	@Override
+	protected double getJumpVelocity() {
+		return 0.42;
+	}
+
 	public double getJumpBoostVelocityModifier() {
 		return EntityUtils.hasEffect(this, PotionEffect.JUMP_BOOST) ?
 				(0.1 * (EntityUtils.getEffect(this, PotionEffect.JUMP_BOOST).amplifier() + 1)) : 0.0;
