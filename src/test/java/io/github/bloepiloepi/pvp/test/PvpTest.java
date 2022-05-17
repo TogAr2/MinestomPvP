@@ -2,20 +2,24 @@ package io.github.bloepiloepi.pvp.test;
 
 import io.github.bloepiloepi.pvp.PvpExtension;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
-import io.github.bloepiloepi.pvp.events.EntityKnockbackEvent;
 import io.github.bloepiloepi.pvp.events.LegacyKnockbackEvent;
+import io.github.bloepiloepi.pvp.explosion.PvpExplosionSupplier;
 import io.github.bloepiloepi.pvp.legacy.LegacyKnockbackSettings;
-import io.github.bloepiloepi.pvp.listeners.DamageListener;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffect;
 import io.github.bloepiloepi.pvp.test.commands.Commands;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.entity.*;
+import net.minestom.server.entity.EntityCreature;
+import net.minestom.server.entity.EntityType;
+import net.minestom.server.entity.GameMode;
+import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.GlobalEventHandler;
-import net.minestom.server.event.player.*;
+import net.minestom.server.event.player.PlayerLoginEvent;
+import net.minestom.server.event.player.PlayerSpawnEvent;
+import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.extras.lan.OpenToLAN;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.potion.Potion;
@@ -92,6 +96,8 @@ public class PvpTest {
 //				.build();
 //		MinecraftServer.getGlobalEventHandler().addListener(LegacyKnockbackEvent.class,
 //				event -> event.setSettings(settings));
+		
+		instance.setExplosionSupplier(new PvpExplosionSupplier(instance));
 		
 		GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
 		eventHandler.addChild(PvpExtension.legacyEvents());

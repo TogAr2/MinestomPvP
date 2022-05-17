@@ -3,6 +3,7 @@ package io.github.bloepiloepi.pvp;
 import io.github.bloepiloepi.pvp.enchantment.CustomEnchantments;
 import io.github.bloepiloepi.pvp.entity.CustomPlayer;
 import io.github.bloepiloepi.pvp.entity.Tracker;
+import io.github.bloepiloepi.pvp.explosion.ExplosionListener;
 import io.github.bloepiloepi.pvp.food.FoodListener;
 import io.github.bloepiloepi.pvp.legacy.SwordBlockHandler;
 import io.github.bloepiloepi.pvp.listeners.ArmorToolListener;
@@ -46,6 +47,7 @@ public class PvpExtension extends Extension {
 		
 		node.addChild(AttackManager.events(true));
 		node.addChild(DamageListener.events(true));
+		node.addChild(ExplosionListener.events());
 		node.addChild(ArmorToolListener.events(true));
 		node.addChild(FoodListener.events(true));
 		node.addChild(PotionListener.events(true));
@@ -76,6 +78,16 @@ public class PvpExtension extends Extension {
 	 */
 	public static EventNode<EntityEvent> damageEvents() {
 		return DamageListener.events(false);
+	}
+	
+	/**
+	 * Creates an EventNode with explosion events.
+	 * This includes end crystals.
+	 *
+	 * @return The EventNode with explosion events
+	 */
+	public static EventNode<EntityEvent> explosionEvents() {
+		return ExplosionListener.events();
 	}
 	
 	/**
