@@ -123,7 +123,13 @@ public record PvpExplosionSupplier(@NotNull Instance instance) implements Explos
 							.findAny().orElse(null);
 				}
 				
-				CustomDamageType damageType = CustomDamageType.explosion(this, causingEntity);
+				boolean anchor = false;
+				if (additionalData != null && additionalData.contains("anchor")) {
+					anchor = Boolean.TRUE.equals(additionalData.getBoolean("anchor"));
+				}
+				
+				CustomDamageType damageType = anchor ? CustomDamageType.invalidRespawnPointExplosion()
+						: CustomDamageType.explosion(this, causingEntity);
 				for (Entity en : entities) {
 					if (!(en instanceof LivingEntity entity))
 						continue;

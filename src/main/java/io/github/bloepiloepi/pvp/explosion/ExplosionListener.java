@@ -1,16 +1,23 @@
 package io.github.bloepiloepi.pvp.explosion;
 
 import io.github.bloepiloepi.pvp.entities.CrystalEntity;
+import io.github.bloepiloepi.pvp.utils.SoundManager;
+import net.kyori.adventure.sound.Sound;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.entity.Entity;
+import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
+import net.minestom.server.event.player.PlayerBlockInteractEvent;
 import net.minestom.server.event.player.PlayerUseItemOnBlockEvent;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import net.minestom.server.sound.SoundEvent;
+import org.jglrxavpok.hephaistos.nbt.NBT;
 
 public class ExplosionListener {
 	
@@ -34,7 +41,54 @@ public class ExplosionListener {
 			CrystalEntity entity = new CrystalEntity();
 			entity.setInstance(instance, above.add(0.5, 0, 0.5));
 			
-			event.getPlayer().setItemInHand(event.getHand(), event.getItemStack().consume(1));
+			if (!event.getPlayer().isCreative())
+				event.getPlayer().setItemInHand(event.getHand(), event.getItemStack().consume(1));
+		});
+		
+		node.addListener(PlayerBlockInteractEvent.class, event -> {
+			Instance instance = event.getInstance();
+			Block block = instance.getBlock(event.getBlockPosition());
+			Player player = event.getPlayer();
+			if (!block.compare(Block.RESPAWN_ANCHOR)) return;
+			
+			// Exit if offhand has glowstone but current hand is main
+			if (event.getHand() == Player.Hand.MAIN
+					&& player.getItemInMainHand().material() != Material.GLOWSTONE
+					&& player.getItemInOffHand().material() == Material.GLOWSTONE)
+				return;
+			
+			ItemStack stack = player.getItemInHand(event.getHand());
+			int charges = Integer.parseInt(block.getProperty("charges"));
+			if (stack.material() == Material.GLOWSTONE && charges < 4) {
+				instance.setBlock(event.getBlockPosition(),
+						block.withProperty("charges", String.valueOf(charges + 1)));
+				SoundManager.sendToAround(
+						instance, event.getBlockPosition().add(0.5, 0.5, 0.5),
+						SoundEvent.BLOCK_RESPAWN_ANCHOR_CHARGE, Sound.Source.BLOCK,
+						1.0f, 1.0f
+				);
+				
+				if (!player.isCreative())
+					player.setItemInHand(event.getHand(), player.getItemInHand(event.getHand()).consume(1));
+				
+				event.setBlockingItemUse(true);
+				return;
+			}
+			
+			if (charges == 0) return;
+			
+			if (!instance.getDimensionType().isRespawnAnchorSafe()) {
+				instance.setBlock(event.getBlockPosition(), Block.AIR);
+				instance.explode(
+						(float) (event.getBlockPosition().x() + 0.5),
+						(float) (event.getBlockPosition().y() + 0.5),
+						(float) (event.getBlockPosition().z() + 0.5),
+						5.0f,
+						NBT.Compound(NBT -> NBT.setByte("fire", (byte) 1).setByte("anchor", (byte) 1))
+				);
+			}
+			
+			event.setBlockingItemUse(true);
 		});
 		
 		return node;
