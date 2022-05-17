@@ -44,10 +44,10 @@ public class CrystalEntity extends LivingEntity {
 			// Set the last damage type since the event is not cancelled
 			this.lastDamageSource = entityDamageEvent.getDamageType();
 			
+			remove();
 			if (!(type instanceof CustomDamageType damageType) || !damageType.isExplosive()) {
 				instance.explode((float) position.x(), (float) position.y(), (float) position.z(), 6.0f);
 			}
-			remove();
 		});
 		
 		return !entityDamageEvent.isCancelled();
