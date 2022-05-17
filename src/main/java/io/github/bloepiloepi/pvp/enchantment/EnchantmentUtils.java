@@ -110,6 +110,15 @@ public class EnchantmentUtils {
 		}
 	}
 	
+	public static double getExplosionKnockback(LivingEntity entity, double strength) {
+		short level = getEquipmentLevel(CustomEnchantments.get(Enchantment.BLAST_PROTECTION), entity);
+		if (level > 0) {
+			strength -= Math.floor((strength * (double) (level * 0.15F)));
+		}
+		
+		return strength;
+	}
+	
 	public static void onUserDamaged(LivingEntity user, LivingEntity attacker) {
 		if (user != null) {
 			forEachEnchantment((enchantment, level) -> enchantment.onUserDamaged(user, attacker, level),
