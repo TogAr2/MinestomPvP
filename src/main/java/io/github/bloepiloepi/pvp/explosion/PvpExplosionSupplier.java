@@ -235,7 +235,7 @@ public record PvpExplosionSupplier(@NotNull Instance instance) implements Explos
 					double rayX = box.minX() + dx * box.width();
 					double rayY = box.minY() + dy * box.height();
 					double rayZ = box.minZ() + dz * box.depth();
-					Point point = new Vec(rayX + g, rayY, rayZ + h);
+					Point point = new Vec(rayX + g, rayY, rayZ + h).add(entity.getPosition());
 					if (noBlocking(entity.getInstance(), point, center)) exposedCount++;
 					rayCount++;
 					dz += zStep;
