@@ -143,7 +143,7 @@ public final class PvpExplosionSupplier implements ExplosionSupplier {
 									/ 2.0D * 7.0D * strength + 1.0D);
 							double knockback = currentStrength;
 							if (entity instanceof LivingEntity living) {
-								living.damage(damageType, damage);
+								if (!living.damage(damageType, damage)) continue;
 								knockback = EnchantmentUtils.getExplosionKnockback(living, currentStrength);
 							}
 							
