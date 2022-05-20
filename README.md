@@ -86,12 +86,17 @@ A lot of servers like to customize their 1.8 knockback. It is also possible to d
 
 To integrate this extension into your minestom server, you may have to tweak a little bit to make sure everything works correctly.
 
-When applying damage to an entity, use `CustomDamageType` instead of `DamageType` (except if you use the default ones: `GRAVITY`, `ON_FIRE` and `VOID`).
+When applying damage to an entity, use `CustomDamageType` instead of `DamageType`.
 If you have your own damage type, also extend `CustomDamageType` instead of `DamageType`.
 
 Potions and milk buckets are considered food: the Minestom food events are also called for drinkable items.
 
 The extension uses a custom player implementation, if you use one, it is recommended to extend `CustomPlayer`. If you for some reason can't, make sure to implement `PvpPlayer`. The implementation is registered inside `PvpExtension.init()`, so register yours after the call.
+
+To allow explosions, you have to register `PvpExplosionSupplier` to every instance in which they are used.
+```
+instance.setExplosionSupplier(PvpExplosionSupplier.INSTANCE);
+```
 
 ### Events
 
