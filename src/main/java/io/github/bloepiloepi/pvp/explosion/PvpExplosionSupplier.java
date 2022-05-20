@@ -3,6 +3,7 @@ package io.github.bloepiloepi.pvp.explosion;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entity.PvpPlayer;
+import io.github.bloepiloepi.pvp.events.ExplosionEvent;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.collision.CollisionUtils;
@@ -12,6 +13,7 @@ import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
+import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.instance.Chunk;
 import net.minestom.server.instance.Explosion;
 import net.minestom.server.instance.ExplosionSupplier;
@@ -89,6 +91,11 @@ public final class PvpExplosionSupplier implements ExplosionSupplier {
 						}
 					}
 				}
+				
+				// Blocks list may be modified during the event call
+				ExplosionEvent explosionEvent = new ExplosionEvent(instance, blocks);
+				EventDispatcher.call(explosionEvent);
+				if (explosionEvent.isCancelled()) return null;
 				
 				double strength = this.getStrength() * 2.0F;
 				int minX_ = (int) Math.floor(this.getCenterX() - strength - 1.0D);
@@ -174,6 +181,7 @@ public final class PvpExplosionSupplier implements ExplosionSupplier {
 			@Override
 			public void apply(@NotNull Instance instance) {
 				List<Point> blocks = prepare(instance);
+				if (blocks == null) return; // Event was cancelled
 				byte[] records = new byte[3 * blocks.size()];
 				for (int i = 0; i < blocks.size(); i++) {
 					final var pos = blocks.get(i);
