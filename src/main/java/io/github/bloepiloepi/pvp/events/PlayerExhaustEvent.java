@@ -7,7 +7,7 @@ import net.minestom.server.event.trait.PlayerEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Called when a players exhaustion level changes.
+ * Called when a players' exhaustion level changes.
  * This is used to determine when their food level should change.
  */
 public class PlayerExhaustEvent implements PlayerEvent, EntityInstanceEvent, CancellableEvent {

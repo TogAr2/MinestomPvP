@@ -1,8 +1,8 @@
 package io.github.bloepiloepi.pvp.projectile;
 
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
-import io.github.bloepiloepi.pvp.entities.EntityUtils;
-import io.github.bloepiloepi.pvp.entities.Tracker;
+import io.github.bloepiloepi.pvp.entity.EntityUtils;
+import io.github.bloepiloepi.pvp.entity.Tracker;
 import io.github.bloepiloepi.pvp.utils.ItemUtils;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import it.unimi.dsi.fastutil.Pair;
@@ -120,19 +120,19 @@ public class ProjectileListener {
 				
 				bobber.setVelocity(velocity.mul(MinecraftServer.TICK_PER_SECOND * 0.75));
 			}
-		}).filter(event -> event.getItemStack().getMaterial() == Material.FISHING_ROD).build());
+		}).filter(event -> event.getItemStack().material() == Material.FISHING_ROD).build());
 		
 		node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
 			Player player = event.getPlayer();
 			ItemStack stack = event.getItemStack();
 			
-			if (Tracker.hasCooldown(player, stack.getMaterial())) {
+			if (Tracker.hasCooldown(player, stack.material())) {
 				event.setCancelled(true);
 				return;
 			}
 			
-			boolean snowball = stack.getMaterial() == Material.SNOWBALL;
-			boolean enderpearl = stack.getMaterial() == Material.ENDER_PEARL;
+			boolean snowball = stack.material() == Material.SNOWBALL;
+			boolean enderpearl = stack.material() == Material.ENDER_PEARL;
 			
 			SoundEvent soundEvent;
 			CustomEntityProjectile projectile;
@@ -171,16 +171,16 @@ public class ProjectileListener {
 					player.isOnGround() ? 0.0D : playerVel.y(), playerVel.z()));
 			
 			if (!player.isCreative()) {
-				player.setItemInHand(event.getHand(), stack.withAmount(stack.getAmount() - 1));
+				player.setItemInHand(event.getHand(), stack.withAmount(stack.amount() - 1));
 			}
-		}).filter(event -> event.getItemStack().getMaterial() == Material.SNOWBALL
-				|| event.getItemStack().getMaterial() == Material.EGG
-				|| event.getItemStack().getMaterial() == Material.ENDER_PEARL)
+		}).filter(event -> event.getItemStack().material() == Material.SNOWBALL
+				|| event.getItemStack().material() == Material.EGG
+				|| event.getItemStack().material() == Material.ENDER_PEARL)
 				.build());
 		
 		node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
 			ItemStack stack = event.getItemStack();
-			if (crossbow(stack).isCharged()) {
+			if (stack.meta(CrossbowMeta.class).isCharged()) {
 				// Make sure the animation event is not called, because this is not an animation
 				event.setCancelled(true);
 				
@@ -200,7 +200,7 @@ public class ProjectileListener {
 					Tracker.itemUseHand.put(event.getPlayer().getUuid(), event.getHand());
 				}
 			}
-		}).filter(event -> event.getItemStack().getMaterial() == Material.CROSSBOW).build());
+		}).filter(event -> event.getItemStack().material() == Material.CROSSBOW).build());
 		
 		node.addListener(PlayerItemAnimationEvent.class, event -> {
 			if (event.getItemAnimationType() == PlayerItemAnimationEvent.ItemAnimationType.BOW) {
@@ -289,10 +289,10 @@ public class ProjectileListener {
 			ItemUtils.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
 					EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, 1);
 			
-			boolean reallyInfinite = infinite && projectile.getMaterial() == Material.ARROW;
+			boolean reallyInfinite = infinite && projectile.material() == Material.ARROW;
 			if (reallyInfinite || player.isCreative()
-					&& (projectile.getMaterial() == Material.SPECTRAL_ARROW
-					|| projectile.getMaterial() == Material.TIPPED_ARROW)) {
+					&& (projectile.material() == Material.SPECTRAL_ARROW
+					|| projectile.material() == Material.TIPPED_ARROW)) {
 				arrow.pickupMode = AbstractArrow.PickupMode.CREATIVE_ONLY;
 			}
 			
@@ -316,9 +316,9 @@ public class ProjectileListener {
 			
 			if (!reallyInfinite && !player.isCreative() && projectileSlot >= 0) {
 				player.getInventory().setItemStack(projectileSlot,
-						projectile.withAmount(projectile.getAmount() - 1));
+						projectile.withAmount(projectile.amount() - 1));
 			}
-		}).filter(event -> event.getItemStack().getMaterial() == Material.BOW).build());
+		}).filter(event -> event.getItemStack().material() == Material.BOW).build());
 		
 		node.addListener(EventListener.builder(ItemUpdateStateEvent.class).handler(event -> {
 			Player player = event.getPlayer();
@@ -329,7 +329,7 @@ public class ProjectileListener {
 			if (quickCharge < 6) {
 				long useDuration = System.currentTimeMillis() - Tracker.itemUseStartTime.get(player.getUuid());
 				double power = getCrossbowPowerForTime(useDuration, stack);
-				if (!(power >= 1.0F) || crossbow(stack).isCharged())
+				if (!(power >= 1.0F) || stack.meta(CrossbowMeta.class).isCharged())
 					return;
 			}
 			
@@ -342,7 +342,7 @@ public class ProjectileListener {
 					1.0F, 1.0F / (random.nextFloat() * 0.5F + 1.0F) + 0.2F);
 			
 			player.setItemInHand(event.getHand(), stack);
-		}).filter(event -> event.getItemStack().getMaterial() == Material.CROSSBOW).build());
+		}).filter(event -> event.getItemStack().material() == Material.CROSSBOW).build());
 		
 		return node;
 	}
@@ -358,7 +358,7 @@ public class ProjectileListener {
 	}
 	
 	public static AbstractArrow createArrow(ItemStack stack, @Nullable Entity shooter, boolean legacy) {
-		if (stack.getMaterial() == Material.SPECTRAL_ARROW) {
+		if (stack.material() == Material.SPECTRAL_ARROW) {
 			return new SpectralArrow(shooter);
 		} else {
 			Arrow arrow = new Arrow(shooter, legacy);
@@ -382,24 +382,24 @@ public class ProjectileListener {
 	}
 	
 	public static ItemStack setCrossbowCharged(ItemStack stack, boolean charged) {
-		return stack.withMeta(meta -> ((CrossbowMeta.Builder) meta).charged(charged));
+		return stack.withMeta(CrossbowMeta.class, meta -> meta.charged(charged));
 	}
 	
 	public static ItemStack setCrossbowProjectile(ItemStack stack, ItemStack projectile) {
-		return stack.withMeta(meta -> ((CrossbowMeta.Builder) meta).projectile(projectile));
+		return stack.withMeta(CrossbowMeta.class, meta -> meta.projectile(projectile));
 	}
 	
 	public static ItemStack setCrossbowProjectiles(ItemStack stack, ItemStack projectile1,
 	                                               ItemStack projectile2, ItemStack projectile3) {
-		return stack.withMeta(meta -> ((CrossbowMeta.Builder) meta)
-				.projectiles(projectile1, projectile2, projectile3));
+		return stack.withMeta(CrossbowMeta.class, meta -> meta.projectiles(projectile1, projectile2, projectile3));
 	}
 	
 	public static boolean crossbowContainsProjectile(ItemStack stack, Material projectile) {
-		CrossbowMeta meta = crossbow(stack);
-		if (meta.getProjectile1().getMaterial() == projectile) return true;
-		if (meta.getProjectile2().getMaterial() == projectile) return true;
-		return meta.getProjectile3().getMaterial() == projectile;
+		CrossbowMeta meta = stack.meta(CrossbowMeta.class);
+		if (meta.getProjectiles().get(0).material() == projectile) return true;
+		if (meta.getProjectiles().size() < 2) return false;
+		if (meta.getProjectiles().get(1).material() == projectile) return true;
+		return meta.getProjectiles().get(2).material() == projectile;
 	}
 	
 	public static int getCrossbowUseDuration(ItemStack stack) {
@@ -440,35 +440,31 @@ public class ProjectileListener {
 		}
 		
 		if (!player.isCreative() && projectileSlot >= 0) {
-			player.getInventory().setItemStack(projectileSlot, projectile.withAmount(projectile.getAmount() - 1));
+			player.getInventory().setItemStack(projectileSlot, projectile.withAmount(projectile.amount() - 1));
 		}
 		
 		return stack;
 	}
 	
-	public static CrossbowMeta crossbow(ItemStack stack) {
-		return (CrossbowMeta) stack.getMeta();
-	}
-	
 	public static ItemStack performCrossbowShooting(Player player, Player.Hand hand, ItemStack stack,
 	                                           double power, double spread, boolean legacy) {
-		CrossbowMeta meta = crossbow(stack);
-		ItemStack projectile = meta.getProjectile1();
+		CrossbowMeta meta = stack.meta(CrossbowMeta.class);
+		ItemStack projectile = meta.getProjectiles().get(0);
 		if (!projectile.isAir()) {
 			shootCrossbowProjectile(player, hand, stack, projectile, 1.0F, power, spread, 0.0F, legacy);
 		}
 		
-		if (meta.isTriple()) {
+		if (meta.getProjectiles().size() > 2) {
 			ThreadLocalRandom random = ThreadLocalRandom.current();
 			boolean firstHighPitch = random.nextBoolean();
 			float firstPitch = getRandomShotPitch(firstHighPitch, random);
 			float secondPitch = getRandomShotPitch(!firstHighPitch, random);
 			
-			projectile = meta.getProjectile2();
+			projectile = meta.getProjectiles().get(1);
 			if (!projectile.isAir()) {
 				shootCrossbowProjectile(player, hand, stack, projectile, firstPitch, power, spread, -10.0F, legacy);
 			}
-			projectile = meta.getProjectile3();
+			projectile = meta.getProjectiles().get(2);
 			if (!projectile.isAir()) {
 				shootCrossbowProjectile(player, hand, stack, projectile, secondPitch, power, spread, 10.0F, legacy);
 			}
@@ -480,7 +476,7 @@ public class ProjectileListener {
 	public static void shootCrossbowProjectile(Player player, Player.Hand hand, ItemStack crossbowStack,
 	                                           ItemStack projectile, float soundPitch,
 	                                           double power, double spread, float yaw, boolean legacy) {
-		boolean firework = projectile.getMaterial() == Material.FIREWORK_ROCKET;
+		boolean firework = projectile.material() == Material.FIREWORK_ROCKET;
 		if (firework) return; //TODO firework
 		
 		AbstractArrow arrow = getCrossbowArrow(player, crossbowStack, projectile, legacy);

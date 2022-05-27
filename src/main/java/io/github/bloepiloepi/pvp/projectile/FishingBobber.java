@@ -1,7 +1,7 @@
 package io.github.bloepiloepi.pvp.projectile;
 
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
-import io.github.bloepiloepi.pvp.entities.EntityUtils;
+import io.github.bloepiloepi.pvp.entity.EntityUtils;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -108,8 +108,8 @@ public class FishingBobber extends CustomEntityProjectile {
 	}
 	
 	private boolean shouldStopFishing(Player player) {
-		boolean main = player.getItemInMainHand().getMaterial() == Material.FISHING_ROD;
-		boolean off = player.getItemInOffHand().getMaterial() == Material.FISHING_ROD;
+		boolean main = player.getItemInMainHand().material() == Material.FISHING_ROD;
+		boolean off = player.getItemInOffHand().material() == Material.FISHING_ROD;
 		if (player.isRemoved() || player.isDead() || (!main && !off)
 				|| (!legacy && getDistanceSquared(player) > 1024)) {
 			setOwnerEntity(null);

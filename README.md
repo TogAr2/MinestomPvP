@@ -37,11 +37,14 @@ Currently, most vanilla PvP features are supported.
 - Fishing rods (only hooking entities or legacy knockback, not fishing)
 - Other projectiles (potions, snowballs, eggs, ender pearls)
 - All enchantments possible with the above features (this includes protection, sharpness, knockback, ...)
+- Fall damage
+- End Crystals
+- TNT
+- Respawn Anchors (Explosion Only)
 
 ## Plans
 
 - Lingering potions
-- Fall damage
 - Fireworks (for crossbows)
 - Projectile collision might need some improvements (which is a Minestom issue too)
 
@@ -52,10 +55,12 @@ This will apply PvP mechanics to your whole server.
 
 But you can also choose to (and this is the preferred option for most servers) use the jar file as a library.
 In this case, you can choose where to apply the PvP mechanics and customize them.
-You can get an `EventNode` with all PvP related events listening using `PvpExtension.events()`.
+
+Before doing anything else, you should call `PvpExtension.init()`. This will make sure everything is registered correctly.
+After you've initialized the extension, you can get an `EventNode` with all PvP related events listening using `PvpExtension.events()`.
 By adding this node as a child to any other node, you enable pvp in that scope.
+
 Separated features of this extension are also available as static methods in `PvpExtension`.
-You also have to call `PvpExtension.init()` before doing anything else.
 
 Example (adds PvP to the global event handler, so everywhere):
 ```java
@@ -81,10 +86,17 @@ A lot of servers like to customize their 1.8 knockback. It is also possible to d
 
 To integrate this extension into your minestom server, you may have to tweak a little bit to make sure everything works correctly.
 
-When applying damage to an entity, use `CustomDamageType` instead of `DamageType` (except if you use the default ones: `GRAVITY`, `ON_FIRE` and `VOID`).
+When applying damage to an entity, use `CustomDamageType` instead of `DamageType`.
 If you have your own damage type, also extend `CustomDamageType` instead of `DamageType`.
 
 Potions and milk buckets are considered food: the Minestom food events are also called for drinkable items.
+
+The extension uses a custom player implementation, if you use one, it is recommended to extend `CustomPlayer`. If you for some reason can't, make sure to implement `PvpPlayer`. The implementation is registered inside `PvpExtension.init()`, so register yours after the call.
+
+To allow explosions, you have to register `PvpExplosionSupplier` to every instance in which they are used.
+```
+instance.setExplosionSupplier(PvpExplosionSupplier.INSTANCE);
+```
 
 ### Events
 
@@ -94,11 +106,13 @@ This extension provides several events:
 - `EntityKnockbackEvent`: cancellable, called when an entity gets knocked back by another entity. Gets called twice for weapons with the knockback enchantment (once for default damage knockback, once for the extra knockback). This event can be used to set the knockback strength.
 - `EntityPreDeathEvent`: cancellable, a form of `EntityDeathEvent` but cancellable and with a damage type.
 - `EquipmentDamageEvent`: cancellable, called when an item in an equipment slot gets damaged.
-- `FinalAttackEvent`: cancellable, called when a player attacks an entity. This event can be used to set a few variables like sprint, critical, sweeping, etc.
+- `ExplosionEvent`: cancellable, called when an explosion will take place. Can be used to modify the affected blocks.
+- `FinalAttackEvent`: cancellable, called when a player attacks an entity. Can be used to set a few variables like sprint, critical, sweeping, etc.
 - `FinalDamageEvent`: cancellable, called when the final damage calculation (including armor and effects) is completed. This event should be used instead of `EntityDamageEvent`, unless you want to detect how much damage was originally dealt.
 - `LegacyKnockbackEvent`: cancellable, called when an entity gets knocked back by another entity using legacy pvp. Same applies as for `EntityKnockbackEvent`. This event can be used to change the knockback settings.
 - `PickupArrowEvent`: cancellable, called when a player picks up an arrow.
-- `PlayerExhaustEvent`: cancellable, called when a players exhaustion level changes.
+- `PlayerExhaustEvent`: cancellable, called when a players' exhaustion level changes.
+- `PlayerRegenerateEvent`: cancellable, called when a player naturally regenerates health.
 - `PlayerSpectateEvent`: cancellable, called when a spectator tries to spectate an entity by attacking it.
 - `PotionVisibilityEvent`: cancellable, called when an entities potion state (ambient, particle color and invisibility) is updated.
 - `ProjectileBlockHitEvent`: called when a projectile hits a block.

@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 public class ItemUtils {
 	
 	public static ItemStack damage(ItemStack stack, int amount) {
-		if (amount == 0 || stack.getMaterial().registry().maxDamage() <= 0)
+		if (amount == 0 || stack.material().registry().maxDamage() <= 0)
 			return stack;
 		
 		return stack.withMeta(meta -> {
@@ -32,19 +32,19 @@ public class ItemUtils {
 			}
 			
 			newAmount -= preventAmount;
-			if (newAmount <= 0) return meta;
+			if (newAmount <= 0) return;
 			
-			return meta.damage(stack.getMeta().getDamage() + newAmount);
+			meta.damage(stack.meta().getDamage() + newAmount);
 		});
 	}
 	
 	public static <T extends LivingEntity> ItemStack damage(ItemStack stack, int amount,
 	                                                        T entity, Consumer<T> breakCallback) {
-		if (amount == 0 || stack.getMaterial().registry().maxDamage() <= 0)
+		if (amount == 0 || stack.material().registry().maxDamage() <= 0)
 			return stack;
 		
 		ItemStack newStack = damage(stack, amount);
-		if (newStack.getMeta().getDamage() >= stack.getMaterial().registry().maxDamage()) {
+		if (newStack.meta().getDamage() >= stack.material().registry().maxDamage()) {
 			breakCallback.accept(entity);
 			newStack = newStack.withAmount(i -> i - 1).withMeta(meta -> meta.damage(0));
 		}
@@ -71,8 +71,8 @@ public class ItemUtils {
 		for (EquipmentSlot slot : slots) {
 			ItemStack stack = entity.getEquipment(slot);
 			if ((!damageType.isFire()
-					|| !stack.getMaterial().namespace().value().toLowerCase().contains("netherite"))
-					&& ArmorMaterial.fromMaterial(stack.getMaterial()) != null) {
+					|| !stack.material().namespace().value().toLowerCase().contains("netherite"))
+					&& ArmorMaterial.fromMaterial(stack.material()) != null) {
 				damageEquipment(entity, slot, (int) damage);
 			}
 		}

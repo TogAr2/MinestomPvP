@@ -48,11 +48,11 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 	public void splash(@Nullable Entity entity) {
 		ItemStack item = getItem();
 		
-		PotionMeta meta = (PotionMeta) item.getMeta();
+		PotionMeta meta = item.meta(PotionMeta.class);
 		List<Potion> potions = PotionListener.getAllPotions(meta, legacy);
 		
 		if (!potions.isEmpty()) {
-			if (item.getMaterial() == Material.LINGERING_POTION) {
+			if (item.material() == Material.LINGERING_POTION) {
 				//TODO lingering
 			} else {
 				applySplash(potions, entity);

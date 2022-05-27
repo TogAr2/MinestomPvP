@@ -1,6 +1,6 @@
 package io.github.bloepiloepi.pvp.potion;
 
-import io.github.bloepiloepi.pvp.entities.EntityUtils;
+import io.github.bloepiloepi.pvp.entity.EntityUtils;
 import io.github.bloepiloepi.pvp.events.PotionVisibilityEvent;
 import io.github.bloepiloepi.pvp.food.FoodListener;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffect;
@@ -13,10 +13,14 @@ import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
-import net.minestom.server.entity.*;
+import net.minestom.server.entity.GameMode;
+import net.minestom.server.entity.LivingEntity;
+import net.minestom.server.entity.Player;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
-import net.minestom.server.event.*;
+import net.minestom.server.event.EventDispatcher;
+import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventListener;
+import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityDeathEvent;
 import net.minestom.server.event.entity.EntityPotionAddEvent;
 import net.minestom.server.event.entity.EntityPotionRemoveEvent;
@@ -128,7 +132,7 @@ public class PotionListener {
 		
 		node.addListener(EventListener.builder(PlayerPreEatEvent.class).handler(event -> {
 			event.setEatingTime(32L * MinecraftServer.TICK_MS); //Potion use time is always 32 ticks
-		}).filter(event -> event.getFoodItem().getMaterial() == Material.POTION).build());
+		}).filter(event -> event.getFoodItem().material() == Material.POTION).build());
 		
 		node.addListener(EventListener.builder(PlayerEatEvent.class).handler(event -> {
 			Player player = event.getPlayer();
@@ -136,7 +140,7 @@ public class PotionListener {
 			
 			FoodListener.triggerEatSounds(player, null);
 			
-			List<Potion> potions = getAllPotions((PotionMeta) stack.getMeta(), legacy);
+			List<Potion> potions = getAllPotions(stack.meta(PotionMeta.class), legacy);
 			
 			//Apply the potions
 			for (Potion potion : potions) {
@@ -150,14 +154,14 @@ public class PotionListener {
 			}
 			
 			if (!player.isCreative()) {
-				if (stack.getAmount() == 1) {
+				if (stack.amount() == 1) {
 					player.setItemInHand(event.getHand(), GLASS_BOTTLE);
 				} else {
-					player.setItemInHand(event.getHand(), stack.withAmount(stack.getAmount() - 1));
+					player.setItemInHand(event.getHand(), stack.withAmount(stack.amount() - 1));
 					player.getInventory().addItemStack(GLASS_BOTTLE);
 				}
 			}
-		}).filter(event -> event.getFoodItem().getMaterial() == Material.POTION).build());
+		}).filter(event -> event.getFoodItem().material() == Material.POTION).build());
 		
 		node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
 			ThreadLocalRandom random = ThreadLocalRandom.current();
@@ -165,7 +169,7 @@ public class PotionListener {
 					0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f));
 			
 			throwPotion(event.getPlayer(), event.getItemStack(), event.getHand(), legacy);
-		}).filter(event -> event.getItemStack().getMaterial() == Material.SPLASH_POTION).build());
+		}).filter(event -> event.getItemStack().material() == Material.SPLASH_POTION).build());
 		
 		node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
 			ThreadLocalRandom random = ThreadLocalRandom.current();
@@ -173,7 +177,7 @@ public class PotionListener {
 					0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f));
 			
 			throwPotion(event.getPlayer(), event.getItemStack(), event.getHand(), legacy);
-		}).filter(event -> event.getItemStack().getMaterial() == Material.LINGERING_POTION).build());
+		}).filter(event -> event.getItemStack().material() == Material.LINGERING_POTION).build());
 		
 		return node;
 	}
@@ -195,7 +199,7 @@ public class PotionListener {
 				player.isOnGround() ? 0.0D : playerVel.y(), playerVel.z()));
 		
 		if (!player.isCreative()) {
-			player.setItemInHand(hand, stack.withAmount(stack.getAmount() - 1));
+			player.setItemInHand(hand, stack.withAmount(stack.amount() - 1));
 		}
 	}
 	
@@ -244,7 +248,7 @@ public class PotionListener {
 	}
 	
 	public static int getColor(ItemStack stack, boolean legacy) {
-		PotionMeta meta = (PotionMeta) stack.getMeta();
+		PotionMeta meta = stack.meta(PotionMeta.class);
 		if (meta.getColor() != null) {
 			return meta.getColor().asRGB();
 		} else {

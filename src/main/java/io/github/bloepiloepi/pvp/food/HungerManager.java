@@ -2,6 +2,7 @@ package io.github.bloepiloepi.pvp.food;
 
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.events.PlayerExhaustEvent;
+import io.github.bloepiloepi.pvp.events.PlayerRegenerateEvent;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventDispatcher;
@@ -49,15 +50,13 @@ public class HungerManager {
 			++this.foodStarvationTimer;
 			if (this.foodStarvationTimer >= 10) {
 				float f = Math.min(player.getFoodSaturation(), 6.0F);
-				player.setHealth(player.getHealth() + (f / 6.0F));
-				this.addExhaustion(f);
+				regenerate(f / 6.0F, f);
 				this.foodStarvationTimer = 0;
 			}
 		} else if (player.getFood() >= 18 && player.getHealth() > 0.0F && player.getHealth() < player.getMaxHealth()) {
 			++this.foodStarvationTimer;
 			if (this.foodStarvationTimer >= 80) {
-				player.setHealth(player.getHealth() + 1.0F);
-				this.addExhaustion(legacy ? 3.0F : 6.0F);
+				regenerate(1.0F, legacy ? 3.0F : 6.0F);
 				this.foodStarvationTimer = 0;
 			}
 		} else if (player.getFood() <= 0) {
@@ -72,6 +71,14 @@ public class HungerManager {
 		} else {
 			this.foodStarvationTimer = 0;
 		}
+	}
+	
+	private void regenerate(float health, float exhaustion) {
+		PlayerRegenerateEvent event = new PlayerRegenerateEvent(player, health, exhaustion);
+		EventDispatcher.callCancellable(event, () -> {
+			player.setHealth(player.getHealth() + event.getAmount());
+			addExhaustion(event.getExhaustion());
+		});
 	}
 	
 	public void addExhaustion(float exhaustion) {

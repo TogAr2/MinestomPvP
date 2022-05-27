@@ -7,41 +7,19 @@ import net.minestom.server.MinecraftServer;
  * <br><br>
  * For further documentation, see the <a href="https://github.com/kernitus/BukkitOldCombatMechanics/blob/d222286fd84fe983fdbdff79699182837871ab9b/src/main/resources/config.yml#L279">config of BukkitOldCombatMechanics</a>
  */
-public class LegacyKnockbackSettings {
+public record LegacyKnockbackSettings(double horizontal, double vertical,
+                                      double verticalLimit,
+                                      double extraHorizontal, double extraVertical) {
 	public static final LegacyKnockbackSettings DEFAULT = builder().build();
-	
-	private final double horizontal, vertical;
-	private final double verticalLimit;
-	private final double extraHorizontal, extraVertical;
 	
 	public LegacyKnockbackSettings(double horizontal, double vertical, double verticalLimit,
 	                               double extraHorizontal, double extraVertical) {
-		double multiplier = MinecraftServer.TICK_PER_SECOND * 0.8;
-		this.horizontal = horizontal * multiplier;
-		this.vertical = vertical * multiplier;
-		this.verticalLimit = verticalLimit * multiplier;
-		this.extraHorizontal = extraHorizontal * multiplier;
-		this.extraVertical = extraVertical * multiplier;
-	}
-	
-	public double getHorizontal() {
-		return horizontal;
-	}
-	
-	public double getVertical() {
-		return vertical;
-	}
-	
-	public double getVerticalLimit() {
-		return verticalLimit;
-	}
-	
-	public double getExtraHorizontal() {
-		return extraHorizontal;
-	}
-	
-	public double getExtraVertical() {
-		return extraVertical;
+		double tps = MinecraftServer.TICK_PER_SECOND;
+		this.horizontal = horizontal * tps * 0.8;
+		this.vertical = (vertical - 0.04) * tps;
+		this.verticalLimit = verticalLimit * tps;
+		this.extraHorizontal = extraHorizontal * tps * 0.8;
+		this.extraVertical = (extraVertical - 0.04) * tps;
 	}
 	
 	public static Builder builder() {

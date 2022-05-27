@@ -46,22 +46,22 @@ public class ArmorToolListener {
 	private static void changeArmorModifiers(LivingEntity entity, EquipmentSlot slot, ItemStack newItem, boolean legacy) {
 		//Remove previous armor
 		ItemStack previousStack = entity.getEquipment(slot);
-		ArmorMaterial material = ArmorMaterial.fromMaterial(previousStack.getMaterial());
+		ArmorMaterial material = ArmorMaterial.fromMaterial(previousStack.material());
 		removeAttributeModifiers(entity, ArmorMaterial.getAttributeIds(material, slot, previousStack));
 		
 		//Add new armor
-		material = ArmorMaterial.fromMaterial(newItem.getMaterial());
+		material = ArmorMaterial.fromMaterial(newItem.material());
 		addAttributeModifiers(entity, ArmorMaterial.getAttributes(material, slot, newItem, legacy));
 	}
 	
 	private static void changeHandModifiers(LivingEntity entity, EquipmentSlot slot, ItemStack newItem, boolean legacy) {
 		//Remove previous attribute modifiers
 		ItemStack previousStack = entity.getEquipment(slot);
-		Tool tool = Tool.fromMaterial(previousStack.getMaterial());
+		Tool tool = Tool.fromMaterial(previousStack.material());
 		removeAttributeModifiers(entity, Tool.getAttributeIds(tool, slot, previousStack));
 		
 		//Add new attribute modifiers
-		tool = Tool.fromMaterial(newItem.getMaterial());
+		tool = Tool.fromMaterial(newItem.material());
 		addAttributeModifiers(entity, Tool.getAttributes(tool, slot, newItem, legacy));
 	}
 	

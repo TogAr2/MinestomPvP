@@ -1,12 +1,12 @@
 package io.github.bloepiloepi.pvp.listeners;
 
-import io.github.bloepiloepi.pvp.legacy.LegacyKnockbackSettings;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.damage.CustomEntityDamage;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
-import io.github.bloepiloepi.pvp.entities.EntityUtils;
-import io.github.bloepiloepi.pvp.entities.Tracker;
+import io.github.bloepiloepi.pvp.entity.EntityUtils;
+import io.github.bloepiloepi.pvp.entity.Tracker;
 import io.github.bloepiloepi.pvp.events.*;
+import io.github.bloepiloepi.pvp.legacy.LegacyKnockbackSettings;
 import io.github.bloepiloepi.pvp.potion.PotionListener;
 import io.github.bloepiloepi.pvp.utils.DamageUtils;
 import io.github.bloepiloepi.pvp.utils.ItemUtils;
@@ -14,6 +14,8 @@ import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
+import net.minestom.server.coordinate.Point;
+import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
@@ -21,19 +23,26 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
-import net.minestom.server.event.*;
+import net.minestom.server.event.EventDispatcher;
+import net.minestom.server.event.EventFilter;
+import net.minestom.server.event.EventListener;
+import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityDamageEvent;
-import net.minestom.server.event.entity.EntityDeathEvent;
-import net.minestom.server.event.player.PlayerTickEvent;
+import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.gamedata.tags.Tag;
+import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.play.SoundEffectPacket;
+import net.minestom.server.particle.Particle;
+import net.minestom.server.particle.ParticleCreator;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.world.Difficulty;
 
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class DamageListener {
@@ -45,7 +54,82 @@ public class DamageListener {
 				.handler(event -> handleEntityDamage(event, legacy))
 				.build());
 		
+		node.addListener(PlayerMoveEvent.class, event -> {
+			Player player = event.getPlayer();
+			double dy = event.getNewPosition().y() - player.getPosition().y();
+			Double fallDistance = Tracker.fallDistance.get(player.getUuid());
+			
+			if (player.isFlying() || EntityUtils.hasEffect(player, PotionEffect.LEVITATION)
+					|| EntityUtils.hasEffect(player, PotionEffect.SLOW_FALLING) || dy > 0) {
+				Tracker.fallDistance.put(player.getUuid(), 0.0);
+				return;
+			}
+			if (player.isFlyingWithElytra() && player.getVelocity().y() > -0.5) {
+				Tracker.fallDistance.put(player.getUuid(), 1.0);
+				return;
+			}
+			
+			if (fallDistance > 3.0 && event.isOnGround()) {
+				Block block = Objects.requireNonNull(player.getInstance()).getBlock(getLandingPos(player, event.getNewPosition()));
+				if (!block.isAir()) {
+					double damageDistance = Math.ceil(fallDistance - 3.0);
+					double d = Math.min(0.2 + damageDistance / 15.0, 2.5);
+					int particleCount = (int) (150 * d);
+					
+					player.sendPacketToViewersAndSelf(ParticleCreator.createParticlePacket(
+							Particle.BLOCK,
+							false,
+							event.getNewPosition().x(), event.getNewPosition().y(), event.getNewPosition().z(),
+							0, 0, 0,
+							0.15f, particleCount,
+							writer -> writer.writeVarInt(block.stateId())
+					));
+				}
+			}
+			
+			if (event.isOnGround()) {
+				Tracker.fallDistance.put(player.getUuid(), 0.0);
+				
+				if (!player.getGameMode().canTakeDamage()) return;
+				int damage = getFallDamage(player, fallDistance);
+				if (damage > 0) {
+					SoundEvent sound = damage > 4 ? SoundEvent.ENTITY_PLAYER_BIG_FALL : SoundEvent.ENTITY_PLAYER_SMALL_FALL;
+					SoundManager.sendToAround(player, player, sound, Sound.Source.PLAYER, 1.0f, 1.0f);
+					
+					player.damage(CustomDamageType.FALL, damage);
+				}
+			} else if (dy < 0) {
+				Tracker.fallDistance.put(player.getUuid(), fallDistance - dy);
+			}
+		});
+		
 		return node;
+	}
+	
+	private static int getFallDamage(Player player, double fallDistance) {
+		float reduce = EntityUtils.hasEffect(player, PotionEffect.JUMP_BOOST)
+				? EntityUtils.getEffect(player, PotionEffect.JUMP_BOOST).amplifier() + 1
+				: 0;
+		return (int) Math.ceil(fallDistance - 3.0 - reduce);
+	}
+	
+	private static Point getLandingPos(Player player, Pos position) {
+		position = position.add(0, -0.2, 0);
+		if (Objects.requireNonNull(player.getInstance()).getBlock(position).isAir()) {
+			position = position.add(0, -1, 0);
+			Block block = player.getInstance().getBlock(position);
+			Tag fences = MinecraftServer.getTagManager().getTag(Tag.BasicType.BLOCKS, "minecraft:fences");
+			Tag walls = MinecraftServer.getTagManager().getTag(Tag.BasicType.BLOCKS, "minecraft:walls");
+			Tag fenceGates = MinecraftServer.getTagManager().getTag(Tag.BasicType.BLOCKS, "minecraft:fence_gates");
+			assert fences != null;
+			assert walls != null;
+			assert fenceGates != null;
+			if (fences.contains(block.namespace()) || walls.contains(block.namespace()) || fenceGates.contains(block.namespace())) {
+				return position;
+			}
+		}
+		
+		return position;
 	}
 	
 	public static void handleEntityDamage(EntityDamageEvent event, boolean legacy) {
@@ -159,7 +243,12 @@ public class DamageListener {
 		
 		amount = finalDamageEvent.getDamage();
 		
-		if ((finalDamageEvent.getDamage() <= 0.0F && !legacy) || finalDamageEvent.isCancelled()) {
+		boolean register = legacy || finalDamageEvent.getDamage() > 0.0F;
+		if (register && entity instanceof Player) {
+			Tracker.combatManager.get(entity.getUuid()).recordDamage(type, amount);
+		}
+		
+		if (!register || finalDamageEvent.isCancelled()) {
 			event.setCancelled(true);
 			return;
 		}
@@ -222,17 +311,20 @@ public class DamageListener {
 						LegacyKnockbackSettings settings = legacyKnockbackEvent.getSettings();
 						Vec newVelocity = entity.getVelocity();
 						
-						double horizontal = settings.getHorizontal();
+						double horizontal = settings.horizontal();
 						newVelocity = newVelocity.withX((newVelocity.x() / 2) - (finalH / magnitude * horizontal));
-						newVelocity = newVelocity.withY((newVelocity.y() / 2) + settings.getVertical());
+						newVelocity = newVelocity.withY((newVelocity.y() / 2) + settings.vertical());
 						newVelocity = newVelocity.withZ((newVelocity.z() / 2) - (finalI / magnitude * horizontal));
 						
-						if (newVelocity.y() > settings.getVerticalLimit())
-							newVelocity = newVelocity.withY(settings.getVerticalLimit());
+						if (newVelocity.y() > settings.verticalLimit())
+							newVelocity = newVelocity.withY(settings.verticalLimit());
 						
 						entity.setVelocity(newVelocity);
 					});
 				}
+			} else if (type != CustomDamageType.DROWN && (!shield || amount > 0.0F)) {
+				// Update velocity
+				entity.setVelocity(entity.getVelocity());
 			}
 		}
 		
@@ -250,10 +342,12 @@ public class DamageListener {
 			
 			if (totem) {
 				event.setCancelled(true);
-			} else if (hurtSoundAndAnimation) {
-				//Death sound
-				sound = type.getDeathSound(entity);
+			} else {
 				death = true;
+				if (hurtSoundAndAnimation) {
+					//Death sound
+					sound = type.getDeathSound(entity);
+				}
 			}
 		} else if (hurtSoundAndAnimation) {
 			//Damage sound
@@ -286,7 +380,14 @@ public class DamageListener {
 			}
 		}
 		
-		event.setDamage(amount);
+		// The Minestom damage method should return false if there was no hurt animation,
+		// because otherwise the AttackManager will deal extra knockback
+		if (!event.isCancelled() && !hurtSoundAndAnimation) {
+			event.setCancelled(true);
+			damageManually(entity, amount);
+		} else {
+			event.setDamage(amount);
+		}
 	}
 	
 	public static boolean totemProtection(LivingEntity entity, CustomDamageType type) {
@@ -296,14 +397,14 @@ public class DamageListener {
 		
 		for (Player.Hand hand : Player.Hand.values()) {
 			ItemStack stack = entity.getItemInHand(hand);
-			if (stack.getMaterial() == Material.TOTEM_OF_UNDYING) {
+			if (stack.material() == Material.TOTEM_OF_UNDYING) {
 				TotemUseEvent totemUseEvent = new TotemUseEvent(entity, hand);
 				EventDispatcher.call(totemUseEvent);
 				
 				if (totemUseEvent.isCancelled()) continue;
 				
 				hasTotem = true;
-				entity.setItemInHand(hand, stack.withAmount(stack.getAmount() - 1));
+				entity.setItemInHand(hand, stack.withAmount(stack.amount() - 1));
 				break;
 			}
 		}
@@ -328,7 +429,6 @@ public class DamageListener {
 		
 		if (amount != 0.0F && entity instanceof Player) {
 			EntityUtils.addExhaustion((Player) entity, type.getExhaustion() * (legacy ? 3 : 1));
-			Tracker.combatManager.get(entity.getUuid()).recordDamage(type, amount);
 		}
 		
 		return amount;
@@ -384,5 +484,24 @@ public class DamageListener {
 				return amount;
 			}
 		}
+	}
+	
+	public static void damageManually(LivingEntity entity, float damage) {
+		// Additional hearts support
+		if (entity instanceof Player player) {
+			final float additionalHearts = player.getAdditionalHearts();
+			if (additionalHearts > 0) {
+				if (damage > additionalHearts) {
+					damage -= additionalHearts;
+					player.setAdditionalHearts(0);
+				} else {
+					player.setAdditionalHearts(additionalHearts - damage);
+					damage = 0;
+				}
+			}
+		}
+		
+		// Set the final entity health
+		entity.setHealth(entity.getHealth() - damage);
 	}
 }

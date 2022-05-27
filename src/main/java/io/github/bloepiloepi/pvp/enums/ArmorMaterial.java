@@ -65,7 +65,7 @@ public enum ArmorMaterial {
 	
 	public static Map<Attribute, List<AttributeModifier>> getAttributes(@Nullable ArmorMaterial material, EquipmentSlot slot, ItemStack item, boolean legacy) {
 		Map<Attribute, List<AttributeModifier>> modifiers = new HashMap<>();
-		for (ItemAttribute itemAttribute : item.getMeta().getAttributes()) {
+		for (ItemAttribute itemAttribute : item.meta().getAttributes()) {
 			if (EquipmentSlot.fromAttributeSlot(itemAttribute.slot()) == slot) {
 				modifiers.computeIfAbsent(itemAttribute.attribute(), k -> new ArrayList<>())
 						.add(new AttributeModifier(itemAttribute.uuid(), itemAttribute.name(), (float) itemAttribute.amount(), itemAttribute.operation()));
@@ -74,7 +74,7 @@ public enum ArmorMaterial {
 		
 		// Only add armor attributes if the material is armor
 		if (material != null) {
-			if (slot == getRequiredSlot(item.getMaterial())) {
+			if (slot == getRequiredSlot(item.material())) {
 				UUID modifierUUID = getModifierUUID(slot);
 				modifiers.computeIfAbsent(Attribute.ARMOR, k -> new ArrayList<>()).add(new AttributeModifier(modifierUUID, "Armor modifier", material.getProtectionAmount(slot, legacy), AttributeOperation.ADDITION));
 				modifiers.computeIfAbsent(Attribute.ARMOR_TOUGHNESS, k -> new ArrayList<>()).add(new AttributeModifier(modifierUUID, "Armor toughness", material.toughness, AttributeOperation.ADDITION));
@@ -89,14 +89,14 @@ public enum ArmorMaterial {
 	
 	public static Map<Attribute, List<UUID>> getAttributeIds(@Nullable ArmorMaterial material, EquipmentSlot slot, ItemStack item) {
 		Map<Attribute, List<UUID>> modifiers = new HashMap<>();
-		for (ItemAttribute itemAttribute : item.getMeta().getAttributes()) {
+		for (ItemAttribute itemAttribute : item.meta().getAttributes()) {
 			if (EquipmentSlot.fromAttributeSlot(itemAttribute.slot()) == slot) {
 				modifiers.computeIfAbsent(itemAttribute.attribute(), k -> new ArrayList<>()).add(itemAttribute.uuid());
 			}
 		}
 		
 		if (material != null) {
-			if (slot == getRequiredSlot(item.getMaterial())) {
+			if (slot == getRequiredSlot(item.material())) {
 				UUID modifierUUID = getModifierUUID(slot);
 				modifiers.computeIfAbsent(Attribute.ARMOR, k -> new ArrayList<>()).add(modifierUUID);
 				modifiers.computeIfAbsent(Attribute.ARMOR_TOUGHNESS, k -> new ArrayList<>()).add(modifierUUID);

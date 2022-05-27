@@ -1,4 +1,4 @@
-package io.github.bloepiloepi.pvp.entities;
+package io.github.bloepiloepi.pvp.entity;
 
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
@@ -67,9 +67,7 @@ public class EntityUtils {
 		
 		// Do not start fire event if the fire needs to be removed (< 0 duration)
 		if (duration.toMillis() > 0) {
-			EventDispatcher.callCancellable(entityFireEvent, () -> {
-				entity.setOnFire(true);
-			});
+			EventDispatcher.callCancellable(entityFireEvent, () -> entity.setOnFire(true));
 		}
 		// Tracker.fireExtinguishTime is updated by event listener
 	}
@@ -127,10 +125,10 @@ public class EntityUtils {
 	}
 	
 	public static boolean isBlocking(LivingEntity entity) {
-		LivingEntityMeta meta = (LivingEntityMeta) entity.getEntityMeta();
-		
-		if (meta.isHandActive()) {
-			return entity.getItemInHand(meta.getActiveHand()).getMaterial() == Material.SHIELD;
+		if (entity.getEntityMeta() instanceof LivingEntityMeta meta) {
+			if (meta.isHandActive()) {
+				return entity.getItemInHand(meta.getActiveHand()).material() == Material.SHIELD;
+			}
 		}
 		
 		return false;
@@ -140,7 +138,7 @@ public class EntityUtils {
 		LivingEntityMeta meta = (LivingEntityMeta) entity.getEntityMeta();
 		
 		if (meta.isHandActive()) {
-			return entity.getItemInHand(meta.getActiveHand()).getMaterial() == Material.CROSSBOW;
+			return entity.getItemInHand(meta.getActiveHand()).material() == Material.CROSSBOW;
 		}
 		
 		return false;
@@ -159,7 +157,7 @@ public class EntityUtils {
 		
 		if (!(entity instanceof Player)) return;
 		
-		Tool tool = Tool.fromMaterial(attacker.getItemInMainHand().getMaterial());
+		Tool tool = Tool.fromMaterial(attacker.getItemInMainHand().material());
 		if (tool != null && tool.isAxe()) {
 			disableShield((Player) entity, true); //For some reason the vanilla server always passes true
 		}

@@ -79,7 +79,7 @@ public enum Tool {
 	
 	public static Map<Attribute, List<AttributeModifier>> getAttributes(@Nullable Tool tool, EquipmentSlot slot, ItemStack item, boolean legacy) {
 		Map<Attribute, List<AttributeModifier>> modifiers = new HashMap<>();
-		for (ItemAttribute itemAttribute : item.getMeta().getAttributes()) {
+		for (ItemAttribute itemAttribute : item.meta().getAttributes()) {
 			if (EquipmentSlot.fromAttributeSlot(itemAttribute.slot()) == slot) {
 				modifiers.computeIfAbsent(itemAttribute.attribute(), k -> new ArrayList<>())
 						.add(new AttributeModifier(itemAttribute.uuid(), itemAttribute.name(), (float) itemAttribute.amount(), itemAttribute.operation()));
@@ -101,7 +101,7 @@ public enum Tool {
 	
 	public static Map<Attribute, List<UUID>> getAttributeIds(@Nullable Tool tool, EquipmentSlot slot, ItemStack item) {
 		Map<Attribute, List<UUID>> modifiers = new HashMap<>();
-		for (ItemAttribute itemAttribute : item.getMeta().getAttributes()) {
+		for (ItemAttribute itemAttribute : item.meta().getAttributes()) {
 			if (EquipmentSlot.fromAttributeSlot(itemAttribute.slot()) == slot) {
 				modifiers.computeIfAbsent(itemAttribute.attribute(), k -> new ArrayList<>()).add(itemAttribute.uuid());
 			}

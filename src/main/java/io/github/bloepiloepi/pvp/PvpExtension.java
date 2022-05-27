@@ -1,8 +1,9 @@
 package io.github.bloepiloepi.pvp;
 
 import io.github.bloepiloepi.pvp.enchantment.CustomEnchantments;
-import io.github.bloepiloepi.pvp.entities.ArrowPickup;
-import io.github.bloepiloepi.pvp.entities.Tracker;
+import io.github.bloepiloepi.pvp.entity.CustomPlayer;
+import io.github.bloepiloepi.pvp.entity.Tracker;
+import io.github.bloepiloepi.pvp.explosion.ExplosionListener;
 import io.github.bloepiloepi.pvp.food.FoodListener;
 import io.github.bloepiloepi.pvp.legacy.SwordBlockHandler;
 import io.github.bloepiloepi.pvp.listeners.ArmorToolListener;
@@ -34,6 +35,7 @@ public class PvpExtension extends Extension {
 		
 		node.addChild(attackEvents());
 		node.addChild(damageEvents());
+		node.addChild(explosionEvents());
 		node.addChild(armorToolEvents());
 		node.addChild(foodEvents());
 		node.addChild(potionEvents());
@@ -47,6 +49,7 @@ public class PvpExtension extends Extension {
 		
 		node.addChild(AttackManager.events(true));
 		node.addChild(DamageListener.events(true));
+		node.addChild(ExplosionListener.events());
 		node.addChild(ArmorToolListener.events(true));
 		node.addChild(FoodListener.events(true));
 		node.addChild(PotionListener.events(true));
@@ -69,7 +72,7 @@ public class PvpExtension extends Extension {
 	
 	/**
 	 * Creates an EventNode with damage events.
-	 * This includes armor, shields and damage invulnerability.
+	 * This includes armor, shields, damage invulnerability, and fall damage.
 	 * (This only reduces damage based on armor attribute,
 	 * to change that attribute for different types of armor you need #armorToolEvents().
 	 *
@@ -77,6 +80,16 @@ public class PvpExtension extends Extension {
 	 */
 	public static EventNode<EntityEvent> damageEvents() {
 		return DamageListener.events(false);
+	}
+	
+	/**
+	 * Creates an EventNode with explosion events.
+	 * This includes end crystals.
+	 *
+	 * @return The EventNode with explosion events
+	 */
+	public static EventNode<EntityEvent> explosionEvents() {
+		return ExplosionListener.events();
 	}
 	
 	/**
@@ -152,7 +165,6 @@ public class PvpExtension extends Extension {
 	
 	@Override
 	public void terminate() {
-		ArrowPickup.stop();
 	}
 	
 	/**
@@ -165,10 +177,10 @@ public class PvpExtension extends Extension {
 		CustomEnchantments.registerAll();
 		CustomPotionEffects.registerAll();
 		CustomPotionTypes.registerAll();
-		
+
 		Tracker.register(eventNode);
-		
-		ArrowPickup.init();
+
+		MinecraftServer.getConnectionManager().setPlayerProvider(CustomPlayer::new);
 		
 		try {
 			Field isFood = Registry.MaterialEntry.class.getDeclaredField("isFood");

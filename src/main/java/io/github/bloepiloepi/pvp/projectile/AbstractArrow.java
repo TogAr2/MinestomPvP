@@ -2,7 +2,8 @@ package io.github.bloepiloepi.pvp.projectile;
 
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
-import io.github.bloepiloepi.pvp.entities.EntityUtils;
+import io.github.bloepiloepi.pvp.entity.EntityUtils;
+import io.github.bloepiloepi.pvp.events.PickupArrowEvent;
 import io.github.bloepiloepi.pvp.utils.EffectManager;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
@@ -15,8 +16,11 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.entity.metadata.arrow.AbstractArrowMeta;
+import net.minestom.server.event.EventDispatcher;
+import net.minestom.server.instance.EntityTracker;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.network.packet.server.play.ChangeGameStatePacket;
+import net.minestom.server.network.packet.server.play.CollectItemPacket;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.utils.MathUtils;
 import org.jetbrains.annotations.NotNull;
@@ -59,7 +63,35 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 		if (pickupDelay > 0) {
 			pickupDelay--;
 		}
-		
+
+        // Pickup
+        if (canBePickedUp(null)) {
+            instance.getEntityTracker().nearbyEntities(position, 5, EntityTracker.Target.PLAYERS,
+                    player -> {
+                        if (!player.canPickupItem()) return;
+
+                        // Do not pickup if not visible
+                        if (!isViewer(player))
+                            return;
+
+                        if (isRemoved() || !canBePickedUp(player))
+                            return;
+
+                        if (player.getBoundingBox().expand(1, 0.5f, 1)
+                                .intersectEntity(player.getPosition(), this)) {
+                            PickupArrowEvent event = new PickupArrowEvent(player, this);
+                            EventDispatcher.callCancellable(event, () -> {
+                                if (pickup(player)) {
+                                    player.sendPacketToViewersAndSelf(new CollectItemPacket(
+                                            getEntityId(), player.getEntityId(), 1
+                                    ));
+                                    remove();
+                                }
+                            });
+                        }
+                    });
+        }
+
 		//TODO water (also for other projectiles?)
 		
 		ticks++;
@@ -191,7 +223,7 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 		
 		return switch (pickupMode) {
 			case ALLOWED -> true;
-			case CREATIVE_ONLY -> player.isCreative();
+			case CREATIVE_ONLY -> player == null || player.isCreative();
 			default -> false;
 		};
 	}

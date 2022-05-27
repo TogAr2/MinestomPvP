@@ -1,44 +1,21 @@
 package io.github.bloepiloepi.pvp.damage.combat;
 
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
-import io.github.bloepiloepi.pvp.entities.EntityUtils;
+import io.github.bloepiloepi.pvp.entity.EntityUtils;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
-public class CombatEntry {
-	private final CustomDamageType damageType;
-	private final float damage;
-	private final String fallLocation;
-	private final float fallDistance;
-	
-	public CombatEntry(CustomDamageType damageType, float damage,
-	                   @Nullable String fallLocation, float fallDistance) {
-		this.damageType = damageType;
-		this.damage = damage;
-		this.fallLocation = fallLocation;
-		this.fallDistance = fallDistance;
-	}
-	
-	public CustomDamageType getDamageType() {
-		return damageType;
-	}
-	
-	public float getDamage() {
-		return damage;
-	}
-	
-	public @Nullable String getFallLocation() {
-		return fallLocation;
-	}
+public record CombatEntry(CustomDamageType damageType, float damage,
+                          @Nullable String fallLocation, double fallDistance) {
 	
 	public String getMessageFallLocation() {
 		return fallLocation == null ? "generic" : fallLocation;
 	}
 	
-	public float getFallDistance() {
-		return damageType.isOutOfWorld() ? Float.MAX_VALUE : fallDistance;
+	public double getFallDistance() {
+		return damageType.isOutOfWorld() ? Double.MAX_VALUE : fallDistance;
 	}
 	
 	public boolean isCombat() {
