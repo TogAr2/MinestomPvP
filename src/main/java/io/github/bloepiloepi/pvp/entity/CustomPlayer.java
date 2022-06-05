@@ -51,7 +51,7 @@ public class CustomPlayer extends Player implements PvpPlayer {
 	
 	@SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
 	@Override
-	protected void updateVelocity(boolean wasOnGround, Pos positionBeforeMove, Vec newVelocity) {
+	protected void updateVelocity(boolean wasOnGround, boolean flying, Pos positionBeforeMove, Vec newVelocity) {
 		final double tps = MinecraftServer.TICK_PER_SECOND;
 		final double drag;
 		if (wasOnGround) {
@@ -62,8 +62,8 @@ public class CustomPlayer extends Player implements PvpPlayer {
 		} else drag = 0.91;
 		
 		boolean slowFall = velocity.y() < 0 && EntityUtils.hasEffect(this, PotionEffect.SLOW_FALLING);
-		double gravity = hasNoGravity() || isFlying() ? 0 : slowFall ? 0.01 : gravityAcceleration;
-		double gravityDrag = hasNoGravity() ? 0 : isFlying() ? 0.6 : (1 - gravityDragPerTick);
+		double gravity = hasNoGravity() || flying ? 0 : slowFall ? 0.01 : gravityAcceleration;
+		double gravityDrag = hasNoGravity() ? 0 : flying ? 0.6 : (1 - gravityDragPerTick);
 		
 		this.velocity = newVelocity
 				// Apply drag
