@@ -193,7 +193,7 @@ public class PotionListener {
 		Vec direction = position.direction();
 		position = position.add(direction.x(), direction.y() + 0.2, direction.z());
 		
-		thrownPotion.shoot(position, 1.1, 1.0);
+		thrownPotion.shoot(position, 0.77, 1.0);
 		
 		if (!player.isCreative()) {
 			player.setItemInHand(hand, stack.withAmount(stack.amount() - 1));
