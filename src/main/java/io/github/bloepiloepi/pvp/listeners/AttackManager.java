@@ -102,7 +102,7 @@ public class AttackManager {
 		if (player.isDead()) return;
 		if (entity.getDistanceSquared(target) >= 36.0D) return;
 		
-		if (target instanceof ItemEntity || target instanceof ExperienceOrb || target instanceof EntityProjectile || target == player) {
+		if (target.getEntityType() == EntityType.ITEM || target.getEntityType() == EntityType.EXPERIENCE_ORB || target == player) {
 			player.kick(Component.translatable("multiplayer.disconnect.invalid_entity_attacked"));
 			LOGGER.error("Player " + player.getUsername() + " tried to attack invalid mob");
 			return;
