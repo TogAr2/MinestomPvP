@@ -11,6 +11,8 @@ You can easily choose which features you want to use.
 
 The maven repository is available on [jitpack](https://jitpack.io/#Bloepiloepi/MinestomPvP).
 
+**You might not want to put this extension in your extensions folder, more information at [usage](#usage).**
+
 ## Table of Contents
 
 - [Features](#features)
