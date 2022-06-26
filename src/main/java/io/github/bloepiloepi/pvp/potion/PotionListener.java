@@ -50,6 +50,8 @@ public class PotionListener {
 	private static final ItemStack GLASS_BOTTLE = ItemStack.of(Material.GLASS_BOTTLE);
 	
 	private static final Map<UUID, Map<PotionEffect, Integer>> durationLeftMap = new ConcurrentHashMap<>();
+
+	private static Double POTION_THROW_STRENGTH = 0.65;
 	
 	public static EventNode<EntityEvent> events(boolean legacy) {
 		EventNode<EntityEvent> node = EventNode.type("potion-events", EventFilter.ENTITY);
@@ -181,7 +183,11 @@ public class PotionListener {
 		
 		return node;
 	}
-	
+
+	private static void setPotionThrowStrength(Double newStrength) {
+		POTION_THROW_STRENGTH = newStrength;
+	}
+
 	private static void throwPotion(Player player, ItemStack stack, Player.Hand hand, boolean legacy) {
 		ThrownPotion thrownPotion = new ThrownPotion(player, legacy);
 		thrownPotion.setItem(stack);
@@ -193,7 +199,7 @@ public class PotionListener {
 		Vec direction = position.direction();
 		position = position.add(direction.x(), direction.y() + 0.2, direction.z());
 		
-		thrownPotion.shoot(position, 0.77, 1.0);
+		thrownPotion.shoot(position, POTION_THROW_STRENGTH, 1.0);
 		
 		if (!player.isCreative()) {
 			player.setItemInHand(hand, stack.withAmount(stack.amount() - 1));
