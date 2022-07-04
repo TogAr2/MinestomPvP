@@ -2,12 +2,15 @@ package io.github.bloepiloepi.pvp.damage;
 
 import io.github.bloepiloepi.pvp.entity.EntityUtils;
 import io.github.bloepiloepi.pvp.entity.Tracker;
+import io.github.bloepiloepi.pvp.events.DeathMessageEvent;
+import io.github.bloepiloepi.pvp.events.DeathScreenEvent;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
+import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.instance.Explosion;
 import net.minestom.server.sound.SoundEvent;
 import org.jetbrains.annotations.NotNull;
@@ -205,12 +208,20 @@ public class CustomDamageType extends DamageType {
 	
 	@Override
 	public @Nullable Component buildDeathMessage(@NotNull Player killed) {
-		return Tracker.combatManager.get(killed.getUuid()).getDeathMessage();
+		Component message = Tracker.combatManager.get(killed.getUuid()).getDeathMessage();
+		DeathMessageEvent event = new DeathMessageEvent(killed, message);
+		EventDispatcher.call(event);
+		if (event.isCancelled()) return null;
+		return event.getMessage();
 	}
 	
 	@Override
 	public Component buildDeathScreenText(@NotNull Player killed) {
-		return buildDeathMessage(killed);
+		Component message = Tracker.combatManager.get(killed.getUuid()).getDeathMessage();
+		DeathScreenEvent event = new DeathScreenEvent(killed, message);
+		EventDispatcher.call(event);
+		if (event.isCancelled()) return null;
+		return event.getMessage();
 	}
 	
 	public boolean isFire() {
