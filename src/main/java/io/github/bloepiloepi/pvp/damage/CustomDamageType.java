@@ -28,6 +28,7 @@ public class CustomDamageType extends DamageType {
 	public static final CustomDamageType STARVE = (new CustomDamageType("starve")).setBypassesArmor().setUnblockable();
 	public static final CustomDamageType CACTUS = new CustomDamageType("cactus");
 	public static final CustomDamageType FALL = (new CustomDamageType("fall")).setBypassesArmor().setFall();
+	public static final CustomDamageType ENDER_PEARL = (new CustomDamageType("fall")).setBypassesArmor().setFall();
 	public static final CustomDamageType FLY_INTO_WALL = (new CustomDamageType("flyIntoWall")).setBypassesArmor();
 	public static final CustomDamageType OUT_OF_WORLD = (new CustomDamageType("outOfWorld")).setBypassesArmor().setOutOfWorld();
 	public static final CustomDamageType GENERIC = (new CustomDamageType("generic")).setBypassesArmor();

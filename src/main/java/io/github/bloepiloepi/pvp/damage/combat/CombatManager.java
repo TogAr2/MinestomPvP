@@ -99,7 +99,7 @@ public class CombatManager {
 		CombatEntry lastEntry = entries.get(entries.size() - 1);
 		
 		boolean fall = false;
-		if (lastEntry.damageType() == CustomDamageType.FALL) {
+		if (lastEntry.damageType().isFall()) {
 			heaviestFall = getHeaviestFall();
 			fall = heaviestFall != null;
 		}
@@ -108,7 +108,7 @@ public class CombatManager {
 			return lastEntry.damageType().getDeathMessage(player);
 		}
 		
-		if (heaviestFall.damageType() == CustomDamageType.FALL || heaviestFall.damageType() == CustomDamageType.OUT_OF_WORLD) {
+		if (heaviestFall.damageType().isFall() || heaviestFall.damageType() == CustomDamageType.OUT_OF_WORLD) {
 			return Component.translatable("death.fell.accident." + heaviestFall.getMessageFallLocation(), getEntityName());
 		}
 		
@@ -167,7 +167,7 @@ public class CombatManager {
 		for (int i = 0; i < entries.size(); i++) {
 			CombatEntry entry = entries.get(i);
 			
-			if ((entry.damageType() == CustomDamageType.FALL || entry.damageType().isOutOfWorld())
+			if ((entry.damageType().isFall() || entry.damageType().isOutOfWorld())
 					&& entry.getFallDistance() > 0.0 && (mostDamageEntry == null || entry.getFallDistance() > highestFall)) {
 				if (i > 0) {
 					mostDamageEntry = entries.get(i - 1);

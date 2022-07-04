@@ -24,7 +24,7 @@ public class ProtectionEnchantment extends CustomEnchantment {
 			return level;
 		} else if (type == Type.FIRE && damageType.isFire()) {
 			return level * 2;
-		} else if (type == Type.FALL && damageType == CustomDamageType.FALL) {
+		} else if (type == Type.FALL && damageType.isFall()) {
 			return level * 3;
 		} else if (type == Type.EXPLOSION && damageType.isExplosive()) {
 			return level * 2;
