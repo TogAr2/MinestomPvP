@@ -49,8 +49,9 @@ public class ProjectileListener {
 			
 			if (FishingBobber.fishingBobbers.containsKey(player.getUuid())) {
 				int durability = FishingBobber.fishingBobbers.get(player.getUuid()).retrieve();
-				ItemUtils.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
-						EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, durability);
+				if (!player.isCreative())
+					ItemUtils.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
+							EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, durability);
 				
 				SoundManager.sendToAround(player, SoundEvent.ENTITY_FISHING_BOBBER_RETRIEVE, Sound.Source.NEUTRAL,
 						1.0F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
