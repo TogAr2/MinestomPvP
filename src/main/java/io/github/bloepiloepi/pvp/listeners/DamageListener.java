@@ -379,7 +379,7 @@ public class DamageListener {
 				event.setCancelled(true);
 			}
 			if (entityPreDeathEvent.isCancelDeath()) {
-				event.setDamage(0.0f);
+				amount = 0.0f;
 			}
 		}
 		
