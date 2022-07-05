@@ -105,8 +105,6 @@ instance.setExplosionSupplier(PvpExplosionSupplier.INSTANCE);
 This extension provides several events:
 
 - `DamageBlockEvent`: cancellable, called when an entity blocks damage using a shield. This event can be used to set the remaining damage.
-- `DeathMessageEvent`: cancellable, called when a death message for a player is requested. This event can be used to change the message.
-- `DeathScreenEvent`: cancellable, same as `DeathMessageEvent` but for the respawn screen instead of chat.
 - `EntityKnockbackEvent`: cancellable, called when an entity gets knocked back by another entity. Gets called twice for weapons with the knockback enchantment (once for default damage knockback, once for the extra knockback). This event can be used to set the knockback strength.
 - `EntityPreDeathEvent`: cancellable, a form of `EntityDeathEvent` but cancellable and with a damage type.
 - `EquipmentDamageEvent`: cancellable, called when an item in an equipment slot gets damaged.
