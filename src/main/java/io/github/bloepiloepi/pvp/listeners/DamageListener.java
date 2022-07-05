@@ -378,6 +378,9 @@ public class DamageListener {
 			if (entityPreDeathEvent.isCancelled()) {
 				event.setCancelled(true);
 			}
+			if (entityPreDeathEvent.isCancelDeath()) {
+				event.setDamage(0.0f);
+			}
 		}
 		
 		// The Minestom damage method should return false if there was no hurt animation,
