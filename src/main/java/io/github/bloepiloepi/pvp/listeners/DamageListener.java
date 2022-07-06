@@ -93,7 +93,7 @@ public class DamageListener {
 				Tracker.fallDistance.put(player.getUuid(), 0.0);
 				
 				if (!player.getGameMode().canTakeDamage()) return;
-				int damage = getFallDamage(player, fallDistance);
+				int damage = getFallDamage(player, fallDistance, event.getNewPosition());
 				if (damage > 0) {
 					SoundEvent sound = damage > 4 ? SoundEvent.ENTITY_PLAYER_BIG_FALL : SoundEvent.ENTITY_PLAYER_SMALL_FALL;
 					SoundManager.sendToAround(player, player, sound, Sound.Source.PLAYER, 1.0f, 1.0f);
@@ -108,7 +108,12 @@ public class DamageListener {
 		return node;
 	}
 	
-	private static int getFallDamage(Player player, double fallDistance) {
+	private static int getFallDamage(Player player, double fallDistance, Point landingPosition) {
+		Block block = player.getInstance().getBlock(landingPosition);
+		Block blockAbove = player.getInstance().getBlock(landingPosition.add(0, 1, 0));
+
+		if ((block.compare(Block.SLIME_BLOCK) && !player.isSneaking()) || block.compare(Block.WATER) || blockAbove.compare(Block.WATER)) return 0;
+
 		float reduce = EntityUtils.hasEffect(player, PotionEffect.JUMP_BOOST)
 				? EntityUtils.getEffect(player, PotionEffect.JUMP_BOOST).amplifier() + 1
 				: 0;
