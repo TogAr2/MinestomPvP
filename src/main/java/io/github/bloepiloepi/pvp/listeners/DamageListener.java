@@ -70,8 +70,10 @@ public class DamageListener {
 			}
 			
 			if (fallDistance > 3.0 && event.isOnGround()) {
-				Block block = Objects.requireNonNull(player.getInstance()).getBlock(getLandingPos(player, event.getNewPosition()));
-				if (!block.isAir()) {
+				Point landingPos = getLandingPos(player, event.getNewPosition());
+				Block block = Objects.requireNonNull(player.getInstance()).getBlock(landingPos);
+				Block blockAbove = Objects.requireNonNull(player.getInstance()).getBlock(landingPos.add(0.0, 1.0, 0.0));
+				if (!block.isAir() && !block.compare(Block.SLIME_BLOCK) && !(block.compare(Block.WATER) || blockAbove.compare(Block.WATER))) {
 					double damageDistance = Math.ceil(fallDistance - 3.0);
 					double d = Math.min(0.2 + damageDistance / 15.0, 2.5);
 					int particleCount = (int) (150 * d);
