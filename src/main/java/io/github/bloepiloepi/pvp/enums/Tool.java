@@ -51,7 +51,7 @@ public enum Tool {
 	
 	// We don't know the legacy attack damage for tridents, since they didn't exist
 	// 5.0 seems to be balanced
-	TRIDENT(null, 8.0F, 5.0F, -2.9000000953674316F);
+	TRIDENT(null, 8.0F, 5.0F, -2.9F);
 	
 	private final Material material;
 	private boolean isAxe = false;
@@ -59,16 +59,20 @@ public enum Tool {
 	
 	private final Map<Attribute, AttributeModifier> attributeModifiers = new HashMap<>();
 	private final Map<Attribute, AttributeModifier> legacyAttributeModifiers = new HashMap<>();
-	
+
+	public final float attackDamage;
+	public final float legacyAttackDamage;
+
 	Tool(@Nullable ToolMaterial toolMaterial, float attackDamage, float legacyAttackDamage, float attackSpeed) {
 		float finalAttackDamage = attackDamage + (toolMaterial == null ? 0 : toolMaterial.getAttackDamage());
-		float finalLegacyAttackDamage = legacyAttackDamage + (toolMaterial == null ? 0 : toolMaterial.getAttackDamage());
+		this.attackDamage = attackDamage;
+		this.legacyAttackDamage = legacyAttackDamage + (toolMaterial == null ? 0 : toolMaterial.getAttackDamage());
 		this.material = Material.fromNamespaceId(this.name().toLowerCase());
 		
 		this.attributeModifiers.put(Attribute.ATTACK_DAMAGE, new AttributeModifier(ModifierUUID.ATTACK_DAMAGE_MODIFIER_ID, "Tool modifier", finalAttackDamage, AttributeOperation.ADDITION));
 		this.attributeModifiers.put(Attribute.ATTACK_SPEED, new AttributeModifier(ModifierUUID.ATTACK_SPEED_MODIFIER_ID, "Tool modifier", attackSpeed, AttributeOperation.ADDITION));
 		
-		this.legacyAttributeModifiers.put(Attribute.ATTACK_DAMAGE, new AttributeModifier(ModifierUUID.ATTACK_DAMAGE_MODIFIER_ID, "Tool modifier", finalLegacyAttackDamage, AttributeOperation.ADDITION));
+		this.legacyAttributeModifiers.put(Attribute.ATTACK_DAMAGE, new AttributeModifier(ModifierUUID.ATTACK_DAMAGE_MODIFIER_ID, "Tool modifier", legacyAttackDamage, AttributeOperation.ADDITION));
 	}
 	
 	Tool(@Nullable ToolMaterial toolMaterial, float attackDamage, float legacyAttackDamage, float attackSpeed, boolean isAxe, boolean isSword) {
