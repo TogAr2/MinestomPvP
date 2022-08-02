@@ -59,11 +59,11 @@ public class ProjectileListener {
 						1.0F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
 				EventDispatcher.call(fishEvent);
 			} else {
-				FishingBobber bobber = new FishingBobber(player, legacy);
-				FishingBobber.fishingBobbers.put(player.getUuid(), bobber);
-				EventDispatcher.call(event);
 				SoundManager.sendToAround(player, SoundEvent.ENTITY_FISHING_BOBBER_THROW, Sound.Source.NEUTRAL,
 						0.5F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
+
+				FishingBobber bobber = new FishingBobber(player, legacy);
+				FishingBobber.fishingBobbers.put(player.getUuid(), bobber);
 
 				EntityShootEvent shootEvent = new EntityShootEvent(player, bobber,
 						player.getPosition(), 0, 1.0);
