@@ -21,4 +21,8 @@ public class PlayerFishEvent implements PlayerEvent {
     public @NotNull Player getPlayer() {
         return player;
     }
+
+    public @NotNull FishingBobber getBobber() {
+        return bobber;
+    }
 }
