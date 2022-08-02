@@ -11,8 +11,6 @@ public class PlayerFishEvent implements PlayerEvent {
     private final Player player;
     private final FishingBobber bobber;
 
-    private boolean cancelled;
-
     public PlayerFishEvent(Player player, FishingBobber bobber) {
         this.player = player;
         this.bobber = bobber;

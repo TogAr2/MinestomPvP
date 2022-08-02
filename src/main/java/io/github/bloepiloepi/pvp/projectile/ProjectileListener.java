@@ -50,7 +50,6 @@ public class ProjectileListener {
 			
 			if (FishingBobber.fishingBobbers.containsKey(player.getUuid())) {
 				PlayerFishEvent fishEvent = new PlayerFishEvent(player, FishingBobber.fishingBobbers.get(player.getUuid()));
-				EventDispatcher.call(fishEvent);
 
 				int durability = FishingBobber.fishingBobbers.get(player.getUuid()).retrieve();
 				ItemUtils.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
@@ -58,6 +57,7 @@ public class ProjectileListener {
 				
 				SoundManager.sendToAround(player, SoundEvent.ENTITY_FISHING_BOBBER_RETRIEVE, Sound.Source.NEUTRAL,
 						1.0F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
+				EventDispatcher.call(fishEvent);
 			} else {
 				FishingBobber bobber = new FishingBobber(player, legacy);
 				FishingBobber.fishingBobbers.put(player.getUuid(), bobber);
