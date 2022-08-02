@@ -120,6 +120,7 @@ This extension provides several events:
 - `ProjectileBlockHitEvent`: called when a projectile hits a block.
 - `ProjectileEntityHitEvent`: cancellable, called when a projectile hits an entity.
 - `TotemUseEvent`: cancellable, called when a totem prevents an entity from dying.
+- `PlayerFishEvent`: Called when a player retracts a fishing rod/finishes fisihing.
 
 ### Customization
 
