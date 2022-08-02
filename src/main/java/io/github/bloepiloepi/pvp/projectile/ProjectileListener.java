@@ -3,6 +3,7 @@ package io.github.bloepiloepi.pvp.projectile;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entity.EntityUtils;
 import io.github.bloepiloepi.pvp.entity.Tracker;
+import io.github.bloepiloepi.pvp.events.PlayerFishEvent;
 import io.github.bloepiloepi.pvp.utils.ItemUtils;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import it.unimi.dsi.fastutil.Pair;
@@ -48,6 +49,9 @@ public class ProjectileListener {
 			Player player = event.getPlayer();
 			
 			if (FishingBobber.fishingBobbers.containsKey(player.getUuid())) {
+				PlayerFishEvent fishEvent = new PlayerFishEvent(player, FishingBobber.fishingBobbers.get(player.getUuid()));
+				EventDispatcher.call(fishEvent);
+
 				int durability = FishingBobber.fishingBobbers.get(player.getUuid()).retrieve();
 				ItemUtils.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
 						EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, durability);
@@ -55,12 +59,12 @@ public class ProjectileListener {
 				SoundManager.sendToAround(player, SoundEvent.ENTITY_FISHING_BOBBER_RETRIEVE, Sound.Source.NEUTRAL,
 						1.0F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
 			} else {
-				SoundManager.sendToAround(player, SoundEvent.ENTITY_FISHING_BOBBER_THROW, Sound.Source.NEUTRAL,
-						0.5F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
-				
 				FishingBobber bobber = new FishingBobber(player, legacy);
 				FishingBobber.fishingBobbers.put(player.getUuid(), bobber);
-				
+				EventDispatcher.call(event);
+				SoundManager.sendToAround(player, SoundEvent.ENTITY_FISHING_BOBBER_THROW, Sound.Source.NEUTRAL,
+						0.5F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
+
 				EntityShootEvent shootEvent = new EntityShootEvent(player, bobber,
 						player.getPosition(), 0, 1.0);
 				EventDispatcher.call(shootEvent);
@@ -69,26 +73,26 @@ public class ProjectileListener {
 					return;
 				}
 				double spread = shootEvent.getSpread() * (legacy ? 0.0075 : 0.0045);
-				
+
 				Pos playerPos = player.getPosition();
 				float playerPitch = playerPos.pitch();
 				float playerYaw = playerPos.yaw();
-				
+
 				float zDir = (float) Math.cos(Math.toRadians(-playerYaw) - Math.PI);
 				float xDir = (float) Math.sin(Math.toRadians(-playerYaw) - Math.PI);
 				double x = playerPos.x() - (double) xDir * 0.3D;
 				double y = playerPos.y() + player.getEyeHeight();
 				double z = playerPos.z() - (double) zDir * 0.3D;
 				bobber.setInstance(Objects.requireNonNull(player.getInstance()), new Pos(x, y, z));
-				
+
 				Vec velocity;
-				
+
 				if (!legacy) {
 					velocity = new Vec(
 							-xDir,
 							MathUtils.clamp(-(
 									(float) Math.sin(Math.toRadians(-playerPitch)) /
-									(float) -Math.cos(Math.toRadians(-playerPitch))
+											(float) -Math.cos(Math.toRadians(-playerPitch))
 							), -5.0F, 5.0F),
 							-zDir
 					);
@@ -117,7 +121,7 @@ public class ProjectileListener {
 							)
 							.mul(1.5);
 				}
-				
+
 				bobber.setVelocity(velocity.mul(MinecraftServer.TICK_PER_SECOND * 0.75));
 			}
 		}).filter(event -> event.getItemStack().material() == Material.FISHING_ROD).build());
