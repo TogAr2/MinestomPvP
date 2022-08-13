@@ -2,6 +2,7 @@
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 [![license](https://img.shields.io/github/license/Bloepiloepi/MinestomPvP.svg?style=flat-square)](LICENSE)
+[![](https://jitpack.io/v/TogAr2/MinestomPvP.svg?style=flat-square)](https://jitpack.io/#TogAr2/MinestomPvP)
 
 MinestomPvP is an extension for Minestom.
 It tries to mimic vanilla (and pre-1.9) PvP as good as possible, while also focusing on customizability and usability.
