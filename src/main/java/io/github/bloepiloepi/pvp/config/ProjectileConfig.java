@@ -4,6 +4,11 @@ import io.github.bloepiloepi.pvp.projectile.ProjectileListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.PlayerEvent;
 
+/**
+ * Creates an EventNode with projectile events.
+ * This includes fishing rods, snowballs, eggs,
+ * ender pearls, bows and crossbows.
+ */
 public class ProjectileConfig extends ElementConfig<PlayerEvent> {
 	public static final ProjectileConfig DEFAULT = new ProjectileConfig(
 			false, true, true,

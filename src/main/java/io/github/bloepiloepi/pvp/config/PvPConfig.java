@@ -4,6 +4,10 @@ import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityEvent;
 
+/**
+ * Creates an EventNode which contains the event nodes from all the child configs you specify.
+ * The default and the legacy version are already specified: {@code PvPConfig.DEFAULT} and {@code PvPConfig.LEGACY}.
+ */
 public class PvPConfig extends ElementConfig<EntityEvent> {
 	public static final PvPConfig DEFAULT = new PvPConfig(
 			AttackConfig.DEFAULT, DamageConfig.DEFAULT,

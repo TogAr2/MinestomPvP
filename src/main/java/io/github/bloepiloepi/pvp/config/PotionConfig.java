@@ -4,6 +4,11 @@ import io.github.bloepiloepi.pvp.potion.PotionListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityEvent;
 
+/**
+ * Creates an EventNode with potion events.
+ * This includes potion drinking, potion splashing and effects
+ * for potion add and remove (like glowing and invisibility).
+ */
 public class PotionConfig extends ElementConfig<EntityEvent> {
 	public static final PotionConfig DEFAULT = new PotionConfig(
 			false, true, true,

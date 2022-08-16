@@ -4,6 +4,10 @@ import io.github.bloepiloepi.pvp.food.FoodListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.PlayerEvent;
 
+/**
+ * Creates an EventNode with food events.
+ * This includes eating and exhaustion for movement and block breaking.
+ */
 public class FoodConfig extends ElementConfig<PlayerEvent> {
 	public static final FoodConfig DEFAULT = new FoodConfig(
 			false, true, true,

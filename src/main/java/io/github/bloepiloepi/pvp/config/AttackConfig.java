@@ -4,6 +4,11 @@ import io.github.bloepiloepi.pvp.listeners.AttackManager;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityEvent;
 
+/**
+ * Creates an EventNode with attack events.
+ * This includes entity hitting, attack cooldown
+ * and spectating entities as a spectator.
+ */
 public class AttackConfig extends ElementConfig<EntityEvent> {
 	public static final AttackConfig DEFAULT = new AttackConfig(
 			false, true, true,
