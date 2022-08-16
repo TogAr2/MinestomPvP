@@ -4,7 +4,7 @@ import io.github.bloepiloepi.pvp.projectile.ProjectileListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.PlayerEvent;
 
-public class ProjectileConfig extends PvPConfig<PlayerEvent> {
+public class ProjectileConfig extends ElementConfig<PlayerEvent> {
 	public static final ProjectileConfig DEFAULT = new ProjectileConfig(
 			false, true, true,
 			true, true, true,

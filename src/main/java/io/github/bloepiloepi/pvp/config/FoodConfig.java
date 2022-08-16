@@ -4,7 +4,7 @@ import io.github.bloepiloepi.pvp.food.FoodListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.PlayerEvent;
 
-public class FoodConfig extends PvPConfig<PlayerEvent> {
+public class FoodConfig extends ElementConfig<PlayerEvent> {
 	public static final FoodConfig DEFAULT = new FoodConfig(
 			false, true, true,
 			true, true, true

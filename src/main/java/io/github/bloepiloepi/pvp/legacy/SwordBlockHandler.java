@@ -17,7 +17,7 @@ import net.minestom.server.item.Material;
 public class SwordBlockHandler {
 	private static final ItemStack SHIELD = ItemStack.of(Material.SHIELD);
 	
-	public static EventNode<PlayerEvent> legacyEvents() {
+	public static EventNode<PlayerEvent> events() {
 		EventNode<PlayerEvent> node = EventNode.type("legacy-sword-block", EventFilter.PLAYER);
 		
 		node.addListener(EventListener.builder(PlayerUseItemEvent.class)

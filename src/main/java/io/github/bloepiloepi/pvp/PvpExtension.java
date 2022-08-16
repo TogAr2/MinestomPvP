@@ -6,7 +6,6 @@ import io.github.bloepiloepi.pvp.entity.CustomPlayer;
 import io.github.bloepiloepi.pvp.entity.Tracker;
 import io.github.bloepiloepi.pvp.explosion.ExplosionListener;
 import io.github.bloepiloepi.pvp.food.FoodListener;
-import io.github.bloepiloepi.pvp.legacy.SwordBlockHandler;
 import io.github.bloepiloepi.pvp.listeners.ArmorToolListener;
 import io.github.bloepiloepi.pvp.listeners.AttackManager;
 import io.github.bloepiloepi.pvp.listeners.DamageListener;
@@ -18,7 +17,6 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeInstance;
 import net.minestom.server.entity.Player;
-import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.event.trait.PlayerEvent;
@@ -31,32 +29,11 @@ import java.lang.reflect.Field;
 public class PvpExtension extends Extension {
 	
 	public static EventNode<EntityEvent> events() {
-		EventNode<EntityEvent> node = EventNode.type("pvp-events", EventFilter.ENTITY);
-		
-		node.addChild(attackEvents());
-		node.addChild(damageEvents());
-		node.addChild(explosionEvents());
-		node.addChild(armorToolEvents());
-		node.addChild(foodEvents());
-		node.addChild(potionEvents());
-		node.addChild(projectileEvents());
-		
-		return node;
+		return PvPConfig.DEFAULT.createNode();
 	}
 	
 	public static EventNode<EntityEvent> legacyEvents() {
-		EventNode<EntityEvent> node = EventNode.type("legacy-pvp-events", EventFilter.ENTITY);
-		
-		node.addChild(AttackManager.events(AttackConfig.LEGACY));
-		node.addChild(DamageListener.events(DamageConfig.LEGACY));
-		node.addChild(ExplosionListener.events(ExplosionConfig.DEFAULT));
-		node.addChild(ArmorToolListener.events(ArmorToolConfig.LEGACY));
-		node.addChild(FoodListener.events(FoodConfig.LEGACY));
-		node.addChild(PotionListener.events(PotionConfig.LEGACY));
-		node.addChild(ProjectileListener.events(ProjectileConfig.LEGACY));
-		node.addChild(SwordBlockHandler.legacyEvents());
-		
-		return node;
+		return PvPConfig.LEGACY.createNode();
 	}
 	
 	/**

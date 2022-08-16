@@ -49,7 +49,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class DamageListener {
 	
 	public static EventNode<EntityEvent> events(DamageConfig config) {
-		EventNode<EntityEvent> node = EventNode.type((config.isLegacy() ? "legacy-" : "") + "damage-events", EventFilter.ENTITY);
+		EventNode<EntityEvent> node = EventNode.type("damage-events", EventFilter.ENTITY);
 		
 		node.addListener(EventListener.builder(EntityDamageEvent.class)
 				.handler(event -> handleEntityDamage(event, config))

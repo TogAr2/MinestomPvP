@@ -4,7 +4,7 @@ import io.github.bloepiloepi.pvp.potion.PotionListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityEvent;
 
-public class PotionConfig extends PvPConfig<EntityEvent> {
+public class PotionConfig extends ElementConfig<EntityEvent> {
 	public static final PotionConfig DEFAULT = new PotionConfig(
 			false, true, true,
 			true, true, true,

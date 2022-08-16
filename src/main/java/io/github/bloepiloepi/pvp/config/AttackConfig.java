@@ -4,7 +4,7 @@ import io.github.bloepiloepi.pvp.listeners.AttackManager;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityEvent;
 
-public class AttackConfig extends PvPConfig<EntityEvent> {
+public class AttackConfig extends ElementConfig<EntityEvent> {
 	public static final AttackConfig DEFAULT = new AttackConfig(
 			false, true, true,
 			false, true, true,

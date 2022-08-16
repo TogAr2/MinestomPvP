@@ -4,7 +4,7 @@ import io.github.bloepiloepi.pvp.explosion.ExplosionListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityEvent;
 
-public class ExplosionConfig extends PvPConfig<EntityEvent> {
+public class ExplosionConfig extends ElementConfig<EntityEvent> {
 	public static final ExplosionConfig DEFAULT = new ExplosionConfig(
 			false, true, true, true
 	);

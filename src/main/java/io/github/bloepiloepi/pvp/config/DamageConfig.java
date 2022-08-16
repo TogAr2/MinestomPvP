@@ -4,7 +4,7 @@ import io.github.bloepiloepi.pvp.listeners.DamageListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityEvent;
 
-public class DamageConfig extends PvPConfig<EntityEvent> {
+public class DamageConfig extends ElementConfig<EntityEvent> {
 	public static final DamageConfig DEFAULT = new DamageConfig(
 			false, true, true,
 			true, false, 10,
