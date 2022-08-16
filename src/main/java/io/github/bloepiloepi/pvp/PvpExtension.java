@@ -53,7 +53,7 @@ public class PvpExtension extends Extension {
 		node.addChild(ArmorToolListener.events(ArmorToolConfig.LEGACY));
 		node.addChild(FoodListener.events(FoodConfig.LEGACY));
 		node.addChild(PotionListener.events(PotionConfig.LEGACY));
-		node.addChild(ProjectileListener.events(true));
+		node.addChild(ProjectileListener.events(ProjectileConfig.LEGACY));
 		node.addChild(SwordBlockHandler.legacyEvents());
 		
 		return node;
@@ -132,7 +132,7 @@ public class PvpExtension extends Extension {
 	 * @return The EventNode with projectile events
 	 */
 	public static EventNode<PlayerEvent> projectileEvents() {
-		return ProjectileListener.events(false);
+		return ProjectileListener.events(ProjectileConfig.DEFAULT);
 	}
 	
 	/**

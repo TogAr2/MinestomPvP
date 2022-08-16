@@ -1,5 +1,6 @@
 package io.github.bloepiloepi.pvp.projectile;
 
+import io.github.bloepiloepi.pvp.config.ProjectileConfig;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entity.EntityUtils;
 import io.github.bloepiloepi.pvp.entity.Tracker;
@@ -40,10 +41,10 @@ public class ProjectileListener {
 	private static final Tag<Byte> MID_LOAD_SOUND_PLAYED = Tag.Byte("MidLoadSoundPlayed");
 	
 	// Please, don't look at the random hardcoded numbers in this class, even I am confused
-	public static EventNode<PlayerEvent> events(boolean legacy) {
+	public static EventNode<PlayerEvent> events(ProjectileConfig config) {
 		EventNode<PlayerEvent> node = EventNode.type("projectile-events", EventFilter.PLAYER);
 		
-		node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
+		if (config.isFishingRodEnabled()) node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
 			ThreadLocalRandom random = ThreadLocalRandom.current();
 			Player player = event.getPlayer();
 			
@@ -59,7 +60,7 @@ public class ProjectileListener {
 				SoundManager.sendToAround(player, SoundEvent.ENTITY_FISHING_BOBBER_THROW, Sound.Source.NEUTRAL,
 						0.5F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
 				
-				FishingBobber bobber = new FishingBobber(player, legacy);
+				FishingBobber bobber = new FishingBobber(player, config.isLegacy());
 				FishingBobber.fishingBobbers.put(player.getUuid(), bobber);
 				
 				EntityShootEvent shootEvent = new EntityShootEvent(player, bobber,
@@ -69,7 +70,7 @@ public class ProjectileListener {
 					bobber.remove();
 					return;
 				}
-				double spread = shootEvent.getSpread() * (legacy ? 0.0075 : 0.0045);
+				double spread = shootEvent.getSpread() * (config.isLegacy() ? 0.0075 : 0.0045);
 				
 				Pos playerPos = player.getPosition();
 				float playerPitch = playerPos.pitch();
@@ -84,7 +85,7 @@ public class ProjectileListener {
 				
 				Vec velocity;
 				
-				if (!legacy) {
+				if (!config.isLegacy()) {
 					velocity = new Vec(
 							-xDir,
 							MathUtils.clamp(-(
@@ -138,12 +139,15 @@ public class ProjectileListener {
 			SoundEvent soundEvent;
 			CustomEntityProjectile projectile;
 			if (snowball) {
+				if (!config.isSnowballEnabled()) return;
 				soundEvent = SoundEvent.ENTITY_SNOWBALL_THROW;
 				projectile = new Snowball(player);
 			} else if (enderpearl) {
+				if (!config.isEnderPearlEnabled()) return;
 				soundEvent = SoundEvent.ENTITY_ENDER_PEARL_THROW;
 				projectile = new ThrownEnderpearl(player);
 			} else {
+				if (!config.isEggEnabled()) return;
 				soundEvent = SoundEvent.ENTITY_EGG_THROW;
 				projectile = new ThrownEgg(player);
 			}
@@ -179,14 +183,14 @@ public class ProjectileListener {
 				|| event.getItemStack().material() == Material.ENDER_PEARL)
 				.build());
 		
-		node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
+		if (config.isCrossbowEnabled()) node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
 			ItemStack stack = event.getItemStack();
 			if (stack.meta(CrossbowMeta.class).isCharged()) {
 				// Make sure the animation event is not called, because this is not an animation
 				event.setCancelled(true);
 				
 				stack = performCrossbowShooting(event.getPlayer(), event.getHand(), stack,
-						getCrossbowPower(stack), 1.0, legacy);
+						getCrossbowPower(stack), 1.0, config.isLegacy());
 				event.getPlayer().setItemInHand(event.getHand(), setCrossbowCharged(stack, false));
 			} else {
 				if (EntityUtils.getProjectile(event.getPlayer(),
@@ -212,7 +216,7 @@ public class ProjectileListener {
 			}
 		});
 		
-		node.addListener(PlayerTickEvent.class, event -> {
+		if (config.isCrossbowEnabled()) node.addListener(PlayerTickEvent.class, event -> {
 			Player player = event.getPlayer();
 			if (EntityUtils.isChargingCrossbow(player)) {
 				Player.Hand hand = EntityUtils.getActiveHand(player);
@@ -247,7 +251,7 @@ public class ProjectileListener {
 			}
 		});
 		
-		node.addListener(EventListener.builder(ItemUpdateStateEvent.class).handler(event -> {
+		if (config.isBowEnabled()) node.addListener(EventListener.builder(ItemUpdateStateEvent.class).handler(event -> {
 			Player player = event.getPlayer();
 			ItemStack stack = event.getItemStack();
 			boolean infinite = player.isCreative() || EnchantmentUtils.getLevel(Enchantment.INFINITY, stack) > 0;
@@ -267,7 +271,7 @@ public class ProjectileListener {
 			if (power < 0.1) return;
 			
 			// Arrow creation
-			AbstractArrow arrow = createArrow(projectile, player, legacy);
+			AbstractArrow arrow = createArrow(projectile, player, config.isLegacy());
 			
 			if (power >= 1) {
 				arrow.setCritical(true);
@@ -321,7 +325,7 @@ public class ProjectileListener {
 			}
 		}).filter(event -> event.getItemStack().material() == Material.BOW).build());
 		
-		node.addListener(EventListener.builder(ItemUpdateStateEvent.class).handler(event -> {
+		if (config.isCrossbowEnabled()) node.addListener(EventListener.builder(ItemUpdateStateEvent.class).handler(event -> {
 			Player player = event.getPlayer();
 			ItemStack stack = event.getItemStack();
 			
