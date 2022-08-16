@@ -37,6 +37,11 @@ public class ExplosionConfig extends ElementConfig<EntityEvent> {
 		return ExplosionListener.events(this);
 	}
 	
+	/**
+	 * Creates an empty builder which has everything disabled.
+	 *
+	 * @return An empty builder
+	 */
 	public static ExplosionConfigBuilder builder() {
 		return new ExplosionConfigBuilder(false);
 	}

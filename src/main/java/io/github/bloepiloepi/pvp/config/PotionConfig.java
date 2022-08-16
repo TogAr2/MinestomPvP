@@ -63,6 +63,11 @@ public class PotionConfig extends ElementConfig<EntityEvent> {
 		return PotionListener.events(this);
 	}
 	
+	/**
+	 * Creates an empty builder which has everything disabled.
+	 *
+	 * @return An empty builder
+	 */
 	public static PotionConfigBuilder builder(boolean legacy) {
 		return new PotionConfigBuilder(legacy);
 	}

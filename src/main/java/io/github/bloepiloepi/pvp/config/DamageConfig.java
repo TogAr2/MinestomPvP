@@ -77,6 +77,11 @@ public class DamageConfig extends ElementConfig<EntityEvent> {
 		return DamageListener.events(this);
 	}
 	
+	/**
+	 * Creates an empty builder which has everything disabled.
+	 *
+	 * @return An empty builder
+	 */
 	public static DamageConfigBuilder builder(boolean legacy) {
 		return new DamageConfigBuilder(legacy);
 	}

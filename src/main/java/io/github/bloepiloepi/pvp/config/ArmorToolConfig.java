@@ -34,6 +34,11 @@ public class ArmorToolConfig extends ElementConfig<EntityEvent> {
 		return ArmorToolListener.events(this);
 	}
 	
+	/**
+	 * Creates an empty builder which has everything disabled.
+	 *
+	 * @return An empty builder
+	 */
 	public static ArmorToolConfigBuilder builder(boolean legacy) {
 		return new ArmorToolConfigBuilder(legacy);
 	}

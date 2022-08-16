@@ -64,6 +64,11 @@ public class AttackConfig extends ElementConfig<EntityEvent> {
 		return AttackManager.events(this);
 	}
 	
+	/**
+	 * Creates an empty builder which has everything disabled.
+	 *
+	 * @return An empty builder
+	 */
 	public static AttackConfigBuilder builder(boolean legacy) {
 		return new AttackConfigBuilder(legacy);
 	}

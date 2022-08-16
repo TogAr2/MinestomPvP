@@ -7,24 +7,16 @@ import net.minestom.server.event.trait.EntityEvent;
 /**
  * Creates an EventNode which contains the event nodes from all the child configs you specify.
  * The default and the legacy version are already specified: {@code PvPConfig.DEFAULT} and {@code PvPConfig.LEGACY}.
+ *
+ * If you want more customization, you can also use the empty builder to enable features by yourself.
  */
 public class PvPConfig extends ElementConfig<EntityEvent> {
-	public static final PvPConfig DEFAULT = new PvPConfig(
-			AttackConfig.DEFAULT, DamageConfig.DEFAULT,
-			ExplosionConfig.DEFAULT, ArmorToolConfig.DEFAULT,
-			FoodConfig.DEFAULT, PotionConfig.DEFAULT,
-			ProjectileConfig.DEFAULT
-	);
-	public static final PvPConfig LEGACY = new PvPConfig(
-			AttackConfig.LEGACY, DamageConfig.LEGACY,
-			ExplosionConfig.DEFAULT, ArmorToolConfig.LEGACY,
-			FoodConfig.LEGACY, PotionConfig.LEGACY,
-			ProjectileConfig.LEGACY, SwordBlockingConfig.LEGACY
-	);
+	public static final PvPConfig DEFAULT = new PvPConfigBuilder().defaultOptions().build();
+	public static final PvPConfig LEGACY = new PvPConfigBuilder().legacyOptions().build();
 	
 	private final ElementConfig<?>[] elements;
 	
-	public PvPConfig(ElementConfig<?>... elements) {
+	PvPConfig(ElementConfig<?>... elements) {
 		super(false); // Doesn't matter because it isn't used
 		this.elements = elements;
 	}
@@ -34,9 +26,19 @@ public class PvPConfig extends ElementConfig<EntityEvent> {
 		EventNode<EntityEvent> node = EventNode.type("pvp-events", EventFilter.ENTITY);
 		
 		for (ElementConfig<?> config : elements) {
+			if (config == null) continue;
 			node.addChild(config.createNode());
 		}
 		
 		return node;
+	}
+	
+	/**
+	 * Creates an empty builder which has everything disabled.
+	 *
+	 * @return An empty builder
+	 */
+	public static PvPConfigBuilder builder() {
+		return new PvPConfigBuilder();
 	}
 }

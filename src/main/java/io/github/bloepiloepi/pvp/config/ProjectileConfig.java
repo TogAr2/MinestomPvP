@@ -58,6 +58,11 @@ public class ProjectileConfig extends ElementConfig<PlayerEvent> {
 		return ProjectileListener.events(this);
 	}
 	
+	/**
+	 * Creates an empty builder which has everything disabled.
+	 *
+	 * @return An empty builder
+	 */
 	public static ProjectileConfigBuilder builder(boolean legacy) {
 		return new ProjectileConfigBuilder(legacy);
 	}

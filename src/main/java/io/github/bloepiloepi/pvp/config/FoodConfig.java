@@ -51,6 +51,11 @@ public class FoodConfig extends ElementConfig<PlayerEvent> {
 		return FoodListener.events(this);
 	}
 	
+	/**
+	 * Creates an empty builder which has everything disabled.
+	 *
+	 * @return An empty builder
+	 */
 	public static FoodConfigBuilder builder(boolean legacy) {
 		return new FoodConfigBuilder(legacy);
 	}
