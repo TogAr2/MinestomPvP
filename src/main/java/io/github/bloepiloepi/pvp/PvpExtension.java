@@ -52,7 +52,7 @@ public class PvpExtension extends Extension {
 		node.addChild(ExplosionListener.events(ExplosionConfig.DEFAULT));
 		node.addChild(ArmorToolListener.events(ArmorToolConfig.LEGACY));
 		node.addChild(FoodListener.events(FoodConfig.LEGACY));
-		node.addChild(PotionListener.events(true));
+		node.addChild(PotionListener.events(PotionConfig.LEGACY));
 		node.addChild(ProjectileListener.events(true));
 		node.addChild(SwordBlockHandler.legacyEvents());
 		
@@ -121,7 +121,7 @@ public class PvpExtension extends Extension {
 	 * @return The EventNode with potion events
 	 */
 	public static EventNode<EntityEvent> potionEvents() {
-		return PotionListener.events(false);
+		return PotionListener.events(PotionConfig.DEFAULT);
 	}
 	
 	/**
