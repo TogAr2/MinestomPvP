@@ -1,5 +1,6 @@
 package io.github.bloepiloepi.pvp.listeners;
 
+import io.github.bloepiloepi.pvp.config.DamageConfig;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.damage.CustomEntityDamage;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
@@ -47,14 +48,14 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class DamageListener {
 	
-	public static EventNode<EntityEvent> events(boolean legacy) {
-		EventNode<EntityEvent> node = EventNode.type((legacy ? "legacy-" : "") + "damage-events", EventFilter.ENTITY);
+	public static EventNode<EntityEvent> events(DamageConfig config) {
+		EventNode<EntityEvent> node = EventNode.type((config.isLegacy() ? "legacy-" : "") + "damage-events", EventFilter.ENTITY);
 		
 		node.addListener(EventListener.builder(EntityDamageEvent.class)
-				.handler(event -> handleEntityDamage(event, legacy))
+				.handler(event -> handleEntityDamage(event, config))
 				.build());
 		
-		node.addListener(PlayerMoveEvent.class, event -> {
+		if (config.isFallDamageEnabled()) node.addListener(PlayerMoveEvent.class, event -> {
 			Player player = event.getPlayer();
 			double dy = event.getNewPosition().y() - player.getPosition().y();
 			Double fallDistance = Tracker.fallDistance.get(player.getUuid());
@@ -132,7 +133,7 @@ public class DamageListener {
 		return position;
 	}
 	
-	public static void handleEntityDamage(EntityDamageEvent event, boolean legacy) {
+	public static void handleEntityDamage(EntityDamageEvent event, DamageConfig config) {
 		event.setAnimation(false);
 		event.setSound(null);
 		
@@ -169,7 +170,7 @@ public class DamageListener {
 			return;
 		}
 		
-		if (type.damagesHelmet() && !entity.getEquipment(EquipmentSlot.HELMET).isAir()) {
+		if (config.isEquipmentDamageEnabled() && type.damagesHelmet() && !entity.getEquipment(EquipmentSlot.HELMET).isAir()) {
 			ItemUtils.damageArmor(entity, type, amount, EquipmentSlot.HELMET);
 			amount *= 0.75F;
 		}
@@ -181,9 +182,9 @@ public class DamageListener {
 		}
 		
 		boolean shield = false;
-		if (amount > 0.0F && EntityUtils.blockedByShield(entity, type, legacy)) {
+		if (config.isShieldEnabled() && amount > 0.0F && EntityUtils.blockedByShield(entity, type, config.isLegacyShieldMechanics())) {
 			float resultingDamage = 0.0F;
-			if (legacy) {
+			if (config.isLegacyShieldMechanics()) {
 				resultingDamage = (amount + 1.0F) * 0.5F;
 				if (resultingDamage < 0.0F)
 					resultingDamage = 0.0F;
@@ -193,7 +194,7 @@ public class DamageListener {
 			EventDispatcher.call(damageBlockEvent);
 			
 			if (!damageBlockEvent.isCancelled()) {
-				if (amount >= 3) {
+				if (config.isEquipmentDamageEnabled() && amount >= 3) {
 					int shieldDamage = 1 + (int) Math.floor(amount);
 					Player.Hand hand = EntityUtils.getActiveHand(entity);
 					ItemUtils.damageEquipment(entity, hand == Player.Hand.MAIN ? EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, shieldDamage);
@@ -210,7 +211,7 @@ public class DamageListener {
 				
 				amount = damageBlockEvent.getResultingDamage();
 				
-				if (!legacy) {
+				if (!config.isLegacyShieldMechanics()) {
 					if (!type.isProjectile()) {
 						if (attacker instanceof LivingEntity) {
 							EntityUtils.takeShieldHit(entity, (LivingEntity) attacker, damageBlockEvent.knockbackAttacker());
@@ -232,18 +233,18 @@ public class DamageListener {
 				return;
 			}
 			
-			amount = applyDamage(entity, type, amount - lastDamage, legacy);
+			amount = applyDamage(entity, type, amount - lastDamage, config);
 			hurtSoundAndAnimation = false;
 		} else {
-			amount = applyDamage(entity, type, amount, legacy);
+			amount = applyDamage(entity, type, amount, config);
 		}
 		
-		FinalDamageEvent finalDamageEvent = new FinalDamageEvent(entity, type, amount);
+		FinalDamageEvent finalDamageEvent = new FinalDamageEvent(entity, type, amount, config.getInvulnerabilityTicks());
 		EventDispatcher.call(finalDamageEvent);
 		
 		amount = finalDamageEvent.getDamage();
 		
-		boolean register = legacy || finalDamageEvent.getDamage() > 0.0F;
+		boolean register = config.isLegacy() || finalDamageEvent.getDamage() > 0.0F;
 		if (register && entity instanceof Player) {
 			Tracker.combatManager.get(entity.getUuid()).recordDamage(type, amount);
 		}
@@ -298,7 +299,7 @@ public class DamageListener {
 				}
 				double finalH = h;
 				double finalI = i;
-				if (!legacy) {
+				if (!config.isLegacyKnockback()) {
 					EntityKnockbackEvent entityKnockbackEvent = new EntityKnockbackEvent(entity, directAttacker, false, false, 0.4F);
 					EventDispatcher.callCancellable(entityKnockbackEvent, () -> {
 						float strength = entityKnockbackEvent.getStrength();
@@ -355,7 +356,7 @@ public class DamageListener {
 		}
 		
 		//Play sound
-		if (sound != null) {
+		if (config.isSoundsEnabled() && sound != null) {
 			Sound.Source soundCategory;
 			if (entity instanceof Player) {
 				soundCategory = Sound.Source.PLAYER;
@@ -426,21 +427,23 @@ public class DamageListener {
 		return hasTotem;
 	}
 	
-	public static float applyDamage(LivingEntity entity, CustomDamageType type, float amount, boolean legacy) {
-		amount = applyArmorToDamage(entity, type, amount, legacy);
-		amount = applyEnchantmentsToDamage(entity, type, amount, legacy);
+	public static float applyDamage(LivingEntity entity, CustomDamageType type, float amount, DamageConfig config) {
+		amount = applyArmorToDamage(entity, type, amount, config);
+		amount = applyEnchantmentsToDamage(entity, type, amount, config);
 		
-		if (amount != 0.0F && entity instanceof Player) {
-			EntityUtils.addExhaustion((Player) entity, type.getExhaustion() * (legacy ? 3 : 1));
+		if (config.isExhaustionEnabled() && amount != 0.0F && entity instanceof Player) {
+			EntityUtils.addExhaustion((Player) entity, type.getExhaustion() * (config.isLegacy() ? 3 : 1));
 		}
 		
 		return amount;
 	}
 	
-	public static float applyArmorToDamage(LivingEntity entity, CustomDamageType type, float amount, boolean legacy) {
+	public static float applyArmorToDamage(LivingEntity entity, CustomDamageType type, float amount, DamageConfig config) {
+		if (config.isArmorDisabled()) return amount;
+		
 		if (!type.bypassesArmor()) {
 			float armorValue = entity.getAttributeValue(Attribute.ARMOR);
-			if (!legacy) {
+			if (!config.isLegacy()) {
 				amount = DamageUtils.getDamageLeft(amount, (float) Math.floor(armorValue), entity.getAttributeValue(Attribute.ARMOR_TOUGHNESS));
 			} else {
 				int i = 25 - (int) armorValue;
@@ -452,7 +455,7 @@ public class DamageListener {
 		return amount;
 	}
 	
-	public static float applyEnchantmentsToDamage(LivingEntity entity, CustomDamageType type, float amount, boolean legacy) {
+	public static float applyEnchantmentsToDamage(LivingEntity entity, CustomDamageType type, float amount, DamageConfig config) {
 		if (type.isUnblockable()) {
 			return amount;
 		} else {
@@ -464,11 +467,13 @@ public class DamageListener {
 				amount = Math.max(f / 25.0F, 0.0F);
 			}
 			
+			if (config.isArmorDisabled()) return amount;
+			
 			if (amount <= 0.0F) {
 				return 0.0F;
 			} else {
 				k = EnchantmentUtils.getProtectionAmount(EntityUtils.getArmorItems(entity), type);
-				if (!legacy) {
+				if (!config.isLegacy()) {
 					if (k > 0) {
 						amount = DamageUtils.getInflictedDamage(amount, (float) k);
 					}

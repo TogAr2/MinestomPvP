@@ -16,14 +16,16 @@ public class FinalDamageEvent implements EntityInstanceEvent, CancellableEvent {
 	private final LivingEntity entity;
 	private final CustomDamageType damageType;
 	private float damage;
-	private int invulnerabilityTicks = 10;
+	private int invulnerabilityTicks;
 	
 	private boolean cancelled;
 	
-	public FinalDamageEvent(@NotNull LivingEntity entity, @NotNull CustomDamageType damageType, float damage) {
+	public FinalDamageEvent(@NotNull LivingEntity entity, @NotNull CustomDamageType damageType,
+	                        float damage, int invulnerabilityTicks) {
 		this.entity = entity;
 		this.damageType = damageType;
 		this.damage = damage;
+		this.invulnerabilityTicks = invulnerabilityTicks;
 	}
 	
 	@NotNull
