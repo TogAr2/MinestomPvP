@@ -2,6 +2,7 @@ package io.github.bloepiloepi.pvp.entity;
 
 import io.github.bloepiloepi.pvp.damage.combat.CombatManager;
 import io.github.bloepiloepi.pvp.food.HungerManager;
+import io.github.bloepiloepi.pvp.listeners.AttackManager;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
@@ -156,6 +157,8 @@ public class Tracker {
 					Tracker.lastDamagedBy.remove(uuid);
 				}
 			}
+			
+			AttackManager.spectateTick(player);
 		});
 		
 		node.addListener(EntityTickEvent.class, event -> {
@@ -171,7 +174,7 @@ public class Tracker {
 		});
 		
 		node.addListener(PlayerPreEatEvent.class, event -> {
-			if (Tracker.hasCooldown(event.getPlayer(), event.getFoodItem().material())) {
+			if (Tracker.hasCooldown(event.getPlayer(), event.getItemStack().material())) {
 				event.setCancelled(true);
 			}
 		});

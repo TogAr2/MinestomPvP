@@ -1,5 +1,6 @@
 package io.github.bloepiloepi.pvp;
 
+import io.github.bloepiloepi.pvp.config.AttackConfig;
 import io.github.bloepiloepi.pvp.enchantment.CustomEnchantments;
 import io.github.bloepiloepi.pvp.entity.CustomPlayer;
 import io.github.bloepiloepi.pvp.entity.Tracker;
@@ -46,7 +47,7 @@ public class PvpExtension extends Extension {
 	public static EventNode<EntityEvent> legacyEvents() {
 		EventNode<EntityEvent> node = EventNode.type("legacy-pvp-events", EventFilter.ENTITY);
 		
-		node.addChild(AttackManager.events(true));
+		node.addChild(AttackManager.events(AttackConfig.LEGACY));
 		node.addChild(DamageListener.events(true));
 		node.addChild(ExplosionListener.events());
 		node.addChild(ArmorToolListener.events(true));
@@ -66,7 +67,7 @@ public class PvpExtension extends Extension {
 	 * @return The EventNode with attack events
 	 */
 	public static EventNode<EntityEvent> attackEvents() {
-		return AttackManager.events(false);
+		return AttackManager.events(AttackConfig.DEFAULT);
 	}
 	
 	/**
