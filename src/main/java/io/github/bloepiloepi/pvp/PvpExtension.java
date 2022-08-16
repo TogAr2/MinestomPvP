@@ -1,5 +1,6 @@
 package io.github.bloepiloepi.pvp;
 
+import io.github.bloepiloepi.pvp.config.ArmorToolConfig;
 import io.github.bloepiloepi.pvp.config.AttackConfig;
 import io.github.bloepiloepi.pvp.config.DamageConfig;
 import io.github.bloepiloepi.pvp.config.ExplosionConfig;
@@ -52,7 +53,7 @@ public class PvpExtension extends Extension {
 		node.addChild(AttackManager.events(AttackConfig.LEGACY));
 		node.addChild(DamageListener.events(DamageConfig.LEGACY));
 		node.addChild(ExplosionListener.events(ExplosionConfig.DEFAULT));
-		node.addChild(ArmorToolListener.events(true));
+		node.addChild(ArmorToolListener.events(ArmorToolConfig.LEGACY));
 		node.addChild(FoodListener.events(true));
 		node.addChild(PotionListener.events(true));
 		node.addChild(ProjectileListener.events(true));
@@ -102,7 +103,7 @@ public class PvpExtension extends Extension {
 	 * @return The EventNode with armor and tool events
 	 */
 	public static EventNode<EntityEvent> armorToolEvents() {
-		return ArmorToolListener.events(false);
+		return ArmorToolListener.events(ArmorToolConfig.DEFAULT);
 	}
 	
 	/**
