@@ -10,17 +10,12 @@ import net.minestom.server.event.trait.EntityEvent;
  * an entity equips items.
  */
 public class ArmorToolConfig extends ElementConfig<EntityEvent> {
-	public static final ArmorToolConfig DEFAULT = new ArmorToolConfig(
-			false, true, true
-	);
-	public static final ArmorToolConfig LEGACY = new ArmorToolConfig(
-			true, true, true
-	);
+	public static final ArmorToolConfig DEFAULT = new ArmorToolConfigBuilder(false).defaultOptions().build();
+	public static final ArmorToolConfig LEGACY = new ArmorToolConfigBuilder(true).defaultOptions().build();
 	
-	private final boolean armorModifiersEnabled;
-	private final boolean toolModifiersEnabled;
+	private final boolean armorModifiersEnabled, toolModifiersEnabled;
 	
-	public ArmorToolConfig(boolean legacy, boolean armorModifiersEnabled, boolean toolModifiersEnabled) {
+	ArmorToolConfig(boolean legacy, boolean armorModifiersEnabled, boolean toolModifiersEnabled) {
 		super(legacy);
 		this.armorModifiersEnabled = armorModifiersEnabled;
 		this.toolModifiersEnabled = toolModifiersEnabled;
@@ -37,5 +32,9 @@ public class ArmorToolConfig extends ElementConfig<EntityEvent> {
 	@Override
 	public EventNode<EntityEvent> createNode() {
 		return ArmorToolListener.events(this);
+	}
+	
+	public static ArmorToolConfigBuilder builder(boolean legacy) {
+		return new ArmorToolConfigBuilder(legacy);
 	}
 }

@@ -10,25 +10,16 @@ import net.minestom.server.event.trait.PlayerEvent;
  * ender pearls, bows and crossbows.
  */
 public class ProjectileConfig extends ElementConfig<PlayerEvent> {
-	public static final ProjectileConfig DEFAULT = new ProjectileConfig(
-			false, true, true,
-			true, true, true,
-			true
-	);
-	public static final ProjectileConfig LEGACY = new ProjectileConfig(
-			true, true, true,
-			true, true, true,
-			true
-	);
+	public static final ProjectileConfig DEFAULT = new ProjectileConfigBuilder(false).defaultOptions().build();
+	public static final ProjectileConfig LEGACY = new ProjectileConfigBuilder(true).defaultOptions().build();
 	
-	private final boolean fishingRodEnabled;
-	private final boolean snowballEnabled;
-	private final boolean eggEnabled;
-	private final boolean enderPearlEnabled;
-	private final boolean crossbowEnabled;
-	private final boolean bowEnabled;
+	private final boolean
+			fishingRodEnabled, snowballEnabled, eggEnabled,
+			enderPearlEnabled, crossbowEnabled, bowEnabled;
 	
-	public ProjectileConfig(boolean legacy, boolean fishingRodEnabled, boolean snowballEnabled, boolean eggEnabled, boolean enderPearlEnabled, boolean crossbowEnabled, boolean bowEnabled) {
+	ProjectileConfig(boolean legacy, boolean fishingRodEnabled, boolean snowballEnabled,
+	                        boolean eggEnabled, boolean enderPearlEnabled, boolean crossbowEnabled,
+	                        boolean bowEnabled) {
 		super(legacy);
 		this.fishingRodEnabled = fishingRodEnabled;
 		this.snowballEnabled = snowballEnabled;
@@ -65,5 +56,9 @@ public class ProjectileConfig extends ElementConfig<PlayerEvent> {
 	@Override
 	public EventNode<PlayerEvent> createNode() {
 		return ProjectileListener.events(this);
+	}
+	
+	public static ProjectileConfigBuilder builder(boolean legacy) {
+		return new ProjectileConfigBuilder(legacy);
 	}
 }

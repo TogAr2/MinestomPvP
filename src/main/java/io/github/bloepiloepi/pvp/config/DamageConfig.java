@@ -11,30 +11,19 @@ import net.minestom.server.event.trait.EntityEvent;
  * to change that attribute for different types of armor you need {@code ArmorToolConfig}.
  */
 public class DamageConfig extends ElementConfig<EntityEvent> {
-	public static final DamageConfig DEFAULT = new DamageConfig(
-			false, true, true,
-			true, false, 10,
-			true, true, false,
-			true
-	);
-	public static final DamageConfig LEGACY = new DamageConfig(
-			true, true, true,
-			true, true, 10,
-			true, true, true,
-			true
-	);
+	public static final DamageConfig DEFAULT = new DamageConfigBuilder(false).defaultOptions().build();
+	public static final DamageConfig LEGACY = new DamageConfigBuilder(true).legacyOptions().build();
 	
-	private final boolean fallDamageEnabled;
-	private final boolean equipmentDamageEnabled;
-	private final boolean shieldEnabled;
-	private final boolean legacyShieldMechanics;
+	private final boolean
+			fallDamageEnabled, equipmentDamageEnabled, shieldEnabled,
+			legacyShieldMechanics, armorEnabled, exhaustionEnabled,
+			legacyKnockback, soundsEnabled;
 	private final int invulnerabilityTicks;
-	private final boolean armorEnabled;
-	private final boolean exhaustionEnabled;
-	private final boolean legacyKnockback;
-	private final boolean soundsEnabled;
 	
-	public DamageConfig(boolean legacy, boolean fallDamageEnabled, boolean equipmentDamageEnabled, boolean shieldEnabled, boolean legacyShieldMechanics, int invulnerabilityTicks, boolean armorEnabled, boolean exhaustionEnabled, boolean legacyKnockback, boolean soundsEnabled) {
+	public DamageConfig(boolean legacy, boolean fallDamageEnabled, boolean equipmentDamageEnabled,
+	                    boolean shieldEnabled, boolean legacyShieldMechanics, int invulnerabilityTicks,
+	                    boolean armorEnabled, boolean exhaustionEnabled, boolean legacyKnockback,
+	                    boolean soundsEnabled) {
 		super(legacy);
 		this.fallDamageEnabled = fallDamageEnabled;
 		this.equipmentDamageEnabled = equipmentDamageEnabled;
@@ -86,5 +75,9 @@ public class DamageConfig extends ElementConfig<EntityEvent> {
 	@Override
 	public EventNode<EntityEvent> createNode() {
 		return DamageListener.events(this);
+	}
+	
+	public static DamageConfigBuilder builder(boolean legacy) {
+		return new DamageConfigBuilder(legacy);
 	}
 }

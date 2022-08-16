@@ -10,26 +10,16 @@ import net.minestom.server.event.trait.EntityEvent;
  * for potion add and remove (like glowing and invisibility).
  */
 public class PotionConfig extends ElementConfig<EntityEvent> {
-	public static final PotionConfig DEFAULT = new PotionConfig(
-			false, true, true,
-			true, true, true,
-			true, true
-	);
-	public static final PotionConfig LEGACY = new PotionConfig(
-			true, true, true,
-			true, true, true,
-			true, true
-	);
+	public static final PotionConfig DEFAULT = new PotionConfigBuilder(false).defaultOptions().build();
+	public static final PotionConfig LEGACY = new PotionConfigBuilder(true).defaultOptions().build();
 	
-	private final boolean updateEffectEnabled;
-	private final boolean applyEffectEnabled;
-	private final boolean instantEffectEnabled;
-	private final boolean drinkingEnabled;
-	private final boolean splashEnabled;
-	private final boolean lingeringEnabled;
-	private final boolean particlesEnabled;
+	private final boolean
+			updateEffectEnabled, applyEffectEnabled, instantEffectEnabled,
+			drinkingEnabled, splashEnabled, lingeringEnabled, particlesEnabled;
 	
-	public PotionConfig(boolean legacy, boolean updateEffectEnabled, boolean applyEffectEnabled, boolean instantEffectEnabled, boolean drinkingEnabled, boolean splashEnabled, boolean lingeringEnabled, boolean particlesEnabled) {
+	PotionConfig(boolean legacy, boolean updateEffectEnabled, boolean applyEffectEnabled,
+	             boolean instantEffectEnabled, boolean drinkingEnabled, boolean splashEnabled,
+	             boolean lingeringEnabled, boolean particlesEnabled) {
 		super(legacy);
 		this.updateEffectEnabled = updateEffectEnabled;
 		this.applyEffectEnabled = applyEffectEnabled;
@@ -71,5 +61,9 @@ public class PotionConfig extends ElementConfig<EntityEvent> {
 	@Override
 	public EventNode<EntityEvent> createNode() {
 		return PotionListener.events(this);
+	}
+	
+	public static PotionConfigBuilder builder(boolean legacy) {
+		return new PotionConfigBuilder(legacy);
 	}
 }

@@ -10,26 +10,15 @@ import net.minestom.server.event.trait.EntityEvent;
  * and spectating entities as a spectator.
  */
 public class AttackConfig extends ElementConfig<EntityEvent> {
-	public static final AttackConfig DEFAULT = new AttackConfig(
-			false, true, true,
-			false, true, true,
-			true, true
-	);
-	public static final AttackConfig LEGACY = new AttackConfig(
-			true, true, false,
-			true, false, true,
-			false, true
-	);
+	public static final AttackConfig DEFAULT = new AttackConfigBuilder(false).defaultOptions().build();
+	public static final AttackConfig LEGACY = new AttackConfigBuilder(true).legacyOptions().build();
 	
-	private final boolean spectatingEnabled;
-	private final boolean attackCooldownEnabled;
-	private final boolean legacyKnockback;
-	private final boolean soundsEnabled;
-	private final boolean toolDamageEnabled;
-	private final boolean damageIndicatorParticlesEnabled;
-	private final boolean exhaustionEnabled;
+	private final boolean
+			spectatingEnabled, attackCooldownEnabled, legacyKnockback,
+			soundsEnabled, toolDamageEnabled, damageIndicatorParticlesEnabled,
+			exhaustionEnabled;
 	
-	public AttackConfig(boolean legacy, boolean spectatingEnabled, boolean attackCooldownEnabled, boolean legacyKnockback,
+	AttackConfig(boolean legacy, boolean spectatingEnabled, boolean attackCooldownEnabled, boolean legacyKnockback,
 	             boolean soundsEnabled, boolean toolDamageEnabled, boolean damageIndicatorParticlesEnabled,
 	             boolean exhaustionEnabled) {
 		super(legacy);
@@ -73,5 +62,9 @@ public class AttackConfig extends ElementConfig<EntityEvent> {
 	@Override
 	public EventNode<EntityEvent> createNode() {
 		return AttackManager.events(this);
+	}
+	
+	public static AttackConfigBuilder builder(boolean legacy) {
+		return new AttackConfigBuilder(legacy);
 	}
 }

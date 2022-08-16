@@ -9,22 +9,15 @@ import net.minestom.server.event.trait.PlayerEvent;
  * This includes eating and exhaustion for movement and block breaking.
  */
 public class FoodConfig extends ElementConfig<PlayerEvent> {
-	public static final FoodConfig DEFAULT = new FoodConfig(
-			false, true, true,
-			true, true, true
-	);
-	public static final FoodConfig LEGACY = new FoodConfig(
-			true, true, true,
-			true, true, true
-	);
+	public static final FoodConfig DEFAULT = new FoodConfigBuilder(false).defaultOptions().build();
+	public static final FoodConfig LEGACY = new FoodConfigBuilder(true).defaultOptions().build();
 	
-	private final boolean naturalExhaustionEnabled;
-	private final boolean naturalRegenerationEnabled;
-	private final boolean foodEnabled;
-	private final boolean blockBreakExhaustionEnabled;
-	private final boolean moveExhaustionEnabled;
+	private final boolean
+			naturalExhaustionEnabled, naturalRegenerationEnabled,
+			foodEnabled, blockBreakExhaustionEnabled, moveExhaustionEnabled;
 	
-	public FoodConfig(boolean legacy, boolean naturalExhaustionEnabled, boolean naturalRegenerationEnabled, boolean foodEnabled, boolean blockBreakExhaustionEnabled, boolean moveExhaustionEnabled) {
+	FoodConfig(boolean legacy, boolean naturalExhaustionEnabled, boolean naturalRegenerationEnabled,
+	           boolean foodEnabled, boolean blockBreakExhaustionEnabled, boolean moveExhaustionEnabled) {
 		super(legacy);
 		this.naturalExhaustionEnabled = naturalExhaustionEnabled;
 		this.naturalRegenerationEnabled = naturalRegenerationEnabled;
@@ -56,5 +49,9 @@ public class FoodConfig extends ElementConfig<PlayerEvent> {
 	@Override
 	public EventNode<PlayerEvent> createNode() {
 		return FoodListener.events(this);
+	}
+	
+	public static FoodConfigBuilder builder(boolean legacy) {
+		return new FoodConfigBuilder(legacy);
 	}
 }
