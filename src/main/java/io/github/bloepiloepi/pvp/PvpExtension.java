@@ -2,6 +2,7 @@ package io.github.bloepiloepi.pvp;
 
 import io.github.bloepiloepi.pvp.config.AttackConfig;
 import io.github.bloepiloepi.pvp.config.DamageConfig;
+import io.github.bloepiloepi.pvp.config.ExplosionConfig;
 import io.github.bloepiloepi.pvp.enchantment.CustomEnchantments;
 import io.github.bloepiloepi.pvp.entity.CustomPlayer;
 import io.github.bloepiloepi.pvp.entity.Tracker;
@@ -50,7 +51,7 @@ public class PvpExtension extends Extension {
 		
 		node.addChild(AttackManager.events(AttackConfig.LEGACY));
 		node.addChild(DamageListener.events(DamageConfig.LEGACY));
-		node.addChild(ExplosionListener.events());
+		node.addChild(ExplosionListener.events(ExplosionConfig.DEFAULT));
 		node.addChild(ArmorToolListener.events(true));
 		node.addChild(FoodListener.events(true));
 		node.addChild(PotionListener.events(true));
@@ -90,7 +91,7 @@ public class PvpExtension extends Extension {
 	 * @return The EventNode with explosion events
 	 */
 	public static EventNode<EntityEvent> explosionEvents() {
-		return ExplosionListener.events();
+		return ExplosionListener.events(ExplosionConfig.DEFAULT);
 	}
 	
 	/**
