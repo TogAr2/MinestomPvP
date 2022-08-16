@@ -63,20 +63,20 @@ Before doing anything else, you should call `PvpExtension.init()`. This will mak
 After you've initialized the extension, you can get an `EventNode` with all PvP related events listening using `PvpExtension.events()`.
 By adding this node as a child to any other node, you enable pvp in that scope.
 
-Separated features of this extension are also available as static methods in `PvpExtension`.
-
 Example (adds PvP to the global event handler, so everywhere):
 ```java
 PvpExtension.init();
 MinecraftServer.getGlobalEventHandler().addChild(PvpExtension.events());
 ```
 
+You can customize which features of this extension you want to enable or disable by using `PvPConfig`.
+Obtain a builder by using `PvPConfig.builder()`. It has everything disabled by default. You can add custom settings to it by using the methods of the builder. If you want to use the default settings with some changes, you can use `PvPConfigBuilder.defaultOptions()` or `PvPConfigBuilder.legacyOptions()` for the legacy equivalent, and apply your changes afterwards. To create an `EventNode` from your config builder, use `PvPConfigBuilder.build().createNode()`.
+
 The rest of this readme assumes you are using the extension as a library.
 
 ### Legacy PvP
 
-You can get the `EventNode` for legacy PvP using `PvpExtension.legacyEvents()`.
-**Do not combine it with any non-legacy node, as this will cause issues.**
+You can get the `EventNode` for legacy PvP using `PvpExtension.legacyEvents()`, and adjust its settings by using the method described above.
 
 To disable attack cooldown for a player and set their attack damage to the legacy value, use `PvpExtension.setLegacyAttack(player, true)`.
 To enable the cooldown again and set the attack damage to the new value, use `false` instead of `true`.
