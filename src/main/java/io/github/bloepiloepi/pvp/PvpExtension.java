@@ -1,9 +1,6 @@
 package io.github.bloepiloepi.pvp;
 
-import io.github.bloepiloepi.pvp.config.ArmorToolConfig;
-import io.github.bloepiloepi.pvp.config.AttackConfig;
-import io.github.bloepiloepi.pvp.config.DamageConfig;
-import io.github.bloepiloepi.pvp.config.ExplosionConfig;
+import io.github.bloepiloepi.pvp.config.*;
 import io.github.bloepiloepi.pvp.enchantment.CustomEnchantments;
 import io.github.bloepiloepi.pvp.entity.CustomPlayer;
 import io.github.bloepiloepi.pvp.entity.Tracker;
@@ -54,7 +51,7 @@ public class PvpExtension extends Extension {
 		node.addChild(DamageListener.events(DamageConfig.LEGACY));
 		node.addChild(ExplosionListener.events(ExplosionConfig.DEFAULT));
 		node.addChild(ArmorToolListener.events(ArmorToolConfig.LEGACY));
-		node.addChild(FoodListener.events(true));
+		node.addChild(FoodListener.events(FoodConfig.LEGACY));
 		node.addChild(PotionListener.events(true));
 		node.addChild(ProjectileListener.events(true));
 		node.addChild(SwordBlockHandler.legacyEvents());
@@ -113,7 +110,7 @@ public class PvpExtension extends Extension {
 	 * @return The EventNode with food events
 	 */
 	public static EventNode<PlayerEvent> foodEvents() {
-		return FoodListener.events(false);
+		return FoodListener.events(FoodConfig.DEFAULT);
 	}
 	
 	/**

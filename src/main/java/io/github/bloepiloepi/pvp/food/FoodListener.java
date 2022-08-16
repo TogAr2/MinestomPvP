@@ -1,5 +1,6 @@
 package io.github.bloepiloepi.pvp.food;
 
+import io.github.bloepiloepi.pvp.config.FoodConfig;
 import io.github.bloepiloepi.pvp.entity.EntityUtils;
 import io.github.bloepiloepi.pvp.entity.PvpPlayer;
 import io.github.bloepiloepi.pvp.entity.Tracker;
@@ -26,17 +27,17 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class FoodListener {
 	
-	public static EventNode<PlayerEvent> events(boolean legacy) {
+	public static EventNode<PlayerEvent> events(FoodConfig config) {
 		EventNode<PlayerEvent> node = EventNode.type("food-events", EventFilter.PLAYER);
 		
 		node.addListener(PlayerTickEvent.class, event -> {
 			if (Tracker.hungerManager.containsKey(event.getPlayer().getUuid())) {
-				Tracker.hungerManager.get(event.getPlayer().getUuid()).update(legacy);
+				Tracker.hungerManager.get(event.getPlayer().getUuid()).update(config);
 			}
 		});
 		
-		node.addListener(EventListener.builder(PlayerPreEatEvent.class).handler(event -> {
-			FoodComponent foodComponent = FoodComponents.fromMaterial(event.getFoodItem().material());
+		if (config.isFoodEnabled()) node.addListener(EventListener.builder(PlayerPreEatEvent.class).handler(event -> {
+			FoodComponent foodComponent = FoodComponents.fromMaterial(event.getItemStack().material());
 			
 			//If no food, or if the players hunger is full and the food is not always edible, cancel
 			if (foodComponent == null || (!event.getPlayer().isCreative()
@@ -46,13 +47,13 @@ public class FoodListener {
 			}
 			
 			event.setEatingTime((long) getUseTime(foodComponent) * MinecraftServer.TICK_MS);
-		}).filter(event -> event.getFoodItem().material().isFood()
-				&& event.getFoodItem().material() != Material.POTION)
+		}).filter(event -> event.getItemStack().material().isFood()
+				&& event.getItemStack().material() != Material.POTION)
 				.build());
 		
 		node.addListener(EventListener.builder(PlayerEatEvent.class).handler(event -> {
 			Player player = event.getPlayer();
-			ItemStack stack = event.getFoodItem();
+			ItemStack stack = event.getItemStack();
 			Tracker.hungerManager.get(player.getUuid()).eat(stack.material());
 			
 			FoodComponent component = FoodComponents.fromMaterial(stack.material());
@@ -61,7 +62,7 @@ public class FoodListener {
 			
 			triggerEatSounds(player, component);
 			
-			if (!component.isDrink() || event.getFoodItem().material() == Material.HONEY_BOTTLE) {
+			if (!component.isDrink() || event.getItemStack().material() == Material.HONEY_BOTTLE) {
 				SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_BURP, Sound.Source.PLAYER,
 						0.5F, random.nextFloat() * 0.1F + 0.9F);
 			}
@@ -88,8 +89,8 @@ public class FoodListener {
 					event.getPlayer().setItemInHand(event.getHand(), stack.withAmount(stack.amount() - 1));
 				}
 			}
-		}).filter(event -> event.getFoodItem().material().isFood()
-				&& event.getFoodItem().material() != Material.POTION).build()); //May also be a potion
+		}).filter(event -> event.getItemStack().material().isFood()
+				&& event.getItemStack().material() != Material.POTION).build()); //May also be a potion
 		
 		node.addListener(PlayerTickEvent.class, event -> {
 			Player player = event.getPlayer();
@@ -98,8 +99,8 @@ public class FoodListener {
 			eatSounds(player);
 		});
 		
-		node.addListener(EventListener.builder(PlayerBlockBreakEvent.class)
-				.handler(event -> EntityUtils.addExhaustion(event.getPlayer(), legacy ? 0.025F : 0.005F))
+		if (config.isBlockBreakExhaustionEnabled()) node.addListener(EventListener.builder(PlayerBlockBreakEvent.class)
+				.handler(event -> EntityUtils.addExhaustion(event.getPlayer(), config.isLegacy() ? 0.025F : 0.005F))
 				.build());
 		
 		node.addListener(EventListener.builder(PlayerMoveEvent.class).handler(event -> {
@@ -111,26 +112,30 @@ public class FoodListener {
 			
 			//Check if movement was a jump
 			if (yDiff > 0.0D && player.isOnGround()) {
-				if (player.isSprinting()) {
-					EntityUtils.addExhaustion(player, legacy ? 0.8F : 0.2F);
-				} else {
-					EntityUtils.addExhaustion(player, legacy ? 0.2F : 0.05F);
+				if (config.isMoveExhaustionEnabled()) {
+					if (player.isSprinting()) {
+						EntityUtils.addExhaustion(player, config.isLegacy() ? 0.8F : 0.2F);
+					} else {
+						EntityUtils.addExhaustion(player, config.isLegacy() ? 0.2F : 0.05F);
+					}
 				}
 				
 				if (player instanceof PvpPlayer custom)
 					custom.jump(); //Velocity change
 			}
 			
-			if (player.isOnGround()) {
-				int l = (int) Math.round(Math.sqrt(xDiff * xDiff + zDiff * zDiff) * 100.0F);
-				if (l > 0) {
-					EntityUtils.addExhaustion(player, (player.isSprinting() ? 0.1F : 0.0F) * (float) l * 0.01F);
-				}
-			} else {
-				if (Objects.requireNonNull(player.getInstance()).getBlock(player.getPosition()) == Block.WATER) {
-					int l = (int) Math.round(Math.sqrt(xDiff * xDiff + yDiff * yDiff + zDiff * zDiff) * 100.0F);
+			if (config.isMoveExhaustionEnabled()) {
+				if (player.isOnGround()) {
+					int l = (int) Math.round(Math.sqrt(xDiff * xDiff + zDiff * zDiff) * 100.0F);
 					if (l > 0) {
-						EntityUtils.addExhaustion(player, 0.01F * (float) l * 0.01F);
+						EntityUtils.addExhaustion(player, (player.isSprinting() ? 0.1F : 0.0F) * (float) l * 0.01F);
+					}
+				} else {
+					if (Objects.requireNonNull(player.getInstance()).getBlock(player.getPosition()) == Block.WATER) {
+						int l = (int) Math.round(Math.sqrt(xDiff * xDiff + yDiff * yDiff + zDiff * zDiff) * 100.0F);
+						if (l > 0) {
+							EntityUtils.addExhaustion(player, 0.01F * (float) l * 0.01F);
+						}
 					}
 				}
 			}
