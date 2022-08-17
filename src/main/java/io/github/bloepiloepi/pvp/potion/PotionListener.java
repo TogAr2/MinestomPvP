@@ -137,7 +137,8 @@ public class PotionListener {
 		node.addListener(EntityDeathEvent.class, event ->
 				event.getEntity().clearEffects());
 		
-		if (config.isDrinkingEnabled()) node.addListener(EventListener.builder(PlayerPreEatEvent.class).handler(event -> {
+		node.addListener(EventListener.builder(PlayerPreEatEvent.class).handler(event -> {
+			if (!config.isDrinkingEnabled()) event.setCancelled(true);
 			event.setEatingTime(32L * MinecraftServer.TICK_MS); //Potion use time is always 32 ticks
 		}).filter(event -> event.getItemStack().material() == Material.POTION).build());
 		

@@ -36,7 +36,12 @@ public class FoodListener {
 			}
 		});
 		
-		if (config.isFoodEnabled()) node.addListener(EventListener.builder(PlayerPreEatEvent.class).handler(event -> {
+		node.addListener(EventListener.builder(PlayerPreEatEvent.class).handler(event -> {
+			if (!config.isFoodEnabled()) {
+				event.setCancelled(true);
+				return;
+			}
+			
 			FoodComponent foodComponent = FoodComponents.fromMaterial(event.getItemStack().material());
 			
 			//If no food, or if the players hunger is full and the food is not always edible, cancel

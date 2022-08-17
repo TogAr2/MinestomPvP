@@ -47,36 +47,44 @@ public class PvPConfigBuilder {
 		return this;
 	}
 	
-	public void attack(AttackConfig attack) {
+	public PvPConfigBuilder attack(AttackConfig attack) {
 		this.attack = attack;
+		return this;
 	}
 	
-	public void damage(DamageConfig damage) {
+	public PvPConfigBuilder damage(DamageConfig damage) {
 		this.damage = damage;
+		return this;
 	}
 	
-	public void explosion(ExplosionConfig explosion) {
+	public PvPConfigBuilder explosion(ExplosionConfig explosion) {
 		this.explosion = explosion;
+		return this;
 	}
 	
-	public void armorTool(ArmorToolConfig armorTool) {
+	public PvPConfigBuilder armorTool(ArmorToolConfig armorTool) {
 		this.armorTool = armorTool;
+		return this;
 	}
 	
-	public void food(FoodConfig food) {
+	public PvPConfigBuilder food(FoodConfig food) {
 		this.food = food;
+		return this;
 	}
 	
-	public void potion(PotionConfig potion) {
+	public PvPConfigBuilder potion(PotionConfig potion) {
 		this.potion = potion;
+		return this;
 	}
 	
-	public void projectile(ProjectileConfig projectile) {
+	public PvPConfigBuilder projectile(ProjectileConfig projectile) {
 		this.projectile = projectile;
+		return this;
 	}
 	
-	public void swordBlocking(SwordBlockingConfig swordBlocking) {
+	public PvPConfigBuilder swordBlocking(SwordBlockingConfig swordBlocking) {
 		this.swordBlocking = swordBlocking;
+		return this;
 	}
 	
 	public PvPConfig build() {
