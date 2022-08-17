@@ -103,11 +103,8 @@ public class PvpTest {
 		
 		GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
 		eventHandler.addChild(PvPConfig.emptyBuilder()
-				.potion(PotionConfig.legacyBuilder()
-						.defaultOptions()
-						.drinking(false)
-				).build()
-				.createNode()
+				.potion(PotionConfig.legacyBuilder().drinking(false))
+				.build().createNode()
 		);
 		
 		eventHandler.addListener(PlayerTickEvent.class, event -> {
