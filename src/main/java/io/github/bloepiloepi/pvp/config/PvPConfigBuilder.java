@@ -52,8 +52,18 @@ public class PvPConfigBuilder {
 		return this;
 	}
 	
+	public PvPConfigBuilder attack(AttackConfigBuilder attack) {
+		this.attack = attack.build();
+		return this;
+	}
+	
 	public PvPConfigBuilder damage(DamageConfig damage) {
 		this.damage = damage;
+		return this;
+	}
+	
+	public PvPConfigBuilder damage(DamageConfigBuilder damage) {
+		this.damage = damage.build();
 		return this;
 	}
 	
@@ -62,8 +72,18 @@ public class PvPConfigBuilder {
 		return this;
 	}
 	
+	public PvPConfigBuilder explosion(ExplosionConfigBuilder explosion) {
+		this.explosion = explosion.build();
+		return this;
+	}
+	
 	public PvPConfigBuilder armorTool(ArmorToolConfig armorTool) {
 		this.armorTool = armorTool;
+		return this;
+	}
+	
+	public PvPConfigBuilder armorTool(ArmorToolConfigBuilder armorTool) {
+		this.armorTool = armorTool.build();
 		return this;
 	}
 	
@@ -72,13 +92,28 @@ public class PvPConfigBuilder {
 		return this;
 	}
 	
+	public PvPConfigBuilder food(FoodConfigBuilder food) {
+		this.food = food.build();
+		return this;
+	}
+	
 	public PvPConfigBuilder potion(PotionConfig potion) {
 		this.potion = potion;
 		return this;
 	}
 	
+	public PvPConfigBuilder potion(PotionConfigBuilder potion) {
+		this.potion = potion.build();
+		return this;
+	}
+	
 	public PvPConfigBuilder projectile(ProjectileConfig projectile) {
 		this.projectile = projectile;
+		return this;
+	}
+	
+	public PvPConfigBuilder projectile(ProjectileConfigBuilder projectile) {
+		this.projectile = projectile.build();
 		return this;
 	}
 	

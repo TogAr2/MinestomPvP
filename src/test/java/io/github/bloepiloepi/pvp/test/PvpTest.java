@@ -106,7 +106,6 @@ public class PvpTest {
 				.potion(PotionConfig.legacyBuilder()
 						.defaultOptions()
 						.drinking(false)
-						.build()
 				).build()
 				.createNode()
 		);
