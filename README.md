@@ -71,7 +71,18 @@ MinecraftServer.getGlobalEventHandler().addChild(PvpExtension.events());
 ```
 
 You can customize which features of this extension you want to enable or disable by using `PvPConfig`.
-Obtain a builder by using `PvPConfig.builder()`. It has everything disabled by default. You can add custom settings to it by using the methods of the builder. If you want to use the default settings with some changes, you can use `PvPConfigBuilder.defaultOptions()` or `PvPConfigBuilder.legacyOptions()` for the legacy equivalent, and apply your changes afterwards. Don't forget that any config builder you create will have all features disabled by default. To create an `EventNode` from your config builder, use `#build().createNode()`.
+Obtain a builder by using one of the static methods of `PvPConfig`: `#defaultBuilder()` (returns a builder with the default options), `#legacyBuilder()` (returns a builder with the legacy options) or `#emptyBuilder()` (has everything disabled by default). You can add custom settings to it by using the methods of the builder. To create an `EventNode` from your config builder, use `#build().createNode()`.
+
+Example:
+```java
+eventHandler.addChild(
+    PvPConfig.emptyBuilder()
+        .potion(PotionConfig.legacyBuilder().drinking(false))
+        .build().createNode()
+);
+```
+Which would result in potion effects and splash potions still working, but not drinkable potions.
+Everything else not to do with potions would be disabled as well, since you are using `PvPConfig.emptyBuilder()`.
 
 ### Legacy PvP
 
