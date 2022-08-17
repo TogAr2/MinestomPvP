@@ -58,6 +58,7 @@ This will apply PvP mechanics to your whole server.
 
 But you can also choose to (and this is the preferred option for most servers) use the jar file as a library.
 In this case, you can choose where to apply the PvP mechanics and customize them.
+The rest of this readme assumes you are using this method.
 
 Before doing anything else, you should call `PvpExtension.init()`. This will make sure everything is registered correctly.
 After you've initialized the extension, you can get an `EventNode` with all PvP related events listening using `PvpExtension.events()`.
@@ -70,9 +71,7 @@ MinecraftServer.getGlobalEventHandler().addChild(PvpExtension.events());
 ```
 
 You can customize which features of this extension you want to enable or disable by using `PvPConfig`.
-Obtain a builder by using `PvPConfig.builder()`. It has everything disabled by default. You can add custom settings to it by using the methods of the builder. If you want to use the default settings with some changes, you can use `PvPConfigBuilder.defaultOptions()` or `PvPConfigBuilder.legacyOptions()` for the legacy equivalent, and apply your changes afterwards. To create an `EventNode` from your config builder, use `PvPConfigBuilder.build().createNode()`.
-
-The rest of this readme assumes you are using the extension as a library.
+Obtain a builder by using `PvPConfig.builder()`. It has everything disabled by default. You can add custom settings to it by using the methods of the builder. If you want to use the default settings with some changes, you can use `PvPConfigBuilder.defaultOptions()` or `PvPConfigBuilder.legacyOptions()` for the legacy equivalent, and apply your changes afterwards. Don't forget that any config builder you create will have all features disabled by default. To create an `EventNode` from your config builder, use `#build().createNode()`.
 
 ### Legacy PvP
 
