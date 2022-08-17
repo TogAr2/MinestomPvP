@@ -11,8 +11,8 @@ import net.minestom.server.event.trait.EntityEvent;
  * If you want more customization, you can also use the empty builder to enable features by yourself.
  */
 public class PvPConfig extends ElementConfig<EntityEvent> {
-	public static final PvPConfig DEFAULT = new PvPConfigBuilder().defaultOptions().build();
-	public static final PvPConfig LEGACY = new PvPConfigBuilder().legacyOptions().build();
+	public static final PvPConfig DEFAULT = defaultBuilder().build();
+	public static final PvPConfig LEGACY = legacyBuilder().build();
 	
 	private final ElementConfig<?>[] elements;
 	
@@ -34,11 +34,29 @@ public class PvPConfig extends ElementConfig<EntityEvent> {
 	}
 	
 	/**
+	 * Creates a builder with the default options.
+	 *
+	 * @return A builder with default options
+	 */
+	public static PvPConfigBuilder defaultBuilder() {
+		return new PvPConfigBuilder().defaultOptions();
+	}
+	
+	/**
+	 * Creates a builder with the legacy options.
+	 *
+	 * @return A builder with legacy options
+	 */
+	public static PvPConfigBuilder legacyBuilder() {
+		return new PvPConfigBuilder().legacyOptions();
+	}
+	
+	/**
 	 * Creates an empty builder which has everything disabled.
 	 *
 	 * @return An empty builder
 	 */
-	public static PvPConfigBuilder builder() {
+	public static PvPConfigBuilder emptyBuilder() {
 		return new PvPConfigBuilder();
 	}
 }

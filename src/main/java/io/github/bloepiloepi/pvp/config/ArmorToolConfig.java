@@ -10,8 +10,8 @@ import net.minestom.server.event.trait.EntityEvent;
  * an entity equips items.
  */
 public class ArmorToolConfig extends ElementConfig<EntityEvent> {
-	public static final ArmorToolConfig DEFAULT = new ArmorToolConfigBuilder(false).defaultOptions().build();
-	public static final ArmorToolConfig LEGACY = new ArmorToolConfigBuilder(true).defaultOptions().build();
+	public static final ArmorToolConfig DEFAULT = defaultBuilder().build();
+	public static final ArmorToolConfig LEGACY = legacyBuilder().build();
 	
 	private final boolean armorModifiersEnabled, toolModifiersEnabled;
 	
@@ -35,11 +35,29 @@ public class ArmorToolConfig extends ElementConfig<EntityEvent> {
 	}
 	
 	/**
+	 * Creates a builder with the default options.
+	 *
+	 * @return A builder with default options
+	 */
+	public static ArmorToolConfigBuilder defaultBuilder() {
+		return new ArmorToolConfigBuilder(false).defaultOptions();
+	}
+	
+	/**
+	 * Creates a builder with the legacy options.
+	 *
+	 * @return A builder with legacy options
+	 */
+	public static ArmorToolConfigBuilder legacyBuilder() {
+		return new ArmorToolConfigBuilder(true).defaultOptions();
+	}
+	
+	/**
 	 * Creates an empty builder which has everything disabled.
 	 *
 	 * @return An empty builder
 	 */
-	public static ArmorToolConfigBuilder builder(boolean legacy) {
+	public static ArmorToolConfigBuilder emptyBuilder(boolean legacy) {
 		return new ArmorToolConfigBuilder(legacy);
 	}
 }

@@ -10,8 +10,8 @@ import net.minestom.server.event.trait.EntityEvent;
  * for potion add and remove (like glowing and invisibility).
  */
 public class PotionConfig extends ElementConfig<EntityEvent> {
-	public static final PotionConfig DEFAULT = new PotionConfigBuilder(false).defaultOptions().build();
-	public static final PotionConfig LEGACY = new PotionConfigBuilder(true).defaultOptions().build();
+	public static final PotionConfig DEFAULT = defaultBuilder().build();
+	public static final PotionConfig LEGACY = legacyBuilder().build();
 	
 	private final boolean
 			updateEffectEnabled, applyEffectEnabled, instantEffectEnabled,
@@ -64,11 +64,29 @@ public class PotionConfig extends ElementConfig<EntityEvent> {
 	}
 	
 	/**
+	 * Creates a builder with the default options.
+	 *
+	 * @return A builder with default options
+	 */
+	public static PotionConfigBuilder defaultBuilder() {
+		return new PotionConfigBuilder(false).defaultOptions();
+	}
+	
+	/**
+	 * Creates a builder with the legacy options.
+	 *
+	 * @return A builder with legacy options
+	 */
+	public static PotionConfigBuilder legacyBuilder() {
+		return new PotionConfigBuilder(true).defaultOptions();
+	}
+	
+	/**
 	 * Creates an empty builder which has everything disabled.
 	 *
 	 * @return An empty builder
 	 */
-	public static PotionConfigBuilder builder(boolean legacy) {
+	public static PotionConfigBuilder emptyBuilder(boolean legacy) {
 		return new PotionConfigBuilder(legacy);
 	}
 }

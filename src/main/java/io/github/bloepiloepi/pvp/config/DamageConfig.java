@@ -11,8 +11,8 @@ import net.minestom.server.event.trait.EntityEvent;
  * to change that attribute for different types of armor you need {@code ArmorToolConfig}.
  */
 public class DamageConfig extends ElementConfig<EntityEvent> {
-	public static final DamageConfig DEFAULT = new DamageConfigBuilder(false).defaultOptions().build();
-	public static final DamageConfig LEGACY = new DamageConfigBuilder(true).legacyOptions().build();
+	public static final DamageConfig DEFAULT = defaultBuilder().build();
+	public static final DamageConfig LEGACY = legacyBuilder().build();
 	
 	private final boolean
 			fallDamageEnabled, equipmentDamageEnabled, shieldEnabled,
@@ -78,11 +78,29 @@ public class DamageConfig extends ElementConfig<EntityEvent> {
 	}
 	
 	/**
+	 * Creates a builder with the default options.
+	 *
+	 * @return A builder with default options
+	 */
+	public static DamageConfigBuilder defaultBuilder() {
+		return new DamageConfigBuilder(false).defaultOptions();
+	}
+	
+	/**
+	 * Creates a builder with the legacy options.
+	 *
+	 * @return A builder with legacy options
+	 */
+	public static DamageConfigBuilder legacyBuilder() {
+		return new DamageConfigBuilder(true).legacyOptions();
+	}
+	
+	/**
 	 * Creates an empty builder which has everything disabled.
 	 *
 	 * @return An empty builder
 	 */
-	public static DamageConfigBuilder builder(boolean legacy) {
+	public static DamageConfigBuilder emptyBuilder(boolean legacy) {
 		return new DamageConfigBuilder(legacy);
 	}
 }

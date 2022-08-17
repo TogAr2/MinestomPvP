@@ -10,8 +10,8 @@ import net.minestom.server.event.trait.PlayerEvent;
  * ender pearls, bows and crossbows.
  */
 public class ProjectileConfig extends ElementConfig<PlayerEvent> {
-	public static final ProjectileConfig DEFAULT = new ProjectileConfigBuilder(false).defaultOptions().build();
-	public static final ProjectileConfig LEGACY = new ProjectileConfigBuilder(true).defaultOptions().build();
+	public static final ProjectileConfig DEFAULT = defaultBuilder().build();
+	public static final ProjectileConfig LEGACY = legacyBuilder().build();
 	
 	private final boolean
 			fishingRodEnabled, snowballEnabled, eggEnabled,
@@ -59,11 +59,29 @@ public class ProjectileConfig extends ElementConfig<PlayerEvent> {
 	}
 	
 	/**
+	 * Creates a builder with the default options.
+	 *
+	 * @return A builder with default options
+	 */
+	public static ProjectileConfigBuilder defaultBuilder() {
+		return new ProjectileConfigBuilder(false).defaultOptions();
+	}
+	
+	/**
+	 * Creates a builder with the legacy options.
+	 *
+	 * @return A builder with legacy options
+	 */
+	public static ProjectileConfigBuilder legacyBuilder() {
+		return new ProjectileConfigBuilder(true).defaultOptions();
+	}
+	
+	/**
 	 * Creates an empty builder which has everything disabled.
 	 *
 	 * @return An empty builder
 	 */
-	public static ProjectileConfigBuilder builder(boolean legacy) {
+	public static ProjectileConfigBuilder emptyBuilder(boolean legacy) {
 		return new ProjectileConfigBuilder(legacy);
 	}
 }

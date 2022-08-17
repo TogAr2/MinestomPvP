@@ -10,8 +10,8 @@ import net.minestom.server.event.trait.EntityEvent;
  * and spectating entities as a spectator.
  */
 public class AttackConfig extends ElementConfig<EntityEvent> {
-	public static final AttackConfig DEFAULT = new AttackConfigBuilder(false).defaultOptions().build();
-	public static final AttackConfig LEGACY = new AttackConfigBuilder(true).legacyOptions().build();
+	public static final AttackConfig DEFAULT = defaultBuilder().build();
+	public static final AttackConfig LEGACY = legacyBuilder().build();
 	
 	private final boolean
 			spectatingEnabled, attackCooldownEnabled, legacyKnockback,
@@ -65,11 +65,29 @@ public class AttackConfig extends ElementConfig<EntityEvent> {
 	}
 	
 	/**
+	 * Creates a builder with the default options.
+	 *
+	 * @return A builder with default options
+	 */
+	public static AttackConfigBuilder defaultBuilder() {
+		return new AttackConfigBuilder(false).defaultOptions();
+	}
+	
+	/**
+	 * Creates a builder with the legacy options.
+	 *
+	 * @return A builder with legacy options
+	 */
+	public static AttackConfigBuilder legacyBuilder() {
+		return new AttackConfigBuilder(true).legacyOptions();
+	}
+	
+	/**
 	 * Creates an empty builder which has everything disabled.
 	 *
 	 * @return An empty builder
 	 */
-	public static AttackConfigBuilder builder(boolean legacy) {
+	public static AttackConfigBuilder emptyBuilder(boolean legacy) {
 		return new AttackConfigBuilder(legacy);
 	}
 }

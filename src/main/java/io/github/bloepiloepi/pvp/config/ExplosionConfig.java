@@ -9,7 +9,7 @@ import net.minestom.server.event.trait.EntityEvent;
  * This includes tnt, end crystals and respawn anchors.
  */
 public class ExplosionConfig extends ElementConfig<EntityEvent> {
-	public static final ExplosionConfig DEFAULT = new ExplosionConfigBuilder(false).defaultOptions().build();
+	public static final ExplosionConfig DEFAULT = defaultBuilder().build();
 	
 	private final boolean tntEnabled, crystalEnabled, anchorEnabled;
 	
@@ -38,11 +38,29 @@ public class ExplosionConfig extends ElementConfig<EntityEvent> {
 	}
 	
 	/**
+	 * Creates a builder with the default options.
+	 *
+	 * @return A builder with default options
+	 */
+	public static ExplosionConfigBuilder defaultBuilder() {
+		return new ExplosionConfigBuilder(false).defaultOptions();
+	}
+	
+	/**
+	 * Creates a builder with the legacy options.
+	 *
+	 * @return A builder with legacy options
+	 */
+	public static ExplosionConfigBuilder legacyBuilder() {
+		return new ExplosionConfigBuilder(true).defaultOptions();
+	}
+	
+	/**
 	 * Creates an empty builder which has everything disabled.
 	 *
 	 * @return An empty builder
 	 */
-	public static ExplosionConfigBuilder builder() {
-		return new ExplosionConfigBuilder(false);
+	public static ExplosionConfigBuilder emptyBuilder(boolean legacy) {
+		return new ExplosionConfigBuilder(legacy);
 	}
 }
