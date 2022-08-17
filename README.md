@@ -58,12 +58,11 @@ This will apply PvP mechanics to your whole server.
 
 But you can also choose to (and this is the preferred option for most servers) use the jar file as a library.
 In this case, you can choose where to apply the PvP mechanics and customize them.
+The rest of this readme assumes you are using this method.
 
 Before doing anything else, you should call `PvpExtension.init()`. This will make sure everything is registered correctly.
 After you've initialized the extension, you can get an `EventNode` with all PvP related events listening using `PvpExtension.events()`.
 By adding this node as a child to any other node, you enable pvp in that scope.
-
-Separated features of this extension are also available as static methods in `PvpExtension`.
 
 Example (adds PvP to the global event handler, so everywhere):
 ```java
@@ -71,12 +70,23 @@ PvpExtension.init();
 MinecraftServer.getGlobalEventHandler().addChild(PvpExtension.events());
 ```
 
-The rest of this readme assumes you are using the extension as a library.
+You can customize which features of this extension you want to enable or disable by using `PvPConfig`.
+Obtain a builder by using one of the static methods of `PvPConfig`: `#defaultBuilder()` (returns a builder with the default options), `#legacyBuilder()` (returns a builder with the legacy options) or `#emptyBuilder()` (has everything disabled by default). You can add custom settings to it by using the methods of the builder. To create an `EventNode` from your config builder, use `#build().createNode()`.
+
+Example:
+```java
+eventHandler.addChild(
+    PvPConfig.emptyBuilder()
+        .potion(PotionConfig.legacyBuilder().drinking(false))
+        .build().createNode()
+);
+```
+Which would result in potion effects and splash potions still working, but not drinkable potions.
+Everything else not to do with potions would be disabled as well, since you are using `PvPConfig.emptyBuilder()`.
 
 ### Legacy PvP
 
-You can get the `EventNode` for legacy PvP using `PvpExtension.legacyEvents()`.
-**Do not combine it with any non-legacy node, as this will cause issues.**
+You can get the `EventNode` for legacy PvP using `PvpExtension.legacyEvents()`, and adjust its settings by using the method described above.
 
 To disable attack cooldown for a player and set their attack damage to the legacy value, use `PvpExtension.setLegacyAttack(player, true)`.
 To enable the cooldown again and set the attack damage to the new value, use `false` instead of `true`.

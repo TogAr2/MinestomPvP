@@ -1,6 +1,8 @@
 package io.github.bloepiloepi.pvp.test;
 
 import io.github.bloepiloepi.pvp.PvpExtension;
+import io.github.bloepiloepi.pvp.config.PotionConfig;
+import io.github.bloepiloepi.pvp.config.PvPConfig;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.events.LegacyKnockbackEvent;
 import io.github.bloepiloepi.pvp.explosion.PvpExplosionSupplier;
@@ -100,7 +102,10 @@ public class PvpTest {
 		instance.setExplosionSupplier(PvpExplosionSupplier.INSTANCE);
 		
 		GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-		eventHandler.addChild(PvpExtension.legacyEvents());
+		eventHandler.addChild(PvPConfig.emptyBuilder()
+				.potion(PotionConfig.legacyBuilder().drinking(false))
+				.build().createNode()
+		);
 		
 		eventHandler.addListener(PlayerTickEvent.class, event -> {
 			event.getPlayer().sendActionBar(Component.text(event.getPlayer().getVelocity().toString()));

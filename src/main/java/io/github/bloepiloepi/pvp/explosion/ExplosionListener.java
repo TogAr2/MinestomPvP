@@ -1,5 +1,6 @@
 package io.github.bloepiloepi.pvp.explosion;
 
+import io.github.bloepiloepi.pvp.config.ExplosionConfig;
 import io.github.bloepiloepi.pvp.utils.ItemUtils;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
@@ -24,10 +25,10 @@ import org.jglrxavpok.hephaistos.nbt.NBT;
 
 public class ExplosionListener {
 	
-	public static EventNode<EntityEvent> events() {
+	public static EventNode<EntityEvent> events(ExplosionConfig config) {
 		EventNode<EntityEvent> node = EventNode.type("explosion-events", EventFilter.ENTITY);
 		
-		node.addListener(PlayerUseItemOnBlockEvent.class, event -> {
+		if (config.isTntEnabled()) node.addListener(PlayerUseItemOnBlockEvent.class, event -> {
 			ItemStack stack = event.getItemStack();
 			Instance instance = event.getInstance();
 			Point position = event.getPosition();
@@ -50,7 +51,7 @@ public class ExplosionListener {
 			}
 		});
 		
-		node.addListener(PlayerUseItemOnBlockEvent.class, event -> {
+		if (config.isCrystalEnabled()) node.addListener(PlayerUseItemOnBlockEvent.class, event -> {
 			if (event.getItemStack().material() != Material.END_CRYSTAL) return;
 			Instance instance = event.getInstance();
 			Block block = instance.getBlock(event.getPosition());
@@ -71,7 +72,7 @@ public class ExplosionListener {
 				event.getPlayer().setItemInHand(event.getHand(), event.getItemStack().consume(1));
 		});
 		
-		node.addListener(PlayerBlockInteractEvent.class, event -> {
+		if (config.isAnchorEnabled()) node.addListener(PlayerBlockInteractEvent.class, event -> {
 			Instance instance = event.getInstance();
 			Block block = instance.getBlock(event.getBlockPosition());
 			Player player = event.getPlayer();

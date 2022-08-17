@@ -42,6 +42,7 @@ public class FinalAttackEvent implements EntityInstanceEvent, CancellableEvent {
 		this.baseDamage = baseDamage;
 		this.enchantsExtraDamage = enchantsExtraDamage;
 		this.attackSounds = attackSounds;
+		this.playSoundsOnFail = playSoundsOnFail;
 	}
 	
 	@Override

@@ -1,5 +1,6 @@
 package io.github.bloepiloepi.pvp.listeners;
 
+import io.github.bloepiloepi.pvp.config.AttackConfig;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entity.EntityGroup;
@@ -28,7 +29,6 @@ import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
 import net.minestom.server.event.player.PlayerHandAnimationEvent;
-import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.network.packet.server.play.EntityAnimationPacket;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
@@ -47,13 +47,12 @@ import java.util.concurrent.ThreadLocalRandom;
 public class AttackManager {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AttackManager.class);
 	
-	public static EventNode<EntityEvent> events(boolean legacy) {
+	public static EventNode<EntityEvent> events(AttackConfig config) {
 		EventNode<EntityEvent> node = EventNode.type("attack-events", EventFilter.ENTITY);
 		
-		node.addListener(EntityAttackEvent.class, event -> entityHit(event.getEntity(), event.getTarget(), legacy));
-		node.addListener(PlayerTickEvent.class, AttackManager::spectateTick);
+		node.addListener(EntityAttackEvent.class, event -> entityHit(event.getEntity(), event.getTarget(), config));
 		
-		if (!legacy) {
+		if (!config.isLegacy()) {
 			node.addListener(EventListener.builder(PlayerHandAnimationEvent.class).handler(event ->
 					resetLastAttackedTicks(event.getPlayer())).build());
 			
@@ -80,8 +79,7 @@ public class AttackManager {
 		Tracker.lastAttackedTicks.put(player.getUuid(), 0);
 	}
 	
-	private static void spectateTick(PlayerTickEvent event) {
-		Player player = event.getPlayer();
+	public static void spectateTick(Player player) {
 		Entity spectating = Tracker.spectating.get(player.getUuid());
 		if (spectating == null || spectating == player) return;
 		
@@ -91,13 +89,12 @@ public class AttackManager {
 		
 		if (player.getEntityMeta().isSneaking() || spectating.isRemoved()
 				|| (spectating instanceof LivingEntity && ((LivingEntity) spectating).isDead())) {
-			event.getPlayer().stopSpectating();
-			Tracker.spectating.remove(event.getPlayer().getUuid());
+			player.stopSpectating();
+			Tracker.spectating.remove(player.getUuid());
 		}
 	}
 	
-	private static void entityHit(Entity entity, Entity target, boolean legacy) {
-		if (target == null) return;
+	private static void entityHit(Entity entity, Entity target, AttackConfig config) {
 		if (!(entity instanceof Player player)) return;
 		if (player.isDead()) return;
 		if (entity.getDistanceSquared(target) >= 36.0D) return;
@@ -108,28 +105,32 @@ public class AttackManager {
 			return;
 		}
 		
-		performAttack(player, target, legacy);
+		performAttack(player, target, config);
 	}
 	
-	public static void performAttack(Player player, Entity target, boolean legacy) {
-		if (player.getGameMode() == GameMode.SPECTATOR) {
-			PlayerSpectateEvent playerSpectateEvent = new PlayerSpectateEvent(player, target);
-			EventDispatcher.callCancellable(playerSpectateEvent, () -> {
-				player.spectate(target);
-				Tracker.spectating.put(player.getUuid(), target);
-			});
+	public static void makeSpectate(Player player, Entity target) {
+		PlayerSpectateEvent playerSpectateEvent = new PlayerSpectateEvent(player, target);
+		EventDispatcher.callCancellable(playerSpectateEvent, () -> {
+			player.spectate(target);
+			Tracker.spectating.put(player.getUuid(), target);
+		});
+	}
+	
+	public static void performAttack(Player player, Entity target, AttackConfig config) {
+		if (player.getGameMode() == GameMode.SPECTATOR && config.isSpectatingEnabled()) {
+			makeSpectate(player, target);
 			return;
 		}
 		
 		float damage = player.getAttributeValue(Attribute.ATTACK_DAMAGE);
 		float enchantedDamage;
 		if (target instanceof LivingEntity) {
-			enchantedDamage = EnchantmentUtils.getAttackDamage(player.getItemInMainHand(), EntityGroup.ofEntity((LivingEntity) target), legacy);
+			enchantedDamage = EnchantmentUtils.getAttackDamage(player.getItemInMainHand(), EntityGroup.ofEntity((LivingEntity) target), config.isLegacy());
 		} else {
-			enchantedDamage = EnchantmentUtils.getAttackDamage(player.getItemInMainHand(), EntityGroup.DEFAULT, legacy);
+			enchantedDamage = EnchantmentUtils.getAttackDamage(player.getItemInMainHand(), EntityGroup.DEFAULT, config.isLegacy());
 		}
 		
-		float i = legacy ? 1.0F : getAttackCooldownProgress(player, 0.5F);
+		float i = config.isAttackCooldownEnabled() ? getAttackCooldownProgress(player, 0.5F) : 1.0F;
 		damage *= 0.2F + i * i * 0.8F;
 		enchantedDamage *= i;
 		resetLastAttackedTicks(player);
@@ -139,13 +140,13 @@ public class AttackManager {
 		int knockback = EnchantmentUtils.getKnockback(player);
 		
 		boolean critical = strongAttack && !EntityUtils.isClimbing(player) && player.getVelocity().y() < 0 && !player.isOnGround() && !EntityUtils.hasEffect(player, PotionEffect.BLINDNESS) && player.getVehicle() == null && target instanceof LivingEntity;
-		if (!legacy) {
+		if (!config.isLegacy()) {
 			// Not sprinting required for critical in 1.9+
 			critical = critical && !player.isSprinting();
 		}
 		
 		boolean sweeping = false;
-		if (!legacy && strongAttack && !critical && !sprintAttack && player.isOnGround()) {
+		if (!config.isLegacy() && strongAttack && !critical && !sprintAttack && player.isOnGround()) {
 			// Use reflection to get previousPosition field
 			try {
 				Field field = Entity.class.getDeclaredField("previousPosition");
@@ -163,7 +164,7 @@ public class AttackManager {
 			}
 		}
 		
-		FinalAttackEvent finalAttackEvent = new FinalAttackEvent(player, target, sprintAttack, critical, sweeping, damage, enchantedDamage, !legacy, true);
+		FinalAttackEvent finalAttackEvent = new FinalAttackEvent(player, target, sprintAttack, critical, sweeping, damage, enchantedDamage, config.isSoundsEnabled(), true);
 		EventDispatcher.call(finalAttackEvent);
 		
 		if (finalAttackEvent.isCancelled()) {
@@ -177,7 +178,7 @@ public class AttackManager {
 		enchantedDamage = finalAttackEvent.getEnchantsExtraDamage();
 		
 		if (critical) {
-			if (legacy) {
+			if (config.isLegacy()) {
 				damage += ThreadLocalRandom.current().nextInt((int) (damage / 2 + 2));
 			} else {
 				damage *= 1.5F;
@@ -191,14 +192,14 @@ public class AttackManager {
 			originalHealth = ((LivingEntity) target).getHealth();
 		}
 		
-		if (legacy && player instanceof PvpPlayer custom) {
+		if (config.isLegacy() && player instanceof PvpPlayer custom) {
 			custom.afterSprintAttack();
 		}
 		
 		boolean damageSucceeded = EntityUtils.damage(target, CustomDamageType.player(player), damage);
 		
 		if (sprintAttack) {
-			if (finalAttackEvent.hasAttackSounds()) {
+			if (config.isSoundsEnabled() && finalAttackEvent.hasAttackSounds()) {
 				if (damageSucceeded || finalAttackEvent.playSoundsOnFail()) {
 					SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_KNOCKBACK, Sound.Source.PLAYER, 1.0F, 1.0F);
 				}
@@ -208,14 +209,14 @@ public class AttackManager {
 		}
 		
 		if (!damageSucceeded) {
-			if (finalAttackEvent.hasAttackSounds() && finalAttackEvent.playSoundsOnFail()) {
+			if (config.isSoundsEnabled() && finalAttackEvent.hasAttackSounds() && finalAttackEvent.playSoundsOnFail()) {
 				SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_NODAMAGE, Sound.Source.PLAYER, 1.0F, 1.0F);
 			}
 			return;
 		}
 		
 		if (knockback > 0) {
-			if (!legacy) {
+			if (!config.isLegacyKnockback()) {
 				EntityKnockbackEvent entityKnockbackEvent = new EntityKnockbackEvent(target, player, true, false, knockback * 0.5F);
 				EventDispatcher.callCancellable(entityKnockbackEvent, () -> {
 					float strength = entityKnockbackEvent.getStrength();
@@ -245,7 +246,7 @@ public class AttackManager {
 				});
 			}
 			
-			if (!legacy && player instanceof PvpPlayer custom) {
+			if (!config.isLegacy() && player instanceof PvpPlayer custom) {
 				custom.afterSprintAttack();
 			}
 			
@@ -273,7 +274,7 @@ public class AttackManager {
 						}
 					});
 			
-			if (finalAttackEvent.hasAttackSounds()) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_SWEEP, Sound.Source.PLAYER, 1.0F, 1.0F);
+			if (config.isSoundsEnabled() && finalAttackEvent.hasAttackSounds()) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_SWEEP, Sound.Source.PLAYER, 1.0F, 1.0F);
 			Pos pos = player.getPosition();
 			double x = -Math.sin(Math.toRadians(pos.yaw()));
 			double z = Math.cos(Math.toRadians(pos.yaw()));
@@ -288,16 +289,16 @@ public class AttackManager {
 		}
 		
 		if (critical) {
-			if (finalAttackEvent.hasAttackSounds()) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_CRIT, Sound.Source.PLAYER, 1.0F, 1.0F);
+			if (config.isSoundsEnabled() && finalAttackEvent.hasAttackSounds()) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_CRIT, Sound.Source.PLAYER, 1.0F, 1.0F);
 			
 			player.sendPacketToViewersAndSelf(new EntityAnimationPacket(target.getEntityId(), EntityAnimationPacket.Animation.CRITICAL_EFFECT));
 		}
 		
 		if (!critical && !sweeping) {
 			if (strongAttack) {
-				if (finalAttackEvent.hasAttackSounds()) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_STRONG, Sound.Source.PLAYER, 1.0F, 1.0F);
+				if (config.isSoundsEnabled() && finalAttackEvent.hasAttackSounds()) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_STRONG, Sound.Source.PLAYER, 1.0F, 1.0F);
 			} else {
-				if (finalAttackEvent.hasAttackSounds()) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_WEAK, Sound.Source.PLAYER, 1.0F, 1.0F);
+				if (config.isSoundsEnabled() && finalAttackEvent.hasAttackSounds()) SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_ATTACK_WEAK, Sound.Source.PLAYER, 1.0F, 1.0F);
 			}
 		}
 		
@@ -313,7 +314,7 @@ public class AttackManager {
 		//TODO target and user damaged should also work when non-player mob attacks (mobs, arrows, trident)
 		
 		Tool tool = Tool.fromMaterial(player.getItemInMainHand().material());
-		if (tool != null) {
+		if (tool != null && config.isToolDamageEnabled()) {
 			ItemUtils.damageEquipment(player, EquipmentSlot.MAIN_HAND, (tool.isSword() || tool == Tool.TRIDENT) ? 1 : 2);
 		}
 		
@@ -326,7 +327,7 @@ public class AttackManager {
 			float damageDone = originalHealth - ((LivingEntity) target).getHealth();
 			
 			//Damage indicator particles
-			if (!legacy && damageDone > 2.0F) {
+			if (config.isDamageIndicatorParticlesEnabled() && damageDone > 2.0F) {
 				int count = (int) ((double) damageDone * 0.5D);
 				Pos targetPosition = target.getPosition();
 				ParticlePacket packet = ParticleCreator.createParticlePacket(
@@ -339,6 +340,6 @@ public class AttackManager {
 			}
 		}
 		
-		EntityUtils.addExhaustion(player, legacy ? 0.3F: 0.1F);
+		if (config.isExhaustionEnabled()) EntityUtils.addExhaustion(player, config.isLegacy() ? 0.3F: 0.1F);
 	}
 }
