@@ -2,6 +2,7 @@
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 [![license](https://img.shields.io/github/license/Bloepiloepi/MinestomPvP.svg?style=flat-square)](LICENSE)
+[![platform](https://img.shields.io/badge/platform-Minestom-ff69b4?style=flat-square)](https://github.com/Minestom/Minestom)
 [![](https://jitpack.io/v/TogAr2/MinestomPvP.svg?style=flat-square)](https://jitpack.io/#TogAr2/MinestomPvP)
 
 MinestomPvP is an extension for Minestom.
