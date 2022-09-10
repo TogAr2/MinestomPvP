@@ -2,13 +2,13 @@ package io.github.bloepiloepi.pvp.config;
 
 import io.github.bloepiloepi.pvp.explosion.ExplosionListener;
 import net.minestom.server.event.EventNode;
-import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 
 /**
  * Creates an EventNode with explosion events.
  * This includes tnt, end crystals and respawn anchors.
  */
-public class ExplosionConfig extends ElementConfig<EntityEvent> {
+public class ExplosionConfig extends ElementConfig<EntityInstanceEvent> {
 	public static final ExplosionConfig DEFAULT = defaultBuilder().build();
 	
 	private final boolean tntEnabled, crystalEnabled, anchorEnabled;
@@ -33,7 +33,7 @@ public class ExplosionConfig extends ElementConfig<EntityEvent> {
 	}
 	
 	@Override
-	public EventNode<EntityEvent> createNode() {
+	public EventNode<EntityInstanceEvent> createNode() {
 		return ExplosionListener.events(this);
 	}
 	

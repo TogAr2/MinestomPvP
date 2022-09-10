@@ -2,14 +2,14 @@ package io.github.bloepiloepi.pvp.config;
 
 import io.github.bloepiloepi.pvp.projectile.ProjectileListener;
 import net.minestom.server.event.EventNode;
-import net.minestom.server.event.trait.PlayerEvent;
+import net.minestom.server.event.trait.PlayerInstanceEvent;
 
 /**
  * Creates an EventNode with projectile events.
  * This includes fishing rods, snowballs, eggs,
  * ender pearls, bows and crossbows.
  */
-public class ProjectileConfig extends ElementConfig<PlayerEvent> {
+public class ProjectileConfig extends ElementConfig<PlayerInstanceEvent> {
 	public static final ProjectileConfig DEFAULT = defaultBuilder().build();
 	public static final ProjectileConfig LEGACY = legacyBuilder().build();
 	
@@ -54,7 +54,7 @@ public class ProjectileConfig extends ElementConfig<PlayerEvent> {
 	}
 	
 	@Override
-	public EventNode<PlayerEvent> createNode() {
+	public EventNode<PlayerInstanceEvent> createNode() {
 		return ProjectileListener.events(this);
 	}
 	

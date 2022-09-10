@@ -1,8 +1,8 @@
 package io.github.bloepiloepi.pvp.legacy;
 
+import io.github.bloepiloepi.pvp.config.PvPConfig;
 import io.github.bloepiloepi.pvp.entity.Tracker;
 import net.minestom.server.entity.Player;
-import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.item.ItemUpdateStateEvent;
@@ -10,15 +10,15 @@ import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
 import net.minestom.server.event.player.PlayerHandAnimationEvent;
 import net.minestom.server.event.player.PlayerSwapItemEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
-import net.minestom.server.event.trait.PlayerEvent;
+import net.minestom.server.event.trait.PlayerInstanceEvent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 
 public class SwordBlockHandler {
 	private static final ItemStack SHIELD = ItemStack.of(Material.SHIELD);
 	
-	public static EventNode<PlayerEvent> events() {
-		EventNode<PlayerEvent> node = EventNode.type("legacy-sword-block", EventFilter.PLAYER);
+	public static EventNode<PlayerInstanceEvent> events() {
+		EventNode<PlayerInstanceEvent> node = EventNode.type("legacy-sword-block", PvPConfig.PLAYER_INSTANCE_FILTER);
 		
 		node.addListener(EventListener.builder(PlayerUseItemEvent.class)
 				.handler(SwordBlockHandler::handleUseItem)

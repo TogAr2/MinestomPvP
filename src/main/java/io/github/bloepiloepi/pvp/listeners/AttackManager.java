@@ -1,6 +1,7 @@
 package io.github.bloepiloepi.pvp.listeners;
 
 import io.github.bloepiloepi.pvp.config.AttackConfig;
+import io.github.bloepiloepi.pvp.config.PvPConfig;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entity.EntityGroup;
@@ -23,13 +24,12 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.metadata.other.ArmorStandMeta;
 import net.minestom.server.event.EventDispatcher;
-import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
 import net.minestom.server.event.player.PlayerHandAnimationEvent;
-import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.network.packet.server.play.EntityAnimationPacket;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
@@ -47,8 +47,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class AttackManager {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AttackManager.class);
 	
-	public static EventNode<EntityEvent> events(AttackConfig config) {
-		EventNode<EntityEvent> node = EventNode.type("attack-events", EventFilter.ENTITY);
+	public static EventNode<EntityInstanceEvent> events(AttackConfig config) {
+		EventNode<EntityInstanceEvent> node = EventNode.type("attack-events", PvPConfig.ENTITY_INSTANCE_FILTER);
 		
 		node.addListener(EntityAttackEvent.class, event -> entityHit(event.getEntity(), event.getTarget(), config));
 		

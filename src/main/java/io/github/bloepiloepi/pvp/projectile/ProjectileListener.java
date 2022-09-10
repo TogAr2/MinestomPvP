@@ -1,6 +1,7 @@
 package io.github.bloepiloepi.pvp.projectile;
 
 import io.github.bloepiloepi.pvp.config.ProjectileConfig;
+import io.github.bloepiloepi.pvp.config.PvPConfig;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entity.EntityUtils;
 import io.github.bloepiloepi.pvp.entity.Tracker;
@@ -15,7 +16,6 @@ import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventDispatcher;
-import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityShootEvent;
@@ -23,7 +23,7 @@ import net.minestom.server.event.item.ItemUpdateStateEvent;
 import net.minestom.server.event.player.PlayerItemAnimationEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
-import net.minestom.server.event.trait.PlayerEvent;
+import net.minestom.server.event.trait.PlayerInstanceEvent;
 import net.minestom.server.item.Enchantment;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
@@ -41,8 +41,8 @@ public class ProjectileListener {
 	private static final Tag<Byte> MID_LOAD_SOUND_PLAYED = Tag.Byte("MidLoadSoundPlayed");
 	
 	// Please, don't look at the random hardcoded numbers in this class, even I am confused
-	public static EventNode<PlayerEvent> events(ProjectileConfig config) {
-		EventNode<PlayerEvent> node = EventNode.type("projectile-events", EventFilter.PLAYER);
+	public static EventNode<PlayerInstanceEvent> events(ProjectileConfig config) {
+		EventNode<PlayerInstanceEvent> node = EventNode.type("projectile-events", PvPConfig.PLAYER_INSTANCE_FILTER);
 		
 		if (config.isFishingRodEnabled()) node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
 			ThreadLocalRandom random = ThreadLocalRandom.current();

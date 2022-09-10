@@ -11,7 +11,7 @@ import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeInstance;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventNode;
-import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.extensions.Extension;
 import net.minestom.server.item.Material;
 import net.minestom.server.registry.Registry;
@@ -20,11 +20,11 @@ import java.lang.reflect.Field;
 
 public class PvpExtension extends Extension {
 	
-	public static EventNode<EntityEvent> events() {
+	public static EventNode<EntityInstanceEvent> events() {
 		return PvPConfig.DEFAULT.createNode();
 	}
 	
-	public static EventNode<EntityEvent> legacyEvents() {
+	public static EventNode<EntityInstanceEvent> legacyEvents() {
 		return PvPConfig.LEGACY.createNode();
 	}
 	

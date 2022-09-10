@@ -1,6 +1,7 @@
 package io.github.bloepiloepi.pvp.explosion;
 
 import io.github.bloepiloepi.pvp.config.ExplosionConfig;
+import io.github.bloepiloepi.pvp.config.PvPConfig;
 import io.github.bloepiloepi.pvp.utils.ItemUtils;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
@@ -10,11 +11,10 @@ import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
-import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.player.PlayerBlockInteractEvent;
 import net.minestom.server.event.player.PlayerUseItemOnBlockEvent;
-import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
@@ -25,8 +25,8 @@ import org.jglrxavpok.hephaistos.nbt.NBT;
 
 public class ExplosionListener {
 	
-	public static EventNode<EntityEvent> events(ExplosionConfig config) {
-		EventNode<EntityEvent> node = EventNode.type("explosion-events", EventFilter.ENTITY);
+	public static EventNode<EntityInstanceEvent> events(ExplosionConfig config) {
+		EventNode<EntityInstanceEvent> node = EventNode.type("explosion-events", PvPConfig.ENTITY_INSTANCE_FILTER);
 		
 		if (config.isTntEnabled()) node.addListener(PlayerUseItemOnBlockEvent.class, event -> {
 			ItemStack stack = event.getItemStack();

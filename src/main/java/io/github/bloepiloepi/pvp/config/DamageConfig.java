@@ -2,7 +2,7 @@ package io.github.bloepiloepi.pvp.config;
 
 import io.github.bloepiloepi.pvp.listeners.DamageListener;
 import net.minestom.server.event.EventNode;
-import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 
 /**
  * Creates an EventNode with damage events.
@@ -10,7 +10,7 @@ import net.minestom.server.event.trait.EntityEvent;
  * It only reduces damage based on armor attribute,
  * to change that attribute for different types of armor you need {@code ArmorToolConfig}.
  */
-public class DamageConfig extends ElementConfig<EntityEvent> {
+public class DamageConfig extends ElementConfig<EntityInstanceEvent> {
 	public static final DamageConfig DEFAULT = defaultBuilder().build();
 	public static final DamageConfig LEGACY = legacyBuilder().build();
 	
@@ -73,7 +73,7 @@ public class DamageConfig extends ElementConfig<EntityEvent> {
 	}
 	
 	@Override
-	public EventNode<EntityEvent> createNode() {
+	public EventNode<EntityInstanceEvent> createNode() {
 		return DamageListener.events(this);
 	}
 	

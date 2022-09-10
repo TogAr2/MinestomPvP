@@ -2,13 +2,13 @@ package io.github.bloepiloepi.pvp.config;
 
 import io.github.bloepiloepi.pvp.food.FoodListener;
 import net.minestom.server.event.EventNode;
-import net.minestom.server.event.trait.PlayerEvent;
+import net.minestom.server.event.trait.PlayerInstanceEvent;
 
 /**
  * Creates an EventNode with food events.
  * This includes eating and exhaustion for movement and block breaking.
  */
-public class FoodConfig extends ElementConfig<PlayerEvent> {
+public class FoodConfig extends ElementConfig<PlayerInstanceEvent> {
 	public static final FoodConfig DEFAULT = defaultBuilder().build();
 	public static final FoodConfig LEGACY = legacyBuilder().build();
 	
@@ -47,7 +47,7 @@ public class FoodConfig extends ElementConfig<PlayerEvent> {
 	}
 	
 	@Override
-	public EventNode<PlayerEvent> createNode() {
+	public EventNode<PlayerInstanceEvent> createNode() {
 		return FoodListener.events(this);
 	}
 	

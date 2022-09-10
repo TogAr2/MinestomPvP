@@ -2,14 +2,14 @@ package io.github.bloepiloepi.pvp.config;
 
 import io.github.bloepiloepi.pvp.listeners.ArmorToolListener;
 import net.minestom.server.event.EventNode;
-import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 
 /**
  * Creates an EventNode with armor and tool related events.
  * This changes attributes like attack damage and armor when
  * an entity equips items.
  */
-public class ArmorToolConfig extends ElementConfig<EntityEvent> {
+public class ArmorToolConfig extends ElementConfig<EntityInstanceEvent> {
 	public static final ArmorToolConfig DEFAULT = defaultBuilder().build();
 	public static final ArmorToolConfig LEGACY = legacyBuilder().build();
 	
@@ -30,7 +30,7 @@ public class ArmorToolConfig extends ElementConfig<EntityEvent> {
 	}
 	
 	@Override
-	public EventNode<EntityEvent> createNode() {
+	public EventNode<EntityInstanceEvent> createNode() {
 		return ArmorToolListener.events(this);
 	}
 	

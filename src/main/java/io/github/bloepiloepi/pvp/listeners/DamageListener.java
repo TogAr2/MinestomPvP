@@ -1,6 +1,7 @@
 package io.github.bloepiloepi.pvp.listeners;
 
 import io.github.bloepiloepi.pvp.config.DamageConfig;
+import io.github.bloepiloepi.pvp.config.PvPConfig;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.damage.CustomEntityDamage;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
@@ -25,12 +26,11 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
 import net.minestom.server.event.EventDispatcher;
-import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityDamageEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
-import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.gamedata.tags.Tag;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
@@ -48,8 +48,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class DamageListener {
 	
-	public static EventNode<EntityEvent> events(DamageConfig config) {
-		EventNode<EntityEvent> node = EventNode.type("damage-events", EventFilter.ENTITY);
+	public static EventNode<EntityInstanceEvent> events(DamageConfig config) {
+		EventNode<EntityInstanceEvent> node = EventNode.type("damage-events", PvPConfig.ENTITY_INSTANCE_FILTER);
 		
 		node.addListener(EventListener.builder(EntityDamageEvent.class)
 				.handler(event -> handleEntityDamage(event, config))

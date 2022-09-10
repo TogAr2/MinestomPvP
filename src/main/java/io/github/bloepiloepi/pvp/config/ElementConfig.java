@@ -1,9 +1,9 @@
 package io.github.bloepiloepi.pvp.config;
 
 import net.minestom.server.event.EventNode;
-import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 
-public abstract class ElementConfig<E extends EntityEvent> {
+public abstract class ElementConfig<E extends EntityInstanceEvent> {
 	private final boolean legacy;
 	
 	public ElementConfig(boolean legacy) {

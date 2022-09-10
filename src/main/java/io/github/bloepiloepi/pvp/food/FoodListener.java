@@ -1,6 +1,7 @@
 package io.github.bloepiloepi.pvp.food;
 
 import io.github.bloepiloepi.pvp.config.FoodConfig;
+import io.github.bloepiloepi.pvp.config.PvPConfig;
 import io.github.bloepiloepi.pvp.entity.EntityUtils;
 import io.github.bloepiloepi.pvp.entity.PvpPlayer;
 import io.github.bloepiloepi.pvp.entity.Tracker;
@@ -9,11 +10,10 @@ import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
-import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.player.*;
-import net.minestom.server.event.trait.PlayerEvent;
+import net.minestom.server.event.trait.PlayerInstanceEvent;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
@@ -27,8 +27,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class FoodListener {
 	
-	public static EventNode<PlayerEvent> events(FoodConfig config) {
-		EventNode<PlayerEvent> node = EventNode.type("food-events", EventFilter.PLAYER);
+	public static EventNode<PlayerInstanceEvent> events(FoodConfig config) {
+		EventNode<PlayerInstanceEvent> node = EventNode.type("food-events", PvPConfig.PLAYER_INSTANCE_FILTER);
 		
 		node.addListener(PlayerTickEvent.class, event -> {
 			if (Tracker.hungerManager.containsKey(event.getPlayer().getUuid())) {

@@ -1,6 +1,7 @@
 package io.github.bloepiloepi.pvp.potion;
 
 import io.github.bloepiloepi.pvp.config.PotionConfig;
+import io.github.bloepiloepi.pvp.config.PvPConfig;
 import io.github.bloepiloepi.pvp.entity.EntityUtils;
 import io.github.bloepiloepi.pvp.events.PotionVisibilityEvent;
 import io.github.bloepiloepi.pvp.food.FoodListener;
@@ -19,19 +20,16 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
 import net.minestom.server.event.EventDispatcher;
-import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityDeathEvent;
 import net.minestom.server.event.entity.EntityPotionAddEvent;
 import net.minestom.server.event.entity.EntityPotionRemoveEvent;
 import net.minestom.server.event.entity.EntityTickEvent;
-import net.minestom.server.event.instance.AddEntityToInstanceEvent;
-import net.minestom.server.event.instance.RemoveEntityFromInstanceEvent;
 import net.minestom.server.event.player.PlayerEatEvent;
 import net.minestom.server.event.player.PlayerPreEatEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
-import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.item.metadata.PotionMeta;
@@ -50,18 +48,10 @@ import java.util.stream.Collectors;
 public class PotionListener {
 	private static final ItemStack GLASS_BOTTLE = ItemStack.of(Material.GLASS_BOTTLE);
 	
-	private static final Map<UUID, Map<PotionEffect, Integer>> durationLeftMap = new ConcurrentHashMap<>();
+	public static final Map<UUID, Map<PotionEffect, Integer>> durationLeftMap = new ConcurrentHashMap<>();
 	
-	public static EventNode<EntityEvent> events(PotionConfig config) {
-		EventNode<EntityEvent> node = EventNode.type("potion-events", EventFilter.ENTITY);
-		
-		node.addListener(AddEntityToInstanceEvent.class, event -> {
-			if (event.getEntity() instanceof LivingEntity)
-				durationLeftMap.put(event.getEntity().getUuid(), new ConcurrentHashMap<>());
-		});
-		
-		node.addListener(RemoveEntityFromInstanceEvent.class, event ->
-				durationLeftMap.remove(event.getEntity().getUuid()));
+	public static EventNode<EntityInstanceEvent> events(PotionConfig config) {
+		EventNode<EntityInstanceEvent> node = EventNode.type("potion-events", PvPConfig.ENTITY_INSTANCE_FILTER);
 		
 		node.addListener(EntityTickEvent.class, event -> {
 			if (!(event.getEntity() instanceof LivingEntity entity)) return;

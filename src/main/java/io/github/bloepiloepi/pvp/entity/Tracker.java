@@ -3,6 +3,7 @@ package io.github.bloepiloepi.pvp.entity;
 import io.github.bloepiloepi.pvp.damage.combat.CombatManager;
 import io.github.bloepiloepi.pvp.food.HungerManager;
 import io.github.bloepiloepi.pvp.listeners.AttackManager;
+import io.github.bloepiloepi.pvp.potion.PotionListener;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
@@ -11,6 +12,7 @@ import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityFireEvent;
 import net.minestom.server.event.entity.EntityTickEvent;
+import net.minestom.server.event.instance.AddEntityToInstanceEvent;
 import net.minestom.server.event.instance.RemoveEntityFromInstanceEvent;
 import net.minestom.server.event.player.*;
 import net.minestom.server.event.trait.EntityEvent;
@@ -21,6 +23,7 @@ import net.minestom.server.network.packet.server.play.SetCooldownPacket;
 import net.minestom.server.utils.time.TimeUnit;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Tracker {
 	public static final Map<UUID, Integer> lastAttackedTicks = new HashMap<>();
@@ -199,6 +202,14 @@ public class Tracker {
 		
 		node.addListener(RemoveEntityFromInstanceEvent.class, event ->
 				Tracker.fireExtinguishTime.remove(event.getEntity().getUuid()));
+		
+		node.addListener(AddEntityToInstanceEvent.class, event -> {
+			if (event.getEntity() instanceof LivingEntity)
+				PotionListener.durationLeftMap.put(event.getEntity().getUuid(), new ConcurrentHashMap<>());
+		});
+		
+		node.addListener(RemoveEntityFromInstanceEvent.class, event ->
+				PotionListener.durationLeftMap.remove(event.getEntity().getUuid()));
 		
 		MinecraftServer.getSchedulerManager()
 				.buildTask(Tracker::updateCooldown)
