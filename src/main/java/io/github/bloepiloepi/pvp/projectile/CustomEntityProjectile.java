@@ -6,12 +6,11 @@ import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
+import net.minestom.server.entity.EntityProjectile;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
-import net.minestom.server.entity.metadata.ProjectileMeta;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.entity.EntityDamageEvent;
-import net.minestom.server.event.entity.EntityShootEvent;
 import net.minestom.server.instance.Chunk;
 import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.NotNull;
@@ -19,8 +18,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Optional;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,9 +25,8 @@ import java.util.stream.Stream;
 /**
  * Stolen from <a href="https://github.com/Minestom/Minestom/pull/496/">Pull Request #496</a> and edited
  */
-public class CustomEntityProjectile extends Entity {
-	
-	private final Entity shooter;
+public class CustomEntityProjectile extends EntityProjectile {
+
 	private final @Nullable Predicate<Entity> victimsPredicate;
 	private final boolean hitAnticipation;
 	
@@ -43,11 +39,9 @@ public class CustomEntityProjectile extends Entity {
 	 *                         otherwise it's a predicate for those entities that may be hit by that projectile.
 	 */
 	public CustomEntityProjectile(@Nullable Entity shooter, @NotNull EntityType entityType, @Nullable Predicate<Entity> victimsPredicate, boolean hitAnticipation) {
-		super(entityType);
-		this.shooter = shooter;
+		super(shooter, entityType);
 		this.victimsPredicate = victimsPredicate;
 		this.hitAnticipation = hitAnticipation;
-		setup();
 	}
 	
 	/**
@@ -57,19 +51,7 @@ public class CustomEntityProjectile extends Entity {
 	 * @param entityType type of the projectile.
 	 */
 	public CustomEntityProjectile(@Nullable Entity shooter, @NotNull EntityType entityType, boolean hitAnticipation) {
-		this(shooter, entityType, entity -> entity instanceof LivingEntity, hitAnticipation);
-	}
-	
-	private void setup() {
-		super.hasPhysics = false;
-		if (getEntityMeta() instanceof ProjectileMeta) {
-			((ProjectileMeta) getEntityMeta()).setShooter(this.shooter);
-		}
-	}
-	
-	@Nullable
-	public Entity getShooter() {
-		return this.shooter;
+		this(shooter, entityType, LivingEntity.class::isInstance, hitAnticipation);
 	}
 	
 	/**
@@ -94,42 +76,6 @@ public class CustomEntityProjectile extends Entity {
 	 */
 	public void onHit(Entity entity) {
 	
-	}
-	
-	public void shoot(Point to, double power, double spread) {
-		EntityShootEvent shootEvent = new EntityShootEvent(this.shooter, this, to, power, spread);
-		EventDispatcher.call(shootEvent);
-		if (shootEvent.isCancelled()) {
-			remove();
-			return;
-		}
-		final var from = this.shooter.getPosition().add(0D, this.shooter.getEyeHeight(), 0D);
-		shoot(from, to, shootEvent.getPower(), shootEvent.getSpread());
-	}
-	
-	private void shoot(@NotNull Point from, @NotNull Point to, double power, double spread) {
-		double dx = to.x() - from.x();
-		double dy = to.y() - from.y();
-		double dz = to.z() - from.z();
-		double xzLength = Math.sqrt(dx * dx + dz * dz);
-		dy += xzLength * 0.20000000298023224D;
-		
-		double length = Math.sqrt(dx * dx + dy * dy + dz * dz);
-		dx /= length;
-		dy /= length;
-		dz /= length;
-		Random random = ThreadLocalRandom.current();
-		spread *= 0.007499999832361937D;
-		dx += random.nextGaussian() * spread;
-		dy += random.nextGaussian() * spread;
-		dz += random.nextGaussian() * spread;
-		
-		final double mul = 20 * power;
-		this.velocity = new Vec(dx * mul, dy * mul, dz * mul);
-		setView(
-				(float) Math.toDegrees(Math.atan2(dx, dz)),
-				(float) Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz)))
-		);
 	}
 	
 	@Override
