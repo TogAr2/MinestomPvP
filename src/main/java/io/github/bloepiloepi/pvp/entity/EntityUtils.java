@@ -199,10 +199,10 @@ public class EntityUtils {
 	}
 	
 	//TODO needs improving
-	public static boolean isClimbing(Player player) {
-		if (player.getGameMode() == GameMode.SPECTATOR) return false;
+	public static boolean isClimbing(Entity entity) {
+		if (entity instanceof Player player && player.getGameMode() == GameMode.SPECTATOR) return false;
 		
-		Block block = Objects.requireNonNull(player.getInstance()).getBlock(player.getPosition());
+		Block block = Objects.requireNonNull(entity.getInstance()).getBlock(entity.getPosition());
 		return block.compare(Block.LADDER) || block.compare(Block.VINE) || block.compare(Block.TWISTING_VINES)
 				|| block.compare(Block.TWISTING_VINES_PLANT) || block.compare(Block.WEEPING_VINES)
 				|| block.compare(Block.WEEPING_VINES_PLANT) || block.compare(Block.ACACIA_TRAPDOOR)
