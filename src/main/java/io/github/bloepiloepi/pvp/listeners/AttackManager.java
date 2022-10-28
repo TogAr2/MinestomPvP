@@ -65,17 +65,17 @@ public class AttackManager {
 		return node;
 	}
 	
-	public static float getAttackCooldownProgressPerTick(LivingEntity livingEntity) {
-		return (float) (1.0D / livingEntity.getAttributeValue(Attribute.ATTACK_SPEED) * 20.0D);
+	public static float getAttackCooldownProgressPerTick(Player player) {
+		return (float) (1.0D / player.getAttributeValue(Attribute.ATTACK_SPEED) * 20.0D);
 	}
 	
 	@SuppressWarnings("UnstableApiUsage")
-	public static float getAttackCooldownProgress(LivingEntity livingEntity, float baseTime) {
-		return MathUtils.clamp(((float) Tracker.lastAttackedTicks.get(livingEntity.getUuid()) + baseTime) / getAttackCooldownProgressPerTick(livingEntity), 0.0F, 1.0F);
+	public static float getAttackCooldownProgress(Player player, float baseTime) {
+		return MathUtils.clamp(((float) Tracker.lastAttackedTicks.get(player.getUuid()) + baseTime) / getAttackCooldownProgressPerTick(player), 0.0F, 1.0F);
 	}
 	
-	public static void resetLastAttackedTicks(LivingEntity livingEntity) {
-		Tracker.lastAttackedTicks.put(livingEntity.getUuid(), 0);
+	public static void resetLastAttackedTicks(Player player) {
+		Tracker.lastAttackedTicks.put(player.getUuid(), 0);
 	}
 	
 	public static void spectateTick(Player player) {
@@ -130,10 +130,10 @@ public class AttackManager {
 			enchantedDamage = EnchantmentUtils.getAttackDamage(attacker.getItemInMainHand(), EntityGroup.DEFAULT, config.isLegacy());
 		}
 		
-		float i = config.isAttackCooldownEnabled() ? getAttackCooldownProgress(attacker, 0.5F) : 1.0F;
+		float i = config.isAttackCooldownEnabled() && attacker instanceof Player player ? getAttackCooldownProgress(player, 0.5F) : 1.0F;
 		damage *= 0.2F + i * i * 0.8F;
 		enchantedDamage *= i;
-		resetLastAttackedTicks(attacker);
+		if (attacker instanceof Player player) resetLastAttackedTicks(player);
 		
 		boolean strongAttack = i > 0.9F;
 		boolean sprintAttack = attacker.isSprinting() && strongAttack;
