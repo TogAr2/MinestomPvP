@@ -166,7 +166,7 @@ public class CustomPotionEffect {
 				entity.getAttribute(attribute).removeModifier(modifier));
 	}
 	
-	private float adjustModifierAmount(byte amplifier, AttributeModifier modifier) {
-		return modifier.getAmount() * (float) (amplifier + 1);
+	private double adjustModifierAmount(byte amplifier, AttributeModifier modifier) {
+		return modifier.getAmount() * (amplifier + 1);
 	}
 }
