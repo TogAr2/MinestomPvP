@@ -39,7 +39,6 @@ import net.minestom.server.utils.MathUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Field;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -147,11 +146,8 @@ public class AttackManager {
 		
 		boolean sweeping = false;
 		if (!config.isLegacy() && strongAttack && !critical && !sprintAttack && attacker.isOnGround()) {
-			// Use reflection to get previousPosition field
-			try {
-				Field field = Entity.class.getDeclaredField("previousPosition");
-				field.setAccessible(true);
-				Pos previousPosition = (Pos) field.get(attacker);
+			Pos previousPosition = EntityUtils.getPreviousPosition(attacker);
+			if (previousPosition != null) {
 				double lastMoveDistance = previousPosition.distance(attacker.getPosition()) * 0.6;
 				if (lastMoveDistance < attacker.getAttributeValue(Attribute.MOVEMENT_SPEED)) {
 					Tool tool = Tool.fromMaterial(attacker.getItemInMainHand().material());
@@ -159,8 +155,6 @@ public class AttackManager {
 						sweeping = true;
 					}
 				}
-			} catch (NoSuchFieldException | IllegalAccessException e) {
-				e.printStackTrace();
 			}
 		}
 		

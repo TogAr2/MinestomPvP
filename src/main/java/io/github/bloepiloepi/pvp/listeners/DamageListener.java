@@ -29,6 +29,7 @@ import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityDamageEvent;
+import net.minestom.server.event.entity.EntityTickEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.gamedata.tags.Tag;
@@ -55,32 +56,32 @@ public class DamageListener {
 				.handler(event -> handleEntityDamage(event, config))
 				.build());
 		
-		if (config.isFallDamageEnabled()) node.addListener(PlayerMoveEvent.class, event -> {
-			Player player = event.getPlayer();
-			double dy = event.getNewPosition().y() - player.getPosition().y();
-			Double fallDistance = Tracker.fallDistance.get(player.getUuid());
+		if (config.isFallDamageEnabled()) node.addListener(EntityTickEvent.class, event -> {
+			if (!(event.getEntity() instanceof LivingEntity livingEntity)) return;
+			double dy = livingEntity.getPosition().y() - EntityUtils.getPreviousPosition(livingEntity).y();
+			Double fallDistance = Tracker.fallDistance.getOrDefault(livingEntity.getUuid(), 0.0);
 			
-			if (player.isFlying() || EntityUtils.hasEffect(player, PotionEffect.LEVITATION)
-					|| EntityUtils.hasEffect(player, PotionEffect.SLOW_FALLING) || dy > 0) {
-				Tracker.fallDistance.put(player.getUuid(), 0.0);
+			if ((livingEntity instanceof Player player && player.isFlying()) || EntityUtils.hasEffect(livingEntity, PotionEffect.LEVITATION)
+					|| EntityUtils.hasEffect(livingEntity, PotionEffect.SLOW_FALLING) || dy > 0) {
+				Tracker.fallDistance.put(livingEntity.getUuid(), 0.0);
 				return;
 			}
-			if (player.isFlyingWithElytra() && player.getVelocity().y() > -0.5) {
-				Tracker.fallDistance.put(player.getUuid(), 1.0);
+			if (livingEntity.isFlyingWithElytra() && livingEntity.getVelocity().y() > -0.5) {
+				Tracker.fallDistance.put(livingEntity.getUuid(), 1.0);
 				return;
 			}
 			
-			if (fallDistance > 3.0 && event.isOnGround()) {
-				Block block = Objects.requireNonNull(player.getInstance()).getBlock(getLandingPos(player, event.getNewPosition()));
+			if (fallDistance > 3.0 && livingEntity.isOnGround()) {
+				Block block = Objects.requireNonNull(livingEntity.getInstance()).getBlock(getLandingPos(livingEntity, livingEntity.getPosition()));
 				if (!block.isAir()) {
 					double damageDistance = Math.ceil(fallDistance - 3.0);
 					double d = Math.min(0.2 + damageDistance / 15.0, 2.5);
 					int particleCount = (int) (150 * d);
 					
-					player.sendPacketToViewersAndSelf(ParticleCreator.createParticlePacket(
+					livingEntity.sendPacketToViewersAndSelf(ParticleCreator.createParticlePacket(
 							Particle.BLOCK,
 							false,
-							event.getNewPosition().x(), event.getNewPosition().y(), event.getNewPosition().z(),
+							livingEntity.getPosition().x(), livingEntity.getPosition().y(), livingEntity.getPosition().z(),
 							0, 0, 0,
 							0.15f, particleCount,
 							writer -> writer.writeVarInt(block.stateId())
@@ -88,37 +89,42 @@ public class DamageListener {
 				}
 			}
 			
-			if (event.isOnGround()) {
-				Tracker.fallDistance.put(player.getUuid(), 0.0);
+			if (livingEntity.isOnGround()) {
+				Tracker.fallDistance.put(livingEntity.getUuid(), 0.0);
 				
-				if (!player.getGameMode().canTakeDamage()) return;
-				int damage = getFallDamage(player, fallDistance);
+				if (livingEntity instanceof Player player && !player.getGameMode().canTakeDamage()) return;
+				int damage = getFallDamage(livingEntity, fallDistance);
 				if (damage > 0) {
-					SoundEvent sound = damage > 4 ? SoundEvent.ENTITY_PLAYER_BIG_FALL : SoundEvent.ENTITY_PLAYER_SMALL_FALL;
-					SoundManager.sendToAround(player, player, sound, Sound.Source.PLAYER, 1.0f, 1.0f);
+					if (livingEntity instanceof Player player) {
+						SoundEvent sound = damage > 4 ? SoundEvent.ENTITY_PLAYER_BIG_FALL : SoundEvent.ENTITY_PLAYER_SMALL_FALL;
+						SoundManager.sendToAround(player, player, sound, Sound.Source.PLAYER, 1.0f, 1.0f);
+					} else {
+						SoundEvent sound = damage > 4 ? SoundEvent.ENTITY_GENERIC_BIG_FALL : SoundEvent.ENTITY_GENERIC_SMALL_FALL;
+						SoundManager.sendToAround(livingEntity, sound, Sound.Source.HOSTILE, 1.0f, 1.0f);
+					}
 					
-					player.damage(CustomDamageType.FALL, damage);
+					livingEntity.damage(CustomDamageType.FALL, damage);
 				}
 			} else if (dy < 0) {
-				Tracker.fallDistance.put(player.getUuid(), fallDistance - dy);
+				Tracker.fallDistance.put(livingEntity.getUuid(), fallDistance - dy);
 			}
 		});
 		
 		return node;
 	}
 	
-	private static int getFallDamage(Player player, double fallDistance) {
-		float reduce = EntityUtils.hasEffect(player, PotionEffect.JUMP_BOOST)
-				? EntityUtils.getEffect(player, PotionEffect.JUMP_BOOST).amplifier() + 1
+	private static int getFallDamage(LivingEntity livingEntity, double fallDistance) {
+		float reduce = EntityUtils.hasEffect(livingEntity, PotionEffect.JUMP_BOOST)
+				? EntityUtils.getEffect(livingEntity, PotionEffect.JUMP_BOOST).amplifier() + 1
 				: 0;
 		return (int) Math.ceil(fallDistance - 3.0 - reduce);
 	}
 	
-	private static Point getLandingPos(Player player, Pos position) {
+	private static Point getLandingPos(LivingEntity livingEntity, Pos position) {
 		position = position.add(0, -0.2, 0);
-		if (Objects.requireNonNull(player.getInstance()).getBlock(position).isAir()) {
+		if (Objects.requireNonNull(livingEntity.getInstance()).getBlock(position).isAir()) {
 			position = position.add(0, -1, 0);
-			Block block = player.getInstance().getBlock(position);
+			Block block = livingEntity.getInstance().getBlock(position);
 			Tag fences = MinecraftServer.getTagManager().getTag(Tag.BasicType.BLOCKS, "minecraft:fences");
 			Tag walls = MinecraftServer.getTagManager().getTag(Tag.BasicType.BLOCKS, "minecraft:walls");
 			Tag fenceGates = MinecraftServer.getTagManager().getTag(Tag.BasicType.BLOCKS, "minecraft:fence_gates");
