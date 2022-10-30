@@ -30,6 +30,7 @@ import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityDamageEvent;
 import net.minestom.server.event.entity.EntityTickEvent;
+import net.minestom.server.event.instance.RemoveEntityFromInstanceEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.gamedata.tags.Tag;
@@ -48,14 +49,14 @@ import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class DamageListener {
-	
+
 	public static EventNode<EntityInstanceEvent> events(DamageConfig config) {
 		EventNode<EntityInstanceEvent> node = EventNode.type("damage-events", PvPConfig.ENTITY_INSTANCE_FILTER);
-		
+
 		node.addListener(EventListener.builder(EntityDamageEvent.class)
 				.handler(event -> handleEntityDamage(event, config))
 				.build());
-		
+
 		if (config.isFallDamageEnabled()) {
 			node.addListener(EntityTickEvent.class, event -> {
 				if (!(event.getEntity() instanceof LivingEntity livingEntity)) return;
@@ -64,12 +65,17 @@ public class DamageListener {
 				if (previousPosition == null) return;
 				handleEntityFallDamage(livingEntity, previousPosition, livingEntity.getPosition(), livingEntity.isOnGround());
 			});
+			node.addListener(RemoveEntityFromInstanceEvent.class, event -> {
+				if (!(event.getEntity() instanceof LivingEntity livingEntity)) return;
+				if (livingEntity instanceof Player) return;
+				Tracker.fallDistance.remove(livingEntity.getUuid());
+			});
 			node.addListener(PlayerMoveEvent.class, event -> {
 				var player = event.getPlayer();
 				handleEntityFallDamage(player, player.getPosition(), event.getNewPosition(), event.isOnGround());
 			});
 		}
-		
+
 		return node;
 	}
 
@@ -125,14 +131,14 @@ public class DamageListener {
 			Tracker.fallDistance.put(livingEntity.getUuid(), fallDistance - dy);
 		}
 	}
-	
+
 	private static int getFallDamage(LivingEntity livingEntity, double fallDistance) {
 		float reduce = EntityUtils.hasEffect(livingEntity, PotionEffect.JUMP_BOOST)
 				? EntityUtils.getEffect(livingEntity, PotionEffect.JUMP_BOOST).amplifier() + 1
 				: 0;
 		return (int) Math.ceil(fallDistance - 3.0 - reduce);
 	}
-	
+
 	private static Point getLandingPos(LivingEntity livingEntity, Pos position) {
 		position = position.add(0, -0.2, 0);
 		if (Objects.requireNonNull(livingEntity.getInstance()).getBlock(position).isAir()) {
@@ -148,16 +154,16 @@ public class DamageListener {
 				return position;
 			}
 		}
-		
+
 		return position;
 	}
-	
+
 	public static void handleEntityDamage(EntityDamageEvent event, DamageConfig config) {
 		event.setAnimation(false);
 		event.setSound(null);
-		
+
 		float amount = event.getDamage();
-		
+
 		CustomDamageType type;
 		if (event.getDamageType() instanceof CustomDamageType) {
 			type = (CustomDamageType) event.getDamageType();
@@ -170,7 +176,7 @@ public class DamageListener {
 				type = CustomDamageType.OUT_OF_WORLD;
 			}
 		}
-		
+
 		if (event.getEntity() instanceof Player && type.isScaledWithDifficulty()) {
 			Difficulty difficulty = MinecraftServer.getDifficulty();
 			switch (difficulty) {
@@ -182,24 +188,24 @@ public class DamageListener {
 				case HARD -> amount = amount * 3.0F / 2.0F;
 			}
 		}
-		
+
 		LivingEntity entity = event.getEntity();
 		if (type.isFire() && EntityUtils.hasEffect(entity, PotionEffect.FIRE_RESISTANCE)) {
 			event.setCancelled(true);
 			return;
 		}
-		
+
 		if (config.isEquipmentDamageEnabled() && type.damagesHelmet() && !entity.getEquipment(EquipmentSlot.HELMET).isAir()) {
 			ItemUtils.damageArmor(entity, type, amount, EquipmentSlot.HELMET);
 			amount *= 0.75F;
 		}
-		
+
 		Entity attacker = type.getEntity();
 		if (entity instanceof Player && attacker instanceof LivingEntity) {
 			Tracker.lastDamagedBy.put(entity.getUuid(), (LivingEntity) attacker);
 			Tracker.lastDamageTime.put(entity.getUuid(), System.currentTimeMillis());
 		}
-		
+
 		boolean shield = false;
 		if (config.isShieldEnabled() && amount > 0.0F && EntityUtils.blockedByShield(entity, type, config.isLegacyShieldMechanics())) {
 			float resultingDamage = 0.0F;
@@ -208,16 +214,16 @@ public class DamageListener {
 				if (resultingDamage < 0.0F)
 					resultingDamage = 0.0F;
 			}
-			
+
 			DamageBlockEvent damageBlockEvent = new DamageBlockEvent(entity, amount, resultingDamage);
 			EventDispatcher.call(damageBlockEvent);
-			
+
 			if (!damageBlockEvent.isCancelled()) {
 				if (config.isEquipmentDamageEnabled() && amount >= 3) {
 					int shieldDamage = 1 + (int) Math.floor(amount);
 					Player.Hand hand = EntityUtils.getActiveHand(entity);
 					ItemUtils.damageEquipment(entity, hand == Player.Hand.MAIN ? EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, shieldDamage);
-					
+
 					if (entity.getItemInHand(hand).isAir()) {
 						((LivingEntityMeta) entity.getEntityMeta()).setHandActive(false);
 						SoundManager.sendToAround(
@@ -227,57 +233,57 @@ public class DamageListener {
 						);
 					}
 				}
-				
+
 				amount = damageBlockEvent.getResultingDamage();
-				
+
 				if (!config.isLegacyShieldMechanics()) {
 					if (!type.isProjectile()) {
 						if (attacker instanceof LivingEntity) {
 							EntityUtils.takeShieldHit(entity, (LivingEntity) attacker, damageBlockEvent.knockbackAttacker());
 						}
 					}
-					
+
 					shield = true;
 				}
 			}
 		}
-		
+
 		boolean hurtSoundAndAnimation = true;
 		float amountBeforeProcessing = amount;
 		if (Tracker.invulnerableTime.getOrDefault(entity.getUuid(), 0) > 10) {
 			float lastDamage = Tracker.lastDamageTaken.get(entity.getUuid());
-			
+
 			if (amount <= lastDamage) {
 				event.setCancelled(true);
 				return;
 			}
-			
+
 			amount = applyDamage(entity, type, amount - lastDamage, config);
 			hurtSoundAndAnimation = false;
 		} else {
 			amount = applyDamage(entity, type, amount, config);
 		}
-		
+
 		FinalDamageEvent finalDamageEvent = new FinalDamageEvent(entity, type, amount, config.getInvulnerabilityTicks());
 		EventDispatcher.call(finalDamageEvent);
-		
+
 		amount = finalDamageEvent.getDamage();
-		
+
 		boolean register = config.isLegacy() || finalDamageEvent.getDamage() > 0.0F;
 		if (register && entity instanceof Player) {
 			Tracker.combatManager.get(entity.getUuid()).recordDamage(type, amount);
 		}
-		
+
 		if (!register || finalDamageEvent.isCancelled()) {
 			event.setCancelled(true);
 			return;
 		}
-		
+
 		Tracker.lastDamageTaken.put(entity.getUuid(), amountBeforeProcessing);
-		
+
 		if (hurtSoundAndAnimation) {
 			Tracker.invulnerableTime.put(entity.getUuid(), finalDamageEvent.getInvulnerabilityTicks() + 10);
-			
+
 			if (shield) {
 				entity.triggerStatus((byte) 29);
 			} else if (type instanceof CustomEntityDamage && ((CustomEntityDamage) type).isThorns()) {
@@ -300,18 +306,18 @@ public class DamageListener {
 					//Damage sound and animation
 					status = 2;
 				}
-				
+
 				entity.triggerStatus(status);
 			}
-			
+
 			if (attacker != null && !shield) {
 				double h = attacker.getPosition().x() - entity.getPosition().x();
-				
+
 				double i;
 				for(i = attacker.getPosition().z() - entity.getPosition().z(); h * h + i * i < 0.0001; i = (Math.random() - Math.random()) * 0.01D) {
 					h = (Math.random() - Math.random()) * 0.01D;
 				}
-				
+
 				Entity directAttacker = type.getDirectEntity();
 				if (directAttacker == null) {
 					directAttacker = attacker;
@@ -330,15 +336,15 @@ public class DamageListener {
 					EventDispatcher.callCancellable(legacyKnockbackEvent, () -> {
 						LegacyKnockbackSettings settings = legacyKnockbackEvent.getSettings();
 						Vec newVelocity = entity.getVelocity();
-						
+
 						double horizontal = settings.horizontal();
 						newVelocity = newVelocity.withX((newVelocity.x() / 2) - (finalH / magnitude * horizontal));
 						newVelocity = newVelocity.withY((newVelocity.y() / 2) + settings.vertical());
 						newVelocity = newVelocity.withZ((newVelocity.z() / 2) - (finalI / magnitude * horizontal));
-						
+
 						if (newVelocity.y() > settings.verticalLimit())
 							newVelocity = newVelocity.withY(settings.verticalLimit());
-						
+
 						entity.setVelocity(newVelocity);
 					});
 				}
@@ -347,19 +353,19 @@ public class DamageListener {
 				entity.setVelocity(entity.getVelocity());
 			}
 		}
-		
+
 		if (shield) {
 			event.setCancelled(true);
 			return;
 		}
-		
+
 		SoundEvent sound = null;
-		
+
 		boolean death = false;
 		float totalHealth = entity.getHealth() + (entity instanceof Player ? ((Player) entity).getAdditionalHearts() : 0);
 		if (totalHealth - amount <= 0) {
 			boolean totem = totemProtection(entity, type);
-			
+
 			if (totem) {
 				event.setCancelled(true);
 			} else {
@@ -373,7 +379,7 @@ public class DamageListener {
 			//Damage sound
 			sound = type.getSound(entity);
 		}
-		
+
 		//Play sound
 		if (config.isSoundsEnabled() && sound != null) {
 			Sound.Source soundCategory;
@@ -383,7 +389,7 @@ public class DamageListener {
 				// TODO: separate living entity categories
 				soundCategory = Sound.Source.HOSTILE;
 			}
-			
+
 			SoundEffectPacket damageSoundPacket = new SoundEffectPacket(
 					sound, soundCategory,
 					entity.getPosition(),
@@ -391,7 +397,7 @@ public class DamageListener {
 			);
 			entity.sendPacketToViewersAndSelf(damageSoundPacket);
 		}
-		
+
 		if (death && !event.isCancelled()) {
 			EntityPreDeathEvent entityPreDeathEvent = new EntityPreDeathEvent(entity, type);
 			EventDispatcher.call(entityPreDeathEvent);
@@ -402,7 +408,7 @@ public class DamageListener {
 				amount = 0.0f;
 			}
 		}
-		
+
 		// The Minestom damage method should return false if there was no hurt animation,
 		// because otherwise the AttackManager will deal extra knockback
 		if (!event.isCancelled() && !hurtSoundAndAnimation) {
@@ -412,54 +418,54 @@ public class DamageListener {
 			event.setDamage(amount);
 		}
 	}
-	
+
 	public static boolean totemProtection(LivingEntity entity, CustomDamageType type) {
 		if (type.isOutOfWorld()) return false;
-		
+
 		boolean hasTotem = false;
-		
+
 		for (Player.Hand hand : Player.Hand.values()) {
 			ItemStack stack = entity.getItemInHand(hand);
 			if (stack.material() == Material.TOTEM_OF_UNDYING) {
 				TotemUseEvent totemUseEvent = new TotemUseEvent(entity, hand);
 				EventDispatcher.call(totemUseEvent);
-				
+
 				if (totemUseEvent.isCancelled()) continue;
-				
+
 				hasTotem = true;
 				entity.setItemInHand(hand, stack.withAmount(stack.amount() - 1));
 				break;
 			}
 		}
-		
+
 		if (hasTotem) {
 			entity.setHealth(1.0F);
 			entity.clearEffects();
 			entity.addEffect(new Potion(PotionEffect.REGENERATION, (byte) 1, 900, PotionListener.defaultFlags()));
 			entity.addEffect(new Potion(PotionEffect.ABSORPTION, (byte) 1, 100, PotionListener.defaultFlags()));
 			entity.addEffect(new Potion(PotionEffect.FIRE_RESISTANCE, (byte) 0, 800, PotionListener.defaultFlags()));
-			
+
 			//Totem particles
 			entity.triggerStatus((byte) 35);
 		}
-		
+
 		return hasTotem;
 	}
-	
+
 	public static float applyDamage(LivingEntity entity, CustomDamageType type, float amount, DamageConfig config) {
 		amount = applyArmorToDamage(entity, type, amount, config);
 		amount = applyEnchantmentsToDamage(entity, type, amount, config);
-		
+
 		if (config.isExhaustionEnabled() && amount != 0.0F && entity instanceof Player) {
 			EntityUtils.addExhaustion((Player) entity, type.getExhaustion() * (config.isLegacy() ? 3 : 1));
 		}
-		
+
 		return amount;
 	}
-	
+
 	public static float applyArmorToDamage(LivingEntity entity, CustomDamageType type, float amount, DamageConfig config) {
 		if (config.isArmorDisabled()) return amount;
-		
+
 		if (!type.bypassesArmor()) {
 			float armorValue = entity.getAttributeValue(Attribute.ARMOR);
 			if (!config.isLegacy()) {
@@ -470,10 +476,10 @@ public class DamageListener {
 				amount = f1 / 25.0F;
 			}
 		}
-		
+
 		return amount;
 	}
-	
+
 	public static float applyEnchantmentsToDamage(LivingEntity entity, CustomDamageType type, float amount, DamageConfig config) {
 		if (type.isUnblockable()) {
 			return amount;
@@ -485,9 +491,9 @@ public class DamageListener {
 				float f = amount * (float) j;
 				amount = Math.max(f / 25.0F, 0.0F);
 			}
-			
+
 			if (config.isArmorDisabled()) return amount;
-			
+
 			if (amount <= 0.0F) {
 				return 0.0F;
 			} else {
@@ -500,19 +506,19 @@ public class DamageListener {
 					if (k > 20) {
 						k = 20;
 					}
-					
+
 					if (k > 0) {
 						int j = 25 - k;
 						float f = amount * (float) j;
 						amount = f / 25.0F;
 					}
 				}
-				
+
 				return amount;
 			}
 		}
 	}
-	
+
 	public static void damageManually(LivingEntity entity, float damage) {
 		// Additional hearts support
 		if (entity instanceof Player player) {
@@ -527,7 +533,7 @@ public class DamageListener {
 				}
 			}
 		}
-		
+
 		// Set the final entity health
 		entity.setHealth(entity.getHealth() - damage);
 	}
