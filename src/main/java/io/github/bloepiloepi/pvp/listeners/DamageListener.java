@@ -65,11 +65,6 @@ public class DamageListener {
 				if (previousPosition == null) return;
 				handleEntityFallDamage(livingEntity, previousPosition, livingEntity.getPosition(), livingEntity.isOnGround());
 			});
-			node.addListener(RemoveEntityFromInstanceEvent.class, event -> {
-				if (!(event.getEntity() instanceof LivingEntity livingEntity)) return;
-				if (livingEntity instanceof Player) return;
-				Tracker.fallDistance.remove(livingEntity.getUuid());
-			});
 			node.addListener(PlayerMoveEvent.class, event -> {
 				var player = event.getPlayer();
 				handleEntityFallDamage(player, player.getPosition(), event.getNewPosition(), event.isOnGround());
