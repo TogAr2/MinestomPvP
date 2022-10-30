@@ -56,61 +56,74 @@ public class DamageListener {
 				.handler(event -> handleEntityDamage(event, config))
 				.build());
 		
-		if (config.isFallDamageEnabled()) node.addListener(EntityTickEvent.class, event -> {
-			if (!(event.getEntity() instanceof LivingEntity livingEntity)) return;
-			double dy = livingEntity.getPosition().y() - EntityUtils.getPreviousPosition(livingEntity).y();
-			Double fallDistance = Tracker.fallDistance.getOrDefault(livingEntity.getUuid(), 0.0);
-			
-			if ((livingEntity instanceof Player player && player.isFlying()) || EntityUtils.hasEffect(livingEntity, PotionEffect.LEVITATION)
-					|| EntityUtils.hasEffect(livingEntity, PotionEffect.SLOW_FALLING) || dy > 0) {
-				Tracker.fallDistance.put(livingEntity.getUuid(), 0.0);
-				return;
-			}
-			if (livingEntity.isFlyingWithElytra() && livingEntity.getVelocity().y() > -0.5) {
-				Tracker.fallDistance.put(livingEntity.getUuid(), 1.0);
-				return;
-			}
-			
-			if (fallDistance > 3.0 && livingEntity.isOnGround()) {
-				Block block = Objects.requireNonNull(livingEntity.getInstance()).getBlock(getLandingPos(livingEntity, livingEntity.getPosition()));
-				if (!block.isAir()) {
-					double damageDistance = Math.ceil(fallDistance - 3.0);
-					double d = Math.min(0.2 + damageDistance / 15.0, 2.5);
-					int particleCount = (int) (150 * d);
-					
-					livingEntity.sendPacketToViewersAndSelf(ParticleCreator.createParticlePacket(
-							Particle.BLOCK,
-							false,
-							livingEntity.getPosition().x(), livingEntity.getPosition().y(), livingEntity.getPosition().z(),
-							0, 0, 0,
-							0.15f, particleCount,
-							writer -> writer.writeVarInt(block.stateId())
-					));
-				}
-			}
-			
-			if (livingEntity.isOnGround()) {
-				Tracker.fallDistance.put(livingEntity.getUuid(), 0.0);
-				
-				if (livingEntity instanceof Player player && !player.getGameMode().canTakeDamage()) return;
-				int damage = getFallDamage(livingEntity, fallDistance);
-				if (damage > 0) {
-					if (livingEntity instanceof Player player) {
-						SoundEvent sound = damage > 4 ? SoundEvent.ENTITY_PLAYER_BIG_FALL : SoundEvent.ENTITY_PLAYER_SMALL_FALL;
-						SoundManager.sendToAround(player, player, sound, Sound.Source.PLAYER, 1.0f, 1.0f);
-					} else {
-						SoundEvent sound = damage > 4 ? SoundEvent.ENTITY_GENERIC_BIG_FALL : SoundEvent.ENTITY_GENERIC_SMALL_FALL;
-						SoundManager.sendToAround(livingEntity, sound, Sound.Source.HOSTILE, 1.0f, 1.0f);
-					}
-					
-					livingEntity.damage(CustomDamageType.FALL, damage);
-				}
-			} else if (dy < 0) {
-				Tracker.fallDistance.put(livingEntity.getUuid(), fallDistance - dy);
-			}
-		});
+		if (config.isFallDamageEnabled()) {
+			node.addListener(EntityTickEvent.class, event -> {
+				if (!(event.getEntity() instanceof LivingEntity livingEntity)) return;
+				if (livingEntity instanceof Player) return;
+				var previousPosition = EntityUtils.getPreviousPosition(livingEntity);
+				if (previousPosition == null) return;
+				handleEntityFallDamage(livingEntity, previousPosition, livingEntity.getPosition(), livingEntity.isOnGround());
+			});
+			node.addListener(PlayerMoveEvent.class, event -> {
+				var player = event.getPlayer();
+				handleEntityFallDamage(player, player.getPosition(), event.getNewPosition(), event.isOnGround());
+			});
+		}
 		
 		return node;
+	}
+
+	private static void handleEntityFallDamage(LivingEntity livingEntity, Pos currentPosition, Pos newPosition, boolean isOnGround) {
+		double dy = newPosition.y() - currentPosition.y();
+		Double fallDistance = Tracker.fallDistance.getOrDefault(livingEntity.getUuid(), 0.0);
+
+		if ((livingEntity instanceof Player player && player.isFlying()) || EntityUtils.hasEffect(livingEntity, PotionEffect.LEVITATION)
+				|| EntityUtils.hasEffect(livingEntity, PotionEffect.SLOW_FALLING) || dy > 0) {
+			Tracker.fallDistance.put(livingEntity.getUuid(), 0.0);
+			return;
+		}
+		if (livingEntity.isFlyingWithElytra() && livingEntity.getVelocity().y() > -0.5) {
+			Tracker.fallDistance.put(livingEntity.getUuid(), 1.0);
+			return;
+		}
+
+		if (fallDistance > 3.0 && isOnGround) {
+			Block block = Objects.requireNonNull(livingEntity.getInstance()).getBlock(getLandingPos(livingEntity, newPosition));
+			if (!block.isAir()) {
+				double damageDistance = Math.ceil(fallDistance - 3.0);
+				double d = Math.min(0.2 + damageDistance / 15.0, 2.5);
+				int particleCount = (int) (150 * d);
+
+				livingEntity.sendPacketToViewersAndSelf(ParticleCreator.createParticlePacket(
+						Particle.BLOCK,
+						false,
+						newPosition.x(), newPosition.y(), newPosition.z(),
+						0, 0, 0,
+						0.15f, particleCount,
+						writer -> writer.writeVarInt(block.stateId())
+				));
+			}
+		}
+
+		if (isOnGround) {
+			Tracker.fallDistance.put(livingEntity.getUuid(), 0.0);
+
+			if (livingEntity instanceof Player player && !player.getGameMode().canTakeDamage()) return;
+			int damage = getFallDamage(livingEntity, fallDistance);
+			if (damage > 0) {
+				if (livingEntity instanceof Player player) {
+					SoundEvent sound = damage > 4 ? SoundEvent.ENTITY_PLAYER_BIG_FALL : SoundEvent.ENTITY_PLAYER_SMALL_FALL;
+					SoundManager.sendToAround(player, player, sound, Sound.Source.PLAYER, 1.0f, 1.0f);
+				} else {
+					SoundEvent sound = damage > 4 ? SoundEvent.ENTITY_GENERIC_BIG_FALL : SoundEvent.ENTITY_GENERIC_SMALL_FALL;
+					SoundManager.sendToAround(livingEntity, sound, Sound.Source.HOSTILE, 1.0f, 1.0f);
+				}
+
+				livingEntity.damage(CustomDamageType.FALL, damage);
+			}
+		} else if (dy < 0) {
+			Tracker.fallDistance.put(livingEntity.getUuid(), fallDistance - dy);
+		}
 	}
 	
 	private static int getFallDamage(LivingEntity livingEntity, double fallDistance) {
