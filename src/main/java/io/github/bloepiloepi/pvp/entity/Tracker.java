@@ -129,6 +129,16 @@ public class Tracker {
 			Tracker.lastSwingTime.remove(uuid);
 			Tracker.fallDistance.remove(uuid);
 		});
+
+		/*
+		 * A special case for fall damage as we cache the fall distance for all entities,
+		 * and we need to remove it when the entity dies.
+ 		 */
+		node.addListener(RemoveEntityFromInstanceEvent.class, event -> {
+			if (!(event.getEntity() instanceof LivingEntity livingEntity)) return;
+			if (livingEntity instanceof Player) return;
+			Tracker.fallDistance.remove(livingEntity.getUuid());
+		});
 		
 		node.addListener(PlayerSpawnEvent.class, event -> {
 			CombatManager combatManager = Tracker.combatManager.get(event.getPlayer().getUuid());

@@ -37,6 +37,10 @@ public class SoundManager {
 	public static void sendToAround(Entity entity, SoundEvent sound, Sound.Source source, float volume, float pitch) {
 		sendToAround(Objects.requireNonNull(entity.getInstance()), entity.getPosition(), sound, source, volume, pitch);
 	}
+
+	public static void sendHostileToAround(Entity entity, SoundEvent sound, float volume, float pitch) {
+		sendToAround(entity, sound, entity instanceof Player ? Sound.Source.PLAYER : Sound.Source.HOSTILE, volume, pitch);
+	}
 	
 	public static void sendToAround(Player notSend, Entity entity, SoundEvent sound, Sound.Source source, float volume, float pitch) {
 		sendToAround(Objects.requireNonNull(entity.getInstance()), entity.getPosition(), sound, source, volume, pitch, (player) -> player != notSend);

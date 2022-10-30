@@ -38,6 +38,7 @@ public class Arrow extends AbstractArrow {
 	public Arrow(@Nullable Entity shooter, boolean legacy) {
 		super(shooter, EntityType.ARROW);
 		this.legacy = legacy;
+		this.potion = new PotionMeta(new PotionMeta.Builder().potionType(PotionType.EMPTY));
 	}
 	
 	public void inheritEffects(ItemStack stack) {
@@ -61,7 +62,7 @@ public class Arrow extends AbstractArrow {
 			}
 			
 			PotionMeta.Builder builder = new PotionMeta.Builder().effects(customEffects);
-			if (potionType != null) builder.potionType(potionType);
+			builder.potionType(potionType);
 			potion = new PotionMeta(builder);
 		} else if (stack.material() == Material.ARROW) {
 			fixedColor = false;
@@ -130,7 +131,7 @@ public class Arrow extends AbstractArrow {
 		}
 		
 		return ItemStack.builder(Material.TIPPED_ARROW).meta(PotionMeta.class, meta -> {
-			if (potion.getPotionType() != null && potion.getPotionType() != PotionType.EMPTY) {
+			if (potion.getPotionType() != PotionType.EMPTY) {
 				meta.potionType(potion.getPotionType());
 			}
 			if (!potion.getCustomPotionEffects().isEmpty()) {

@@ -29,6 +29,7 @@ import net.minestom.server.utils.inventory.PlayerInventoryUtils;
 import net.minestom.server.utils.time.TimeUnit;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Field;
 import java.time.Duration;
 import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
@@ -199,10 +200,10 @@ public class EntityUtils {
 	}
 	
 	//TODO needs improving
-	public static boolean isClimbing(Player player) {
-		if (player.getGameMode() == GameMode.SPECTATOR) return false;
+	public static boolean isClimbing(Entity entity) {
+		if (entity instanceof Player player && player.getGameMode() == GameMode.SPECTATOR) return false;
 		
-		Block block = Objects.requireNonNull(player.getInstance()).getBlock(player.getPosition());
+		Block block = Objects.requireNonNull(entity.getInstance()).getBlock(entity.getPosition());
 		return block.compare(Block.LADDER) || block.compare(Block.VINE) || block.compare(Block.TWISTING_VINES)
 				|| block.compare(Block.TWISTING_VINES_PLANT) || block.compare(Block.WEEPING_VINES)
 				|| block.compare(Block.WEEPING_VINES_PLANT) || block.compare(Block.ACACIA_TRAPDOOR)
@@ -303,6 +304,18 @@ public class EntityUtils {
 			String name = entity.getEntityType().name();
 			name = name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
 			return Component.text(name).hoverEvent(hoverEvent);
+		}
+	}
+
+	public static Pos getPreviousPosition(Entity entity) {
+		// Use reflection to get previousPosition field
+		try {
+			Field field = Entity.class.getDeclaredField("previousPosition");
+			field.setAccessible(true);
+			return (Pos) field.get(entity);
+		} catch (NoSuchFieldException | IllegalAccessException e) {
+			e.printStackTrace();
+			return null;
 		}
 	}
 }
