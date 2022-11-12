@@ -102,7 +102,7 @@ public class PvpTest {
 		instance.setExplosionSupplier(PvpExplosionSupplier.INSTANCE);
 		
 		GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-		eventHandler.addChild(PvPConfig.emptyBuilder()
+		eventHandler.addChild(PvPConfig.defaultBuilder()
 				.potion(PotionConfig.legacyBuilder().drinking(false))
 				.build().createNode()
 		);
