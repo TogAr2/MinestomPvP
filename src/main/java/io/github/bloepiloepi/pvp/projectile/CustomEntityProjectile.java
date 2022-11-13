@@ -11,6 +11,7 @@ import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.entity.EntityDamageEvent;
+import net.minestom.server.event.entity.projectile.ProjectileUncollideEvent;
 import net.minestom.server.instance.Chunk;
 import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.NotNull;
@@ -101,16 +102,17 @@ public class CustomEntityProjectile extends EntityProjectile {
 			}
 			super.onGround = false;
 			setNoGravity(false);
+			EventDispatcher.call(new ProjectileUncollideEvent(this));
 			onUnstuck();
 		} else if (state == State.StuckInBlock) {
 			if (super.onGround) {
 				return;
 			}
+			EventDispatcher.call(new ProjectileBlockHitEvent(this));
 			super.onGround = true;
 			this.velocity = Vec.ZERO;
 			sendPacketToViewersAndSelf(getVelocityPacket());
 			setNoGravity(true);
-			EventDispatcher.call(new ProjectileBlockHitEvent(this));
 			onStuck();
 		} else {
 			Entity entity = ((State.HitEntity) state).entity;
