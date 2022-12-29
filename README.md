@@ -44,7 +44,7 @@ Currently, most vanilla PvP features are supported.
 - Fall damage
 - End Crystals
 - TNT
-- Respawn Anchors (Explosion Only)
+- Respawn anchors (explosion only)
 
 ## Plans
 
