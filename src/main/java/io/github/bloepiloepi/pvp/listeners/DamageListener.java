@@ -48,6 +48,8 @@ import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class DamageListener {
+	public static final net.minestom.server.tag.Tag<Long> NEW_DAMAGE_TIME = net.minestom.server.tag.Tag.Long("lastDamageTime");
+	public static final net.minestom.server.tag.Tag<Float> LAST_DAMAGE_AMOUNT = net.minestom.server.tag.Tag.Float("lastDamageAmount");
 
 	public static EventNode<EntityInstanceEvent> events(DamageConfig config) {
 		EventNode<EntityInstanceEvent> node = EventNode.type("damage-events", PvPConfig.ENTITY_INSTANCE_FILTER);
@@ -244,8 +246,9 @@ public class DamageListener {
 
 		boolean hurtSoundAndAnimation = true;
 		float amountBeforeProcessing = amount;
-		if (Tracker.invulnerableTime.getOrDefault(entity.getUuid(), 0) > 10) {
-			float lastDamage = Tracker.lastDamageTaken.get(entity.getUuid());
+		long newDamageTime = entity.hasTag(NEW_DAMAGE_TIME) ? entity.getTag(NEW_DAMAGE_TIME) : -10000;
+		if (entity.getAliveTicks() - newDamageTime > 0) {
+			float lastDamage = entity.hasTag(LAST_DAMAGE_AMOUNT) ? entity.getTag(LAST_DAMAGE_AMOUNT) : 0;
 
 			if (amount <= lastDamage) {
 				event.setCancelled(true);
@@ -263,20 +266,19 @@ public class DamageListener {
 
 		amount = finalDamageEvent.getDamage();
 
-		boolean register = config.isLegacy() || finalDamageEvent.getDamage() > 0.0F;
-		if (register && entity instanceof Player) {
+		boolean register = config.isLegacy() || finalDamageEvent.getDamage() > 0;
+		if (register && entity instanceof Player)
 			Tracker.combatManager.get(entity.getUuid()).recordDamage(type, amount);
-		}
 
 		if (!register || finalDamageEvent.isCancelled()) {
 			event.setCancelled(true);
 			return;
 		}
 
-		Tracker.lastDamageTaken.put(entity.getUuid(), amountBeforeProcessing);
+		entity.setTag(LAST_DAMAGE_AMOUNT, amountBeforeProcessing);
 
 		if (hurtSoundAndAnimation) {
-			Tracker.invulnerableTime.put(entity.getUuid(), finalDamageEvent.getInvulnerabilityTicks() + 10);
+			entity.setTag(NEW_DAMAGE_TIME, entity.getAliveTicks() + finalDamageEvent.getInvulnerabilityTicks());
 
 			if (shield) {
 				entity.triggerStatus((byte) 29);
@@ -308,8 +310,9 @@ public class DamageListener {
 				double dx = attacker.getPosition().x() - entity.getPosition().x();
 				double dz = attacker.getPosition().z() - entity.getPosition().z();
 
-				for(; dx * dx + dz * dz < 0.0001; dz = (Math.random() - Math.random()) * 0.01D) {
-					dx = (Math.random() - Math.random()) * 0.01D;
+				ThreadLocalRandom random = ThreadLocalRandom.current();
+				for(; dx * dx + dz * dz < 0.0001; dz = random.nextDouble(-1, 1) * 0.01) {
+					dx = random.nextDouble(-1, 1) * 0.01;
 				}
 
 				Entity directAttacker = type.getDirectEntity();
@@ -342,7 +345,7 @@ public class DamageListener {
 						entity.setVelocity(newVelocity);
 					});
 				}
-			} else if (type != CustomDamageType.DROWN && (!shield || amount > 0.0F)) {
+			} else if (type != CustomDamageType.DROWN && (!shield || amount > 0)) {
 				// Update velocity
 				entity.setVelocity(entity.getVelocity());
 			}
@@ -399,7 +402,7 @@ public class DamageListener {
 				event.setCancelled(true);
 			}
 			if (entityPreDeathEvent.isCancelDeath()) {
-				amount = 0.0f;
+				amount = 0;
 			}
 		}
 
@@ -471,7 +474,7 @@ public class DamageListener {
 			} else {
 				int i = 25 - (int) armorValue;
 				float f1 = amount * (float) i;
-				amount = f1 / 25.0F;
+				amount = f1 / 25;
 			}
 		}
 
@@ -487,13 +490,13 @@ public class DamageListener {
 				k = (EntityUtils.getEffect(entity, PotionEffect.RESISTANCE).amplifier() + 1) * 5;
 				int j = 25 - k;
 				float f = amount * (float) j;
-				amount = Math.max(f / 25.0F, 0.0F);
+				amount = Math.max(f / 25, 0);
 			}
 
 			if (config.isArmorDisabled()) return amount;
 
-			if (amount <= 0.0F) {
-				return 0.0F;
+			if (amount <= 0) {
+				return 0;
 			} else {
 				k = EnchantmentUtils.getProtectionAmount(EntityUtils.getArmorItems(entity), type);
 				if (!config.isLegacy()) {
@@ -508,7 +511,7 @@ public class DamageListener {
 					if (k > 0) {
 						int j = 25 - k;
 						float f = amount * (float) j;
-						amount = f / 25.0F;
+						amount = f / 25;
 					}
 				}
 

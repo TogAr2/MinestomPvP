@@ -11,7 +11,6 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityFireEvent;
-import net.minestom.server.event.entity.EntityTickEvent;
 import net.minestom.server.event.instance.AddEntityToInstanceEvent;
 import net.minestom.server.event.instance.RemoveEntityFromInstanceEvent;
 import net.minestom.server.event.player.*;
@@ -26,8 +25,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Tracker {
-	public static final Map<UUID, Integer> invulnerableTime = new HashMap<>();
-	public static final Map<UUID, Float> lastDamageTaken = new HashMap<>();
 	public static final Map<UUID, HungerManager> hungerManager = new HashMap<>();
 	public static final Map<UUID, Map<Material, Long>> cooldownEnd = new HashMap<>();
 	public static final Map<UUID, Entity> spectating = new HashMap<>();
@@ -96,8 +93,6 @@ public class Tracker {
 			UUID uuid = event.getPlayer().getUuid();
 			
 			event.getPlayer().setTag(AttackManager.LAST_ATTACKED_TICKS, 0L);
-			Tracker.invulnerableTime.put(uuid, 0);
-			Tracker.lastDamageTaken.put(uuid, 0F);
 			Tracker.hungerManager.put(uuid, new HungerManager(event.getPlayer()));
 			Tracker.cooldownEnd.put(uuid, new HashMap<>());
 			Tracker.spectating.put(uuid, event.getPlayer());
@@ -110,8 +105,6 @@ public class Tracker {
 		node.addListener(PlayerDisconnectEvent.class, event -> {
 			UUID uuid = event.getPlayer().getUuid();
 			
-			Tracker.invulnerableTime.remove(uuid);
-			Tracker.lastDamageTaken.remove(uuid);
 			Tracker.hungerManager.remove(uuid);
 			Tracker.cooldownEnd.remove(uuid);
 			Tracker.spectating.remove(uuid);
@@ -169,12 +162,6 @@ public class Tracker {
 			}
 			
 			AttackManager.spectateTick(player);
-		});
-		
-		node.addListener(EntityTickEvent.class, event -> {
-			if (Tracker.invulnerableTime.getOrDefault(event.getEntity().getUuid(), 0) > 0) {
-				Tracker.decreaseInt(Tracker.invulnerableTime, event.getEntity().getUuid(), 1);
-			}
 		});
 		
 		node.addListener(PlayerUseItemEvent.class, event -> {

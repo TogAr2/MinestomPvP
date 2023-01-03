@@ -65,16 +65,15 @@ public class AttackManager {
 		return 1 / player.getAttributeValue(Attribute.ATTACK_SPEED) * 20;
 	}
 	
-	@SuppressWarnings({"UnstableApiUsage", "ConstantConditions"})
+	@SuppressWarnings({"UnstableApiUsage"})
 	public static double getAttackCooldownProgress(Player player) {
 		long lastAttacked = player.getTag(LAST_ATTACKED_TICKS);
-		long timeSinceLastAttacked = player.getInstance().getWorldAge() - lastAttacked;
+		long timeSinceLastAttacked = player.getAliveTicks() - lastAttacked;
 		return MathUtils.clamp((timeSinceLastAttacked + 0.5) / getAttackCooldownProgressPerTick(player), 0, 1);
 	}
 	
-	@SuppressWarnings("ConstantConditions")
 	public static void resetCooldownProgress(Player player) {
-		player.setTag(LAST_ATTACKED_TICKS, player.getInstance().getWorldAge());
+		player.setTag(LAST_ATTACKED_TICKS, player.getAliveTicks());
 	}
 	
 	public static void spectateTick(Player player) {
