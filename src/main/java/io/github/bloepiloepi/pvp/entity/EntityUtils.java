@@ -25,6 +25,7 @@ import net.minestom.server.item.Material;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.TimedPotion;
+import net.minestom.server.tag.Tag;
 import net.minestom.server.utils.inventory.PlayerInventoryUtils;
 import net.minestom.server.utils.time.TimeUnit;
 import org.jetbrains.annotations.Nullable;
@@ -39,6 +40,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 
 public class EntityUtils {
+	public static final Tag<Long> FIRE_EXTINGUISH_TIME = Tag.Long("fireExtinguishTime");
 	
 	public static boolean hasEffect(Entity entity, PotionEffect type) {
 		return entity.getActiveEffects().stream().anyMatch((effect) -> effect.getPotion().effect() == type);
@@ -70,7 +72,7 @@ public class EntityUtils {
 		if (duration.toMillis() > 0) {
 			EventDispatcher.callCancellable(entityFireEvent, () -> entity.setOnFire(true));
 		}
-		// Tracker.fireExtinguishTime is updated by event listener
+		// FIRE_EXTINGUISH_TIME is updated by event listener
 	}
 	
 	public static void setOnFireForSeconds(Entity entity, int seconds) {
@@ -83,7 +85,7 @@ public class EntityUtils {
 		}
 		int millis = ticks * MinecraftServer.TICK_MS;
 		
-		long fireExtinguishTime = Tracker.fireExtinguishTime.getOrDefault(entity.getUuid(), 0L);
+		long fireExtinguishTime = entity.hasTag(FIRE_EXTINGUISH_TIME) ? entity.getTag(FIRE_EXTINGUISH_TIME) : 0;
 		if (System.currentTimeMillis() + millis > fireExtinguishTime) {
 			setFireForDuration(entity, millis, TimeUnit.MILLISECOND);
 		}

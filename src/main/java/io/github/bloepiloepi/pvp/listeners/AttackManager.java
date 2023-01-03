@@ -77,7 +77,9 @@ public class AttackManager {
 	}
 	
 	public static void spectateTick(Player player) {
-		Entity spectating = Entity.getEntity(player.getTag(SPECTATING));
+		Integer spectatingId = player.getTag(SPECTATING);
+		if (spectatingId == null) return;
+		Entity spectating = Entity.getEntity(spectatingId);
 		if (spectating == null || spectating == player) return;
 		
 		// This is to make sure other players don't see the player standing still while spectating

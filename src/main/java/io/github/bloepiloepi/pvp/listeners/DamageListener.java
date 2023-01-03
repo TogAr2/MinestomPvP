@@ -48,8 +48,10 @@ import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class DamageListener {
-	public static final net.minestom.server.tag.Tag<Long> NEW_DAMAGE_TIME = net.minestom.server.tag.Tag.Long("lastDamageTime");
+	public static final net.minestom.server.tag.Tag<Long> LAST_DAMAGE_TIME = net.minestom.server.tag.Tag.Long("lastDamageTime");
+	public static final net.minestom.server.tag.Tag<Long> NEW_DAMAGE_TIME = net.minestom.server.tag.Tag.Long("newDamageTime");
 	public static final net.minestom.server.tag.Tag<Float> LAST_DAMAGE_AMOUNT = net.minestom.server.tag.Tag.Float("lastDamageAmount");
+	public static final net.minestom.server.tag.Tag<Integer> LAST_DAMAGED_BY = net.minestom.server.tag.Tag.Integer("lastDamagedBy");
 
 	public static EventNode<EntityInstanceEvent> events(DamageConfig config) {
 		EventNode<EntityInstanceEvent> node = EventNode.type("damage-events", PvPConfig.ENTITY_INSTANCE_FILTER);
@@ -198,8 +200,8 @@ public class DamageListener {
 
 		Entity attacker = type.getEntity();
 		if (entity instanceof Player && attacker instanceof LivingEntity) {
-			Tracker.lastDamagedBy.put(entity.getUuid(), (LivingEntity) attacker);
-			Tracker.lastDamageTime.put(entity.getUuid(), System.currentTimeMillis());
+			entity.setTag(LAST_DAMAGED_BY, attacker.getEntityId());
+			entity.setTag(LAST_DAMAGE_TIME, System.currentTimeMillis());
 		}
 
 		boolean shield = false;

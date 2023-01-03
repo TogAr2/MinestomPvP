@@ -2,6 +2,7 @@ package io.github.bloepiloepi.pvp.damage;
 
 import io.github.bloepiloepi.pvp.entity.EntityUtils;
 import io.github.bloepiloepi.pvp.entity.Tracker;
+import io.github.bloepiloepi.pvp.listeners.DamageListener;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;
@@ -283,7 +284,11 @@ public class CustomDamageType extends DamageType {
 	public static @Nullable LivingEntity getKillCredit(@NotNull Player killed) {
 		LivingEntity killer = Tracker.combatManager.get(killed.getUuid()).getKiller();
 		if (killer == null) {
-			killer = Tracker.lastDamagedBy.get(killed.getUuid());
+			Integer lastDamagedById = killed.getTag(DamageListener.LAST_DAMAGED_BY);
+			if (lastDamagedById != null) {
+				Entity entity = Entity.getEntity(lastDamagedById);
+				if (entity instanceof LivingEntity living) killer = living;
+			}
 		}
 		
 		return killer;
