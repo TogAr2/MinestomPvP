@@ -26,7 +26,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Tracker {
-	public static final Map<UUID, Integer> lastAttackedTicks = new HashMap<>();
 	public static final Map<UUID, Integer> invulnerableTime = new HashMap<>();
 	public static final Map<UUID, Float> lastDamageTaken = new HashMap<>();
 	public static final Map<UUID, HungerManager> hungerManager = new HashMap<>();
@@ -96,7 +95,7 @@ public class Tracker {
 		node.addListener(PlayerLoginEvent.class, event -> {
 			UUID uuid = event.getPlayer().getUuid();
 			
-			Tracker.lastAttackedTicks.put(uuid, 0);
+			event.getPlayer().setTag(AttackManager.LAST_ATTACKED_TICKS, 0L);
 			Tracker.invulnerableTime.put(uuid, 0);
 			Tracker.lastDamageTaken.put(uuid, 0F);
 			Tracker.hungerManager.put(uuid, new HungerManager(event.getPlayer()));
@@ -111,7 +110,6 @@ public class Tracker {
 		node.addListener(PlayerDisconnectEvent.class, event -> {
 			UUID uuid = event.getPlayer().getUuid();
 			
-			Tracker.lastAttackedTicks.remove(uuid);
 			Tracker.invulnerableTime.remove(uuid);
 			Tracker.lastDamageTaken.remove(uuid);
 			Tracker.hungerManager.remove(uuid);
@@ -148,7 +146,6 @@ public class Tracker {
 		node.addListener(PlayerTickEvent.class, event -> {
 			Player player = event.getPlayer();
 			UUID uuid = player.getUuid();
-			Tracker.increaseInt(Tracker.lastAttackedTicks, uuid, 1);
 			
 			if (player.isOnGround()) {
 				Tracker.lastClimbedBlock.remove(uuid);
