@@ -26,9 +26,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Tracker {
 	public static final Tag<Long> ITEM_USE_START_TIME = Tag.Long("itemUseStartTime");
+	public static final Tag<Block> LAST_CLIMBED_BLOCK = Tag.Short("lastClimbedBlock").map(Block::fromStateId, Block::stateId);
+	public static final Tag<Double> FALL_DISTANCE = Tag.Double("fallDistance");
 	public static final Map<UUID, HungerManager> hungerManager = new HashMap<>();
 	public static final Map<UUID, Map<Material, Long>> cooldownEnd = new HashMap<>();
-	public static final Map<UUID, Block> lastClimbedBlock = new HashMap<>();
 	public static final Map<UUID, CombatManager> combatManager = new HashMap<>();
 	public static final Map<UUID, LivingEntity> lastDamagedBy = new HashMap<>();
 	public static final Map<UUID, Long> lastDamageTime = new HashMap<>();
@@ -36,7 +37,6 @@ public class Tracker {
 	public static final Map<UUID, ItemStack> blockReplacementItem = new HashMap<>();
 	public static final Map<UUID, Boolean> blockingSword = new HashMap<>();
 	public static final Map<UUID, Long> lastSwingTime = new HashMap<>();
-	public static final Map<UUID, Double> fallDistance = new HashMap<>();
 	
 	public static boolean hasCooldown(Player player, Material material) {
 		Map<Material, Long> cooldownMap = cooldownEnd.get(player.getUuid());
@@ -88,7 +88,6 @@ public class Tracker {
 			Tracker.combatManager.put(uuid, new CombatManager(event.getPlayer()));
 			Tracker.blockingSword.put(uuid, false);
 			Tracker.lastSwingTime.put(uuid, 0L);
-			Tracker.fallDistance.put(uuid, 0.0);
 		});
 		
 		node.addListener(PlayerDisconnectEvent.class, event -> {
@@ -96,7 +95,6 @@ public class Tracker {
 			
 			Tracker.hungerManager.remove(uuid);
 			Tracker.cooldownEnd.remove(uuid);
-			Tracker.lastClimbedBlock.remove(uuid);
 			Tracker.combatManager.remove(uuid);
 			Tracker.lastDamagedBy.remove(uuid);
 			Tracker.lastDamageTime.remove(uuid);
@@ -104,17 +102,6 @@ public class Tracker {
 			Tracker.blockReplacementItem.remove(uuid);
 			Tracker.blockingSword.remove(uuid);
 			Tracker.lastSwingTime.remove(uuid);
-			Tracker.fallDistance.remove(uuid);
-		});
-
-		/*
-		 * A special case for fall damage as we cache the fall distance for all entities,
-		 * and we need to remove it when the entity dies.
- 		 */
-		node.addListener(RemoveEntityFromInstanceEvent.class, event -> {
-			if (!(event.getEntity() instanceof LivingEntity livingEntity)) return;
-			if (livingEntity instanceof Player) return;
-			Tracker.fallDistance.remove(livingEntity.getUuid());
 		});
 		
 		node.addListener(PlayerSpawnEvent.class, event -> {
@@ -127,7 +114,7 @@ public class Tracker {
 			UUID uuid = player.getUuid();
 			
 			if (player.isOnGround()) {
-				Tracker.lastClimbedBlock.remove(uuid);
+				player.removeTag(LAST_CLIMBED_BLOCK);
 			}
 			
 			if (player.isDead()) {
@@ -168,13 +155,13 @@ public class Tracker {
 		node.addListener(PlayerMoveEvent.class, event -> {
 			Player player = event.getPlayer();
 			if (EntityUtils.isClimbing(player)) {
-				lastClimbedBlock.put(player.getUuid(), Objects.requireNonNull(player.getInstance())
+				player.setTag(LAST_CLIMBED_BLOCK, Objects.requireNonNull(player.getInstance())
 						.getBlock(player.getPosition()));
-				fallDistance.put(player.getUuid(), 0.0);
+				player.setTag(FALL_DISTANCE, 0.0);
 			}
 		});
 		
-		node.addListener(PlayerSpawnEvent.class, event -> fallDistance.put(event.getPlayer().getUuid(), 0.0));
+		node.addListener(PlayerSpawnEvent.class, event -> event.getPlayer().setTag(FALL_DISTANCE, 0.0));
 		
 		node.addListener(EntityFireEvent.class, event ->
 				Tracker.fireExtinguishTime.put(event.getEntity().getUuid(),

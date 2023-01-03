@@ -77,15 +77,15 @@ public class DamageListener {
 
 	private static void handleEntityFallDamage(LivingEntity livingEntity, Pos currentPosition, Pos newPosition, boolean isOnGround) {
 		double dy = newPosition.y() - currentPosition.y();
-		Double fallDistance = Tracker.fallDistance.getOrDefault(livingEntity.getUuid(), 0.0);
+		Double fallDistance = livingEntity.getTag(Tracker.FALL_DISTANCE);
 
 		if ((livingEntity instanceof Player player && player.isFlying()) || EntityUtils.hasEffect(livingEntity, PotionEffect.LEVITATION)
 				|| EntityUtils.hasEffect(livingEntity, PotionEffect.SLOW_FALLING) || dy > 0) {
-			Tracker.fallDistance.put(livingEntity.getUuid(), 0.0);
+			livingEntity.setTag(Tracker.FALL_DISTANCE, 0.0);
 			return;
 		}
 		if (livingEntity.isFlyingWithElytra() && livingEntity.getVelocity().y() > -0.5) {
-			Tracker.fallDistance.put(livingEntity.getUuid(), 1.0);
+			livingEntity.setTag(Tracker.FALL_DISTANCE, 1.0);
 			return;
 		}
 
@@ -108,7 +108,7 @@ public class DamageListener {
 		}
 
 		if (isOnGround) {
-			Tracker.fallDistance.put(livingEntity.getUuid(), 0.0);
+			livingEntity.setTag(Tracker.FALL_DISTANCE, 0.0);
 
 			if (livingEntity instanceof Player player && !player.getGameMode().canTakeDamage()) return;
 			int damage = getFallDamage(livingEntity, fallDistance);
@@ -124,7 +124,7 @@ public class DamageListener {
 				livingEntity.damage(CustomDamageType.FALL, damage);
 			}
 		} else if (dy < 0) {
-			Tracker.fallDistance.put(livingEntity.getUuid(), fallDistance - dy);
+			livingEntity.setTag(Tracker.FALL_DISTANCE, fallDistance - dy);
 		}
 	}
 
