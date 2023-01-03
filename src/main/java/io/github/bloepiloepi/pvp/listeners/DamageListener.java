@@ -79,7 +79,7 @@ public class DamageListener {
 
 	private static void handleEntityFallDamage(LivingEntity livingEntity, Pos currentPosition, Pos newPosition, boolean isOnGround) {
 		double dy = newPosition.y() - currentPosition.y();
-		Double fallDistance = livingEntity.getTag(Tracker.FALL_DISTANCE);
+		double fallDistance = livingEntity.hasTag(Tracker.FALL_DISTANCE) ? livingEntity.getTag(Tracker.FALL_DISTANCE) : 0;
 
 		if ((livingEntity instanceof Player player && player.isFlying()) || EntityUtils.hasEffect(livingEntity, PotionEffect.LEVITATION)
 				|| EntityUtils.hasEffect(livingEntity, PotionEffect.SLOW_FALLING) || dy > 0) {
@@ -249,18 +249,18 @@ public class DamageListener {
 		boolean hurtSoundAndAnimation = true;
 		float amountBeforeProcessing = amount;
 		long newDamageTime = entity.hasTag(NEW_DAMAGE_TIME) ? entity.getTag(NEW_DAMAGE_TIME) : -10000;
-		if (entity.getAliveTicks() - newDamageTime > 0) {
+		if (entity.getAliveTicks() - newDamageTime >= 0) {
+			amount = applyDamage(entity, type, amount, config);
+		} else {
 			float lastDamage = entity.hasTag(LAST_DAMAGE_AMOUNT) ? entity.getTag(LAST_DAMAGE_AMOUNT) : 0;
-
+			
 			if (amount <= lastDamage) {
 				event.setCancelled(true);
 				return;
 			}
-
+			
 			amount = applyDamage(entity, type, amount - lastDamage, config);
 			hurtSoundAndAnimation = false;
-		} else {
-			amount = applyDamage(entity, type, amount, config);
 		}
 
 		FinalDamageEvent finalDamageEvent = new FinalDamageEvent(entity, type, amount, config.getInvulnerabilityTicks());
