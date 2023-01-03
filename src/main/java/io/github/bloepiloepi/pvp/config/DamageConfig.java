@@ -17,13 +17,13 @@ public class DamageConfig extends ElementConfig<EntityInstanceEvent> {
 	private final boolean
 			fallDamageEnabled, equipmentDamageEnabled, shieldEnabled,
 			legacyShieldMechanics, armorEnabled, exhaustionEnabled,
-			legacyKnockback, soundsEnabled;
+			legacyKnockback, soundsEnabled, damageAnimation, performDamage;
 	private final int invulnerabilityTicks;
 	
 	public DamageConfig(boolean legacy, boolean fallDamageEnabled, boolean equipmentDamageEnabled,
 	                    boolean shieldEnabled, boolean legacyShieldMechanics, int invulnerabilityTicks,
 	                    boolean armorEnabled, boolean exhaustionEnabled, boolean legacyKnockback,
-	                    boolean soundsEnabled) {
+	                    boolean soundsEnabled, boolean damageAnimation, boolean performDamage) {
 		super(legacy);
 		this.fallDamageEnabled = fallDamageEnabled;
 		this.equipmentDamageEnabled = equipmentDamageEnabled;
@@ -34,6 +34,8 @@ public class DamageConfig extends ElementConfig<EntityInstanceEvent> {
 		this.exhaustionEnabled = exhaustionEnabled;
 		this.legacyKnockback = legacyKnockback;
 		this.soundsEnabled = soundsEnabled;
+		this.damageAnimation = damageAnimation;
+		this.performDamage = performDamage;
 	}
 	
 	public boolean isFallDamageEnabled() {
@@ -70,6 +72,14 @@ public class DamageConfig extends ElementConfig<EntityInstanceEvent> {
 	
 	public boolean isSoundsEnabled() {
 		return soundsEnabled;
+	}
+	
+	public boolean isDamageAnimation() {
+		return damageAnimation;
+	}
+	
+	public boolean shouldPerformDamage() {
+		return performDamage;
 	}
 	
 	@Override

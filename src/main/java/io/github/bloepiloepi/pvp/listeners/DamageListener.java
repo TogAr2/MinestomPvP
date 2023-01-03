@@ -30,7 +30,6 @@ import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityDamageEvent;
 import net.minestom.server.event.entity.EntityTickEvent;
-import net.minestom.server.event.instance.RemoveEntityFromInstanceEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.gamedata.tags.Tag;
@@ -282,7 +281,7 @@ public class DamageListener {
 			if (shield) {
 				entity.triggerStatus((byte) 29);
 			} else if (type instanceof CustomEntityDamage && ((CustomEntityDamage) type).isThorns()) {
-				entity.triggerStatus((byte) 33);
+				if (config.isDamageAnimation()) entity.triggerStatus((byte) 33);
 			} else {
 				byte status;
 				if (type == CustomDamageType.DROWN) {
@@ -302,38 +301,38 @@ public class DamageListener {
 					status = 2;
 				}
 
-				entity.triggerStatus(status);
+				if (config.isDamageAnimation()) entity.triggerStatus(status);
 			}
 
 			if (attacker != null && !shield) {
-				double h = attacker.getPosition().x() - entity.getPosition().x();
+				double dx = attacker.getPosition().x() - entity.getPosition().x();
+				double dz = attacker.getPosition().z() - entity.getPosition().z();
 
-				double i;
-				for(i = attacker.getPosition().z() - entity.getPosition().z(); h * h + i * i < 0.0001; i = (Math.random() - Math.random()) * 0.01D) {
-					h = (Math.random() - Math.random()) * 0.01D;
+				for(; dx * dx + dz * dz < 0.0001; dz = (Math.random() - Math.random()) * 0.01D) {
+					dx = (Math.random() - Math.random()) * 0.01D;
 				}
 
 				Entity directAttacker = type.getDirectEntity();
 				if (directAttacker == null) {
 					directAttacker = attacker;
 				}
-				double finalH = h;
-				double finalI = i;
+				double finalDx = dx;
+				double finalI = dz;
 				if (!config.isLegacyKnockback()) {
 					EntityKnockbackEvent entityKnockbackEvent = new EntityKnockbackEvent(entity, directAttacker, false, false, 0.4F);
 					EventDispatcher.callCancellable(entityKnockbackEvent, () -> {
 						float strength = entityKnockbackEvent.getStrength();
-						entity.takeKnockback(strength, finalH, finalI);
+						entity.takeKnockback(strength, finalDx, finalI);
 					});
 				} else {
-					double magnitude = Math.sqrt(h * h + i * i);
+					double magnitude = Math.sqrt(dx * dx + dz * dz);
 					LegacyKnockbackEvent legacyKnockbackEvent = new LegacyKnockbackEvent(entity, directAttacker, false);
 					EventDispatcher.callCancellable(legacyKnockbackEvent, () -> {
 						LegacyKnockbackSettings settings = legacyKnockbackEvent.getSettings();
 						Vec newVelocity = entity.getVelocity();
 
 						double horizontal = settings.horizontal();
-						newVelocity = newVelocity.withX((newVelocity.x() / 2) - (finalH / magnitude * horizontal));
+						newVelocity = newVelocity.withX((newVelocity.x() / 2) - (finalDx / magnitude * horizontal));
 						newVelocity = newVelocity.withY((newVelocity.y() / 2) + settings.vertical());
 						newVelocity = newVelocity.withZ((newVelocity.z() / 2) - (finalI / magnitude * horizontal));
 
@@ -404,13 +403,17 @@ public class DamageListener {
 			}
 		}
 
-		// The Minestom damage method should return false if there was no hurt animation,
-		// because otherwise the AttackManager will deal extra knockback
-		if (!event.isCancelled() && !hurtSoundAndAnimation) {
-			event.setCancelled(true);
-			damageManually(entity, amount);
+		if (config.shouldPerformDamage()) {
+			// The Minestom damage method should return false if there was no hurt animation,
+			// because otherwise the AttackManager will deal extra knockback
+			if (!event.isCancelled() && !hurtSoundAndAnimation) {
+				event.setCancelled(true);
+				damageManually(entity, amount);
+			} else {
+				event.setDamage(amount);
+			}
 		} else {
-			event.setDamage(amount);
+			event.setCancelled(true);
 		}
 	}
 

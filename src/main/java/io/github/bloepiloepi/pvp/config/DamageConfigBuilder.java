@@ -5,7 +5,7 @@ public class DamageConfigBuilder {
 	private boolean
 			fallDamageEnabled, equipmentDamageEnabled, shieldEnabled,
 			legacyShieldMechanics, armorEnabled, exhaustionEnabled,
-			legacyKnockback, soundsEnabled;
+			legacyKnockback, soundsEnabled, damageAnimation, performDamage;
 	private int invulnerabilityTicks;
 	
 	DamageConfigBuilder(boolean legacy) {
@@ -22,6 +22,8 @@ public class DamageConfigBuilder {
 		exhaustionEnabled = true;
 		legacyKnockback = false;
 		soundsEnabled = true;
+		damageAnimation = true;
+		performDamage = true;
 		return this;
 	}
 	
@@ -35,6 +37,8 @@ public class DamageConfigBuilder {
 		exhaustionEnabled = true;
 		legacyKnockback = true;
 		soundsEnabled = true;
+		damageAnimation = true;
+		performDamage = true;
 		return this;
 	}
 	
@@ -83,12 +87,22 @@ public class DamageConfigBuilder {
 		return this;
 	}
 	
+	public DamageConfigBuilder animation(boolean animation) {
+		this.damageAnimation = animation;
+		return this;
+	}
+	
+	public DamageConfigBuilder performDamage(boolean performDamage) {
+		this.performDamage = performDamage;
+		return this;
+	}
+	
 	public DamageConfig build() {
 		return new DamageConfig(
 				legacy, fallDamageEnabled, equipmentDamageEnabled,
 				shieldEnabled, legacyShieldMechanics, invulnerabilityTicks,
 				armorEnabled, exhaustionEnabled, legacyKnockback,
-				soundsEnabled
+				soundsEnabled, damageAnimation, performDamage
 		);
 	}
 }
