@@ -7,7 +7,6 @@ import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entity.EntityGroup;
 import io.github.bloepiloepi.pvp.entity.EntityUtils;
 import io.github.bloepiloepi.pvp.entity.PvpPlayer;
-import io.github.bloepiloepi.pvp.entity.Tracker;
 import io.github.bloepiloepi.pvp.enums.Tool;
 import io.github.bloepiloepi.pvp.events.EntityKnockbackEvent;
 import io.github.bloepiloepi.pvp.events.FinalAttackEvent;
@@ -41,6 +40,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class AttackManager {
 	public static final Tag<Long> LAST_ATTACKED_TICKS = Tag.Long("lastAttackedTicks");
+	public static final Tag<Integer> SPECTATING = Tag.Integer("spectating");
 	
 	public static EventNode<EntityInstanceEvent> events(AttackConfig config) {
 		EventNode<EntityInstanceEvent> node = EventNode.type("attack-events", PvPConfig.ENTITY_INSTANCE_FILTER);
@@ -77,16 +77,16 @@ public class AttackManager {
 	}
 	
 	public static void spectateTick(Player player) {
-		Entity spectating = Tracker.spectating.get(player.getUuid());
+		Entity spectating = Entity.getEntity(player.getTag(SPECTATING));
 		if (spectating == null || spectating == player) return;
 		
-		//This is to make sure other players don't see the player standing still while spectating
-		//And when the player stops spectating, they are at the entities position instead of their position before spectating
+		// This is to make sure other players don't see the player standing still while spectating
+		// And when the player stops spectating, they are at the entities position instead of their position before spectating
 		player.teleport(spectating.getPosition());
 		
 		if (player.getEntityMeta().isSneaking() || spectating.isRemoved() || (spectating instanceof LivingEntity livingSpectating && livingSpectating.isDead())) {
 			player.stopSpectating();
-			Tracker.spectating.remove(player.getUuid());
+			player.removeTag(SPECTATING);
 		}
 	}
 	
@@ -94,7 +94,7 @@ public class AttackManager {
 		PlayerSpectateEvent playerSpectateEvent = new PlayerSpectateEvent(player, target);
 		EventDispatcher.callCancellable(playerSpectateEvent, () -> {
 			player.spectate(target);
-			Tracker.spectating.put(player.getUuid(), target);
+			player.setTag(SPECTATING, target.getEntityId());
 		});
 	}
 	

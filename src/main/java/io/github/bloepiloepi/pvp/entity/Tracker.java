@@ -40,14 +40,6 @@ public class Tracker {
 	public static final Map<UUID, Long> lastSwingTime = new HashMap<>();
 	public static final Map<UUID, Double> fallDistance = new HashMap<>();
 	
-	public static <K> void increaseInt(Map<K, Integer> map, K key, int amount) {
-		map.put(key, map.getOrDefault(key, 0) + amount);
-	}
-	
-	public static <K> void decreaseInt(Map<K, Integer> map, K key, int amount) {
-		map.put(key, map.getOrDefault(key, 0) - amount);
-	}
-	
 	public static boolean hasCooldown(Player player, Material material) {
 		Map<Material, Long> cooldownMap = cooldownEnd.get(player.getUuid());
 		
@@ -95,7 +87,6 @@ public class Tracker {
 			event.getPlayer().setTag(AttackManager.LAST_ATTACKED_TICKS, 0L);
 			Tracker.hungerManager.put(uuid, new HungerManager(event.getPlayer()));
 			Tracker.cooldownEnd.put(uuid, new HashMap<>());
-			Tracker.spectating.put(uuid, event.getPlayer());
 			Tracker.combatManager.put(uuid, new CombatManager(event.getPlayer()));
 			Tracker.blockingSword.put(uuid, false);
 			Tracker.lastSwingTime.put(uuid, 0L);
