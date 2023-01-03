@@ -201,8 +201,6 @@ public class ProjectileListener {
 							.withTag(START_SOUND_PLAYED, (byte) 0)
 							.withTag(MID_LOAD_SOUND_PLAYED, (byte) 0);
 					event.getPlayer().setItemInHand(event.getHand(), newStack);
-					
-					Tracker.itemUseHand.put(event.getPlayer().getUuid(), event.getHand());
 				}
 			}
 		}).filter(event -> event.getItemStack().material() == Material.CROSSBOW).build());
@@ -224,7 +222,7 @@ public class ProjectileListener {
 				
 				int quickCharge = EnchantmentUtils.getLevel(Enchantment.QUICK_CHARGE, stack);
 				
-				long useDuration = System.currentTimeMillis() - Tracker.itemUseStartTime.get(player.getUuid());
+				long useDuration = System.currentTimeMillis() - player.getTag(Tracker.ITEM_USE_START_TIME);
 				long useTicks = useDuration / MinecraftServer.TICK_MS;
 				double progress = (getCrossbowUseDuration(stack) - useTicks) / (double) getCrossbowChargeDuration(stack);
 				
@@ -266,7 +264,7 @@ public class ProjectileListener {
 				projectileSlot = -1;
 			}
 			
-			long useDuration = System.currentTimeMillis() - Tracker.itemUseStartTime.get(player.getUuid());
+			long useDuration = System.currentTimeMillis() - player.getTag(Tracker.ITEM_USE_START_TIME);
 			double power = getBowPower(useDuration);
 			if (power < 0.1) return;
 			
@@ -332,7 +330,7 @@ public class ProjectileListener {
 			int quickCharge = EnchantmentUtils.getLevel(Enchantment.QUICK_CHARGE, stack);
 			
 			if (quickCharge < 6) {
-				long useDuration = System.currentTimeMillis() - Tracker.itemUseStartTime.get(player.getUuid());
+				long useDuration = System.currentTimeMillis() - player.getTag(Tracker.ITEM_USE_START_TIME);
 				double power = getCrossbowPowerForTime(useDuration, stack);
 				if (!(power >= 1.0F) || stack.meta(CrossbowMeta.class).isCharged())
 					return;

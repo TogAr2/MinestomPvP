@@ -5,7 +5,6 @@ import io.github.bloepiloepi.pvp.food.HungerManager;
 import io.github.bloepiloepi.pvp.listeners.AttackManager;
 import io.github.bloepiloepi.pvp.potion.PotionListener;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventFilter;
@@ -19,17 +18,16 @@ import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.play.SetCooldownPacket;
+import net.minestom.server.tag.Tag;
 import net.minestom.server.utils.time.TimeUnit;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Tracker {
+	public static final Tag<Long> ITEM_USE_START_TIME = Tag.Long("itemUseStartTime");
 	public static final Map<UUID, HungerManager> hungerManager = new HashMap<>();
 	public static final Map<UUID, Map<Material, Long>> cooldownEnd = new HashMap<>();
-	public static final Map<UUID, Entity> spectating = new HashMap<>();
-	public static final Map<UUID, Long> itemUseStartTime = new HashMap<>();
-	public static final Map<UUID, Player.Hand> itemUseHand = new HashMap<>();
 	public static final Map<UUID, Block> lastClimbedBlock = new HashMap<>();
 	public static final Map<UUID, CombatManager> combatManager = new HashMap<>();
 	public static final Map<UUID, LivingEntity> lastDamagedBy = new HashMap<>();
@@ -98,9 +96,6 @@ public class Tracker {
 			
 			Tracker.hungerManager.remove(uuid);
 			Tracker.cooldownEnd.remove(uuid);
-			Tracker.spectating.remove(uuid);
-			Tracker.itemUseStartTime.remove(uuid);
-			Tracker.itemUseHand.remove(uuid);
 			Tracker.lastClimbedBlock.remove(uuid);
 			Tracker.combatManager.remove(uuid);
 			Tracker.lastDamagedBy.remove(uuid);
@@ -168,7 +163,7 @@ public class Tracker {
 		});
 		
 		node.addListener(PlayerItemAnimationEvent.class, event ->
-				itemUseStartTime.put(event.getPlayer().getUuid(), System.currentTimeMillis()));
+				event.getPlayer().setTag(ITEM_USE_START_TIME, System.currentTimeMillis()));
 		
 		node.addListener(PlayerMoveEvent.class, event -> {
 			Player player = event.getPlayer();

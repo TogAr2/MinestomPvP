@@ -155,7 +155,7 @@ public class FoodListener {
 		FoodComponent component = FoodComponents.fromMaterial(stack.material());
 		
 		long useTime = getUseTime(component);
-		long usedDuration = System.currentTimeMillis() - Tracker.itemUseStartTime.get(player.getUuid());
+		long usedDuration = System.currentTimeMillis() - player.getTag(Tracker.ITEM_USE_START_TIME);
 		long usedTicks = usedDuration / MinecraftServer.TICK_MS;
 		long remainingUseTicks = useTime - usedTicks;
 		
