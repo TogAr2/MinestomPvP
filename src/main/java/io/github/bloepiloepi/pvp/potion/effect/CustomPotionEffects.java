@@ -45,7 +45,7 @@ public class CustomPotionEffects {
 				new HealthBoostPotionEffect(16284963).addAttributeModifier(Attribute.MAX_HEALTH, "5D6F0BA2-1186-46AC-B896-C61C5CEE99CC", 4.0F, AttributeOperation.ADDITION),
 				new AbsorptionPotionEffect(2445989),
 				new InstantPotionEffect(PotionEffect.SATURATION, 16262179),
-				new CustomPotionEffect(PotionEffect.GLOWING, 9740385),
+				new GlowingPotionEffect(9740385),
 				new CustomPotionEffect(PotionEffect.LEVITATION, 13565951),
 				new CustomPotionEffect(PotionEffect.LUCK, 3381504).addAttributeModifier(Attribute.LUCK, "03C3C89D-7037-4B42-869F-B146BCB64D2E", 1.0F, AttributeOperation.ADDITION),
 				new CustomPotionEffect(PotionEffect.UNLUCK, 12624973).addAttributeModifier(Attribute.LUCK, "CC5AF142-2BD2-4215-B636-2605AED11727", -1.0F, AttributeOperation.ADDITION),
