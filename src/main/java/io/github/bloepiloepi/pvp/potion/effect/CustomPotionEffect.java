@@ -3,7 +3,7 @@ package io.github.bloepiloepi.pvp.potion.effect;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.entity.EntityGroup;
 import io.github.bloepiloepi.pvp.entity.EntityUtils;
-import io.github.bloepiloepi.pvp.entity.Tracker;
+import io.github.bloepiloepi.pvp.food.HungerManager;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeInstance;
 import net.minestom.server.attribute.AttributeModifier;
@@ -67,14 +67,12 @@ public class CustomPotionEffect {
 			return;
 		}
 		
-		if (entity instanceof Player) {
+		if (entity instanceof Player player) {
 			if (potionEffect == PotionEffect.HUNGER) {
-				EntityUtils.addExhaustion((Player) entity, legacy ? 0.025F : 0.005F * (float) (amplifier + 1));
+				EntityUtils.addExhaustion(player, legacy ? 0.025F : 0.005F * (float) (amplifier + 1));
 				return;
 			} else if (potionEffect == PotionEffect.SATURATION) {
-				if (((Player) entity).isOnline()) {
-					Tracker.hungerManager.get(entity.getUuid()).add(amplifier + 1, 1.0F);
-				}
+				if (player.isOnline()) HungerManager.add(player, amplifier + 1, 1.0F);
 				return;
 			}
 		}

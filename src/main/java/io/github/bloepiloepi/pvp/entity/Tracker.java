@@ -31,7 +31,6 @@ public class Tracker {
 	public static final Tag<Block> LAST_CLIMBED_BLOCK = Tag.Short("lastClimbedBlock").map(Block::fromStateId, Block::stateId);
 	public static final Tag<Double> FALL_DISTANCE = Tag.Double("fallDistance");
 	
-	public static final Map<UUID, HungerManager> hungerManager = new HashMap<>();
 	public static final Map<UUID, Map<Material, Long>> cooldownEnd = new HashMap<>();
 	public static final Map<UUID, CombatManager> combatManager = new HashMap<>();
 	
@@ -82,17 +81,15 @@ public class Tracker {
 			event.getPlayer().setTag(AttackManager.LAST_ATTACKED_TICKS, 0L);
 			event.getPlayer().setTag(SwordBlockHandler.LAST_SWING_TIME, 0L);
 			event.getPlayer().setTag(SwordBlockHandler.BLOCKING_SWORD, false);
-			Tracker.hungerManager.put(uuid, new HungerManager(event.getPlayer()));
+			event.getPlayer().setTag(HungerManager.EXHAUSTION, 0F);
+			event.getPlayer().setTag(HungerManager.STARVATION_TICKS, 0);
 			Tracker.cooldownEnd.put(uuid, new HashMap<>());
 			Tracker.combatManager.put(uuid, new CombatManager(event.getPlayer()));
 		});
 		
 		node.addListener(PlayerDisconnectEvent.class, event -> {
-			UUID uuid = event.getPlayer().getUuid();
-			
-			Tracker.hungerManager.remove(uuid);
-			Tracker.cooldownEnd.remove(uuid);
-			Tracker.combatManager.remove(uuid);
+			Tracker.cooldownEnd.remove(event.getPlayer().getUuid());
+			Tracker.combatManager.remove(event.getPlayer().getUuid());
 		});
 		
 		node.addListener(PlayerSpawnEvent.class, event -> {

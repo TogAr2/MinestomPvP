@@ -31,9 +31,7 @@ public class FoodListener {
 		EventNode<PlayerInstanceEvent> node = EventNode.type("food-events", PvPConfig.PLAYER_INSTANCE_FILTER);
 		
 		node.addListener(PlayerTickEvent.class, event -> {
-			if (Tracker.hungerManager.containsKey(event.getPlayer().getUuid())) {
-				Tracker.hungerManager.get(event.getPlayer().getUuid()).update(config);
-			}
+			if (event.getPlayer().isOnline()) HungerManager.update(event.getPlayer(), config);
 		});
 		
 		node.addListener(EventListener.builder(PlayerPreEatEvent.class).handler(event -> {
@@ -59,7 +57,7 @@ public class FoodListener {
 		node.addListener(EventListener.builder(PlayerEatEvent.class).handler(event -> {
 			Player player = event.getPlayer();
 			ItemStack stack = event.getItemStack();
-			Tracker.hungerManager.get(player.getUuid()).eat(stack.material());
+			HungerManager.eat(player, stack.material());
 			
 			FoodComponent component = FoodComponents.fromMaterial(stack.material());
 			assert component != null;

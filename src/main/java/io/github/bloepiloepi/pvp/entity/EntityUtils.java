@@ -4,6 +4,7 @@ import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.enchantment.enchantments.ProtectionEnchantment;
 import io.github.bloepiloepi.pvp.enums.Tool;
+import io.github.bloepiloepi.pvp.food.HungerManager;
 import io.github.bloepiloepi.pvp.potion.PotionListener;
 import io.github.bloepiloepi.pvp.projectile.Arrow;
 import it.unimi.dsi.fastutil.Pair;
@@ -197,7 +198,7 @@ public class EntityUtils {
 	
 	public static void addExhaustion(Player player, float exhaustion) {
 		if (!player.isInvulnerable() && player.getGameMode().canTakeDamage() && player.isOnline()) {
-			Tracker.hungerManager.get(player.getUuid()).addExhaustion(exhaustion);
+			HungerManager.addExhaustion(player, exhaustion);
 		}
 	}
 	
