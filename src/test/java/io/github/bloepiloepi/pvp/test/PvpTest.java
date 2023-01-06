@@ -26,7 +26,9 @@ import net.minestom.server.extras.lan.OpenToLAN;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
+import net.minestom.server.utils.NamespaceID;
 import net.minestom.server.utils.time.TimeUnit;
+import net.minestom.server.world.DimensionType;
 
 import java.util.Optional;
 
@@ -36,7 +38,10 @@ public class PvpTest {
 		PvpExtension.init();
 		//VelocityProxy.enable("tj7MulOtnIDe");
 		
-		Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer();
+		DimensionType fullbright = DimensionType.builder(NamespaceID.from("idk")).ambientLight(1.0f).build();
+		MinecraftServer.getDimensionTypeManager().addDimension(fullbright);
+		
+		Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(fullbright);
 		instance.setChunkGenerator(new DemoGenerator());
 		instance.enableAutoChunkLoad(true);
 		
@@ -83,7 +88,7 @@ public class PvpTest {
 		
 		MinecraftServer.getGlobalEventHandler().addListener(PlayerSpawnEvent.class, event -> {
 			event.getPlayer().setGameMode(GameMode.CREATIVE);
-			//PvpExtension.setLegacyAttack(event.getPlayer(), true);
+			PvpExtension.setLegacyAttack(event.getPlayer(), true);
 			
 			event.getPlayer().setPermissionLevel(4);
 			event.getPlayer().addEffect(new Potion(PotionEffect.REGENERATION, (byte) 10, CustomPotionEffect.PERMANENT));
