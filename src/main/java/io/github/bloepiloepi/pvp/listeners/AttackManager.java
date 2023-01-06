@@ -221,8 +221,6 @@ public class AttackManager {
 							-Math.cos(Math.toRadians(attacker.getPosition().yaw()))
 					).normalize().mul(horizontal);
 					
-					System.out.println(horizontal);
-					System.out.println(vertical);
 					Vec velocity = target.getVelocity();
 					target.setVelocity(new Vec(
 							velocity.x() / 2d - horizontalModifier.x(),
