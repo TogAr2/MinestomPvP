@@ -313,8 +313,9 @@ public class DamageListener {
 				double dz = attacker.getPosition().z() - entity.getPosition().z();
 
 				ThreadLocalRandom random = ThreadLocalRandom.current();
-				for(; dx * dx + dz * dz < 0.0001; dz = random.nextDouble(-1, 1) * 0.01) {
+				while (dx * dx + dz * dz < 0.0001) {
 					dx = random.nextDouble(-1, 1) * 0.01;
+					dz = random.nextDouble(-1, 1) * 0.01;
 				}
 
 				Entity directAttacker = type.getDirectEntity();
@@ -322,29 +323,29 @@ public class DamageListener {
 					directAttacker = attacker;
 				}
 				double finalDx = dx;
-				double finalI = dz;
+				double finalDz = dz;
 				if (!config.isLegacyKnockback()) {
 					EntityKnockbackEvent entityKnockbackEvent = new EntityKnockbackEvent(entity, directAttacker, false, false, 0.4F);
 					EventDispatcher.callCancellable(entityKnockbackEvent, () -> {
 						float strength = entityKnockbackEvent.getStrength();
-						entity.takeKnockback(strength, finalDx, finalI);
+						entity.takeKnockback(strength, finalDx, finalDz);
 					});
 				} else {
-					double magnitude = Math.sqrt(dx * dx + dz * dz);
 					LegacyKnockbackEvent legacyKnockbackEvent = new LegacyKnockbackEvent(entity, directAttacker, false);
 					EventDispatcher.callCancellable(legacyKnockbackEvent, () -> {
 						LegacyKnockbackSettings settings = legacyKnockbackEvent.getSettings();
-						Vec newVelocity = entity.getVelocity();
-
-						double horizontal = settings.horizontal();
-						newVelocity = newVelocity.withX((newVelocity.x() / 2) - (finalDx / magnitude * horizontal));
-						newVelocity = newVelocity.withY((newVelocity.y() / 2) + settings.vertical());
-						newVelocity = newVelocity.withZ((newVelocity.z() / 2) - (finalI / magnitude * horizontal));
-
-						if (newVelocity.y() > settings.verticalLimit())
-							newVelocity = newVelocity.withY(settings.verticalLimit());
-
-						entity.setVelocity(newVelocity);
+						
+						float kbResistance = entity.getAttributeValue(Attribute.KNOCKBACK_RESISTANCE);
+						double horizontal = settings.horizontal() * (1 - kbResistance);
+						double vertical = settings.vertical() * (1 - kbResistance);
+						Vec horizontalModifier = new Vec(finalDx, finalDz).normalize().mul(horizontal);
+						
+						Vec velocity = entity.getVelocity();
+						entity.setVelocity(new Vec(
+								velocity.x() / 2d - horizontalModifier.x(),
+								entity.isOnGround() ? Math.min(settings.verticalLimit(), velocity.y() / 2d + vertical) : velocity.y(),
+								velocity.z() / 2d - horizontalModifier.z()
+						));
 					});
 				}
 			} else if (type != CustomDamageType.DROWN && (!shield || amount > 0)) {

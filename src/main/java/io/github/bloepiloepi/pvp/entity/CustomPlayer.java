@@ -4,6 +4,8 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
+import net.minestom.server.event.EventDispatcher;
+import net.minestom.server.event.entity.EntityVelocityEvent;
 import net.minestom.server.instance.Chunk;
 import net.minestom.server.network.player.PlayerConnection;
 import net.minestom.server.potion.PotionEffect;
@@ -14,6 +16,7 @@ import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
 public class CustomPlayer extends Player implements PvpPlayer {
+	private boolean velocityUpdate = false;
 	
 	public CustomPlayer(@NotNull UUID uuid, @NotNull String username, @NotNull PlayerConnection playerConnection) {
 		super(uuid, username, playerConnection);
@@ -47,6 +50,22 @@ public class CustomPlayer extends Player implements PvpPlayer {
 	@Override
 	public void addVelocity(Vec add) {
 		velocity = velocity.add(add);
+	}
+	
+	@Override
+	public void setVelocity(@NotNull Vec velocity) {
+		EntityVelocityEvent entityVelocityEvent = new EntityVelocityEvent(this, velocity);
+		EventDispatcher.callCancellable(entityVelocityEvent, () -> {
+			this.velocity = entityVelocityEvent.getVelocity();
+			velocityUpdate = true;
+		});
+	}
+	
+	public void sendImmediateVelocityUpdate() {
+		if (velocityUpdate) {
+			velocityUpdate = false;
+			sendPacketToViewersAndSelf(getVelocityPacket());
+		}
 	}
 	
 	@SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
@@ -84,5 +103,7 @@ public class CustomPlayer extends Player implements PvpPlayer {
 							- (velocity.y() / tps)) * 0.2) * tps
 			);
 		}
+		
+		sendImmediateVelocityUpdate();
 	}
 }

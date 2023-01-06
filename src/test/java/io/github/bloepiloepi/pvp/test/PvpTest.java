@@ -1,7 +1,6 @@
 package io.github.bloepiloepi.pvp.test;
 
 import io.github.bloepiloepi.pvp.PvpExtension;
-import io.github.bloepiloepi.pvp.config.PotionConfig;
 import io.github.bloepiloepi.pvp.config.PvPConfig;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.events.LegacyKnockbackEvent;
@@ -12,6 +11,7 @@ import io.github.bloepiloepi.pvp.test.commands.Commands;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
+import net.minestom.server.command.builder.Command;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.EntityCreature;
 import net.minestom.server.entity.EntityType;
@@ -83,7 +83,7 @@ public class PvpTest {
 		
 		MinecraftServer.getGlobalEventHandler().addListener(PlayerSpawnEvent.class, event -> {
 			event.getPlayer().setGameMode(GameMode.CREATIVE);
-			PvpExtension.setLegacyAttack(event.getPlayer(), true);
+			//PvpExtension.setLegacyAttack(event.getPlayer(), true);
 			
 			event.getPlayer().setPermissionLevel(4);
 			event.getPlayer().addEffect(new Potion(PotionEffect.REGENERATION, (byte) 10, CustomPotionEffect.PERMANENT));
@@ -102,10 +102,19 @@ public class PvpTest {
 		instance.setExplosionSupplier(PvpExplosionSupplier.INSTANCE);
 		
 		GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-		eventHandler.addChild(PvPConfig.defaultBuilder()
-				.potion(PotionConfig.legacyBuilder().drinking(false))
+		eventHandler.addChild(PvPConfig.legacyBuilder()
+				//.potion(PotionConfig.legacyBuilder().drinking(false))
 				.build().createNode()
 		);
+		
+		MinecraftServer.getCommandManager().register(new Command("test") {{
+			setDefaultExecutor((sender, args) -> {
+				if (sender instanceof Player player) {
+					player.refreshOnGround(true);
+					player.takeKnockback(0.4f, -0.00825, -0.00716738);
+				}
+			});
+		}});
 		
 		eventHandler.addListener(PlayerTickEvent.class, event -> {
 			event.getPlayer().sendActionBar(Component.text(event.getPlayer().getVelocity().toString()));

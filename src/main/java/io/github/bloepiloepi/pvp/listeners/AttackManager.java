@@ -4,6 +4,7 @@ import io.github.bloepiloepi.pvp.config.AttackConfig;
 import io.github.bloepiloepi.pvp.config.PvPConfig;
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
+import io.github.bloepiloepi.pvp.entity.CustomPlayer;
 import io.github.bloepiloepi.pvp.entity.EntityGroup;
 import io.github.bloepiloepi.pvp.entity.EntityUtils;
 import io.github.bloepiloepi.pvp.entity.PvpPlayer;
@@ -18,6 +19,7 @@ import io.github.bloepiloepi.pvp.utils.SoundManager;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.metadata.other.ArmorStandMeta;
 import net.minestom.server.event.EventDispatcher;
@@ -203,21 +205,29 @@ public class AttackManager {
 					}
 				});
 			} else {
-				float finalKnockback;
-				if (target instanceof LivingEntity livingTarget) {
-					float knockbackResistance = livingTarget.getAttributeValue(Attribute.KNOCKBACK_RESISTANCE);
-					finalKnockback = knockback * (1 - knockbackResistance);
-				} else {
-					finalKnockback = knockback;
-				}
+				float kbResistance = target instanceof LivingEntity living ?
+						living.getAttributeValue(Attribute.KNOCKBACK_RESISTANCE) : 0;
+				int finalKnockback = knockback;
 				
 				LegacyKnockbackEvent legacyKnockbackEvent = new LegacyKnockbackEvent(target, attacker, true);
 				EventDispatcher.callCancellable(legacyKnockbackEvent, () -> {
 					LegacyKnockbackSettings settings = legacyKnockbackEvent.getSettings();
-					target.setVelocity(target.getVelocity().add(
-							-Math.sin(attacker.getPosition().yaw() * Math.PI / 180.0F) * finalKnockback * settings.extraHorizontal(),
-							settings.extraVertical(),
-							Math.cos(attacker.getPosition().yaw() * Math.PI / 180.0F) * finalKnockback * settings.extraHorizontal()
+					
+					double horizontal = settings.extraHorizontal() * (1 - kbResistance) * finalKnockback;
+					double vertical = settings.extraVertical() * (1 - kbResistance) * finalKnockback;
+					
+					Vec horizontalModifier = new Vec(
+							Math.sin(Math.toRadians(attacker.getPosition().yaw())),
+							-Math.cos(Math.toRadians(attacker.getPosition().yaw()))
+					).normalize().mul(horizontal);
+					
+					System.out.println(horizontal);
+					System.out.println(vertical);
+					Vec velocity = target.getVelocity();
+					target.setVelocity(new Vec(
+							velocity.x() / 2d - horizontalModifier.x(),
+							entity.isOnGround() ? Math.min(settings.verticalLimit(), velocity.y() + vertical) : velocity.y(),
+							velocity.z() / 2d - horizontalModifier.z()
 					));
 				});
 			}
@@ -260,6 +270,9 @@ public class AttackManager {
 			
 			attacker.sendPacketToViewersAndSelf(packet);
 		}
+		
+		if (target instanceof CustomPlayer customPlayer)
+			customPlayer.sendImmediateVelocityUpdate();
 		
 		if (critical) {
 			if (config.isSoundsEnabled() && finalAttackEvent.hasAttackSounds()) SoundManager.sendHostileToAround(attacker, SoundEvent.ENTITY_PLAYER_ATTACK_CRIT, 1.0F, 1.0F);

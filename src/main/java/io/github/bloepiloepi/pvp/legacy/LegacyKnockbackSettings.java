@@ -15,11 +15,11 @@ public record LegacyKnockbackSettings(double horizontal, double vertical,
 	public LegacyKnockbackSettings(double horizontal, double vertical, double verticalLimit,
 	                               double extraHorizontal, double extraVertical) {
 		double tps = MinecraftServer.TICK_PER_SECOND;
-		this.horizontal = horizontal * tps * 0.8;
-		this.vertical = (vertical - 0.04) * tps;
+		this.horizontal = horizontal * tps;
+		this.vertical = vertical * tps;
 		this.verticalLimit = verticalLimit * tps;
-		this.extraHorizontal = extraHorizontal * tps * 0.8;
-		this.extraVertical = (extraVertical - 0.04) * tps;
+		this.extraHorizontal = extraHorizontal * tps;
+		this.extraVertical = extraVertical * tps;
 	}
 	
 	public static Builder builder() {
