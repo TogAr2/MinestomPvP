@@ -41,7 +41,8 @@ public class CrystalEntity extends LivingEntity {
 		this.lastDamageSource = type;
 		
 		remove();
-		if (!(type instanceof CustomDamageType damageType) || !damageType.isExplosive()) {
+		if (instance.getExplosionSupplier() != null
+				&& (!(type instanceof CustomDamageType damageType) || !damageType.isExplosive())) {
 			instance.explode((float) position.x(), (float) position.y(), (float) position.z(), 6.0f);
 		}
 		

@@ -104,7 +104,7 @@ public class ExplosionListener {
 			
 			if (charges == 0) return;
 			
-			if (!instance.getDimensionType().isRespawnAnchorSafe()) {
+			if (instance.getExplosionSupplier() != null && !instance.getDimensionType().isRespawnAnchorSafe()) {
 				instance.setBlock(event.getBlockPosition(), Block.AIR);
 				instance.explode(
 						(float) (event.getBlockPosition().x() + 0.5),

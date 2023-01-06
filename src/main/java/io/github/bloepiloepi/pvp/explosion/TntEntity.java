@@ -40,7 +40,7 @@ public class TntEntity extends Entity {
 		setFuse(newFuse);
 		if (newFuse <= 0) {
 			remove();
-			instance.explode(
+			if (instance.getExplosionSupplier() != null) instance.explode(
 					(float) position.x(),
 					(float) EntityUtils.getBodyY(this, 0.0625),
 					(float) position.z(),
