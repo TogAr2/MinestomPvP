@@ -155,6 +155,7 @@ public class Tracker {
 		});
 		
 		node.addListener(PlayerSpawnEvent.class, event -> event.getPlayer().setTag(FALL_DISTANCE, 0.0));
+		node.addListener(PlayerRespawnEvent.class, event -> event.getPlayer().setTag(FALL_DISTANCE, 0.0));
 		
 		node.addListener(EntityFireEvent.class, event ->
 				event.getEntity().setTag(EntityUtils.FIRE_EXTINGUISH_TIME,
