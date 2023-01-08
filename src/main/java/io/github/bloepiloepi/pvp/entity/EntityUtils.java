@@ -163,7 +163,7 @@ public class EntityUtils {
 		
 		Tool tool = Tool.fromMaterial(attacker.getItemInMainHand().material());
 		if (tool != null && tool.isAxe()) {
-			disableShield((Player) entity, true); //For some reason the vanilla server always passes true
+			disableShield((Player) entity, true); // For some reason the vanilla server always passes true
 		}
 	}
 	

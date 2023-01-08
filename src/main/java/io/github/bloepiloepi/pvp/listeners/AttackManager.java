@@ -329,13 +329,12 @@ public class AttackManager {
 		if (knockback <= 0) return;
 		
 		if (config.isLegacyKnockback()) {
-			float kbResistance = target instanceof LivingEntity living ?
-					living.getAttributeValue(Attribute.KNOCKBACK_RESISTANCE) : 0;
-			
 			LegacyKnockbackEvent knockbackEvent = new LegacyKnockbackEvent(target, attacker, true);
 			EventDispatcher.callCancellable(knockbackEvent, () -> {
 				LegacyKnockbackSettings settings = knockbackEvent.getSettings();
 				
+				float kbResistance = target instanceof LivingEntity living ?
+						living.getAttributeValue(Attribute.KNOCKBACK_RESISTANCE) : 0;
 				double horizontal = settings.extraHorizontal() * (1 - kbResistance) * knockback;
 				double vertical = settings.extraVertical() * (1 - kbResistance) * knockback;
 				
