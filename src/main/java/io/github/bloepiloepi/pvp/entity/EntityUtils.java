@@ -1,9 +1,7 @@
 package io.github.bloepiloepi.pvp.entity;
 
 import io.github.bloepiloepi.pvp.damage.CustomDamageType;
-import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.enchantment.enchantments.ProtectionEnchantment;
-import io.github.bloepiloepi.pvp.enums.Tool;
 import io.github.bloepiloepi.pvp.food.HungerManager;
 import io.github.bloepiloepi.pvp.potion.PotionListener;
 import io.github.bloepiloepi.pvp.projectile.Arrow;
@@ -37,7 +35,6 @@ import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 
 public class EntityUtils {
@@ -150,39 +147,6 @@ public class EntityUtils {
 	
 	public static Player.Hand getActiveHand(LivingEntity entity) {
 		return ((LivingEntityMeta) entity.getEntityMeta()).getActiveHand();
-	}
-	
-	public static void takeShieldHit(LivingEntity entity, LivingEntity attacker, boolean applyKnockback) {
-		if (applyKnockback) {
-			Pos entityPos = entity.getPosition();
-			Pos attackerPos = attacker.getPosition();
-			attacker.takeKnockback(0.5F, attackerPos.x() - entityPos.x(), attackerPos.z() - entityPos.z());
-		}
-		
-		if (!(entity instanceof Player)) return;
-		
-		Tool tool = Tool.fromMaterial(attacker.getItemInMainHand().material());
-		if (tool != null && tool.isAxe()) {
-			disableShield((Player) entity, true); // For some reason the vanilla server always passes true
-		}
-	}
-	
-	public static void disableShield(Player player, boolean sprinting) {
-		float chance = 0.25F + (float) EnchantmentUtils.getBlockEfficiency(player) * 0.05F;
-		if (sprinting) {
-			chance += 0.75F;
-		}
-		
-		if (ThreadLocalRandom.current().nextFloat() < chance) {
-			Tracker.setCooldown(player, Material.SHIELD, 100);
-			
-			//Shield disable status
-			player.triggerStatus((byte) 30);
-			player.triggerStatus((byte) 9);
-			
-			Player.Hand hand = player.getEntityMeta().getActiveHand();
-			player.refreshActiveHand(false, hand == Player.Hand.OFF, false);
-		}
 	}
 	
 	public static Iterable<ItemStack> getArmorItems(LivingEntity entity) {

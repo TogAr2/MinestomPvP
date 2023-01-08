@@ -7,6 +7,7 @@ import io.github.bloepiloepi.pvp.damage.CustomEntityDamage;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entity.EntityUtils;
 import io.github.bloepiloepi.pvp.entity.Tracker;
+import io.github.bloepiloepi.pvp.enums.Tool;
 import io.github.bloepiloepi.pvp.events.*;
 import io.github.bloepiloepi.pvp.legacy.LegacyKnockbackSettings;
 import io.github.bloepiloepi.pvp.potion.PotionListener;
@@ -101,6 +102,39 @@ public class DamageListener {
 		};
 	}
 	
+	private static void takeShieldHit(LivingEntity entity, LivingEntity attacker, boolean applyKnockback) {
+		if (applyKnockback) {
+			Pos entityPos = entity.getPosition();
+			Pos attackerPos = attacker.getPosition();
+			attacker.takeKnockback(0.5F,
+					attackerPos.x() - entityPos.x(),
+					attackerPos.z() - entityPos.z()
+			);
+		}
+		
+		if (!(entity instanceof Player)) return;
+		Tool tool = Tool.fromMaterial(attacker.getItemInMainHand().material());
+		if (tool != null && tool.isAxe()) {
+			disableShield((Player) entity, true); // For some reason the vanilla server always passes true
+		}
+	}
+	
+	private static void disableShield(Player player, boolean sprinting) {
+		float chance = 0.25F + (float) EnchantmentUtils.getBlockEfficiency(player) * 0.05F;
+		if (sprinting) chance += 0.75F;
+		
+		if (ThreadLocalRandom.current().nextFloat() < chance) {
+			Tracker.setCooldown(player, Material.SHIELD, 100);
+			
+			// Shield disable status
+			player.triggerStatus((byte) 30);
+			player.triggerStatus((byte) 9);
+			
+			Player.Hand hand = player.getEntityMeta().getActiveHand();
+			player.refreshActiveHand(false, hand == Player.Hand.OFF, false);
+		}
+	}
+	
 	private static Pair<Boolean, Float> handleShield(LivingEntity entity, Entity attacker,
 	                                                 CustomDamageType type, float amount,
 	                                                 DamageConfig config) {
@@ -139,14 +173,8 @@ public class DamageListener {
 			return Pair.of(false, amount);
 		
 		// If not legacy, attacker takes shield hit (knockback and disabling)
-		if (!type.isProjectile()) {
-			if (attacker instanceof LivingEntity) {
-				EntityUtils.takeShieldHit(
-						entity, (LivingEntity) attacker,
-						damageBlockEvent.knockbackAttacker()
-				);
-			}
-		}
+		if (!type.isProjectile() && attacker instanceof LivingEntity)
+			takeShieldHit(entity, (LivingEntity) attacker, damageBlockEvent.knockbackAttacker());
 		
 		boolean everythingBlocked = damageBlockEvent.getResultingDamage() == 0;
 		return Pair.of(everythingBlocked, amount);
