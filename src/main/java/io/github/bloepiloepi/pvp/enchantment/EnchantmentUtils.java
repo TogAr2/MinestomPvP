@@ -95,12 +95,6 @@ public class EnchantmentUtils {
 		return result.get();
 	}
 	
-	public static float getSweepingMultiplier(LivingEntity entity) {
-		int i = getEquipmentLevel(CustomEnchantments.get(Enchantment.SWEEPING), entity);
-		if (i <= 0) return 0.0F;
-		return 1.0F - 1.0F / (float) (i + 1);
-	}
-	
 	public static boolean shouldPreventStackWithUnbreakingDamage(ItemStack item, int unbreakingLevel) {
 		ThreadLocalRandom random = ThreadLocalRandom.current();
 		if (ArmorMaterial.fromMaterial(item.material()) != null && random.nextFloat() < 0.6F) {
@@ -139,6 +133,10 @@ public class EnchantmentUtils {
 	
 	public static short getKnockback(LivingEntity entity) {
 		return getEquipmentLevel(CustomEnchantments.get(Enchantment.KNOCKBACK), entity);
+	}
+	
+	public static short getSweeping(LivingEntity entity) {
+		return getEquipmentLevel(CustomEnchantments.get(Enchantment.SWEEPING), entity);
 	}
 	
 	public static short getFireAspect(LivingEntity entity) {
