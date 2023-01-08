@@ -15,11 +15,12 @@ public class ProjectileConfig extends ElementConfig<PlayerInstanceEvent> {
 	
 	private final boolean
 			fishingRodEnabled, snowballEnabled, eggEnabled,
-			enderPearlEnabled, crossbowEnabled, bowEnabled;
+			enderPearlEnabled, crossbowEnabled, bowEnabled,
+			tridentEnabled;
 	
 	ProjectileConfig(boolean legacy, boolean fishingRodEnabled, boolean snowballEnabled,
 	                        boolean eggEnabled, boolean enderPearlEnabled, boolean crossbowEnabled,
-	                        boolean bowEnabled) {
+	                        boolean bowEnabled, boolean tridentEnabled) {
 		super(legacy);
 		this.fishingRodEnabled = fishingRodEnabled;
 		this.snowballEnabled = snowballEnabled;
@@ -27,6 +28,7 @@ public class ProjectileConfig extends ElementConfig<PlayerInstanceEvent> {
 		this.enderPearlEnabled = enderPearlEnabled;
 		this.crossbowEnabled = crossbowEnabled;
 		this.bowEnabled = bowEnabled;
+		this.tridentEnabled = tridentEnabled;
 	}
 	
 	public boolean isFishingRodEnabled() {
@@ -51,6 +53,10 @@ public class ProjectileConfig extends ElementConfig<PlayerInstanceEvent> {
 	
 	public boolean isBowEnabled() {
 		return bowEnabled;
+	}
+	
+	public boolean isTridentEnabled() {
+		return tridentEnabled;
 	}
 	
 	@Override

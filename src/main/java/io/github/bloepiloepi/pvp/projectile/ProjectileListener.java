@@ -1,10 +1,14 @@
 package io.github.bloepiloepi.pvp.projectile;
 
+import io.github.bloepiloepi.pvp.config.AttackConfig;
 import io.github.bloepiloepi.pvp.config.ProjectileConfig;
 import io.github.bloepiloepi.pvp.config.PvPConfig;
 import io.github.bloepiloepi.pvp.enchantment.EnchantmentUtils;
 import io.github.bloepiloepi.pvp.entity.EntityUtils;
+import io.github.bloepiloepi.pvp.entity.PvpPlayer;
 import io.github.bloepiloepi.pvp.entity.Tracker;
+import io.github.bloepiloepi.pvp.listeners.AttackManager;
+import io.github.bloepiloepi.pvp.utils.FluidUtils;
 import io.github.bloepiloepi.pvp.utils.ItemUtils;
 import io.github.bloepiloepi.pvp.utils.SoundManager;
 import it.unimi.dsi.fastutil.Pair;
@@ -14,6 +18,7 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
+import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventListener;
@@ -24,6 +29,7 @@ import net.minestom.server.event.player.PlayerItemAnimationEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.event.trait.PlayerInstanceEvent;
+import net.minestom.server.instance.EntityTracker;
 import net.minestom.server.item.Enchantment;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
@@ -35,10 +41,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ProjectileListener {
 	private static final Tag<Byte> START_SOUND_PLAYED = Tag.Byte("StartSoundPlayed");
 	private static final Tag<Byte> MID_LOAD_SOUND_PLAYED = Tag.Byte("MidLoadSoundPlayed");
+	public static final Tag<Long> RIPTIDE_START = Tag.Long("riptideStart");
 	
 	// Please, don't look at the random hardcoded numbers in this class, even I am confused
 	public static EventNode<PlayerInstanceEvent> events(ProjectileConfig config) {
@@ -346,6 +354,92 @@ public class ProjectileListener {
 			
 			player.setItemInHand(event.getHand(), stack);
 		}).filter(event -> event.getItemStack().material() == Material.CROSSBOW).build());
+		
+		if (config.isTridentEnabled()) node.addListener(EventListener.builder(ItemUpdateStateEvent.class).handler(event -> {
+			Player player = event.getPlayer();
+			ItemStack stack = event.getItemStack();
+			
+			long useDuration = System.currentTimeMillis() - player.getTag(Tracker.ITEM_USE_START_TIME);
+			int ticks = (int) ((useDuration / 1000.0) * 20);
+			if (ticks < 10) return;
+			
+			int riptide = EnchantmentUtils.getLevel(Enchantment.RIPTIDE, stack);
+			if (riptide > 0 && !FluidUtils.isTouchingWater(player)) return;
+			
+			ItemUtils.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
+					EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, 1);
+			if (riptide > 0) {
+				float yaw = player.getPosition().yaw();
+				float pitch = player.getPosition().pitch();
+				double h = -Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch));
+				double k = -Math.sin(Math.toRadians(pitch));
+				double l = Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch));
+				double length = Math.sqrt(h * h + k * k + l * l);
+				double n = 3.0 * ((1.0 + riptide) / 4.0);
+				
+				player.setTag(RIPTIDE_START, player.getAliveTicks());
+				player.setVelocity(player.getVelocity().add(new Vec(
+						h * (n / length),
+						k * (n / length),
+						l * (n / length)
+				).mul(MinecraftServer.TICK_PER_SECOND)));
+				
+				SoundEvent soundEvent = riptide >= 3 ? SoundEvent.ITEM_TRIDENT_RIPTIDE_3 :
+						(riptide == 2 ? SoundEvent.ITEM_TRIDENT_RIPTIDE_2 : SoundEvent.ITEM_TRIDENT_RIPTIDE_1);
+				if (player.getChunk() != null) player.getChunk().getViewersAsAudience().playSound(Sound.sound(
+						soundEvent, Sound.Source.PLAYER,
+						1.0f, 1.0f
+				), player);
+				
+				player.scheduleNextTick(entity -> player.refreshActiveHand(false, false, true));
+			} else {
+				ThrownTrident trident = new ThrownTrident(player, config.isLegacy(), stack);
+				Pos position = player.getPosition().add(0D, player.getEyeHeight(), 0D);
+				trident.setInstance(Objects.requireNonNull(player.getInstance()),
+						position.sub(0, 0.10000000149011612D, 0));
+				
+				Vec direction = position.direction();
+				position = position.add(direction).sub(0, 0.2, 0); //????????
+				
+				trident.shoot(position, 2.5, 1.0);
+				
+				Vec playerVel = player.getVelocity();
+				trident.setVelocity(trident.getVelocity().add(playerVel.x(),
+						player.isOnGround() ? 0.0 : playerVel.y(), playerVel.z()));
+				
+				if (player.getChunk() != null) player.getChunk().getViewersAsAudience().playSound(Sound.sound(
+						SoundEvent.ITEM_TRIDENT_THROW, Sound.Source.PLAYER,
+						1.0f, 1.0f
+				), trident);
+				if (!player.isCreative()) player.setItemInHand(event.getHand(), stack.consume(1));
+			}
+		}).filter(event -> event.getItemStack().material() == Material.TRIDENT).build());
+		
+		if (config.isTridentEnabled()) node.addListener(PlayerTickEvent.class, event -> {
+			if (event.getPlayer().getEntityMeta().isInRiptideSpinAttack()) {
+				Player player = event.getPlayer();
+				long ticks = player.getAliveTicks() - player.getTag(RIPTIDE_START);
+				AtomicBoolean stopRiptide = new AtomicBoolean(ticks >= 20);
+				
+				assert player.getInstance() != null;
+				player.getInstance().getEntityTracker().nearbyEntities(player.getPosition(), 5,
+						EntityTracker.Target.ENTITIES, entity -> {
+					if (entity != player && !stopRiptide.get() && entity instanceof LivingEntity
+							&& entity.getBoundingBox().intersectEntity(entity.getPosition(), player)) {
+						stopRiptide.set(true);
+						AttackManager.performAttack(player, entity, config.isLegacy() ?
+								AttackConfig.LEGACY : AttackConfig.DEFAULT);
+						if (player instanceof PvpPlayer pvpPlayer)
+							pvpPlayer.mulVelocity(-0.2);
+					}
+				});
+				
+				//TODO detect player bouncing against wall
+				
+				if (stopRiptide.get())
+					event.getPlayer().refreshActiveHand(false, false, false);
+			}
+		});
 		
 		return node;
 	}

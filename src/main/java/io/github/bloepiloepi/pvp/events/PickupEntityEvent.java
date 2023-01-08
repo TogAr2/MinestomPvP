@@ -2,23 +2,22 @@ package io.github.bloepiloepi.pvp.events;
 
 import io.github.bloepiloepi.pvp.projectile.AbstractArrow;
 import net.minestom.server.entity.Entity;
-import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.trait.CancellableEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Called when a player picks up an arrow.
+ * Called when a player picks up an entity (arrow or trident).
  */
-public class PickupArrowEvent implements EntityInstanceEvent, CancellableEvent {
+public class PickupEntityEvent implements EntityInstanceEvent, CancellableEvent {
 	
 	private final Player player;
 	private final AbstractArrow arrowEntity;
 	
 	private boolean cancelled;
 	
-	public PickupArrowEvent(@NotNull Player player, @NotNull AbstractArrow arrowEntity) {
+	public PickupEntityEvent(@NotNull Player player, @NotNull AbstractArrow arrowEntity) {
 		this.player = player;
 		this.arrowEntity = arrowEntity;
 	}
@@ -29,7 +28,7 @@ public class PickupArrowEvent implements EntityInstanceEvent, CancellableEvent {
 	}
 	
 	@NotNull
-	public AbstractArrow getArrow() {
+	public AbstractArrow getPickedUp() {
 		return arrowEntity;
 	}
 	

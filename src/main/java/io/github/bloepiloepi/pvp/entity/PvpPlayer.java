@@ -8,4 +8,6 @@ public interface PvpPlayer {
     void afterSprintAttack();
     
     void addVelocity(Vec velocity);
+    
+    void mulVelocity(double factor);
 }

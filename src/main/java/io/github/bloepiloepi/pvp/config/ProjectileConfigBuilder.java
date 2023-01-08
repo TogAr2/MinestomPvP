@@ -4,7 +4,8 @@ public class ProjectileConfigBuilder {
 	private final boolean legacy;
 	private boolean
 			fishingRodEnabled, snowballEnabled, eggEnabled,
-			enderPearlEnabled, crossbowEnabled, bowEnabled;
+			enderPearlEnabled, crossbowEnabled, bowEnabled,
+			tridentEnabled;
 	
 	public ProjectileConfigBuilder(boolean legacy) {
 		this.legacy = legacy;
@@ -17,6 +18,7 @@ public class ProjectileConfigBuilder {
 		enderPearlEnabled = true;
 		crossbowEnabled = true;
 		bowEnabled = true;
+		tridentEnabled = true;
 		return this;
 	}
 	
@@ -50,10 +52,15 @@ public class ProjectileConfigBuilder {
 		return this;
 	}
 	
+	public ProjectileConfigBuilder trident(boolean tridentEnabled) {
+		this.tridentEnabled = tridentEnabled;
+		return this;
+	}
+	
 	public ProjectileConfig build() {
 		return new ProjectileConfig(
 				legacy, fishingRodEnabled, snowballEnabled, eggEnabled,
-				enderPearlEnabled, crossbowEnabled, bowEnabled
+				enderPearlEnabled, crossbowEnabled, bowEnabled, tridentEnabled
 		);
 	}
 }

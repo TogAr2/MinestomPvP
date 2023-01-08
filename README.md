@@ -38,6 +38,7 @@ Currently, most vanilla PvP features are supported.
 - Food
 - Totems
 - Bows and crossbows
+- Tridents (with riptide or loyalty)
 - Fishing rods (only hooking entities or legacy knockback, not fishing)
 - Other projectiles (potions, snowballs, eggs, ender pearls)
 - All enchantments possible with the above features (this includes protection, sharpness, knockback, ...)
@@ -50,7 +51,7 @@ Currently, most vanilla PvP features are supported.
 
 - Lingering potions
 - Fireworks (for crossbows)
-- Projectile collision might need some improvements (which is a Minestom issue too)
+- Projectile collision might need some improvements
 
 ## Usage
 
@@ -124,7 +125,7 @@ This extension provides several events:
 - `FinalAttackEvent`: cancellable, called when a player attacks an entity. Can be used to set a few variables like sprint, critical, sweeping, etc.
 - `FinalDamageEvent`: cancellable, called when the final damage calculation (including armor and effects) is completed. This event should be used instead of `EntityDamageEvent`, unless you want to detect how much damage was originally dealt.
 - `LegacyKnockbackEvent`: cancellable, called when an entity gets knocked back by another entity using legacy pvp. Same applies as for `EntityKnockbackEvent`. This event can be used to change the knockback settings.
-- `PickupArrowEvent`: cancellable, called when a player picks up an arrow.
+- `PickupEntityEvent`: cancellable, called when a player picks up an entity (arrow or trident).
 - `PlayerExhaustEvent`: cancellable, called when a players' exhaustion level changes.
 - `PlayerRegenerateEvent`: cancellable, called when a player naturally regenerates health.
 - `PlayerSpectateEvent`: cancellable, called when a spectator tries to spectate an entity by attacking it.

@@ -33,6 +33,7 @@ public class CustomEntityProjectile extends Entity {
 	private final Entity shooter;
 	private final @Nullable Predicate<Entity> victimsPredicate;
 	private final boolean hitAnticipation;
+	protected boolean noClip;
 	
 	/**
 	 * Constructs new projectile.
@@ -146,9 +147,9 @@ public class CustomEntityProjectile extends Entity {
 		handleState(state);
 	}
 	
-	private void handleState(State state) {
+	protected void handleState(State state) {
 		if (state == State.Flying) {
-			if (hasVelocity()) {
+			if (!noClip && hasVelocity()) {
 				Vec direction = getVelocity().normalize();
 				double dx = direction.x();
 				double dy = direction.y();
@@ -183,7 +184,7 @@ public class CustomEntityProjectile extends Entity {
 		}
 	}
 	
-	private State guessNextState(Pos posNow) {
+	protected State guessNextState(Pos posNow) {
 		return getState(posNow, posNow.add(getVelocity().mul(0.06)), false);
 	}
 	
@@ -196,6 +197,8 @@ public class CustomEntityProjectile extends Entity {
 	 */
 	@SuppressWarnings("ConstantConditions")
 	private State getState(Pos pos, Pos posNow, boolean shouldTeleport) {
+		if (noClip) return State.Flying;
+		
 		if (pos.samePoint(posNow)) {
 			if (instance.getBlock(posNow).isSolid()) {
 				return State.StuckInBlock;
@@ -262,7 +265,7 @@ public class CustomEntityProjectile extends Entity {
 		return State.Flying;
 	}
 	
-	private interface State {
+	protected interface State {
 		State Flying = new State() {
 		};
 		State StuckInBlock = new State() {

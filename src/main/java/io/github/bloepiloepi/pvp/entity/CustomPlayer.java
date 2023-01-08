@@ -53,6 +53,11 @@ public class CustomPlayer extends Player implements PvpPlayer {
 	}
 	
 	@Override
+	public void mulVelocity(double factor) {
+		velocity = velocity.mul(factor);
+	}
+	
+	@Override
 	public void setVelocity(@NotNull Vec velocity) {
 		EntityVelocityEvent entityVelocityEvent = new EntityVelocityEvent(this, velocity);
 		EventDispatcher.callCancellable(entityVelocityEvent, () -> {

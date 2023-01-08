@@ -8,6 +8,7 @@ import io.github.bloepiloepi.pvp.explosion.PvpExplosionSupplier;
 import io.github.bloepiloepi.pvp.legacy.LegacyKnockbackSettings;
 import io.github.bloepiloepi.pvp.potion.effect.CustomPotionEffect;
 import io.github.bloepiloepi.pvp.test.commands.Commands;
+import io.github.togar2.fluids.MinestomFluids;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
@@ -22,8 +23,11 @@ import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.PlayerLoginEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
+import net.minestom.server.event.player.PlayerUseItemOnBlockEvent;
 import net.minestom.server.extras.lan.OpenToLAN;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.instance.block.Block;
+import net.minestom.server.item.Material;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.utils.NamespaceID;
@@ -36,6 +40,7 @@ public class PvpTest {
 	public static void main(String[] args) {
 		MinecraftServer server = MinecraftServer.init();
 		PvpExtension.init();
+		MinestomFluids.init();
 		//VelocityProxy.enable("tj7MulOtnIDe");
 		
 		DimensionType fullbright = DimensionType.builder(NamespaceID.from("idk")).ambientLight(1.0f).build();
@@ -88,7 +93,7 @@ public class PvpTest {
 		
 		MinecraftServer.getGlobalEventHandler().addListener(PlayerSpawnEvent.class, event -> {
 			event.getPlayer().setGameMode(GameMode.CREATIVE);
-			PvpExtension.setLegacyAttack(event.getPlayer(), true);
+			//PvpExtension.setLegacyAttack(event.getPlayer(), true);
 			
 			event.getPlayer().setPermissionLevel(4);
 			event.getPlayer().addEffect(new Potion(PotionEffect.REGENERATION, (byte) 10, CustomPotionEffect.PERMANENT));
@@ -107,10 +112,19 @@ public class PvpTest {
 		instance.setExplosionSupplier(PvpExplosionSupplier.INSTANCE);
 		
 		GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-		eventHandler.addChild(PvPConfig.legacyBuilder()
+		eventHandler.addChild(PvPConfig.defaultBuilder()
 				//.potion(PotionConfig.legacyBuilder().drinking(false))
 				.build().createNode()
 		);
+		
+		eventHandler.addChild(MinestomFluids.events());
+		
+		eventHandler.addListener(PlayerUseItemOnBlockEvent.class, event -> {
+			if (event.getItemStack().material() == Material.WATER_BUCKET) {
+				event.getInstance().setBlock(event.getPosition().relative(event.getBlockFace()), Block.WATER);
+			}
+			event.getPlayer().getInventory().update();
+		});
 		
 		MinecraftServer.getCommandManager().register(new Command("test") {{
 			setDefaultExecutor((sender, args) -> {
