@@ -19,7 +19,7 @@ public class ThrownTrident extends AbstractArrow {
 	private final boolean legacy;
 	private final ItemStack tridentItem;
 	private boolean damageDone;
-	private int returnTimer;
+	private boolean hasStartedReturning;
 	
 	public ThrownTrident(@Nullable Entity shooter, boolean legacy, ItemStack tridentItem) {
 		super(shooter, EntityType.TRIDENT);
@@ -34,9 +34,7 @@ public class ThrownTrident extends AbstractArrow {
 	
 	@Override
 	public void update(long time) {
-		if (stuckTime > 4) {
-			damageDone = true;
-		}
+		if (stuckTime > 4) damageDone = true;
 		
 		Entity shooter = getShooter();
 		int loyalty = ((ThrownTridentMeta) getEntityMeta()).getLoyaltyLevel();
@@ -47,19 +45,21 @@ public class ThrownTrident extends AbstractArrow {
 					EntityUtils.spawnItemAtLocation(this, tridentItem, 0.1);
 				remove();
 			} else {
+				// Move towards owner
 				setNoClip(true);
 				setNoGravity(true);
 				Vec vector = shooter.getPosition().add(0, shooter.getEyeHeight(), 0).asVec().sub(position);
 				teleport(position.add(0, vector.y() * 0.015 * loyalty, 0));
 				setVelocity(velocity.mul(0.95).add(vector.normalize().mul(0.05 * loyalty)
 						.mul(MinecraftServer.TICK_PER_SECOND)));
-				if (returnTimer == 0) {
+				
+				if (!hasStartedReturning) {
 					if (getChunk() != null) getChunk().getViewersAsAudience().playSound(Sound.sound(
 							SoundEvent.ITEM_TRIDENT_RETURN, Sound.Source.NEUTRAL,
 							10.0f, 1.0f
 					), position.x(), position.y(), position.z());
+					hasStartedReturning = true;
 				}
-				returnTimer++;
 			}
 		}
 		
