@@ -40,6 +40,7 @@ import net.minestom.server.tag.Tag;
 import net.minestom.server.utils.MathUtils;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class AttackManager {
@@ -142,7 +143,7 @@ public class AttackManager {
 		if (!damageSucceeded) {
 			// No damage sound
 			if (config.isSoundsEnabled() && attack.sounds() && attack.playSoundsOnFail()) {
-				attacker.getViewersAsAudience().playSound(Sound.sound(
+				Objects.requireNonNull(attacker.getChunk()).getViewersAsAudience().playSound(Sound.sound(
 						SoundEvent.ENTITY_PLAYER_ATTACK_NODAMAGE, Sound.Source.PLAYER,
 						1.0f, 1.0f
 				), attacker);
@@ -160,6 +161,9 @@ public class AttackManager {
 		// Play attack sounds
 		if (config.isSoundsEnabled() && attack.sounds()) {
 			Audience audience = attacker.getViewersAsAudience();
+			if (attacker instanceof Player player)
+				audience = Audience.audience(audience, player);
+			
 			if (attack.sprint()) audience.playSound(Sound.sound(
 					SoundEvent.ENTITY_PLAYER_ATTACK_KNOCKBACK, Sound.Source.PLAYER,
 					1.0f, 1.0f
