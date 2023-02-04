@@ -23,8 +23,8 @@ java {
 }
 
 dependencies {
-    compileOnly 'com.github.Minestom.Minestom:Minestom:f291437ada'
-    testImplementation 'com.github.Minestom.Minestom:Minestom:f291437ada'
+    compileOnly 'com.github.Minestom.Minestom:Minestom:aebf72de90'
+    testImplementation 'com.github.Minestom.Minestom:Minestom:aebf72de90'
     implementation 'com.github.TogAr2:MinestomFluids:dfb5df225b'
 }
 
