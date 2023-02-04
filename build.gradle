@@ -25,7 +25,7 @@ java {
 dependencies {
     compileOnly 'com.github.Minestom.Minestom:Minestom:aebf72de90'
     testImplementation 'com.github.Minestom.Minestom:Minestom:aebf72de90'
-    testImplementation 'com.github.TogAr2:MinestomFluids:dfb5df225b'
+    testImplementation 'com.github.TogAr2:MinestomFluids:b237b13a4b'
 }
 
 publishing {
