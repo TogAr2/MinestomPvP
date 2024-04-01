@@ -3,18 +3,19 @@ plugins {
     id 'maven-publish'
 }
 
-sourceCompatibility = 17
+sourceCompatibility = 21
+targetCompatibility = 21
 
-group 'io.github.bloepiloepi'
+group 'io.github.togar2'
 version '1.0'
 
 repositories {
     mavenCentral()
 
-    maven { url 'https://repo.spongepowered.org/maven' }
-    maven { url 'https://repo.velocitypowered.com/snapshots/' }
+//    maven { url 'https://repo.spongepowered.org/maven' }
+//    maven { url 'https://repo.velocitypowered.com/snapshots/' }
     maven { url 'https://jitpack.io' }
-    maven { url 'https://repo.minestom.net/repository/maven-public/' }
+//    maven { url 'https://repo.minestom.net/repository/maven-public/' }
 }
 
 java {
@@ -23,9 +24,9 @@ java {
 }
 
 dependencies {
-    compileOnly 'com.github.Minestom.Minestom:Minestom:aebf72de90'
-    testImplementation 'com.github.Minestom.Minestom:Minestom:aebf72de90'
-    testImplementation 'com.github.TogAr2:MinestomFluids:b237b13a4b'
+    compileOnly 'net.minestom:minestom-snapshots:154059468e'
+    testImplementation 'net.minestom:minestom-snapshots:154059468e'
+    //testImplementation 'com.github.TogAr2:MinestomFluids:b237b13a4b'
 }
 
 publishing {
