@@ -1,7 +1,7 @@
 package io.github.togar2.pvp.explosion;
 
 import io.github.togar2.pvp.entity.EntityUtils;
-import net.minestom.server.MinecraftServer;
+import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
@@ -21,7 +21,7 @@ public class TntEntity extends Entity {
 		
 		double angle = ThreadLocalRandom.current().nextDouble() * 6.2831854820251465;
 		setVelocity(new Vec(-Math.sin(angle) * 0.02, 0.2f, -Math.cos(angle) * 0.02)
-				.mul(MinecraftServer.TICK_PER_SECOND));
+				.mul(ServerFlag.SERVER_TICKS_PER_SECOND));
 		setFuse(80);
 	}
 	

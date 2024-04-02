@@ -9,6 +9,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.ServerFlag;
+import net.minestom.server.collision.SweepResult;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.*;
@@ -266,6 +267,18 @@ public class EntityUtils {
 			field.set(livingEntity, lastDamage);
 		} catch (NoSuchFieldException | IllegalAccessException e) {
 			e.printStackTrace();
+		}
+	}
+
+	public static double getResFromCollision(SweepResult sweepResult) {
+		// Use reflection to get previousPosition field
+		try {
+			Field field = SweepResult.class.getDeclaredField("res");
+			field.setAccessible(true);
+			return (double) field.get(sweepResult);
+		} catch (NoSuchFieldException | IllegalAccessException e) {
+			e.printStackTrace();
+			return 0;
 		}
 	}
 }

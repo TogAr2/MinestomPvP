@@ -309,6 +309,7 @@ public class DamageListener {
 			Tracker.combatManager.get(entity.getUuid()).recordDamage(damage);
 		
 		if (!register || finalDamageEvent.isCancelled()) {
+			//TODO this will make damage from snowballs and eggs not display
 			event.setCancelled(true);
 			return;
 		}

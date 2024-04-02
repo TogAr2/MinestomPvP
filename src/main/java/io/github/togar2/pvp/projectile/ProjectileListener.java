@@ -14,6 +14,7 @@ import io.github.togar2.pvp.utils.SoundManager;
 import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
@@ -128,7 +129,7 @@ public class ProjectileListener {
 							.mul(1.5);
 				}
 				
-				bobber.setVelocity(velocity.mul(MinecraftServer.TICK_PER_SECOND * 0.75));
+				bobber.setVelocity(velocity.mul(ServerFlag.SERVER_TICKS_PER_SECOND * 0.75));
 			}
 		}).filter(event -> event.getItemStack().material() == Material.FISHING_ROD).build());
 		
@@ -174,10 +175,10 @@ public class ProjectileListener {
 			Pos position = player.getPosition().add(0D, player.getEyeHeight(), 0D);
 			projectile.setInstance(Objects.requireNonNull(player.getInstance()), position);
 			
-			Vec direction = position.direction();
-			position = position.add(direction).sub(0, 0.2, 0); //????????
+			//Vec direction = position.direction();
+			//position = position.add(direction).sub(0, 0.2, 0); //????????
 			
-			projectile.shoot(position, 1.5, 1.0);
+			projectile.shootFrom(position, 1.5, 1.0);
 			
 			Vec playerVel = player.getVelocity();
 			projectile.setVelocity(projectile.getVelocity().add(playerVel.x(),
@@ -312,10 +313,10 @@ public class ProjectileListener {
 			arrow.setInstance(Objects.requireNonNull(player.getInstance()),
 					position.sub(0, 0.10000000149011612D, 0)); // Yeah wait what
 			
-			Vec direction = position.direction();
-			position = position.add(direction).sub(0, 0.2, 0); //????????
+			//Vec direction = position.direction();
+			//position = position.add(direction).sub(0, 0.2, 0); //????????
 			
-			arrow.shoot(position, power * 3, 1.0);
+			arrow.shootFrom(position, power * 3, 1.0);
 			
 			Vec playerVel = player.getVelocity();
 			arrow.setVelocity(arrow.getVelocity().add(playerVel.x(),
@@ -382,7 +383,7 @@ public class ProjectileListener {
 						h * (n / length),
 						k * (n / length),
 						l * (n / length)
-				).mul(MinecraftServer.TICK_PER_SECOND)));
+				).mul(ServerFlag.SERVER_TICKS_PER_SECOND)));
 				
 				SoundEvent soundEvent = riptide >= 3 ? SoundEvent.ITEM_TRIDENT_RIPTIDE_3 :
 						(riptide == 2 ? SoundEvent.ITEM_TRIDENT_RIPTIDE_2 : SoundEvent.ITEM_TRIDENT_RIPTIDE_1);
@@ -398,10 +399,10 @@ public class ProjectileListener {
 				trident.setInstance(Objects.requireNonNull(player.getInstance()),
 						position.sub(0, 0.10000000149011612D, 0));
 				
-				Vec direction = position.direction();
-				position = position.add(direction).sub(0, 0.2, 0); //????????
+				//Vec direction = position.direction();
+				//position = position.add(direction).sub(0, 0.2, 0); //????????
 				
-				trident.shoot(position, 2.5, 1.0);
+				trident.shootFrom(position, 2.5, 1.0);
 				
 				Vec playerVel = player.getVelocity();
 				trident.setVelocity(trident.getVelocity().add(playerVel.x(),
@@ -586,10 +587,10 @@ public class ProjectileListener {
 				position.sub(0, 0.10000000149011612D, 0)); // Yeah wait what
 		
 		position = position.withYaw(position.yaw() + yaw);
-		Vec direction = position.direction();
-		position = position.add(direction).sub(0, 0.2, 0); //????????
+		//Vec direction = position.direction();
+		//position = position.add(direction).sub(0, 0.2, 0); //????????
 		
-		arrow.shoot(position, power, spread);
+		arrow.shootFrom(position, power, spread);
 		
 		ItemUtils.damageEquipment(player, hand == Player.Hand.MAIN ?
 				EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, firework ? 3 : 1);

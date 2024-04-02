@@ -34,11 +34,6 @@ public class Snowball extends CustomEntityProjectile implements ItemHoldingProje
 	}
 	
 	@Override
-	public void tick(long time) {
-		super.tick(time);
-	}
-	
-	@Override
 	public void setItem(@NotNull ItemStack item) {
 		((SnowballMeta) getEntityMeta()).setItem(item);
 	}
