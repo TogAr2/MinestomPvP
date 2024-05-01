@@ -10,14 +10,15 @@ import java.util.Map;
 
 public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boolean outOfWorld,
                              boolean unblockable, boolean fire, ScaleWithDifficulty scaleWithDifficulty,
-                             boolean magic, boolean explosive, boolean fall, boolean thorns, boolean projectile) {
+                             boolean magic, boolean explosive, boolean fall, boolean thorns, boolean projectile,
+                             boolean freeze) {
 	private static final DamageTypeInfo DEFAULT = new DamageTypeInfo();
 	
 	public DamageTypeInfo() {
 		this(
 				false, false, false,
 				false, false, ScaleWithDifficulty.NEVER,
-				false, false, false, false, false
+				false, false, false, false, false, false
 		);
 	}
 	
@@ -48,7 +49,7 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 			put(DamageType.FALLING_ANVIL, new DamageTypeInfo().damagesHelmet(true));
 			put(DamageType.FALLING_BLOCK, new DamageTypeInfo().damagesHelmet(true));
 			put(DamageType.DRAGON_BREATH, new DamageTypeInfo().bypassesArmor(true));
-			put(DamageType.FREEZE, new DamageTypeInfo().bypassesArmor(true));
+			put(DamageType.FREEZE, new DamageTypeInfo().freeze(true).bypassesArmor(true));
 			put(DamageType.FALLING_STALACTITE, new DamageTypeInfo().damagesHelmet(true));
 			put(DamageType.STALAGMITE, new DamageTypeInfo().bypassesArmor(true).fall(true));
 			put(DamageType.THORNS, new DamageTypeInfo().magic(true).thorns(true).scale(ScaleWithDifficulty.WHEN_CAUSED_BY_LIVING_NON_PLAYER));
@@ -66,7 +67,8 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 			put(DamageType.PLAYER_ATTACK, new DamageTypeInfo().scale(ScaleWithDifficulty.WHEN_CAUSED_BY_LIVING_NON_PLAYER));
 			put(DamageType.TRIDENT, new DamageTypeInfo().scale(ScaleWithDifficulty.WHEN_CAUSED_BY_LIVING_NON_PLAYER));
 			put(DamageType.FIREWORKS, new DamageTypeInfo().scale(ScaleWithDifficulty.WHEN_CAUSED_BY_LIVING_NON_PLAYER));
-			put(DamageType.SONIC_BOOM, new DamageTypeInfo().scale(ScaleWithDifficulty.WHEN_CAUSED_BY_LIVING_NON_PLAYER));
+			put(DamageType.SONIC_BOOM, new DamageTypeInfo().bypassesArmor(true).scale(ScaleWithDifficulty.WHEN_CAUSED_BY_LIVING_NON_PLAYER));
+			put(DamageType.OUTSIDE_BORDER, new DamageTypeInfo().bypassesArmor(true));
 		}
 	};
 	
@@ -74,7 +76,8 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 		return new DamageTypeInfo(
 				damagesHelmet, bypassesArmor, outOfWorld,
 				unblockable, fire, scaleWithDifficulty,
-				magic, explosive, fall, thorns, projectile
+				magic, explosive, fall, thorns, projectile,
+				freeze
 		);
 	}
 	
@@ -82,7 +85,8 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 		return new DamageTypeInfo(
 				damagesHelmet, bypassesArmor, outOfWorld,
 				unblockable, fire, scaleWithDifficulty,
-				magic, explosive, fall, thorns, projectile
+				magic, explosive, fall, thorns, projectile,
+				freeze
 		);
 	}
 	
@@ -90,7 +94,8 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 		return new DamageTypeInfo(
 				damagesHelmet, bypassesArmor, outOfWorld,
 				unblockable, fire, scaleWithDifficulty,
-				magic, explosive, fall, thorns, projectile
+				magic, explosive, fall, thorns, projectile,
+				freeze
 		);
 	}
 	
@@ -98,7 +103,8 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 		return new DamageTypeInfo(
 				damagesHelmet, bypassesArmor, outOfWorld,
 				unblockable, fire, scaleWithDifficulty,
-				magic, explosive, fall, thorns, projectile
+				magic, explosive, fall, thorns, projectile,
+				freeze
 		);
 	}
 	
@@ -106,7 +112,8 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 		return new DamageTypeInfo(
 				damagesHelmet, bypassesArmor, outOfWorld,
 				unblockable, fire, scaleWithDifficulty,
-				magic, explosive, fall, thorns, projectile
+				magic, explosive, fall, thorns, projectile,
+				freeze
 		);
 	}
 	
@@ -114,7 +121,8 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 		return new DamageTypeInfo(
 				damagesHelmet, bypassesArmor, outOfWorld,
 				unblockable, fire, scale,
-				magic, explosive, fall, thorns, projectile
+				magic, explosive, fall, thorns, projectile,
+				freeze
 		);
 	}
 	
@@ -122,7 +130,8 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 		return new DamageTypeInfo(
 				damagesHelmet, bypassesArmor, outOfWorld,
 				unblockable, fire, scaleWithDifficulty,
-				magic, explosive, fall, thorns, projectile
+				magic, explosive, fall, thorns, projectile,
+				freeze
 		);
 	}
 	
@@ -130,7 +139,8 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 		return new DamageTypeInfo(
 				damagesHelmet, bypassesArmor, outOfWorld,
 				unblockable, fire, scaleWithDifficulty,
-				magic, explosive, fall, thorns, projectile
+				magic, explosive, fall, thorns, projectile,
+				freeze
 		);
 	}
 	
@@ -138,7 +148,8 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 		return new DamageTypeInfo(
 				damagesHelmet, bypassesArmor, outOfWorld,
 				unblockable, fire, scaleWithDifficulty,
-				magic, explosive, fall, thorns, projectile
+				magic, explosive, fall, thorns, projectile,
+				freeze
 		);
 	}
 	
@@ -146,7 +157,8 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 		return new DamageTypeInfo(
 				damagesHelmet, bypassesArmor, outOfWorld,
 				unblockable, fire, scaleWithDifficulty,
-				magic, explosive, fall, thorns, projectile
+				magic, explosive, fall, thorns, projectile,
+				freeze
 		);
 	}
 	
@@ -154,7 +166,17 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 		return new DamageTypeInfo(
 				damagesHelmet, bypassesArmor, outOfWorld,
 				unblockable, fire, scaleWithDifficulty,
-				magic, explosive, fall, thorns, projectile
+				magic, explosive, fall, thorns, projectile,
+				freeze
+		);
+	}
+	
+	public DamageTypeInfo freeze(boolean freeze) {
+		return new DamageTypeInfo(
+				damagesHelmet, bypassesArmor, outOfWorld,
+				unblockable, fire, scaleWithDifficulty,
+				magic, explosive, fall, thorns, projectile,
+				freeze
 		);
 	}
 	

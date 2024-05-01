@@ -55,7 +55,7 @@ public class ThrownEnderpearl extends CustomEntityProjectile implements ItemHold
 				player.teleport(position);
 				player.setTag(Tracker.FALL_DISTANCE, 0.0);
 				
-				//TODO player.damage(DamageType.ENDER_PEARL, 5.0F);
+				player.damage(DamageType.FALL, 5.0F);
 			}
 		} else if (shooter != null) {
 			shooter.teleport(position);

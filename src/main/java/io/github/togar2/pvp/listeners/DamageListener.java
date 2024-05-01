@@ -33,6 +33,8 @@ import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import net.minestom.server.network.packet.server.play.DamageEventPacket;
+import net.minestom.server.network.packet.server.play.HitAnimationPacket;
 import net.minestom.server.network.packet.server.play.SoundEffectPacket;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
@@ -42,6 +44,7 @@ import net.minestom.server.tag.Tag;
 import net.minestom.server.utils.MathUtils;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class DamageListener {
@@ -102,24 +105,19 @@ public class DamageListener {
 		if (!(entity instanceof Player)) return;
 		Tool tool = Tool.fromMaterial(attacker.getItemInMainHand().material());
 		if (tool != null && tool.isAxe()) {
-			disableShield((Player) entity, true); // For some reason the vanilla server always passes true
+			disableShield((Player) entity); // For some reason the vanilla server always passes true
 		}
 	}
 	
-	private static void disableShield(Player player, boolean sprinting) {
-		float chance = 0.25F + (float) EnchantmentUtils.getBlockEfficiency(player) * 0.05F;
-		if (sprinting) chance += 0.75F;
+	private static void disableShield(Player player) {
+		Tracker.setCooldown(player, Material.SHIELD, 100);
 		
-		if (ThreadLocalRandom.current().nextFloat() < chance) {
-			Tracker.setCooldown(player, Material.SHIELD, 100);
-			
-			// Shield disable status
-			player.triggerStatus((byte) 30);
-			player.triggerStatus((byte) 9);
-			
-			Player.Hand hand = player.getPlayerMeta().getActiveHand();
-			player.refreshActiveHand(false, hand == Player.Hand.OFF, false);
-		}
+		// Shield disable status
+		player.triggerStatus((byte) 30);
+		player.triggerStatus((byte) 9);
+		
+		Player.Hand hand = player.getPlayerMeta().getActiveHand();
+		player.refreshActiveHand(false, hand == Player.Hand.OFF, false);
 	}
 	
 	private static Pair<Boolean, Float> handleShield(LivingEntity entity, Entity attacker,
@@ -163,8 +161,7 @@ public class DamageListener {
 		if (!typeInfo.projectile() && attacker instanceof LivingEntity)
 			takeShieldHit(entity, (LivingEntity) attacker, damageBlockEvent.knockbackAttacker());
 		
-		boolean everythingBlocked = damageBlockEvent.getResultingDamage() == 0;
-		return Pair.of(everythingBlocked, amount);
+		return Pair.of(amount == 0, amount);
 	}
 	
 	private static void displayAnimation(LivingEntity entity, DamageType type, DamageTypeInfo typeInfo,
@@ -218,36 +215,45 @@ public class DamageListener {
 		if (config.isLegacyKnockback()) {
 			LegacyKnockbackEvent legacyKnockbackEvent = new LegacyKnockbackEvent(
 					entity, directAttacker == null ? attacker : directAttacker, false);
-			EventDispatcher.callCancellable(legacyKnockbackEvent, () -> {
-				LegacyKnockbackSettings settings = legacyKnockbackEvent.getSettings();
-				
-				float kbResistance = entity.getAttributeValue(Attribute.KNOCKBACK_RESISTANCE);
-				double horizontal = settings.horizontal() * (1 - kbResistance);
-				double vertical = settings.vertical() * (1 - kbResistance);
-				Vec horizontalModifier = new Vec(finalDx, finalDz).normalize().mul(horizontal);
-				
-				Vec velocity = entity.getVelocity();
-				//TODO divide by 2 at y component or not? (also AttackManager)
-				entity.setVelocity(new Vec(
-						velocity.x() / 2d - horizontalModifier.x(),
-						entity.isOnGround() ? Math.min(
-								settings.verticalLimit(), velocity.y() + vertical) : velocity.y(),
-						velocity.z() / 2d - horizontalModifier.z()
-				));
-			});
+			EventDispatcher.call(legacyKnockbackEvent);
+			if (legacyKnockbackEvent.isCancelled()) return;
+			
+			LegacyKnockbackSettings settings = legacyKnockbackEvent.getSettings();
+			
+			float kbResistance = entity.getAttributeValue(Attribute.KNOCKBACK_RESISTANCE);
+			double horizontal = settings.horizontal() * (1 - kbResistance);
+			double vertical = settings.vertical() * (1 - kbResistance);
+			Vec horizontalModifier = new Vec(finalDx, finalDz).normalize().mul(horizontal);
+			
+			Vec velocity = entity.getVelocity();
+			//TODO divide by 2 at y component or not? (also AttackManager)
+			entity.setVelocity(new Vec(
+					velocity.x() / 2d - horizontalModifier.x(),
+					entity.isOnGround() ? Math.min(
+							settings.verticalLimit(), velocity.y() + vertical) : velocity.y(),
+					velocity.z() / 2d - horizontalModifier.z()
+			));
 		} else {
 			EntityKnockbackEvent knockbackEvent = new EntityKnockbackEvent(
 					entity, directAttacker == null ? attacker : directAttacker,
 					false, false,
 					0.4F
 			);
-			EventDispatcher.callCancellable(knockbackEvent, () ->
-					entity.takeKnockback(knockbackEvent.getStrength(), finalDx, finalDz));
+			EventDispatcher.call(knockbackEvent);
+			if (knockbackEvent.isCancelled()) return;
+			
+			entity.takeKnockback(knockbackEvent.getStrength(), finalDx, finalDz);
+		}
+		
+		if (entity instanceof Player player) {
+			float hurtDir = (float) (Math.atan2(dz, dx) * 180.0 / Math.PI - player.getPosition().yaw());
+			player.sendPacket(new HitAnimationPacket(player.getEntityId(), hurtDir));
 		}
 	}
 	
 	public static void handleEntityDamage(EntityDamageEvent event, DamageConfig config) {
 		event.setAnimation(false);
+		SoundEvent sound = event.getSound();
 		event.setSound(null);
 		
 		Damage damage = event.getDamage();
@@ -263,21 +269,27 @@ public class DamageListener {
 			return;
 		}
 		
+		Entity attacker = damage.getAttacker();
+		Pair<Boolean, Float> result = handleShield(entity, attacker, damage, typeInfo, amount, config);
+		boolean shield = result.first();
+		amount = result.second();
+		
+		if (typeInfo.freeze() && Objects.requireNonNull(MinecraftServer.getTagManager().getTag(
+				net.minestom.server.gamedata.tags.Tag.BasicType.ENTITY_TYPES, "minecraft:freeze_hurts_extra_types"))
+				.contains(entity.getEntityType().namespace())) {
+			amount *= 5.0F;
+		}
+		
 		if (config.isEquipmentDamageEnabled() && typeInfo.damagesHelmet()
 				&& !entity.getEquipment(EquipmentSlot.HELMET).isAir()) {
 			ItemUtils.damageArmor(entity, typeInfo, amount, EquipmentSlot.HELMET);
 			amount *= 0.75F;
 		}
 		
-		Entity attacker = damage.getAttacker();
 		if (entity instanceof Player && attacker instanceof LivingEntity) {
 			entity.setTag(LAST_DAMAGED_BY, attacker.getEntityId());
 			entity.setTag(LAST_DAMAGE_TIME, System.currentTimeMillis());
 		}
-		
-		Pair<Boolean, Float> result = handleShield(entity, attacker, damage, typeInfo, amount, config);
-		boolean shield = result.first();
-		amount = result.second();
 		
 		// Invulnerability ticks
 		boolean hurtSoundAndAnimation = true;
@@ -315,7 +327,7 @@ public class DamageListener {
 		}
 		
 		// Exhaustion from damage
-		if (config.isExhaustionEnabled() && amount != 0 && entity instanceof Player)
+		if (config.isExhaustionEnabled() && amountBeforeProcessing != 0 && entity instanceof Player)
 			EntityUtils.addExhaustion((Player) entity,
 					(float) damage.getType().exhaustion() * (config.isLegacy() ? 3 : 1));
 		
@@ -324,14 +336,21 @@ public class DamageListener {
 		if (hurtSoundAndAnimation) {
 			entity.setTag(NEW_DAMAGE_TIME, entity.getAliveTicks() + finalDamageEvent.getInvulnerabilityTicks());
 			
-			//TODO fix new animation
 			//TODO Does this also trigger sound on client? Why do we still send a sound packet?
-			displayAnimation(entity, damage.getType(), typeInfo, shield, config);
+			entity.sendPacketToViewersAndSelf(new DamageEventPacket(
+					entity.getEntityId(),
+					damage.getType().id(),
+					damage.getAttacker() == null ? 0 : damage.getAttacker().getEntityId() + 1,
+					damage.getSource() == null ? 0 : damage.getSource().getEntityId() + 1,
+					null
+			));
 			
-			if (!shield) {
-				if (attacker != null) {
+			//displayAnimation(entity, damage.getType(), typeInfo, shield, config);
+			
+			if (!shield && damage.getType() != DamageType.DROWN) {
+				if (attacker != null && !typeInfo.explosive()) {
 					applyKnockback(entity, attacker, damage.getSource(), config);
-				} else if (damage.getType() != DamageType.DROWN) {
+				} else {
 					// Update velocity
 					entity.setVelocity(entity.getVelocity());
 				}
@@ -342,8 +361,6 @@ public class DamageListener {
 			event.setCancelled(true);
 			return;
 		}
-		
-		SoundEvent sound = event.getSound();
 		
 		boolean death = false;
 		float totalHealth = entity.getHealth() +
@@ -364,8 +381,18 @@ public class DamageListener {
 			// Workaround to have different fire types make a fire sound,
 			// but only if the sound has not been changed by damage#getSound
 			//TODO improve
-			if (typeInfo.fire() && entity instanceof Player && sound == SoundEvent.ENTITY_PLAYER_HURT) {
-				sound = SoundEvent.ENTITY_PLAYER_HURT_ON_FIRE;
+			if (entity instanceof Player && sound == SoundEvent.ENTITY_PLAYER_HURT) {
+				if (typeInfo.fire()) {
+					sound = SoundEvent.ENTITY_PLAYER_HURT_ON_FIRE;
+				} else if (typeInfo.thorns()) {
+					sound = SoundEvent.ENCHANT_THORNS_HIT;
+				} else if (damage.getType() == DamageType.DROWN) {
+					sound = SoundEvent.ENTITY_PLAYER_HURT_DROWN;
+				} else if (damage.getType() == DamageType.SWEET_BERRY_BUSH) {
+					sound = SoundEvent.ENTITY_PLAYER_HURT_SWEET_BERRY_BUSH;
+				} else if (damage.getType() == DamageType.FREEZE) {
+					sound = SoundEvent.ENTITY_PLAYER_HURT_FREEZE;
+				}
 			}
 		}
 		

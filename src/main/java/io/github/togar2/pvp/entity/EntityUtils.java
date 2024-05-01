@@ -97,7 +97,7 @@ public class EntityUtils {
 				Vec attackerDirection = entityPos.asVec().sub(attackerPosVector).normalize();
 				attackerDirection = attackerDirection.withY(0);
 				
-				return attackerDirection.dot(entityRotation) < 0.0D;
+				return attackerDirection.dot(entityRotation) < 0.0;
 			}
 		}
 		

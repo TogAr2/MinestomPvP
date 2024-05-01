@@ -21,7 +21,7 @@ public class DamageBlockEvent implements EntityInstanceEvent, CancellableEvent {
 	public DamageBlockEvent(@NotNull LivingEntity entity, float damage, float resultingDamage) {
 		this.entity = entity;
 		this.damage = damage;
-		this.knockbackAttacker = false;
+		this.knockbackAttacker = true;
 		this.resultingDamage = resultingDamage;
 	}
 	
@@ -38,7 +38,7 @@ public class DamageBlockEvent implements EntityInstanceEvent, CancellableEvent {
 	/**
 	 * This fixes a bug introduced in 1.14. Prior to 1.14, the attacker would receive
 	 * knockback when the victim was blocking. In 1.14 and above, this is no longer the case.
-	 * To apply the fix, set this to true (false by default).
+	 * To apply the fix, set this to true (true by default).
 	 *
 	 * @param knockbackAttacker true if the attacker should be knocked back
 	 */
