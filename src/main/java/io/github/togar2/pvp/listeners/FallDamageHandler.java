@@ -20,8 +20,11 @@ import net.minestom.server.sound.SoundEvent;
 import java.util.Objects;
 
 public class FallDamageHandler {
-	public static void handleFallDamage(LivingEntity entity, Pos currentPosition,
-	                                    Pos newPosition, boolean isOnGround) {
+	/**
+	 * Main method of fall damage handler, called on a move from a LivingEntity
+	 */
+	public void handleFallDamage(LivingEntity entity, Pos currentPosition,
+	                             Pos newPosition, boolean isOnGround) {
 		double dy = newPosition.y() - currentPosition.y();
 		double fallDistance = entity.hasTag(Tracker.FALL_DISTANCE) ? entity.getTag(Tracker.FALL_DISTANCE) : 0;
 		
@@ -85,7 +88,7 @@ public class FallDamageHandler {
 		}
 	}
 	
-	private static int getFallDamage(LivingEntity livingEntity, double fallDistance) {
+	protected int getFallDamage(LivingEntity livingEntity, double fallDistance) {
 		TimedPotion effect = livingEntity.getEffect(PotionEffect.JUMP_BOOST);
 		float reduce = effect != null
 				? effect.potion().amplifier() + 1

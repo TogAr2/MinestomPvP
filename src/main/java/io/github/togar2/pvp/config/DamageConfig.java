@@ -1,6 +1,8 @@
 package io.github.togar2.pvp.config;
 
+import io.github.togar2.pvp.listeners.DamageHandler;
 import io.github.togar2.pvp.listeners.DamageListener;
+import io.github.togar2.pvp.listeners.FallDamageHandler;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 
@@ -14,17 +16,22 @@ public class DamageConfig extends ElementConfig<EntityInstanceEvent> {
 	public static final DamageConfig DEFAULT = defaultBuilder().build();
 	public static final DamageConfig LEGACY = legacyBuilder().build();
 	
+	private final DamageHandler damageHandler;
+	private final FallDamageHandler fallDamageHandler;
 	private final boolean
 			fallDamageEnabled, equipmentDamageEnabled, shieldEnabled,
 			legacyShieldMechanics, armorEnabled, exhaustionEnabled,
 			legacyKnockback, soundsEnabled, damageAnimation, performDamage;
 	private final int invulnerabilityTicks;
 	
-	public DamageConfig(boolean legacy, boolean fallDamageEnabled, boolean equipmentDamageEnabled,
+	public DamageConfig(boolean legacy, DamageHandler damageHandler, FallDamageHandler fallDamageHandler,
+	                    boolean fallDamageEnabled, boolean equipmentDamageEnabled,
 	                    boolean shieldEnabled, boolean legacyShieldMechanics, int invulnerabilityTicks,
 	                    boolean armorEnabled, boolean exhaustionEnabled, boolean legacyKnockback,
 	                    boolean soundsEnabled, boolean damageAnimation, boolean performDamage) {
 		super(legacy);
+		this.damageHandler = damageHandler;
+		this.fallDamageHandler = fallDamageHandler;
 		this.fallDamageEnabled = fallDamageEnabled;
 		this.equipmentDamageEnabled = equipmentDamageEnabled;
 		this.shieldEnabled = shieldEnabled;
@@ -36,6 +43,14 @@ public class DamageConfig extends ElementConfig<EntityInstanceEvent> {
 		this.soundsEnabled = soundsEnabled;
 		this.damageAnimation = damageAnimation;
 		this.performDamage = performDamage;
+	}
+	
+	public DamageHandler getDamageHandler() {
+		return damageHandler;
+	}
+	
+	public FallDamageHandler getFallDamageHandler() {
+		return fallDamageHandler;
 	}
 	
 	public boolean isFallDamageEnabled() {

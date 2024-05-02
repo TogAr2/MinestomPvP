@@ -1,7 +1,7 @@
 package io.github.togar2.pvp.damage;
 
 import io.github.togar2.pvp.entity.Tracker;
-import io.github.togar2.pvp.listeners.DamageListener;
+import io.github.togar2.pvp.listeners.DamageHandler;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;
@@ -279,7 +279,7 @@ public class CustomDamageType {
 	public static @Nullable LivingEntity getKillCredit(@NotNull Player killed) {
 		LivingEntity killer = Tracker.combatManager.get(killed.getUuid()).getKiller();
 		if (killer == null) {
-			Integer lastDamagedById = killed.getTag(DamageListener.LAST_DAMAGED_BY);
+			Integer lastDamagedById = killed.getTag(DamageHandler.LAST_DAMAGED_BY);
 			if (lastDamagedById != null) {
 				Entity entity = Entity.getEntity(lastDamagedById);
 				if (entity instanceof LivingEntity living) killer = living;

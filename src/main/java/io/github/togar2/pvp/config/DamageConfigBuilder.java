@@ -1,7 +1,12 @@
 package io.github.togar2.pvp.config;
 
+import io.github.togar2.pvp.listeners.DamageHandler;
+import io.github.togar2.pvp.listeners.FallDamageHandler;
+
 public class DamageConfigBuilder {
 	private final boolean legacy;
+	private DamageHandler damageHandler;
+	private FallDamageHandler fallDamageHandler;
 	private boolean
 			fallDamageEnabled, equipmentDamageEnabled, shieldEnabled,
 			legacyShieldMechanics, armorEnabled, exhaustionEnabled,
@@ -13,6 +18,8 @@ public class DamageConfigBuilder {
 	}
 	
 	public DamageConfigBuilder defaultOptions() {
+		damageHandler = new DamageHandler();
+		fallDamageHandler = new FallDamageHandler();
 		fallDamageEnabled = true;
 		equipmentDamageEnabled = true;
 		shieldEnabled = true;
@@ -28,6 +35,8 @@ public class DamageConfigBuilder {
 	}
 	
 	public DamageConfigBuilder legacyOptions() {
+		damageHandler = new DamageHandler();
+		fallDamageHandler = new FallDamageHandler();
 		fallDamageEnabled = true;
 		equipmentDamageEnabled = true;
 		shieldEnabled = true;
@@ -39,6 +48,16 @@ public class DamageConfigBuilder {
 		soundsEnabled = true;
 		damageAnimation = true;
 		performDamage = true;
+		return this;
+	}
+	
+	public DamageConfigBuilder damageHandler(DamageHandler handler) {
+		this.damageHandler = handler;
+		return this;
+	}
+	
+	public DamageConfigBuilder fallDamageHandler(FallDamageHandler handler) {
+		this.fallDamageHandler = handler;
 		return this;
 	}
 	
@@ -99,10 +118,10 @@ public class DamageConfigBuilder {
 	
 	public DamageConfig build() {
 		return new DamageConfig(
-				legacy, fallDamageEnabled, equipmentDamageEnabled,
-				shieldEnabled, legacyShieldMechanics, invulnerabilityTicks,
-				armorEnabled, exhaustionEnabled, legacyKnockback,
-				soundsEnabled, damageAnimation, performDamage
+				legacy, damageHandler, fallDamageHandler, fallDamageEnabled,
+				equipmentDamageEnabled, shieldEnabled, legacyShieldMechanics,
+				invulnerabilityTicks, armorEnabled, exhaustionEnabled,
+				legacyKnockback, soundsEnabled, damageAnimation, performDamage
 		);
 	}
 }
