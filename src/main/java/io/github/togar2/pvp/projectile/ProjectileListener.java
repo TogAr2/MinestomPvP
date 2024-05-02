@@ -10,7 +10,7 @@ import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.listeners.AttackManager;
 import io.github.togar2.pvp.utils.FluidUtils;
 import io.github.togar2.pvp.utils.ItemUtils;
-import io.github.togar2.pvp.utils.SoundManager;
+import io.github.togar2.pvp.utils.ViewUtil;
 import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
@@ -63,11 +63,15 @@ public class ProjectileListener {
 					ItemUtils.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
 							EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, durability);
 				
-				SoundManager.sendToAround(player, SoundEvent.ENTITY_FISHING_BOBBER_RETRIEVE, Sound.Source.NEUTRAL,
-						1.0F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
+				ViewUtil.viewersAndSelf(player).playSound(Sound.sound(
+						SoundEvent.ENTITY_FISHING_BOBBER_RETRIEVE, Sound.Source.NEUTRAL,
+						1.0f, 0.4f / (random.nextFloat() * 0.4f + 0.8f)
+				), player);
 			} else {
-				SoundManager.sendToAround(player, SoundEvent.ENTITY_FISHING_BOBBER_THROW, Sound.Source.NEUTRAL,
-						0.5F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
+				ViewUtil.viewersAndSelf(player).playSound(Sound.sound(
+						SoundEvent.ENTITY_FISHING_BOBBER_THROW, Sound.Source.NEUTRAL,
+						0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f)
+				), player);
 				
 				FishingBobber bobber = new FishingBobber(player, config.isLegacy());
 				FishingBobber.fishingBobbers.put(player.getUuid(), bobber);
@@ -164,9 +168,11 @@ public class ProjectileListener {
 			((ItemHoldingProjectile) projectile).setItem(stack);
 			
 			ThreadLocalRandom random = ThreadLocalRandom.current();
-			SoundManager.sendToAround(player, soundEvent,
+			ViewUtil.viewersAndSelf(player).playSound(Sound.sound(
+					soundEvent,
 					snowball || enderpearl ? Sound.Source.NEUTRAL : Sound.Source.PLAYER,
-					0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f));
+					0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f)
+			), player);
 			
 			if (enderpearl) {
 				Tracker.setCooldown(player, Material.ENDER_PEARL, 20);
@@ -239,7 +245,10 @@ public class ProjectileListener {
 				
 				if (progress >= 0.2 && startSoundPlayed == (byte) 0) {
 					SoundEvent startSound = getCrossbowStartSound(quickCharge);
-					SoundManager.sendToAround(player, startSound, Sound.Source.PLAYER, 0.5F, 1.0F);
+					ViewUtil.viewersAndSelf(player).playSound(Sound.sound(
+							startSound, Sound.Source.PLAYER,
+							0.5f, 1.0f
+					), player);
 					
 					stack = stack.withTag(START_SOUND_PLAYED, (byte) 1);
 					player.setItemInHand(hand, stack);
@@ -247,7 +256,10 @@ public class ProjectileListener {
 				
 				SoundEvent midLoadSound = quickCharge == 0 ? SoundEvent.ITEM_CROSSBOW_LOADING_MIDDLE : null;
 				if (progress >= 0.5F && midLoadSound != null && midLoadSoundPlayed == (byte) 0) {
-					SoundManager.sendToAround(player, midLoadSound, Sound.Source.PLAYER, 0.5F, 1.0F);
+					ViewUtil.viewersAndSelf(player).playSound(Sound.sound(
+							midLoadSound, Sound.Source.PLAYER,
+							0.5f, 1.0f
+					), player);
 					
 					stack = stack.withTag(MID_LOAD_SOUND_PLAYED, (byte) 1);
 					player.setItemInHand(hand, stack);
@@ -316,8 +328,10 @@ public class ProjectileListener {
 					player.isOnGround() ? 0.0D : playerVel.y(), playerVel.z()));
 			
 			ThreadLocalRandom random = ThreadLocalRandom.current();
-			SoundManager.sendToAround(player, SoundEvent.ENTITY_ARROW_SHOOT, Sound.Source.PLAYER,
-					1.0f, 1.0f / (random.nextFloat() * 0.4f + 1.2f) + (float) power * 0.5f);
+			ViewUtil.viewersAndSelf(player).playSound(Sound.sound(
+					SoundEvent.ENTITY_ARROW_SHOOT, Sound.Source.PLAYER,
+					1.0f, 1.0f / (random.nextFloat() * 0.4f + 1.2f) + (float) power * 0.5f
+			), player);
 			
 			if (!reallyInfinite && !player.isCreative() && projectileSlot >= 0) {
 				player.getInventory().setItemStack(projectileSlot,
@@ -343,8 +357,10 @@ public class ProjectileListener {
 			stack = setCrossbowCharged(stack, true);
 			
 			ThreadLocalRandom random = ThreadLocalRandom.current();
-			SoundManager.sendToAround(player, SoundEvent.ITEM_CROSSBOW_LOADING_END, Sound.Source.PLAYER,
-					1.0F, 1.0F / (random.nextFloat() * 0.5F + 1.0F) + 0.2F);
+			ViewUtil.viewersAndSelf(player).playSound(Sound.sound(
+					SoundEvent.ITEM_CROSSBOW_LOADING_END, Sound.Source.PLAYER,
+					1.0f, 1.0f / (random.nextFloat() * 0.5f + 1.0f) + 0.2f
+			), player);
 			
 			player.setItemInHand(event.getHand(), stack);
 		}).filter(event -> event.getItemStack().material() == Material.CROSSBOW).build());
@@ -380,7 +396,7 @@ public class ProjectileListener {
 				
 				SoundEvent soundEvent = riptide >= 3 ? SoundEvent.ITEM_TRIDENT_RIPTIDE_3 :
 						(riptide == 2 ? SoundEvent.ITEM_TRIDENT_RIPTIDE_2 : SoundEvent.ITEM_TRIDENT_RIPTIDE_1);
-				if (player.getChunk() != null) player.getChunk().getViewersAsAudience().playSound(Sound.sound(
+				ViewUtil.viewersAndSelf(player).playSound(Sound.sound(
 						soundEvent, Sound.Source.PLAYER,
 						1.0f, 1.0f
 				), player);
@@ -401,7 +417,7 @@ public class ProjectileListener {
 				trident.setVelocity(trident.getVelocity().add(playerVel.x(),
 						player.isOnGround() ? 0.0 : playerVel.y(), playerVel.z()));
 				
-				if (player.getChunk() != null) player.getChunk().getViewersAsAudience().playSound(Sound.sound(
+				ViewUtil.viewersAndSelf(player).playSound(Sound.sound(
 						SoundEvent.ITEM_TRIDENT_THROW, Sound.Source.PLAYER,
 						1.0f, 1.0f
 				), trident);
@@ -588,7 +604,10 @@ public class ProjectileListener {
 		ItemUtils.damageEquipment(player, hand == Player.Hand.MAIN ?
 				EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, firework ? 3 : 1);
 		
-		SoundManager.sendToAround(player, SoundEvent.ITEM_CROSSBOW_SHOOT, Sound.Source.PLAYER, 1.0F, soundPitch);
+		ViewUtil.viewersAndSelf(player).playSound(Sound.sound(
+				SoundEvent.ITEM_CROSSBOW_SHOOT, Sound.Source.PLAYER,
+				1.0f, soundPitch
+		), player);
 	}
 	
 	public static AbstractArrow getCrossbowArrow(Player player, ItemStack crossbowStack, ItemStack projectile, boolean legacy) {

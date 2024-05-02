@@ -55,7 +55,7 @@ public class ThrownTrident extends AbstractArrow {
 						.mul(ServerFlag.SERVER_TICKS_PER_SECOND)));
 				
 				if (!hasStartedReturning) {
-					if (getChunk() != null) getChunk().getViewersAsAudience().playSound(Sound.sound(
+					getViewersAsAudience().playSound(Sound.sound(
 							SoundEvent.ITEM_TRIDENT_RETURN, Sound.Source.NEUTRAL,
 							10.0f, 1.0f
 					), position.x(), position.y(), position.z());
@@ -87,7 +87,7 @@ public class ThrownTrident extends AbstractArrow {
 		damageDone = true;
 		
 		setVelocity(velocity.mul(-0.01, -0.1, -0.01));
-		if (getChunk() != null) getChunk().getViewersAsAudience().playSound(Sound.sound(
+		getViewersAsAudience().playSound(Sound.sound(
 				SoundEvent.ITEM_TRIDENT_HIT, Sound.Source.NEUTRAL,
 				1.0f, 1.0f
 		), position.x(), position.y(), position.z());

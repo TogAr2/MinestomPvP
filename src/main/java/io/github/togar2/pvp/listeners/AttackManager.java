@@ -14,6 +14,7 @@ import io.github.togar2.pvp.events.LegacyKnockbackEvent;
 import io.github.togar2.pvp.events.PlayerSpectateEvent;
 import io.github.togar2.pvp.legacy.LegacyKnockbackSettings;
 import io.github.togar2.pvp.utils.ItemUtils;
+import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.attribute.Attribute;
@@ -40,7 +41,6 @@ import net.minestom.server.tag.Tag;
 import net.minestom.server.utils.MathUtils;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class AttackManager {
@@ -143,7 +143,7 @@ public class AttackManager {
 		if (!damageSucceeded) {
 			// No damage sound
 			if (config.isSoundsEnabled() && attack.sounds() && attack.playSoundsOnFail()) {
-				Objects.requireNonNull(attacker.getChunk()).getViewersAsAudience().playSound(Sound.sound(
+				ViewUtil.viewersAndSelf(attacker).playSound(Sound.sound(
 						SoundEvent.ENTITY_PLAYER_ATTACK_NODAMAGE, Sound.Source.PLAYER,
 						1.0f, 1.0f
 				), attacker);

@@ -4,7 +4,6 @@ import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.events.PickupEntityEvent;
 import io.github.togar2.pvp.utils.EffectManager;
-import io.github.togar2.pvp.utils.SoundManager;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Pos;
@@ -190,8 +189,10 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 			}
 			
 			if (!isSilent()) {
-				SoundManager.sendToAround(this, getSound(), Sound.Source.NEUTRAL,
-						1.0F, 1.2F / (random.nextFloat() * 0.2F + 0.9F));
+				getViewersAsAudience().playSound(Sound.sound(
+						getSound(), Sound.Source.NEUTRAL,
+						1.0f, 1.2f / (random.nextFloat() * 0.2f + 0.9f)
+				), this);
 			}
 			
 			return getPiercingLevel() <= 0;
@@ -216,8 +217,10 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 	public boolean onStuck() {
 		if (!isSilent()) {
 			ThreadLocalRandom random = ThreadLocalRandom.current();
-			SoundManager.sendToAround(this, getSound(), Sound.Source.NEUTRAL,
-					1.0F, 1.2F / (random.nextFloat() * 0.2F + 0.9F));
+			getViewersAsAudience().playSound(Sound.sound(
+					getSound(), Sound.Source.NEUTRAL,
+					1.0f, 1.2f / (random.nextFloat() * 0.2f + 0.9f)
+			), this);
 		}
 		
 		pickupDelay = 7;

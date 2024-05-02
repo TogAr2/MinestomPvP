@@ -3,7 +3,7 @@ package io.github.togar2.pvp.food;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.potion.PotionListener;
-import io.github.togar2.pvp.utils.SoundManager;
+import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
@@ -134,12 +134,16 @@ public class FoodComponents {
 				}
 				
 				if (EntityUtils.randomTeleport(player, new Pos(x, y, z, yaw, pitch), true)) {
-					SoundManager.sendToAround(instance, prevPosition, SoundEvent.ITEM_CHORUS_FRUIT_TELEPORT,
-							Sound.Source.PLAYER, 1.0F, 1.0F);
+					ViewUtil.packetGroup(player).playSound(Sound.sound(
+							SoundEvent.ITEM_CHORUS_FRUIT_TELEPORT, Sound.Source.PLAYER,
+							1.0f, 1.0f
+					), prevPosition);
 					
 					if (!player.isSilent()) {
-						SoundManager.sendToAround(player, player, SoundEvent.ITEM_CHORUS_FRUIT_TELEPORT,
-								Sound.Source.PLAYER, 1.0F, 1.0F);
+						player.getViewersAsAudience().playSound(Sound.sound(
+								SoundEvent.ITEM_CHORUS_FRUIT_TELEPORT, Sound.Source.PLAYER,
+								1.0f, 1.0f
+						), player);
 					}
 					
 					break;

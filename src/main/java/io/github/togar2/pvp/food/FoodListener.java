@@ -5,7 +5,7 @@ import io.github.togar2.pvp.config.PvPConfig;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.entity.PvpPlayer;
 import io.github.togar2.pvp.entity.Tracker;
-import io.github.togar2.pvp.utils.SoundManager;
+import io.github.togar2.pvp.utils.ViewUtil;
 import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
@@ -66,8 +66,10 @@ public class FoodListener {
 			triggerEatSounds(player, component);
 			
 			if (!component.isDrink() || event.getItemStack().material() == Material.HONEY_BOTTLE) {
-				SoundManager.sendToAround(player, SoundEvent.ENTITY_PLAYER_BURP, Sound.Source.PLAYER,
-						0.5F, random.nextFloat() * 0.1F + 0.9F);
+				ViewUtil.viewersAndSelf(player).playSound(Sound.sound(
+						SoundEvent.ENTITY_PLAYER_BURP, Sound.Source.PLAYER,
+						0.5f, random.nextFloat() * 0.1f + 0.9f
+				), player);
 			}
 			
 			List<Pair<Potion, Float>> effectList = component.getStatusEffects();
@@ -170,12 +172,16 @@ public class FoodListener {
 		if (component == null || component.isDrink()) { // null = potion
 			SoundEvent soundEvent = component != null ? component.getMaterial() == Material.HONEY_BOTTLE ?
 					SoundEvent.ITEM_HONEY_BOTTLE_DRINK : SoundEvent.ENTITY_GENERIC_DRINK : SoundEvent.ENTITY_GENERIC_DRINK;
-			SoundManager.sendToAround(player, player, soundEvent, Sound.Source.PLAYER,
-					0.5F, random.nextFloat() * 0.1F + 0.9F);
+			player.getViewersAsAudience().playSound(Sound.sound(
+					soundEvent, Sound.Source.PLAYER,
+					0.5f, random.nextFloat() * 0.1f + 0.9f
+			));
 		} else {
-			SoundManager.sendToAround(player, player, SoundEvent.ENTITY_GENERIC_EAT, Sound.Source.PLAYER,
-					0.5F + 0.5F * random.nextInt(2),
-					(random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F);
+			player.getViewersAsAudience().playSound(Sound.sound(
+					SoundEvent.ENTITY_GENERIC_EAT, Sound.Source.PLAYER,
+					0.5f + 0.5f * random.nextInt(2),
+					(random.nextFloat() - random.nextFloat()) * 0.2f + 1.0f
+			));
 		}
 	}
 	

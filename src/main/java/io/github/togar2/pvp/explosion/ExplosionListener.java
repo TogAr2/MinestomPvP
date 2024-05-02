@@ -3,7 +3,7 @@ package io.github.togar2.pvp.explosion;
 import io.github.togar2.pvp.config.ExplosionConfig;
 import io.github.togar2.pvp.config.PvPConfig;
 import io.github.togar2.pvp.utils.ItemUtils;
-import io.github.togar2.pvp.utils.SoundManager;
+import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Point;
@@ -89,11 +89,10 @@ public class ExplosionListener {
 			if (stack.material() == Material.GLOWSTONE && charges < 4) {
 				instance.setBlock(event.getBlockPosition(),
 						block.withProperty("charges", String.valueOf(charges + 1)));
-				SoundManager.sendToAround(
-						instance, event.getBlockPosition().add(0.5, 0.5, 0.5),
+				ViewUtil.packetGroup(player).playSound(Sound.sound(
 						SoundEvent.BLOCK_RESPAWN_ANCHOR_CHARGE, Sound.Source.BLOCK,
 						1.0f, 1.0f
-				);
+				), event.getBlockPosition().add( 0.5, 0.5, 0.5));
 				
 				if (!player.isCreative())
 					player.setItemInHand(event.getHand(), player.getItemInHand(event.getHand()).consume(1));
@@ -129,11 +128,9 @@ public class ExplosionListener {
 		TntEntity entity = new TntEntity(causingEntity);
 		if (fuse != 80) entity.setFuse(fuse);
 		entity.setInstance(instance, blockPosition.add(0.5, 0, 0.5));
-		SoundManager.sendToAround(
-				instance, entity.getPosition(),
-				SoundEvent.ENTITY_TNT_PRIMED,
-				Sound.Source.BLOCK,
+		entity.getViewersAsAudience().playSound(Sound.sound(
+				SoundEvent.ENTITY_TNT_PRIMED, Sound.Source.BLOCK,
 				1.0f, 1.0f
-		);
+		), entity);
 	}
 }

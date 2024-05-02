@@ -9,7 +9,7 @@ import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
 import io.github.togar2.pvp.potion.item.CustomPotionType;
 import io.github.togar2.pvp.potion.item.CustomPotionTypes;
 import io.github.togar2.pvp.projectile.ThrownPotion;
-import io.github.togar2.pvp.utils.SoundManager;
+import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
@@ -163,16 +163,20 @@ public class PotionListener {
 		
 		if (config.isSplashEnabled()) node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
 			ThreadLocalRandom random = ThreadLocalRandom.current();
-			SoundManager.sendToAround(event.getPlayer(), SoundEvent.ENTITY_SPLASH_POTION_THROW, Sound.Source.PLAYER,
-					0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f));
+			ViewUtil.viewersAndSelf(event.getPlayer()).playSound(Sound.sound(
+					SoundEvent.ENTITY_SPLASH_POTION_THROW, Sound.Source.PLAYER,
+					0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f)
+			), event.getPlayer());
 			
 			throwPotion(event.getPlayer(), event.getItemStack(), event.getHand(), config.isLegacy());
 		}).filter(event -> event.getItemStack().material() == Material.SPLASH_POTION).build());
 		
 		if (config.isLingeringEnabled()) node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
 			ThreadLocalRandom random = ThreadLocalRandom.current();
-			SoundManager.sendToAround(event.getPlayer(), SoundEvent.ENTITY_LINGERING_POTION_THROW, Sound.Source.NEUTRAL,
-					0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f));
+			ViewUtil.viewersAndSelf(event.getPlayer()).playSound(Sound.sound(
+					SoundEvent.ENTITY_LINGERING_POTION_THROW, Sound.Source.NEUTRAL,
+					0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f)
+			), event.getPlayer());
 			
 			throwPotion(event.getPlayer(), event.getItemStack(), event.getHand(), config.isLegacy());
 		}).filter(event -> event.getItemStack().material() == Material.LINGERING_POTION).build());
