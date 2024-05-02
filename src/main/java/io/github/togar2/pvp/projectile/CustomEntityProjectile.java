@@ -1,6 +1,5 @@
 package io.github.togar2.pvp.projectile;
 
-import io.github.togar2.pvp.events.ProjectileHitEvent.ProjectileEntityHitEvent;
 import io.github.togar2.pvp.utils.ProjectileUtils;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.collision.Aerodynamics;
@@ -16,6 +15,7 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.metadata.projectile.ProjectileMeta;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.entity.projectile.ProjectileCollideWithBlockEvent;
+import net.minestom.server.event.entity.projectile.ProjectileCollideWithEntityEvent;
 import net.minestom.server.event.entity.projectile.ProjectileUncollideEvent;
 import net.minestom.server.instance.Chunk;
 import net.minestom.server.instance.block.Block;
@@ -219,7 +219,7 @@ public class CustomEntityProjectile extends Entity {
 				if (entityResult.hasCollision() && entityResult.collisionShapes()[0] instanceof Entity collided) {
 					AtomicBoolean entityCollisionSucceeded = new AtomicBoolean();
 					
-					ProjectileEntityHitEvent event = new ProjectileEntityHitEvent(this, collided);
+					var event = new ProjectileCollideWithEntityEvent(this, Pos.fromPoint(entityResult.collisionPoints()[0]), collided);
 					EventDispatcher.callCancellable(event, () -> entityCollisionSucceeded.set(onHit(collided)));
 					
 					if (entityCollisionSucceeded.get()) {
