@@ -23,8 +23,7 @@ public class ThornsEnchantment extends CustomEnchantment {
 		ThreadLocalRandom random = ThreadLocalRandom.current();
 		if (!shouldDamageAttacker(level, random)) return;
 		
-		Map.Entry<EquipmentSlot, ItemStack> entry =
-				EnchantmentUtils.chooseEquipmentWith(this, user, (stack) -> true);
+		Map.Entry<EquipmentSlot, ItemStack> entry = EnchantmentUtils.pickRandom(user, this);
 		
 		if (attacker != null) {
 			attacker.damage(new Damage(DamageType.THORNS, user, user, null, getDamageAmount(level, random)));
@@ -37,7 +36,7 @@ public class ThornsEnchantment extends CustomEnchantment {
 	
 	private static boolean shouldDamageAttacker(int level, ThreadLocalRandom random) {
 		if (level <= 0) return false;
-		return random.nextFloat() < 0.15F * level;
+		return random.nextFloat() < 0.15f * level;
 	}
 	
 	private static int getDamageAmount(int level, ThreadLocalRandom random) {

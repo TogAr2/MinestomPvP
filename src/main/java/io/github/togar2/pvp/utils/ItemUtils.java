@@ -25,7 +25,7 @@ public class ItemUtils {
 			
 			if (unbreaking > 0) {
 				for (int i = 0; i < newAmount; i++) {
-					if (EnchantmentUtils.shouldPreventStackWithUnbreakingDamage(stack, unbreaking)) {
+					if (EnchantmentUtils.shouldNotBreak(stack, unbreaking)) {
 						preventAmount++;
 					}
 				}

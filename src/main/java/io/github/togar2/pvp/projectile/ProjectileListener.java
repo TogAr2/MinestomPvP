@@ -440,7 +440,7 @@ public class ProjectileListener {
 						AttackManager.performAttack(player, entity, config.isLegacy() ?
 								AttackConfig.LEGACY : AttackConfig.DEFAULT);
 						if (player instanceof PvpPlayer pvpPlayer)
-							pvpPlayer.mulVelocityNoUpdate(-0.2);
+							pvpPlayer.setVelocityNoUpdate(velocity -> velocity.mul(-0.2));
 					}
 				});
 				

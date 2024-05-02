@@ -173,7 +173,7 @@ public final class PvpExplosionSupplier implements ExplosionSupplier {
 									playerKnockback.put(player, knockbackVec);
 									
 									if (player instanceof PvpPlayer custom)
-										custom.addVelocityNoUpdate(knockbackVec.mul(tps));
+										custom.setVelocityNoUpdate(velocity -> velocity.add(knockbackVec.mul(tps)));
 								}
 							} else {
 								entity.setVelocity(entity.getVelocity().add(knockbackVec.mul(tps)));

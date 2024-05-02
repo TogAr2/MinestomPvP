@@ -9,22 +9,19 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.item.Enchantment;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.utils.MathUtils;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
-import java.util.function.Predicate;
 
 public class EnchantmentUtils {
-	
 	public static short getLevel(Enchantment enchantment, ItemStack stack) {
-		if (stack.isAir()) return 0;
 		Map<Enchantment, Short> enchantmentMap = stack.meta().getEnchantmentMap();
-		if (enchantmentMap.containsKey(enchantment)) return (short) MathUtils.clamp(enchantmentMap.get(enchantment), 0, 255);
-		return 0;
+		return enchantmentMap.containsKey(enchantment)
+				? (short) MathUtils.clamp(enchantmentMap.get(enchantment), 0, 255)
+				: 0;
 	}
 	
 	public static short getEquipmentLevel(CustomEnchantment customEnchantment, LivingEntity entity) {
@@ -44,20 +41,16 @@ public class EnchantmentUtils {
 		return highest;
 	}
 	
-	@Nullable
-	public static Map.Entry<EquipmentSlot, ItemStack> chooseEquipmentWith(CustomEnchantment enchantment, LivingEntity entity,
-	                                                                      Predicate<ItemStack> condition) {
+	public static Map.Entry<EquipmentSlot, ItemStack> pickRandom(LivingEntity entity, CustomEnchantment enchantment) {
 		Map<EquipmentSlot, ItemStack> equipmentMap = enchantment.getEquipment(entity);
-		if (equipmentMap.isEmpty()) {
-			return null;
-		}
+		if (equipmentMap.isEmpty()) return null;
 		
 		List<Map.Entry<EquipmentSlot, ItemStack>> possibleStacks = new ArrayList<>();
 		
 		for (Map.Entry<EquipmentSlot, ItemStack> entry : equipmentMap.entrySet()) {
 			ItemStack itemStack = entry.getValue();
 			
-			if (!itemStack.isAir() && getLevel(enchantment.getEnchantment(), itemStack) > 0 && condition.test(itemStack)) {
+			if (!itemStack.isAir() && getLevel(enchantment.getEnchantment(), itemStack) > 0) {
 				possibleStacks.add(entry);
 			}
 		}
@@ -66,38 +59,36 @@ public class EnchantmentUtils {
 				possibleStacks.get(ThreadLocalRandom.current().nextInt(possibleStacks.size()));
 	}
 	
-	private static void forEachEnchantment(BiConsumer<CustomEnchantment, Short> consumer, ItemStack stack) {
-		if (!stack.isAir()) {
-			Set<Enchantment> enchantments = stack.meta().getEnchantmentMap().keySet();
-			
-			for(Enchantment enchantment : enchantments) {
-				CustomEnchantment customEnchantment = CustomEnchantments.get(enchantment);
-				consumer.accept(customEnchantment, stack.meta().getEnchantmentMap().get(enchantment));
-			}
-		}
-	}
-	
-	public static void forEachEnchantment(BiConsumer<CustomEnchantment, Short> consumer, Iterable<ItemStack> stacks) {
+	public static void forEachEnchantment(Iterable<ItemStack> stacks, BiConsumer<CustomEnchantment, Short> consumer) {
 		for (ItemStack itemStack : stacks) {
-			forEachEnchantment(consumer, itemStack);
+			Set<Enchantment> enchantments = itemStack.meta().getEnchantmentMap().keySet();
+			
+			for (Enchantment enchantment : enchantments) {
+				CustomEnchantment customEnchantment = CustomEnchantments.get(enchantment);
+				consumer.accept(customEnchantment, itemStack.meta().getEnchantmentMap().get(enchantment));
+			}
 		}
 	}
 	
 	public static int getProtectionAmount(Iterable<ItemStack> equipment, DamageTypeInfo typeInfo) {
 		AtomicInteger result = new AtomicInteger();
-		forEachEnchantment((enchantment, level) -> result.addAndGet(enchantment.getProtectionAmount(level, typeInfo)), equipment);
+		forEachEnchantment(equipment, (enchantment, level) -> result.addAndGet(enchantment.getProtectionAmount(level, typeInfo)));
 		return result.get();
 	}
 	
 	public static float getAttackDamage(ItemStack stack, EntityGroup group, boolean legacy) {
 		AtomicReference<Float> result = new AtomicReference<>((float) 0);
-		forEachEnchantment((enchantment, level) -> result.updateAndGet(v -> v + enchantment.getAttackDamage(level, group, legacy)), stack);
+		stack.meta().getEnchantmentMap().forEach((enchantment, level) -> {
+			CustomEnchantment customEnchantment = CustomEnchantments.get(enchantment);
+			result.updateAndGet(v -> v + customEnchantment.getAttackDamage(level, group, legacy));
+		});
+		
 		return result.get();
 	}
 	
-	public static boolean shouldPreventStackWithUnbreakingDamage(ItemStack item, int unbreakingLevel) {
+	public static boolean shouldNotBreak(ItemStack item, int unbreakingLevel) {
 		ThreadLocalRandom random = ThreadLocalRandom.current();
-		if (ArmorMaterial.fromMaterial(item.material()) != null && random.nextFloat() < 0.6F) {
+		if (ArmorMaterial.fromMaterial(item.material()) != null && random.nextFloat() < 0.6f) {
 			return false;
 		} else {
 			return random.nextInt(unbreakingLevel + 1) > 0;
@@ -107,7 +98,7 @@ public class EnchantmentUtils {
 	public static double getExplosionKnockback(LivingEntity entity, double strength) {
 		short level = getEquipmentLevel(CustomEnchantments.get(Enchantment.BLAST_PROTECTION), entity);
 		if (level > 0) {
-			strength -= Math.floor((strength * (double) (level * 0.15F)));
+			strength -= Math.floor((strength * (double) (level * 0.15f)));
 		}
 		
 		return strength;
@@ -115,19 +106,21 @@ public class EnchantmentUtils {
 	
 	public static void onUserDamaged(LivingEntity user, LivingEntity attacker) {
 		if (user != null) {
-			forEachEnchantment((enchantment, level) -> enchantment.onUserDamaged(user, attacker, level),
-					Arrays.asList(user.getBoots(), user.getLeggings(),
-							user.getChestplate(), user.getHelmet(),
-							user.getItemInMainHand(), user.getItemInOffHand()));
+			forEachEnchantment(Arrays.asList(
+					user.getBoots(), user.getLeggings(),
+					user.getChestplate(), user.getHelmet(),
+					user.getItemInMainHand(), user.getItemInOffHand()
+			), (enchantment, level) -> enchantment.onUserDamaged(user, attacker, level));
 		}
 	}
 	
 	public static void onTargetDamaged(LivingEntity user, Entity target) {
 		if (user != null) {
-			forEachEnchantment((enchantment, level) -> enchantment.onTargetDamaged(user, target, level),
-					Arrays.asList(user.getBoots(), user.getLeggings(),
-							user.getChestplate(), user.getHelmet(),
-							user.getItemInMainHand(), user.getItemInOffHand()));
+			forEachEnchantment(Arrays.asList(
+					user.getBoots(), user.getLeggings(),
+					user.getChestplate(), user.getHelmet(),
+					user.getItemInMainHand(), user.getItemInOffHand()
+			), (enchantment, level) -> enchantment.onTargetDamaged(user, target, level));
 		}
 	}
 	
