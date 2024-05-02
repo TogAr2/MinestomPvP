@@ -246,7 +246,7 @@ public class DamageListener {
 		}
 		
 		if (entity instanceof Player player) {
-			float hurtDir = (float) (Math.atan2(dz, dx) * 180.0 / Math.PI - player.getPosition().yaw());
+			float hurtDir = (float) (Math.toDegrees(Math.atan2(dz, dx)) - player.getPosition().yaw());
 			player.sendPacket(new HitAnimationPacket(player.getEntityId(), hurtDir));
 		}
 	}
@@ -320,7 +320,7 @@ public class DamageListener {
 		if (register && entity instanceof Player)
 			Tracker.combatManager.get(entity.getUuid()).recordDamage(damage);
 		
-		if (!register || finalDamageEvent.isCancelled()) {
+		if (finalDamageEvent.isCancelled()) {
 			//TODO this will make damage from snowballs and eggs not display
 			event.setCancelled(true);
 			return;
@@ -331,7 +331,7 @@ public class DamageListener {
 			EntityUtils.addExhaustion((Player) entity,
 					(float) damage.getType().exhaustion() * (config.isLegacy() ? 3 : 1));
 		
-		entity.setTag(LAST_DAMAGE_AMOUNT, amountBeforeProcessing);
+		if (register) entity.setTag(LAST_DAMAGE_AMOUNT, amountBeforeProcessing);
 		
 		if (hurtSoundAndAnimation) {
 			entity.setTag(NEW_DAMAGE_TIME, entity.getAliveTicks() + finalDamageEvent.getInvulnerabilityTicks());
@@ -378,7 +378,7 @@ public class DamageListener {
 				}
 			}
 		} else if (hurtSoundAndAnimation) {
-			// Workaround to have different fire types make a fire sound,
+			// Workaround to have different types make a different sound,
 			// but only if the sound has not been changed by damage#getSound
 			//TODO improve
 			if (entity instanceof Player && sound == SoundEvent.ENTITY_PLAYER_HURT) {
@@ -412,9 +412,9 @@ public class DamageListener {
 		}
 		
 		event.getDamage().setAmount(amount);
-
+		
 		// lastDamage field is set when event is not cancelled but should also when cancelled
-		EntityUtils.setLastDamage(entity, damage);
+		if (register) EntityUtils.setLastDamage(entity, damage);
 		
 		if (config.shouldPerformDamage()) {
 			// The Minestom damage method should return false if there was no hurt animation,
