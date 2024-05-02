@@ -61,19 +61,18 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 		}
 		
 		Pos position = getPosition();
-		if (entity == null) position = position.sub(0, 1, 0);
 		Effects effect = CustomPotionType.hasInstantEffect(potions) ? Effects.INSTANT_SPLASH : Effects.SPLASH_POTION;
 		EffectManager.sendNearby(
 				Objects.requireNonNull(getInstance()), effect, position.blockX(),
-				position.blockY() + 1, position.blockZ(), PotionListener.getColor(item, legacy),
+				position.blockY(), position.blockZ(), PotionListener.getColor(item, legacy),
 				64.0D, false
 		);
 	}
 	
 	private void applySplash(List<Potion> potions, @Nullable Entity hitEntity) {
-		BoundingBox boundingBox = getBoundingBox().expand(8.0D, 4.0D, 8.0D);
+		BoundingBox boundingBox = getBoundingBox().expand(8.0, 4.0, 8.0);
 		List<LivingEntity> entities = Objects.requireNonNull(getInstance()).getEntities().stream()
-				.filter(entity -> boundingBox.intersectEntity(getPosition(), entity))
+				.filter(entity -> boundingBox.intersectEntity(getPosition().add(0, -2, 0), entity))
 				.filter(entity -> entity instanceof LivingEntity)
 				.map(entity -> (LivingEntity) entity).collect(Collectors.toList());
 		
@@ -85,9 +84,9 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 			if (entity.getEntityType() == EntityType.ARMOR_STAND) continue;
 			
 			double distanceSquared = getDistanceSquared(entity);
-			if (distanceSquared >= 16.0D) continue;
+			if (distanceSquared >= 16.0) continue;
 			
-			double proximity = entity == hitEntity ? 1.0D : (1.0D - Math.sqrt(distanceSquared) / 4.0D);
+			double proximity = entity == hitEntity ? 1.0 : (1.0 - Math.sqrt(distanceSquared) / 4.0);
 			
 			for (Potion potion : potions) {
 				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.effect());
@@ -97,7 +96,7 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 				} else {
 					int duration = potion.duration();
 					if (legacy) duration = (int) Math.floor(duration * 0.75);
-					duration = (int) (proximity * (double) duration + 0.5D);
+					duration = (int) (proximity * (double) duration + 0.5);
 					
 					if (duration > 20) {
 						entity.addEffect(new Potion(potion.effect(), potion.amplifier(), duration, potion.flags()));
