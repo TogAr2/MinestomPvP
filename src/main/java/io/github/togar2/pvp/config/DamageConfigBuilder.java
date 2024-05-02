@@ -5,8 +5,8 @@ import io.github.togar2.pvp.listeners.FallDamageHandler;
 
 public class DamageConfigBuilder {
 	private final boolean legacy;
-	private DamageHandler damageHandler;
-	private FallDamageHandler fallDamageHandler;
+	private DamageHandler damageHandler = new DamageHandler();
+	private FallDamageHandler fallDamageHandler = new FallDamageHandler();
 	private boolean
 			fallDamageEnabled, equipmentDamageEnabled, shieldEnabled,
 			legacyShieldMechanics, armorEnabled, exhaustionEnabled,
@@ -18,8 +18,6 @@ public class DamageConfigBuilder {
 	}
 	
 	public DamageConfigBuilder defaultOptions() {
-		damageHandler = new DamageHandler();
-		fallDamageHandler = new FallDamageHandler();
 		fallDamageEnabled = true;
 		equipmentDamageEnabled = true;
 		shieldEnabled = true;
@@ -35,8 +33,6 @@ public class DamageConfigBuilder {
 	}
 	
 	public DamageConfigBuilder legacyOptions() {
-		damageHandler = new DamageHandler();
-		fallDamageHandler = new FallDamageHandler();
 		fallDamageEnabled = true;
 		equipmentDamageEnabled = true;
 		shieldEnabled = true;

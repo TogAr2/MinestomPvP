@@ -1,5 +1,6 @@
 package io.github.togar2.pvp.config;
 
+import io.github.togar2.pvp.listeners.AttackHandler;
 import io.github.togar2.pvp.listeners.AttackManager;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityInstanceEvent;
@@ -13,15 +14,17 @@ public class AttackConfig extends ElementConfig<EntityInstanceEvent> {
 	public static final AttackConfig DEFAULT = defaultBuilder().build();
 	public static final AttackConfig LEGACY = legacyBuilder().build();
 	
+	private final AttackHandler handler;
 	private final boolean
 			spectatingEnabled, attackCooldownEnabled, legacyKnockback,
 			soundsEnabled, toolDamageEnabled, damageIndicatorParticlesEnabled,
 			exhaustionEnabled;
 	
-	AttackConfig(boolean legacy, boolean spectatingEnabled, boolean attackCooldownEnabled, boolean legacyKnockback,
-	             boolean soundsEnabled, boolean toolDamageEnabled, boolean damageIndicatorParticlesEnabled,
-	             boolean exhaustionEnabled) {
+	AttackConfig(boolean legacy, AttackHandler handler, boolean spectatingEnabled, boolean attackCooldownEnabled,
+	             boolean legacyKnockback, boolean soundsEnabled, boolean toolDamageEnabled,
+	             boolean damageIndicatorParticlesEnabled, boolean exhaustionEnabled) {
 		super(legacy);
+		this.handler = handler;
 		this.spectatingEnabled = spectatingEnabled;
 		this.attackCooldownEnabled = attackCooldownEnabled;
 		this.legacyKnockback = legacyKnockback;
@@ -29,6 +32,10 @@ public class AttackConfig extends ElementConfig<EntityInstanceEvent> {
 		this.toolDamageEnabled = toolDamageEnabled;
 		this.damageIndicatorParticlesEnabled = damageIndicatorParticlesEnabled;
 		this.exhaustionEnabled = exhaustionEnabled;
+	}
+	
+	public AttackHandler getHandler() {
+		return handler;
 	}
 	
 	public boolean isSpectatingEnabled() {

@@ -1,13 +1,11 @@
 package io.github.togar2.pvp.projectile;
 
-import io.github.togar2.pvp.config.AttackConfig;
 import io.github.togar2.pvp.config.ProjectileConfig;
 import io.github.togar2.pvp.config.PvPConfig;
 import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.entity.PvpPlayer;
 import io.github.togar2.pvp.entity.Tracker;
-import io.github.togar2.pvp.listeners.AttackManager;
 import io.github.togar2.pvp.utils.FluidUtils;
 import io.github.togar2.pvp.utils.ItemUtils;
 import io.github.togar2.pvp.utils.ViewUtil;
@@ -24,6 +22,7 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
+import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.entity.EntityShootEvent;
 import net.minestom.server.event.item.ItemUpdateStateEvent;
 import net.minestom.server.event.player.PlayerItemAnimationEvent;
@@ -437,8 +436,9 @@ public class ProjectileListener {
 					if (entity != player && !stopRiptide.get() && entity instanceof LivingEntity
 							&& entity.getBoundingBox().intersectEntity(entity.getPosition(), player)) {
 						stopRiptide.set(true);
-						AttackManager.performAttack(player, entity, config.isLegacy() ?
-								AttackConfig.LEGACY : AttackConfig.DEFAULT);
+						
+						var attackEvent = new EntityAttackEvent(player, entity);
+						EventDispatcher.call(attackEvent);
 						if (player instanceof PvpPlayer pvpPlayer)
 							pvpPlayer.setVelocityNoUpdate(velocity -> velocity.mul(-0.2));
 					}

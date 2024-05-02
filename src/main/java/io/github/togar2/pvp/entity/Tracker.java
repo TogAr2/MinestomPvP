@@ -3,6 +3,7 @@ package io.github.togar2.pvp.entity;
 import io.github.togar2.pvp.damage.combat.CombatManager;
 import io.github.togar2.pvp.food.HungerManager;
 import io.github.togar2.pvp.legacy.SwordBlockHandler;
+import io.github.togar2.pvp.listeners.AttackHandler;
 import io.github.togar2.pvp.listeners.AttackManager;
 import io.github.togar2.pvp.listeners.DamageHandler;
 import io.github.togar2.pvp.potion.PotionListener;
@@ -78,7 +79,7 @@ public class Tracker {
 		node.addListener(AsyncPlayerConfigurationEvent.class, event -> {
 			UUID uuid = event.getPlayer().getUuid();
 			
-			event.getPlayer().setTag(AttackManager.LAST_ATTACKED_TICKS, 0L);
+			event.getPlayer().setTag(AttackHandler.LAST_ATTACKED_TICKS, 0L);
 			event.getPlayer().setTag(SwordBlockHandler.LAST_SWING_TIME, 0L);
 			event.getPlayer().setTag(SwordBlockHandler.BLOCKING_SWORD, false);
 			event.getPlayer().setTag(HungerManager.EXHAUSTION, 0F);

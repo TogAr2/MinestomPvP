@@ -1,7 +1,10 @@
 package io.github.togar2.pvp.config;
 
+import io.github.togar2.pvp.listeners.AttackHandler;
+
 public class AttackConfigBuilder {
 	private final boolean legacy;
+	private AttackHandler handler = new AttackHandler();
 	private boolean
 			spectatingEnabled, attackCooldownEnabled, legacyKnockback,
 			soundsEnabled, toolDamageEnabled, damageIndicatorParticlesEnabled,
@@ -30,6 +33,11 @@ public class AttackConfigBuilder {
 		toolDamageEnabled = true;
 		damageIndicatorParticlesEnabled = false;
 		exhaustionEnabled = true;
+		return this;
+	}
+	
+	public AttackConfigBuilder handler(AttackHandler handler) {
+		this.handler = handler;
 		return this;
 	}
 	
@@ -70,7 +78,7 @@ public class AttackConfigBuilder {
 	
 	public AttackConfig build() {
 		return new AttackConfig(
-				legacy, spectatingEnabled, attackCooldownEnabled,
+				legacy, handler, spectatingEnabled, attackCooldownEnabled,
 				legacyKnockback, soundsEnabled, toolDamageEnabled,
 				damageIndicatorParticlesEnabled, exhaustionEnabled
 		);
