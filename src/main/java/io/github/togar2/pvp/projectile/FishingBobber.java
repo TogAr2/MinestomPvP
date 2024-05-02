@@ -81,14 +81,14 @@ public class FishingBobber extends CustomEntityProjectile {
 	}
 	
 	@Override
-	public void onHit(Entity entity) {
-		if (hooked != null) return;
+	public boolean onHit(Entity entity) {
+		if (hooked != null) return false;
 		setHookedEntity(entity);
 		
 		if (legacy) {
 			if (entity instanceof Player player
 					&& (player == getShooter() || player.getGameMode() == GameMode.CREATIVE))
-				return;
+				return false;
 			
 			Pos posNow = this.position;
 			this.position = prevPos;
@@ -97,6 +97,8 @@ public class FishingBobber extends CustomEntityProjectile {
 			}
 			this.position = posNow;
 		}
+		
+		return false;
 	}
 	
 	private void setHookedEntity(@Nullable Entity entity) {

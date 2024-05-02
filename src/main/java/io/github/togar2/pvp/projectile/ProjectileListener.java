@@ -172,13 +172,10 @@ public class ProjectileListener {
 				Tracker.setCooldown(player, Material.ENDER_PEARL, 20);
 			}
 			
-			Pos position = player.getPosition().add(0D, player.getEyeHeight(), 0D);
+			Pos position = player.getPosition().add(0D, player.getEyeHeight() - 0.1, 0D);
 			projectile.setInstance(Objects.requireNonNull(player.getInstance()), position);
 			
-			//Vec direction = position.direction();
-			//position = position.add(direction).sub(0, 0.2, 0); //????????
-			
-			projectile.shootFrom(position, 1.5, 1.0);
+			projectile.shootFromRotation(position.pitch(), position.yaw(), 0, 1.5, 1.0);
 			
 			Vec playerVel = player.getVelocity();
 			projectile.setVelocity(projectile.getVelocity().add(playerVel.x(),
@@ -309,12 +306,8 @@ public class ProjectileListener {
 			}
 			
 			// Arrow shooting
-			Pos position = player.getPosition().add(0D, player.getEyeHeight(), 0D);
-			arrow.setInstance(Objects.requireNonNull(player.getInstance()),
-					position.sub(0, 0.1, 0));
-			
-			//Vec direction = position.direction();
-			//position = position.add(direction).sub(0, 0.2, 0); //????????
+			Pos position = player.getPosition().add(0D, player.getEyeHeight() - 0.1, 0D);
+			arrow.setInstance(Objects.requireNonNull(player.getInstance()), position);
 			
 			arrow.shootFromRotation(position.pitch(), position.yaw(), 0 , power * 3, 1.0);
 			

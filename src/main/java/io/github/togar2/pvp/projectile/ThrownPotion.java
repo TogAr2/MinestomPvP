@@ -35,15 +35,15 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 	}
 	
 	@Override
-	public void onHit(Entity entity) {
+	public boolean onHit(Entity entity) {
 		splash(entity);
-		remove();
+		return true;
 	}
 	
 	@Override
-	public void onStuck() {
+	public boolean onStuck() {
 		splash(null);
-		remove();
+		return true;
 	}
 	
 	public void splash(@Nullable Entity entity) {

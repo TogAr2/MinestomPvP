@@ -16,7 +16,6 @@ import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.metadata.projectile.ProjectileMeta;
 import net.minestom.server.event.EventDispatcher;
-import net.minestom.server.event.entity.EntityDamageEvent;
 import net.minestom.server.event.entity.projectile.ProjectileCollideWithBlockEvent;
 import net.minestom.server.event.entity.projectile.ProjectileUncollideEvent;
 import net.minestom.server.instance.Chunk;
@@ -30,6 +29,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -79,7 +79,6 @@ public class CustomEntityProjectile extends Entity {
 	private void setup() {
 		hasCollision = false;
 		setAerodynamics(new Aerodynamics(getAerodynamics().gravity(), 0.99, 0.99));
-		//setAerodynamics(new Aerodynamics(0.05, 0.98, 0.99));
 		if (getEntityMeta() instanceof ProjectileMeta) {
 			((ProjectileMeta) getEntityMeta()).setShooter(shooter);
 		}
@@ -93,9 +92,11 @@ public class CustomEntityProjectile extends Entity {
 	/**
 	 * Called when this projectile is stuck in blocks.
 	 * Probably you want to do nothing with arrows in such case and to remove other types of projectiles.
+	 *
+	 * @return Whether this entity should be removed
 	 */
-	public void onStuck() {
-	
+	public boolean onStuck() {
+		return false;
 	}
 	
 	/**
@@ -107,11 +108,10 @@ public class CustomEntityProjectile extends Entity {
 	}
 	
 	/**
-	 * Called when this projectile hits an entity.
-	 * Probably you want to call {@link EntityDamageEvent} in such case.
+	 * @return Whether this entity should be removed
 	 */
-	public void onHit(Entity entity) {
-	
+	public boolean onHit(Entity entity) {
+		return false;
 	}
 	
 	public void shootFrom(Pos from, double power, double spread) {
@@ -229,6 +229,10 @@ public class CustomEntityProjectile extends Entity {
 		return !block.registry().collisionShape().intersectBox(intersectPos.sub(collidedPoint).sub(0, 0.6, 0), UNSTUCK_BOX);
 	}
 	
+	protected boolean canHit(Entity entity) {
+		return entity instanceof LivingEntity;
+	}
+	
 	@Override
 	protected void movementTick() {
 		// Mostly copied from Minestom
@@ -249,13 +253,21 @@ public class CustomEntityProjectile extends Entity {
 				PhysicsResult entityResult = CollisionUtils.checkEntityCollisions(instance, boundingBox.expand(0.1, 0.3, 0.1),
 						position.add(0, -0.3, 0), diff, 3, e -> {
 							if (noCollideShooter && e == shooter) return false;
-							return e != this;
+							return e != this && canHit(e);
 						}, physicsResult);
 				
 				if (entityResult.hasCollision() && entityResult.collisionShapes()[0] instanceof Entity collided) {
+					AtomicBoolean entityCollisionSucceeded = new AtomicBoolean();
+					
 					ProjectileEntityHitEvent event = new ProjectileEntityHitEvent(this, collided);
-					EventDispatcher.callCancellable(event, () -> onHit(collided));
-					if (isRemoved()) return;
+					EventDispatcher.callCancellable(event, () -> entityCollisionSucceeded.set(onHit(collided)));
+					
+					if (entityCollisionSucceeded.get()) {
+						// Don't remove now because rest of Entity#tick might throw errors
+						scheduler().scheduleNextProcess(this::remove);
+						// Prevent hitting blocks
+						return;
+					}
 				}
 			}
 			
@@ -271,12 +283,20 @@ public class CustomEntityProjectile extends Entity {
 				
 				Point collidedPosition = collisionDirection.add(physicsResult.newPosition()).apply(Vec.Operator.FLOOR);
 				Block block = instance.getBlock(collidedPosition);
+				
+				AtomicBoolean collisionSucceeded = new AtomicBoolean();
+				
 				var event = new ProjectileCollideWithBlockEvent(this, physicsResult.newPosition().withCoord(collidedPosition), block);
 				EventDispatcher.callCancellable(event, () -> {
 					setNoGravity(true);
 					this.collisionDirection = collisionDirection;
-					onStuck();
+					collisionSucceeded.set(onStuck());
 				});
+				
+				if (collisionSucceeded.get()) {
+					// Don't remove now because rest of Entity#tick might throw errors
+					scheduler().scheduleNextProcess(this::remove);
+				}
 			}
 			
 			Aerodynamics aerodynamics = getAerodynamics();

@@ -63,17 +63,17 @@ public class ThrownEnderpearl extends CustomEntityProjectile implements ItemHold
 	}
 	
 	@Override
-	public void onHit(Entity entity) {
+	public boolean onHit(Entity entity) {
 		EntityUtils.damage(entity, new Damage(DamageType.THROWN, this, getShooter(), null, 0));
 		
 		teleportOwner();
-		remove();
+		return true;
 	}
 	
 	@Override
-	public void onStuck() {
+	public boolean onStuck() {
 		teleportOwner();
-		remove();
+		return true;
 	}
 	
 	@Override

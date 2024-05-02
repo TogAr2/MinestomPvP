@@ -116,9 +116,13 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 	}
 	
 	@Override
-	public void onHit(@NotNull Entity entity) {
-		if (piercingIgnore.contains(entity.getEntityId())) return;
-		if (!(entity instanceof LivingEntity)) return;
+	protected boolean canHit(Entity entity) {
+		return super.canHit(entity) && !piercingIgnore.contains(entity.getEntityId());
+	}
+	
+	@Override
+	public boolean onHit(@NotNull Entity entity) {
+		if (piercingIgnore.contains(entity.getEntityId())) return false;
 		
 		ThreadLocalRandom random = ThreadLocalRandom.current();
 		
@@ -128,8 +132,7 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 		
 		if (getPiercingLevel() > 0) {
 			if (piercingIgnore.size() >= getPiercingLevel() + 1) {
-				remove();
-				return;
+				return true;
 			}
 			
 			piercingIgnore.add(entity.getEntityId());
@@ -148,7 +151,7 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 		);
 		
 		if (EntityUtils.damage(entity, damageObj)) {
-			if (entity.getEntityType() == EntityType.ENDERMAN) return;
+			if (entity.getEntityType() == EntityType.ENDERMAN) return false;
 			
 			if (isOnFire()) {
 				EntityUtils.setOnFireForSeconds(entity, 5);
@@ -191,11 +194,7 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 						1.0F, 1.2F / (random.nextFloat() * 0.2F + 0.9F));
 			}
 			
-			if (getPiercingLevel() <= 0) {
-				remove();
-			}
-			
-			entity.teleport(entity.getPosition().withView(0, 90));
+			return getPiercingLevel() <= 0;
 		} else {
 			Pos position = getPosition();
 			setVelocity(getVelocity().mul(-0.5));
@@ -206,13 +205,15 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 					EntityUtils.spawnItemAtLocation(this, getPickupItem(), 0.1);
 				}
 				
-				remove();
+				return true;
 			}
 		}
+		
+		return false;
 	}
 	
 	@Override
-	public void onStuck() {
+	public boolean onStuck() {
 		if (!isSilent()) {
 			ThreadLocalRandom random = ThreadLocalRandom.current();
 			SoundManager.sendToAround(this, getSound(), Sound.Source.NEUTRAL,
@@ -224,6 +225,8 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 		setPiercingLevel((byte) 0);
 		setSound(SoundEvent.ENTITY_ARROW_HIT);
 		piercingIgnore.clear();
+		
+		return false;
 	}
 	
 	public boolean canBePickedUp(@Nullable Player player) {

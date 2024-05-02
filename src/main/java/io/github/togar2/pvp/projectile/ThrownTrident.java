@@ -68,9 +68,14 @@ public class ThrownTrident extends AbstractArrow {
 	}
 	
 	@Override
-	public void onHit(@NotNull Entity entity) {
-		if (damageDone) return;
-		if (!(entity instanceof LivingEntity living)) return;
+	protected boolean canHit(Entity entity) {
+		return !damageDone && super.canHit(entity);
+	}
+	
+	@Override
+	public boolean onHit(@NotNull Entity entity) {
+		if (damageDone) return false;
+		if (!(entity instanceof LivingEntity living)) return false;
 		Entity shooter = getShooter();
 		
 		float damage = 8.0f + EnchantmentUtils.getAttackDamage(tridentItem, EntityGroup.ofEntity(living), legacy);
@@ -86,6 +91,8 @@ public class ThrownTrident extends AbstractArrow {
 				SoundEvent.ITEM_TRIDENT_HIT, Sound.Source.NEUTRAL,
 				1.0f, 1.0f
 		), position.x(), position.y(), position.z());
+		
+		return false;
 	}
 	
 	@Override
