@@ -49,6 +49,7 @@ Currently, most vanilla PvP features are supported.
 
 - Lingering potions
 - Fireworks (for crossbows)
+- Support for (some) water mechanics (e.g. slowing projectiles down)
 
 ## Usage
 
