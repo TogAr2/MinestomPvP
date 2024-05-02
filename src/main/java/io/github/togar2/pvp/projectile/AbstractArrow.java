@@ -107,10 +107,10 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 	@Override
 	public void onUnstuck() {
 		ThreadLocalRandom random = ThreadLocalRandom.current();
-		setVelocity(getPosition().direction().mul(
-				random.nextFloat() * 0.2,
-				random.nextFloat() * 0.2,
-				random.nextFloat() * 0.2
+		setVelocity(velocity.div(ServerFlag.SERVER_TICKS_PER_SECOND).mul(
+				random.nextDouble() * 0.2,
+				random.nextDouble() * 0.2,
+				random.nextDouble() * 0.2
 		).mul(ServerFlag.SERVER_TICKS_PER_SECOND));
 		ticks = 0;
 	}
@@ -118,6 +118,7 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 	@Override
 	public void onHit(@NotNull Entity entity) {
 		if (piercingIgnore.contains(entity.getEntityId())) return;
+		if (!(entity instanceof LivingEntity)) return;
 		
 		ThreadLocalRandom random = ThreadLocalRandom.current();
 		
@@ -193,10 +194,12 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 			if (getPiercingLevel() <= 0) {
 				remove();
 			}
+			
+			entity.teleport(entity.getPosition().withView(0, 90));
 		} else {
 			Pos position = getPosition();
-			setVelocity(getVelocity().mul(-0.1));
-			teleport(position.withYaw(position.yaw() + 180));
+			setVelocity(getVelocity().mul(-0.5));
+			refreshPosition(position.withYaw(position.yaw() + 170.0f + 20.0f * ThreadLocalRandom.current().nextFloat()));
 			
 			if (getVelocity().lengthSquared() < 1.0E-7D) {
 				if (pickupMode == PickupMode.ALLOWED) {

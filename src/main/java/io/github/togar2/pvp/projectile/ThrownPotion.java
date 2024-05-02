@@ -30,6 +30,7 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 		super(shooter, EntityType.POTION, true);
 		this.legacy = legacy;
 		
+		// Why does Minestom have the wrong value 0.03 in its registries?
 		setAerodynamics(getAerodynamics().withGravity(0.05));
 	}
 	

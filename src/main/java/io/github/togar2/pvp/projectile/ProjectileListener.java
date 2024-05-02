@@ -311,12 +311,12 @@ public class ProjectileListener {
 			// Arrow shooting
 			Pos position = player.getPosition().add(0D, player.getEyeHeight(), 0D);
 			arrow.setInstance(Objects.requireNonNull(player.getInstance()),
-					position.sub(0, 0.10000000149011612D, 0)); // Yeah wait what
+					position.sub(0, 0.1, 0));
 			
 			//Vec direction = position.direction();
 			//position = position.add(direction).sub(0, 0.2, 0); //????????
 			
-			arrow.shootFrom(position, power * 3, 1.0);
+			arrow.shootFromRotation(position.pitch(), position.yaw(), 0 , power * 3, 1.0);
 			
 			Vec playerVel = player.getVelocity();
 			arrow.setVelocity(arrow.getVelocity().add(playerVel.x(),

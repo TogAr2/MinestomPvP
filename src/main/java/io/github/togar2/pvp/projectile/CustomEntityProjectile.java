@@ -1,10 +1,10 @@
 package io.github.togar2.pvp.projectile;
 
-import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.events.ProjectileHitEvent.ProjectileBlockHitEvent;
 import io.github.togar2.pvp.events.ProjectileHitEvent.ProjectileEntityHitEvent;
 import io.github.togar2.pvp.utils.ProjectileUtils;
 import net.minestom.server.ServerFlag;
+import net.minestom.server.collision.Aerodynamics;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.collision.CollisionUtils;
 import net.minestom.server.collision.PhysicsResult;
@@ -17,7 +17,6 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.metadata.projectile.ProjectileMeta;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.entity.EntityDamageEvent;
-import net.minestom.server.event.entity.EntityShootEvent;
 import net.minestom.server.event.entity.projectile.ProjectileCollideWithBlockEvent;
 import net.minestom.server.event.entity.projectile.ProjectileUncollideEvent;
 import net.minestom.server.instance.Chunk;
@@ -40,6 +39,7 @@ import java.util.stream.Stream;
  */
 public class CustomEntityProjectile extends Entity {
 	private static final BoundingBox POINT_BOX = new BoundingBox(0, 0, 0);
+	private static final BoundingBox UNSTUCK_BOX = new BoundingBox(0.12, 0.6, 0.12);
 
 	private final Entity shooter;
 	private final @Nullable Predicate<Entity> victimsPredicate;
@@ -48,7 +48,6 @@ public class CustomEntityProjectile extends Entity {
 	
 	protected Vec collisionDirection;
 	
-	private long updateCooldown = 0;
 	private PhysicsResult previousPhysicsResult = null;
 	
 	/**
@@ -79,11 +78,12 @@ public class CustomEntityProjectile extends Entity {
 	
 	private void setup() {
 		hasCollision = false;
-		System.out.println(getAerodynamics());
+		setAerodynamics(new Aerodynamics(getAerodynamics().gravity(), 0.99, 0.99));
 		//setAerodynamics(new Aerodynamics(0.05, 0.98, 0.99));
 		if (getEntityMeta() instanceof ProjectileMeta) {
 			((ProjectileMeta) getEntityMeta()).setShooter(shooter);
 		}
+		setSynchronizationTicks(getUpdateInterval());
 	}
 	
 	public @Nullable Entity getShooter() {
@@ -125,6 +125,42 @@ public class CustomEntityProjectile extends Entity {
 		shoot(from, to, power, spread);
 	}
 	
+	public void shootFromRotation(float pitch, float yaw, float yBias, double power, double spread) {
+		double dx = -Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch));
+		double dy = -Math.sin(Math.toRadians(pitch + yBias));
+		double dz = Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch));
+		this.shoot(dx, dy, dz, power, spread);
+	}
+	
+	private void shoot(double dx, double dy, double dz, double power, double spread) {
+		//TODO custom shoot event
+//		EntityShootEvent shootEvent = new EntityShootEvent(shooter == null ? this : shooter, this, from, power, spread);
+//		EventDispatcher.call(shootEvent);
+//		if (shootEvent.isCancelled()) {
+//			remove();
+//			return;
+//		}
+//		power = shootEvent.getPower();
+//		spread = shootEvent.getSpread();
+		
+		double length = Math.sqrt(dx * dx + dy * dy + dz * dz);
+		dx /= length;
+		dy /= length;
+		dz /= length;
+		Random random = ThreadLocalRandom.current();
+		spread *= 0.007499999832361937D;
+		dx += random.nextGaussian() * spread;
+		dy += random.nextGaussian() * spread;
+		dz += random.nextGaussian() * spread;
+		
+		final double mul = ServerFlag.SERVER_TICKS_PER_SECOND * power;
+		this.velocity = new Vec(dx * mul, dy * mul, dz * mul);
+		setView(
+				(float) Math.toDegrees(Math.atan2(dx, dz)),
+				(float) Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz)))
+		);
+	}
+	
 	private void shoot(@NotNull Pos from, @NotNull Point to, double power, double spread) {
 		// Mostly copied from Minestom PlayerProjectile
 		float pitch = -from.pitch();
@@ -140,38 +176,7 @@ public class CustomEntityProjectile extends Entity {
 			dy += xzLength * 0.20000000298023224D;
 		}
 		
-		EntityShootEvent shootEvent = new EntityShootEvent(shooter == null ? this : shooter, this, from, power, spread);
-		EventDispatcher.call(shootEvent);
-		if (shootEvent.isCancelled()) {
-			remove();
-			return;
-		}
-		power = shootEvent.getPower();
-		spread = shootEvent.getSpread();
-		
-		double length = Math.sqrt(dx * dx + dy * dy + dz * dz);
-		dx /= length;
-		dy /= length;
-		dz /= length;
-		Random random = ThreadLocalRandom.current();
-		spread *= 0.007499999832361937D;
-		dx += random.nextGaussian() * spread;
-		dy += random.nextGaussian() * spread;
-		dz += random.nextGaussian() * spread;
-		
-		final double mul = 20 * power;
-		this.velocity = new Vec(dx * mul, dy * mul * 0.9, dz * mul);
-		if (shooter == null) {
-			setView(
-					(float) Math.toDegrees(Math.atan2(dx, dz)),
-					(float) Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz)))
-			);
-		} else {
-			// Projectile view is opposite of shooting position
-			setView(-from.yaw(), -from.pitch());
-		}
-		
-		updateCooldown = System.currentTimeMillis();
+		shoot(dx, dy, dz, power, spread);
 	}
 	
 	@Override
@@ -212,6 +217,8 @@ public class CustomEntityProjectile extends Entity {
 		return isFree(blockPosition.add(collisionDirection.x(), 0, 0))
 				&& isFree(blockPosition.add(0, collisionDirection.y(), 0))
 				&& isFree(blockPosition.add(0, 0, collisionDirection.z()));
+		//Block block = instance.getBlock(position);
+		//return !block.registry().collisionShape().intersectBox(position.sub(blockPosition).sub(0, 0.6, 0), UNSTUCK_BOX);
 	}
 	
 	private boolean isFree(Point collidedPoint) {
@@ -219,7 +226,7 @@ public class CustomEntityProjectile extends Entity {
 		
 		// Move position slightly towards collision point because we will check for collision
 		Point intersectPos = position.add(collidedPoint.sub(position).mul(0.003));
-		return !block.registry().collisionShape().intersectBox(intersectPos.sub(collidedPoint), getBoundingBox());
+		return !block.registry().collisionShape().intersectBox(intersectPos.sub(collidedPoint).sub(0, 0.6, 0), UNSTUCK_BOX);
 	}
 	
 	@Override
@@ -235,19 +242,21 @@ public class CustomEntityProjectile extends Entity {
 					false, previousPhysicsResult, true);
 			this.previousPhysicsResult = physicsResult;
 			
-			// We won't check collisions with self for first ticks of projectile's life, because it spawns in the
-			// shooter and will immediately be triggered by him.
-			boolean noCollideShooter = getAliveTicks() < 6;
-			PhysicsResult entityResult = CollisionUtils.checkEntityCollisions(instance, boundingBox, position,
-					diff, 3, e -> {
-						if (noCollideShooter && e == shooter) return false;
-						return e != this;
-					}, physicsResult);
-			
-			if (entityResult.hasCollision() && entityResult.collisionShapes()[0] instanceof Entity collided) {
-				ProjectileEntityHitEvent event = new ProjectileEntityHitEvent(this, collided);
-				EventDispatcher.callCancellable(event, () -> onHit(collided));
-				if (isRemoved()) return;
+			if (!noClip) {
+				// We won't check collisions with self for first ticks of projectile's life, because it spawns in the
+				// shooter and will immediately be triggered by him.
+				boolean noCollideShooter = getAliveTicks() < 6;
+				PhysicsResult entityResult = CollisionUtils.checkEntityCollisions(instance, boundingBox.expand(0.1, 0.3, 0.1),
+						position.add(0, -0.3, 0), diff, 3, e -> {
+							if (noCollideShooter && e == shooter) return false;
+							return e != this;
+						}, physicsResult);
+				
+				if (entityResult.hasCollision() && entityResult.collisionShapes()[0] instanceof Entity collided) {
+					ProjectileEntityHitEvent event = new ProjectileEntityHitEvent(this, collided);
+					EventDispatcher.callCancellable(event, () -> onHit(collided));
+					if (isRemoved()) return;
+				}
 			}
 			
 			Chunk finalChunk = ChunkUtils.retrieve(instance, currentChunk, physicsResult.newPosition());
@@ -255,9 +264,6 @@ public class CustomEntityProjectile extends Entity {
 			
 			Pos newPosition = physicsResult.newPosition();
 			if (physicsResult.hasCollision() && !isStuck()) {
-				double res = EntityUtils.getResFromCollision(physicsResult.res());
-				newPosition = position.add(diff.mul(res).add(diff.normalize().mul(0.01)));
-				
 				double signumX = physicsResult.collisionX() ? Math.signum(velocity.x()) : 0;
 				double signumY = physicsResult.collisionY() ? Math.signum(velocity.y()) : 0;
 				double signumZ = physicsResult.collisionZ() ? Math.signum(velocity.z()) : 0;
@@ -273,20 +279,26 @@ public class CustomEntityProjectile extends Entity {
 				});
 			}
 			
-			velocity = isStuck() ? Vec.ZERO : physicsResult.newVelocity().mul(ServerFlag.SERVER_TICKS_PER_SECOND);
+			Aerodynamics aerodynamics = getAerodynamics();
+			velocity = velocity.mul(
+					aerodynamics.horizontalAirResistance(),
+					aerodynamics.verticalAirResistance(),
+					aerodynamics.horizontalAirResistance()
+			).sub(0, hasNoGravity() ? 0 : getAerodynamics().gravity() * ServerFlag.SERVER_TICKS_PER_SECOND, 0);
 			onGround = physicsResult.isOnGround();
-			boolean shouldSendVelocity = hasVelocity();
 			
 			refreshPosition(newPosition, true, false);
-			if (shouldSendVelocity) sendPacketToViewers(getVelocityPacket());
 			
-			if (!noClip && updateCooldown + 500 < System.currentTimeMillis()) {
+			if (!noClip) {
 				float yaw = (float) Math.toDegrees(Math.atan2(diff.x(), diff.z()));
 				float pitch = (float) Math.toDegrees(Math.atan2(diff.y(), Math.sqrt(diff.x() * diff.x() + diff.z() * diff.z())));
-				refreshPosition(position.withView(yaw, pitch));
-				updateCooldown = System.currentTimeMillis();
+				refreshPosition(position.withView(yaw, pitch), false, false);
 			}
 		}
+	}
+	
+	protected int getUpdateInterval() {
+		return 20;
 	}
 	
 	protected void handleState(State state) {
