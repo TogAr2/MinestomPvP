@@ -219,7 +219,7 @@ public class CustomEntityProjectile extends Entity {
 				if (entityResult.hasCollision() && entityResult.collisionShapes()[0] instanceof Entity collided) {
 					AtomicBoolean entityCollisionSucceeded = new AtomicBoolean();
 					
-					var event = new ProjectileCollideWithEntityEvent(this, Pos.fromPoint(entityResult.collisionPoints()[0]), collided);
+					var event = new ProjectileCollideWithEntityEvent(this, Pos.fromPoint(entityResult.newPosition()), collided);
 					EventDispatcher.callCancellable(event, () -> entityCollisionSucceeded.set(onHit(collided)));
 					
 					if (entityCollisionSucceeded.get()) {
