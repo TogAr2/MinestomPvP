@@ -1,6 +1,5 @@
 package io.github.togar2.pvp.projectile;
 
-import io.github.togar2.pvp.events.ProjectileHitEvent.ProjectileBlockHitEvent;
 import io.github.togar2.pvp.events.ProjectileHitEvent.ProjectileEntityHitEvent;
 import io.github.togar2.pvp.utils.ProjectileUtils;
 import net.minestom.server.ServerFlag;
@@ -19,31 +18,20 @@ import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.entity.projectile.ProjectileCollideWithBlockEvent;
 import net.minestom.server.event.entity.projectile.ProjectileUncollideEvent;
 import net.minestom.server.instance.Chunk;
-import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.utils.chunk.ChunkUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-/**
- * Stolen from <a href="https://github.com/Minestom/Minestom/pull/496/">Pull Request #496</a> and edited
- */
 public class CustomEntityProjectile extends Entity {
 	private static final BoundingBox POINT_BOX = new BoundingBox(0, 0, 0);
 	private static final BoundingBox UNSTUCK_BOX = new BoundingBox(0.12, 0.6, 0.12);
 
 	private final Entity shooter;
-	private final @Nullable Predicate<Entity> victimsPredicate;
-	private final boolean hitAnticipation;
 	protected boolean noClip;
 	
 	protected Vec collisionDirection;
@@ -55,25 +43,11 @@ public class CustomEntityProjectile extends Entity {
 	 *
 	 * @param shooter          shooter of the projectile: may be null.
 	 * @param entityType       type of the projectile.
-	 * @param victimsPredicate if this projectile must not be able to hit entities, leave this null;
-	 *                         otherwise it's a predicate for those entities that may be hit by that projectile.
 	 */
-	public CustomEntityProjectile(@Nullable Entity shooter, @NotNull EntityType entityType, @Nullable Predicate<Entity> victimsPredicate, boolean hitAnticipation) {
+	public CustomEntityProjectile(@Nullable Entity shooter, @NotNull EntityType entityType) {
 		super(entityType);
 		this.shooter = shooter;
-		this.victimsPredicate = victimsPredicate;
-		this.hitAnticipation = hitAnticipation;
 		setup();
-	}
-	
-	/**
-	 * Constructs new projectile that can hit living entities.
-	 *
-	 * @param shooter    shooter of the projectile: may be null.
-	 * @param entityType type of the projectile.
-	 */
-	public CustomEntityProjectile(@Nullable Entity shooter, @NotNull EntityType entityType, boolean hitAnticipation) {
-		this(shooter, entityType, LivingEntity.class::isInstance, hitAnticipation);
 	}
 	
 	private void setup() {
@@ -186,19 +160,8 @@ public class CustomEntityProjectile extends Entity {
 	
 	@Override
 	public void tick(long time) {
-//		if (hitAnticipation && getAliveTicks() == 0) {
-//			final State state = guessNextState(getPosition());
-//			handleState(state);
-//			if (state != State.Flying) return;
-//		}
-//
-//		final Pos posBefore = getPosition();
 		super.tick(time);
 		if (isRemoved()) return;
-//		if (isRemoved()) return;
-//		final Pos posNow = getPosition();
-//		final State state = hitAnticipation ? guessNextState(posNow) : getState(posBefore, posNow, true);
-//		handleState(state);
 		
 		if (isStuck() && shouldUnstuck()) {
 			EventDispatcher.call(new ProjectileUncollideEvent(this));
@@ -217,8 +180,6 @@ public class CustomEntityProjectile extends Entity {
 		return isFree(blockPosition.add(collisionDirection.x(), 0, 0))
 				&& isFree(blockPosition.add(0, collisionDirection.y(), 0))
 				&& isFree(blockPosition.add(0, 0, collisionDirection.z()));
-		//Block block = instance.getBlock(position);
-		//return !block.registry().collisionShape().intersectBox(position.sub(blockPosition).sub(0, 0.6, 0), UNSTUCK_BOX);
 	}
 	
 	private boolean isFree(Point collidedPoint) {
@@ -242,8 +203,7 @@ public class CustomEntityProjectile extends Entity {
 		if (!isStuck()) {
 			Vec diff = velocity.div(ServerFlag.SERVER_TICKS_PER_SECOND);
 			PhysicsResult physicsResult = ProjectileUtils.simulateMovement(position, diff, POINT_BOX,
-					instance.getWorldBorder(), instance, getAerodynamics(), hasNoGravity(), hasPhysics, onGround,
-					false, previousPhysicsResult, true);
+					instance.getWorldBorder(), instance, hasPhysics, previousPhysicsResult, true);
 			this.previousPhysicsResult = physicsResult;
 			
 			if (!noClip) {
@@ -319,132 +279,5 @@ public class CustomEntityProjectile extends Entity {
 	
 	protected int getUpdateInterval() {
 		return 20;
-	}
-	
-	protected void handleState(State state) {
-		if (state == State.Flying) {
-			if (!noClip && hasVelocity()) {
-				Vec direction = getVelocity().normalize();
-				double dx = direction.x();
-				double dy = direction.y();
-				double dz = direction.z();
-				this.position = this.position.withView(
-						(float) Math.toDegrees(Math.atan2(dx, dz)),
-						(float) Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz)))
-				);
-			}
-			
-			if (!super.onGround) {
-				return;
-			}
-			super.onGround = false;
-			setNoGravity(false);
-			EventDispatcher.call(new ProjectileUncollideEvent(this));
-			onUnstuck();
-		} else if (state == State.StuckInBlock) {
-			if (super.onGround) {
-				return;
-			}
-			EventDispatcher.call(new ProjectileBlockHitEvent(this));
-			super.onGround = true;
-			this.velocity = Vec.ZERO;
-			sendPacketToViewersAndSelf(getVelocityPacket());
-			setNoGravity(true);
-			onStuck();
-		} else {
-			Entity entity = ((State.HitEntity) state).entity;
-			ProjectileEntityHitEvent event = new ProjectileEntityHitEvent(this, entity);
-			EventDispatcher.callCancellable(event, () -> onHit(entity));
-		}
-	}
-	
-	protected State guessNextState(Pos posNow) {
-		return getState(posNow, posNow.add(getVelocity().mul(0.06)), false);
-	}
-	
-	/**
-	 * Checks whether a projectile is stuck in block / hit an entity.
-	 *
-	 * @param pos    position right before current tick.
-	 * @param posNow position after current tick.
-	 * @return current state of the projectile.
-	 */
-	@SuppressWarnings("ConstantConditions")
-	private State getState(Pos pos, Pos posNow, boolean shouldTeleport) {
-		if (noClip) return State.Flying;
-		
-		if (pos.samePoint(posNow)) {
-			if (instance.getBlock(posNow).isSolid()) {
-				return State.StuckInBlock;
-			} else {
-				return State.Flying;
-			}
-		}
-		
-		Instance instance = getInstance();
-		Chunk chunk = null;
-		Collection<Entity> entities = null;
-
-        /*
-          What we're about to do is to discretely jump from the previous position to the new one.
-          For each point we will be checking blocks and entities we're in.
-         */
-		double part = .25D; // half of the bounding box
-		final var dir = posNow.sub(pos).asVec();
-		int parts = (int) Math.ceil(dir.length() / part);
-		final var direction = dir.normalize().mul(part).asPosition();
-		for (int i = 0; i < parts; ++i) {
-			// If we're at last part, we can't just add another direction-vector, because we can exceed end point.
-			if (i == parts - 1) {
-				pos = posNow;
-			} else {
-				pos = pos.add(direction);
-			}
-			if (!instance.isChunkLoaded(pos)) {
-				remove();
-				return State.Flying;
-			}
-			Point blockPos = new Pos(pos.blockX(), pos.blockY(), pos.blockZ());
-			if (instance.getBlock(pos).registry().collisionShape().intersectBox(pos.sub(blockPos), getBoundingBox())) {
-				if (shouldTeleport) teleport(pos);
-				return State.StuckInBlock;
-			}
-			if (victimsPredicate == null) {
-				continue;
-			}
-			Chunk currentChunk = instance.getChunkAt(pos);
-			if (currentChunk != chunk) {
-				chunk = currentChunk;
-				entities = instance.getChunkEntities(chunk)
-						.stream()
-						.filter(victimsPredicate)
-						.collect(Collectors.toSet());
-			}
-			
-			final Pos finalPos = pos;
-			Stream<Entity> victims = entities.stream().filter(entity -> getBoundingBox().intersectEntity(finalPos, entity));
-
-            /*
-              We won't check collisions with self for first ticks of projectile's life, because it spawns in the
-              shooter and will immediately be triggered by him.
-             */
-			if (getAliveTicks() < 6) {
-				victims = victims.filter(entity -> entity != getShooter());
-			}
-			Optional<Entity> victim = victims.findAny();
-			if (victim.isPresent()) {
-				return new State.HitEntity(victim.get());
-			}
-		}
-		return State.Flying;
-	}
-	
-	protected interface State {
-		State Flying = new State() {
-		};
-		State StuckInBlock = new State() {
-		};
-		
-		record HitEntity(Entity entity) implements State {}
 	}
 }

@@ -45,7 +45,7 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 	private final Set<Integer> piercingIgnore = new HashSet<>();
 	
 	public AbstractArrow(@Nullable Entity shooter, @NotNull EntityType entityType) {
-		super(shooter, entityType, false);
+		super(shooter, entityType);
 		
 		if (shooter instanceof Player) {
 			pickupMode = ((Player) shooter).isCreative() ? PickupMode.CREATIVE_ONLY : PickupMode.ALLOWED;

@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 public class Snowball extends CustomEntityProjectile implements ItemHoldingProjectile {
 	
 	public Snowball(@Nullable Entity shooter) {
-		super(shooter, EntityType.SNOWBALL, true);
+		super(shooter, EntityType.SNOWBALL);
 	}
 	
 	@Override

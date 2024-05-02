@@ -27,7 +27,7 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 	private final boolean legacy;
 	
 	public ThrownPotion(@Nullable Entity shooter, boolean legacy) {
-		super(shooter, EntityType.POTION, true);
+		super(shooter, EntityType.POTION);
 		this.legacy = legacy;
 		
 		// Why does Minestom have the wrong value 0.03 in its registries?

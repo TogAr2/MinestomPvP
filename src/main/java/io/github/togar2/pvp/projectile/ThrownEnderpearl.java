@@ -21,7 +21,7 @@ public class ThrownEnderpearl extends CustomEntityProjectile implements ItemHold
 	private Pos prevPos = Pos.ZERO;
 	
 	public ThrownEnderpearl(@Nullable Entity shooter) {
-		super(shooter, EntityType.ENDER_PEARL, false);
+		super(shooter, EntityType.ENDER_PEARL);
 	}
 	
 	private void teleportOwner() {

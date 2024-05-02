@@ -25,7 +25,7 @@ public class FishingBobber extends CustomEntityProjectile {
 	private Pos prevPos = Pos.ZERO;
 	
 	public FishingBobber(@Nullable Entity shooter, boolean legacy) {
-		super(shooter, EntityType.FISHING_BOBBER, false);
+		super(shooter, EntityType.FISHING_BOBBER);
 		this.legacy = legacy;
 		setOwnerEntity(shooter);
 		

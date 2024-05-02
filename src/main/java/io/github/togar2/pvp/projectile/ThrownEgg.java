@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 public class ThrownEgg extends CustomEntityProjectile implements ItemHoldingProjectile {
 	
 	public ThrownEgg(@Nullable Entity shooter) {
-		super(shooter, EntityType.EGG, true);
+		super(shooter, EntityType.EGG);
 	}
 	
 	@Override
