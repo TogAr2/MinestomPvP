@@ -6,14 +6,12 @@
 [![](https://jitpack.io/v/TogAr2/MinestomPvP.svg?style=flat-square)](https://jitpack.io/#TogAr2/MinestomPvP)
 
 MinestomPvP is an extension for Minestom.
-It tries to mimic vanilla (and pre-1.9) PvP as good as possible, while also focusing on customizability and usability.
+It tries to mimic vanilla (modern **and** pre-1.9) PvP as good as possible, while also focusing on customizability and usability.
 
 But, MinestomPvP does not only provide PvP, it also provides everything around it (e.g., status effects and food).
 You can easily choose which features you want to use.
 
 The maven repository is available on [jitpack](https://jitpack.io/#TogAr2/MinestomPvP).
-
-**You might not want to put this extension in your extensions folder, more information at [usage](#usage).**
 
 ## Table of Contents
 
@@ -51,19 +49,12 @@ Currently, most vanilla PvP features are supported.
 
 - Lingering potions
 - Fireworks (for crossbows)
-- Projectile collision might need some improvements
+- Support for (some) water mechanics (e.g. slowing projectiles down)
 
 ## Usage
 
-One way to use this extension is by simply putting the jar inside your servers extensions folder.
-This will apply PvP mechanics to your whole server.
-
-But you can also choose to (and this is the preferred option for most servers) use the jar file as a library.
-In this case, you can choose where to apply the PvP mechanics and customize them.
-The rest of this readme assumes you are using this method.
-
 Before doing anything else, you should call `PvpExtension.init()`. This will make sure everything is registered correctly.
-After you've initialized the extension, you can get an `EventNode` with all PvP related events listening using `PvpExtension.events()`.
+After you've initialized the library, you can get an `EventNode` with all PvP related events listening using `PvpExtension.events()`.
 By adding this node as a child to any other node, you enable pvp in that scope.
 
 Example (adds PvP to the global event handler, so everywhere):
@@ -83,11 +74,12 @@ eventHandler.addChild(
         .build().createNode()
 );
 ```
-Which would result in potion effects and splash potions still working, but not drinkable potions.
-Everything else not to do with potions would be disabled as well, since you are using `PvPConfig.emptyBuilder()`.
+This example would result in potion effects and splash potions still working, but not drinkable potions.
+Everything else not to do with potions would be disabled as well, since it is using `PvPConfig.emptyBuilder()`.
 
 ### Legacy PvP
 
+Earlier minecraft versions (pre-1.9) used a different PvP system, which to this day is still preferred by some. *Legacy* is the term used to describe this type of PvP throughout the library.
 You can get the `EventNode` for legacy PvP using `PvpExtension.legacyEvents()`, and adjust its settings by using the method described above.
 
 To disable attack cooldown for a player and set their attack damage to the legacy value, use `PvpExtension.setLegacyAttack(player, true)`.
@@ -101,12 +93,9 @@ A lot of servers like to customize their 1.8 knockback. It is also possible to d
 
 To integrate this extension into your minestom server, you may have to tweak a little bit to make sure everything works correctly.
 
-When applying damage to an entity, use `CustomDamageType` instead of `DamageType`.
-If you have your own damage type, also extend `CustomDamageType` instead of `DamageType`.
+First off, potions and milk buckets are considered food: the Minestom food events are also called for drinkable items.
 
-Potions and milk buckets are considered food: the Minestom food events are also called for drinkable items.
-
-The extension uses a custom player implementation, if you use one, it is recommended to extend `CustomPlayer`. If you for some reason can't, make sure to implement `PvpPlayer`. The implementation is registered inside `PvpExtension.init()`, so register yours after the call.
+The extension uses a custom player implementation, if you use one, it is recommended to extend `CustomPlayer`. If you for some reason can't, make sure to implement `PvpPlayer` in a similar fashion to `CustomPlayer`. The implementation is registered inside `PvpExtension.init()`, so register yours after the call.
 
 To allow explosions, you have to register `PvpExplosionSupplier` to every instance in which they are used.
 ```
@@ -137,7 +126,7 @@ This extension provides several events:
 It is possible to add your own features to this extension. For example, you can extend the current enchantment behavior by registering an enchantment using `CustomEnchantments`. This will provide you with a few methods for when the enchantment is used. It is also possible to do the same for potion effects using `CustomPotionEffects`, which will provide you with a few methods for when the effect is applied and removed.
 
 You can use the class `Tool`, which contains all tools and their properties (not all properties are currently included, will change soon).
-The same applies for `ToolMaterial` (wood, stone, ...) and `ArmorMaterial`.
+The same applies to `ToolMaterial` (wood, stone, ...) and `ArmorMaterial`.
 
 ## Contributing
 
