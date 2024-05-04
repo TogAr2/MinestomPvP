@@ -3,7 +3,6 @@ package io.github.togar2.pvp.test;
 import io.github.togar2.pvp.PvpExtension;
 import io.github.togar2.pvp.config.PvPConfig;
 import io.github.togar2.pvp.explosion.PvpExplosionSupplier;
-import io.github.togar2.pvp.potion.effect.CustomPotionEffect;
 import io.github.togar2.pvp.test.commands.Commands;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
@@ -20,8 +19,6 @@ import net.minestom.server.extras.lan.OpenToLAN;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.Material;
-import net.minestom.server.potion.Potion;
-import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.utils.NamespaceID;
 import net.minestom.server.world.DimensionType;
 
@@ -85,7 +82,7 @@ public class PvpTest {
 			//PvpExtension.setLegacyAttack(event.getPlayer(), true);
 			
 			event.getPlayer().setPermissionLevel(4);
-			event.getPlayer().addEffect(new Potion(PotionEffect.REGENERATION, (byte) 10, CustomPotionEffect.PERMANENT));
+			//event.getPlayer().addEffect(new Potion(PotionEffect.REGENERATION, (byte) 10, CustomPotionEffect.PERMANENT));
 		});
 		
 		MinecraftServer.getCommandManager().register(new Command("shoot") {{

@@ -14,14 +14,16 @@ public class FoodConfig extends ElementConfig<PlayerInstanceEvent> {
 	
 	private final boolean
 			naturalExhaustionEnabled, naturalRegenerationEnabled,
-			foodEnabled, blockBreakExhaustionEnabled, moveExhaustionEnabled;
+			foodEnabled, foodSoundsEnabled, blockBreakExhaustionEnabled, moveExhaustionEnabled;
 	
 	FoodConfig(boolean legacy, boolean naturalExhaustionEnabled, boolean naturalRegenerationEnabled,
-	           boolean foodEnabled, boolean blockBreakExhaustionEnabled, boolean moveExhaustionEnabled) {
+	           boolean foodEnabled, boolean foodSoundsEnabled, boolean blockBreakExhaustionEnabled,
+	           boolean moveExhaustionEnabled) {
 		super(legacy);
 		this.naturalExhaustionEnabled = naturalExhaustionEnabled;
 		this.naturalRegenerationEnabled = naturalRegenerationEnabled;
 		this.foodEnabled = foodEnabled;
+		this.foodSoundsEnabled = foodSoundsEnabled;
 		this.blockBreakExhaustionEnabled = blockBreakExhaustionEnabled;
 		this.moveExhaustionEnabled = moveExhaustionEnabled;
 	}
@@ -36,6 +38,10 @@ public class FoodConfig extends ElementConfig<PlayerInstanceEvent> {
 	
 	public boolean isFoodEnabled() {
 		return foodEnabled;
+	}
+	
+	public boolean isFoodSoundsEnabled() {
+		return foodSoundsEnabled;
 	}
 	
 	public boolean isBlockBreakExhaustionEnabled() {

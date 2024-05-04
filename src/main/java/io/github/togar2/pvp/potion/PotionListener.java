@@ -25,7 +25,7 @@ import net.minestom.server.event.entity.EntityDeathEvent;
 import net.minestom.server.event.entity.EntityPotionAddEvent;
 import net.minestom.server.event.entity.EntityPotionRemoveEvent;
 import net.minestom.server.event.entity.EntityTickEvent;
-import net.minestom.server.event.player.PlayerEatEvent;
+import net.minestom.server.event.item.ItemUpdateStateEvent;
 import net.minestom.server.event.player.PlayerPreEatEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
@@ -131,7 +131,9 @@ public class PotionListener {
 			event.setEatingTime(32L * MinecraftServer.TICK_MS); //Potion use time is always 32 ticks
 		}).filter(event -> event.getItemStack().material() == Material.POTION).build());
 		
-		node.addListener(EventListener.builder(PlayerEatEvent.class).handler(event -> {
+		node.addListener(EventListener.builder(ItemUpdateStateEvent.class).handler(event -> {
+			if (!event.getPlayer().isEating()) return; // Temporary hack, waiting on Minestom PR #2128
+			
 			Player player = event.getPlayer();
 			ItemStack stack = event.getItemStack();
 			
@@ -145,7 +147,7 @@ public class PotionListener {
 				
 				if (customPotionEffect.isInstant()) {
 					if (config.isInstantEffectEnabled()) customPotionEffect.applyInstantEffect(
-							player, player, player, potion.amplifier(), 1.0D, config.isLegacy());
+							player, player, player, potion.amplifier(), 1.0, config.isLegacy());
 				} else {
 					player.addEffect(potion);
 				}

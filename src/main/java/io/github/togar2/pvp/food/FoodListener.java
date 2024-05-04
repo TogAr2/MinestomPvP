@@ -6,19 +6,22 @@ import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.entity.PvpPlayer;
 import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.utils.ViewUtil;
-import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
-import net.minestom.server.event.player.*;
+import net.minestom.server.event.item.ItemUpdateStateEvent;
+import net.minestom.server.event.player.PlayerBlockBreakEvent;
+import net.minestom.server.event.player.PlayerMoveEvent;
+import net.minestom.server.event.player.PlayerPreEatEvent;
+import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.trait.PlayerInstanceEvent;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import net.minestom.server.potion.Potion;
 import net.minestom.server.sound.SoundEvent;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -50,11 +53,11 @@ public class FoodListener {
 			}
 			
 			event.setEatingTime((long) getUseTime(foodComponent) * MinecraftServer.TICK_MS);
-		}).filter(event -> event.getItemStack().material().isFood()
-				&& event.getItemStack().material() != Material.POTION)
-				.build());
+		}).filter(event -> event.getItemStack().material().isFood()).build());
 		
-		node.addListener(EventListener.builder(PlayerEatEvent.class).handler(event -> {
+		node.addListener(EventListener.builder(ItemUpdateStateEvent.class).handler(event -> {
+			if (!event.getPlayer().isEating()) return; // Temporary hack, waiting on Minestom PR #2128
+
 			Player player = event.getPlayer();
 			ItemStack stack = event.getItemStack();
 			HungerManager.eat(player, stack.material());
@@ -63,41 +66,43 @@ public class FoodListener {
 			assert component != null;
 			ThreadLocalRandom random = ThreadLocalRandom.current();
 			
-			triggerEatSounds(player, component);
-			
-			if (!component.isDrink() || event.getItemStack().material() == Material.HONEY_BOTTLE) {
-				ViewUtil.viewersAndSelf(player).playSound(Sound.sound(
-						SoundEvent.ENTITY_PLAYER_BURP, Sound.Source.PLAYER,
-						0.5f, random.nextFloat() * 0.1f + 0.9f
-				), player);
-			}
-			
-			List<Pair<Potion, Float>> effectList = component.getStatusEffects();
-			
-			for (Pair<Potion, Float> pair : effectList) {
-				if (pair.first() != null && random.nextFloat() < pair.second()) {
-					player.addEffect(pair.first());
+			if (config.isFoodSoundsEnabled()) {
+				triggerEatSounds(player, component);
+				
+				if (!component.isDrink() || event.getItemStack().material() == Material.HONEY_BOTTLE) {
+					ViewUtil.viewersAndSelf(player).playSound(Sound.sound(
+							SoundEvent.ENTITY_PLAYER_BURP, Sound.Source.PLAYER,
+							0.5f, random.nextFloat() * 0.1f + 0.9f
+					), player);
 				}
 			}
 			
-			component.onEat(player, stack);
+			List<FoodComponent.FoodEffect> effectList = component.getFoodEffects();
+			
+			for (FoodComponent.FoodEffect effect : effectList) {
+				if (random.nextFloat() < effect.chance()) {
+					player.addEffect(effect.potion());
+				}
+			}
+			
+			if (component.getBehaviour() != null) component.getBehaviour().onEat(player, stack);
 			
 			if (!player.isCreative()) {
-				if (component.hasTurnsInto()) {
+				ItemStack leftOver = component.getBehaviour() != null ? component.getBehaviour().getLeftOver() : null;
+				if (leftOver != null) {
 					if (stack.amount() == 1) {
-						player.setItemInHand(event.getHand(), component.getTurnsInto());
+						player.setItemInHand(event.getHand(), leftOver);
 					} else {
 						player.setItemInHand(event.getHand(), stack.withAmount(stack.amount() - 1));
-						player.getInventory().addItemStack(component.getTurnsInto());
+						player.getInventory().addItemStack(leftOver);
 					}
 				} else {
 					event.getPlayer().setItemInHand(event.getHand(), stack.withAmount(stack.amount() - 1));
 				}
 			}
-		}).filter(event -> event.getItemStack().material().isFood()
-				&& event.getItemStack().material() != Material.POTION).build()); //May also be a potion
+		}).filter(event -> event.getItemStack().material().isFood()).build()); //May also be a potion
 		
-		node.addListener(PlayerTickEvent.class, event -> {
+		if (config.isFoodSoundsEnabled()) node.addListener(PlayerTickEvent.class, event -> {
 			Player player = event.getPlayer();
 			if (player.isSilent() || !player.isEating()) return;
 			
@@ -153,13 +158,14 @@ public class FoodListener {
 		ItemStack stack = player.getItemInHand(Objects.requireNonNull(player.getEatingHand()));
 		
 		FoodComponent component = FoodComponents.fromMaterial(stack.material());
+		if (component == null) return;
 		
 		long useTime = getUseTime(component);
 		long usedDuration = System.currentTimeMillis() - player.getTag(Tracker.ITEM_USE_START_TIME);
 		long usedTicks = usedDuration / MinecraftServer.TICK_MS;
 		long remainingUseTicks = useTime - usedTicks;
 		
-		boolean canTrigger = (component != null && component.isSnack()) || remainingUseTicks <= useTime - 7;
+		boolean canTrigger = component.isSnack() || remainingUseTicks <= useTime - 7;
 		boolean shouldTrigger = canTrigger && remainingUseTicks % 4 == 0;
 		if (!shouldTrigger) return;
 		
@@ -170,23 +176,21 @@ public class FoodListener {
 		ThreadLocalRandom random = ThreadLocalRandom.current();
 		
 		if (component == null || component.isDrink()) { // null = potion
-			SoundEvent soundEvent = component != null ? component.getMaterial() == Material.HONEY_BOTTLE ?
-					SoundEvent.ITEM_HONEY_BOTTLE_DRINK : SoundEvent.ENTITY_GENERIC_DRINK : SoundEvent.ENTITY_GENERIC_DRINK;
+			SoundEvent soundEvent = component != null ? component.getDrinkingSound() : SoundEvent.ENTITY_GENERIC_DRINK;
 			player.getViewersAsAudience().playSound(Sound.sound(
 					soundEvent, Sound.Source.PLAYER,
 					0.5f, random.nextFloat() * 0.1f + 0.9f
 			));
 		} else {
 			player.getViewersAsAudience().playSound(Sound.sound(
-					SoundEvent.ENTITY_GENERIC_EAT, Sound.Source.PLAYER,
+					component.getEatingSound(), Sound.Source.PLAYER,
 					0.5f + 0.5f * random.nextInt(2),
 					(random.nextFloat() - random.nextFloat()) * 0.2f + 1.0f
 			));
 		}
 	}
 	
-	private static int getUseTime(@Nullable FoodComponent foodComponent) {
-		if (foodComponent == null) return 32; // null = potion
+	private static int getUseTime(@NotNull FoodComponent foodComponent) {
 		if (foodComponent.getMaterial() == Material.HONEY_BOTTLE) return 40;
 		return foodComponent.isSnack() ? 16 : 32;
 	}

@@ -17,15 +17,13 @@ public class HungerManager {
 	
 	public static void add(Player player, int food, float exhaustion) {
 		player.setFood(Math.min(food + player.getFood(), 20));
-		player.setFoodSaturation(Math.min(player.getFoodSaturation() + (float)food * exhaustion * 2.0F, player.getFood()));
+		player.setFoodSaturation(Math.min(player.getFoodSaturation() + (float) food * exhaustion * 2.0f, player.getFood()));
 	}
 	
 	public static void eat(Player player, Material material) {
-		if (material.isFood()) {
-			FoodComponent foodComponent = FoodComponents.fromMaterial(material);
-			assert foodComponent != null;
-			add(player, foodComponent.getHunger(), foodComponent.getSaturationModifier());
-		}
+		FoodComponent foodComponent = FoodComponents.fromMaterial(material);
+		if (foodComponent == null) return;
+		add(player, foodComponent.getNutrition(), foodComponent.getSaturationModifier());
 	}
 	
 	public static void update(Player player, FoodConfig config) {

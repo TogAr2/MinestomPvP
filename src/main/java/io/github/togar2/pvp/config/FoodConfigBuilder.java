@@ -4,7 +4,8 @@ public class FoodConfigBuilder {
 	private final boolean legacy;
 	private boolean
 			naturalExhaustionEnabled, naturalRegenerationEnabled,
-			foodEnabled, blockBreakExhaustionEnabled, moveExhaustionEnabled;
+			foodEnabled, foodSoundsEnabled, blockBreakExhaustionEnabled,
+			moveExhaustionEnabled;
 	
 	FoodConfigBuilder(boolean legacy) {
 		this.legacy = legacy;
@@ -14,6 +15,7 @@ public class FoodConfigBuilder {
 		naturalExhaustionEnabled = true;
 		naturalRegenerationEnabled = true;
 		foodEnabled = true;
+		foodSoundsEnabled = true;
 		blockBreakExhaustionEnabled = true;
 		moveExhaustionEnabled = true;
 		return this;
@@ -34,6 +36,11 @@ public class FoodConfigBuilder {
 		return this;
 	}
 	
+	public FoodConfigBuilder eatingSounds(boolean foodSoundsEnabled) {
+		this.foodSoundsEnabled = foodSoundsEnabled;
+		return this;
+	}
+	
 	public FoodConfigBuilder blockBreakExhaustion(boolean blockBreakExhaustionEnabled) {
 		this.blockBreakExhaustionEnabled = blockBreakExhaustionEnabled;
 		return this;
@@ -47,7 +54,8 @@ public class FoodConfigBuilder {
 	public FoodConfig build() {
 		return new FoodConfig(
 				legacy, naturalExhaustionEnabled, naturalRegenerationEnabled,
-				foodEnabled, blockBreakExhaustionEnabled, moveExhaustionEnabled
+				foodEnabled, foodSoundsEnabled, blockBreakExhaustionEnabled,
+				moveExhaustionEnabled
 		);
 	}
 }

@@ -4,18 +4,17 @@ import io.github.togar2.pvp.config.PvPConfig;
 import io.github.togar2.pvp.enchantment.CustomEnchantments;
 import io.github.togar2.pvp.entity.CustomPlayer;
 import io.github.togar2.pvp.entity.Tracker;
+import io.github.togar2.pvp.food.FoodComponents;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
 import io.github.togar2.pvp.potion.item.CustomPotionTypes;
+import io.github.togar2.pvp.utils.PvPUseItemListener;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeInstance;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityInstanceEvent;
-import net.minestom.server.item.Material;
-import net.minestom.server.registry.Registry;
-
-import java.lang.reflect.Field;
+import net.minestom.server.network.packet.client.play.ClientUseItemPacket;
 
 public class PvpExtension {
 	
@@ -50,20 +49,13 @@ public class PvpExtension {
 	 * Initialize the PvP extension.
 	 */
 	public static void init() {
+		FoodComponents.registerAll();
 		CustomEnchantments.registerAll();
 		CustomPotionEffects.registerAll();
 		CustomPotionTypes.registerAll();
 		
 		Tracker.register(MinecraftServer.getGlobalEventHandler());
 		MinecraftServer.getConnectionManager().setPlayerProvider(CustomPlayer::new);
-		
-		try {
-			Field isFood = Registry.MaterialEntry.class.getDeclaredField("isFood");
-			isFood.setAccessible(true);
-			isFood.set(Material.POTION.registry(), true);
-			isFood.set(Material.MILK_BUCKET.registry(), true);
-		} catch (NoSuchFieldException | IllegalAccessException e) {
-			e.printStackTrace();
-		}
+		MinecraftServer.getPacketListenerManager().setPlayListener(ClientUseItemPacket.class, PvPUseItemListener::useItemListener);
 	}
 }

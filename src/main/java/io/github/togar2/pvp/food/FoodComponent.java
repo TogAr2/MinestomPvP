@@ -1,52 +1,51 @@
 package io.github.togar2.pvp.food;
 
-import it.unimi.dsi.fastutil.Pair;
 import net.minestom.server.entity.Player;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.potion.Potion;
+import net.minestom.server.sound.SoundEvent;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiConsumer;
 
 public class FoodComponent {
-	private final int hunger;
+	private final Material material;
+	private final int nutrition;
 	private final float saturationModifier;
-	private final boolean meat;
 	private final boolean alwaysEdible;
 	private final boolean snack;
-	private final boolean drink;
-	private final List<Pair<Potion, Float>> statusEffects;
-	private final Material material;
-	private final ItemStack turnsInto;
-	private final BiConsumer<Player, ItemStack> onEat;
+	private final List<FoodEffect> effects;
 	
-	private FoodComponent(int hunger, float saturationModifier, boolean meat, boolean alwaysEdible,
-	                      boolean snack, boolean drink, List<Pair<Potion, Float>> statusEffects,
-	                      Material material, Material turnsInto, BiConsumer<Player, ItemStack> onEat) {
-		this.hunger = hunger;
+	private final SoundEvent eatingSound;
+	private final SoundEvent drinkingSound;
+	private final FoodBehaviour behaviour;
+	
+	public FoodComponent(Material material, int nutrition, float saturationModifier,
+	                      boolean alwaysEdible, boolean snack,
+	                      List<FoodEffect> effects, SoundEvent eatingSound,
+	                      SoundEvent drinkingSound, @Nullable FoodBehaviour behaviour) {
+		this.material = material;
+		this.nutrition = nutrition;
 		this.saturationModifier = saturationModifier;
-		this.meat = meat;
 		this.alwaysEdible = alwaysEdible;
 		this.snack = snack;
-		this.drink = drink;
-		this.statusEffects = statusEffects;
-		this.material = material;
-		this.turnsInto = turnsInto == null ? ItemStack.AIR : ItemStack.of(turnsInto);
-		this.onEat = onEat;
+		this.effects = effects;
+		this.eatingSound = eatingSound;
+		this.drinkingSound = drinkingSound;
+		this.behaviour = behaviour;
 	}
 	
-	public int getHunger() {
-		return this.hunger;
+	public Material getMaterial() {
+		return material;
+	}
+	
+	public int getNutrition() {
+		return this.nutrition;
 	}
 	
 	public float getSaturationModifier() {
 		return this.saturationModifier;
-	}
-	
-	public boolean isMeat() {
-		return this.meat;
 	}
 	
 	public boolean isAlwaysEdible() {
@@ -58,92 +57,38 @@ public class FoodComponent {
 	}
 	
 	public boolean isDrink() {
-		return this.drink;
+		return material == Material.HONEY_BOTTLE || material == Material.MILK_BUCKET;
 	}
 	
-	public List<Pair<Potion, Float>> getStatusEffects() {
-		return this.statusEffects;
+	public List<FoodEffect> getFoodEffects() {
+		return this.effects;
 	}
 	
-	public Material getMaterial() {
-		return material;
+	public SoundEvent getDrinkingSound() {
+		return drinkingSound;
 	}
 	
-	public boolean hasTurnsInto() {
-		return !turnsInto.isAir();
+	public SoundEvent getEatingSound() {
+		return eatingSound;
 	}
 	
-	public ItemStack getTurnsInto() {
-		return turnsInto;
+	public FoodBehaviour getBehaviour() {
+		return behaviour;
 	}
 	
-	public void onEat(Player player, ItemStack stack) {
-		if (onEat != null) {
-			onEat.accept(player, stack);
-		}
-	}
+	public record FoodEffect(Potion potion, double chance) {}
 	
-	public static class Builder {
-		private int hunger;
-		private float saturationModifier;
-		private boolean meat;
-		private boolean alwaysEdible;
-		private boolean snack;
-		private boolean drink;
-		private Material turnsInto;
-		private BiConsumer<Player, ItemStack> onEat;
-		private final List<Pair<Potion, Float>> statusEffects = new ArrayList<>();
+	public static class FoodBehaviour {
+		private final ItemStack leftOver;
 		
-		public FoodComponent.Builder hunger(int hunger) {
-			this.hunger = hunger;
-			return this;
+		public FoodBehaviour(@Nullable ItemStack leftOver) {
+			this.leftOver = leftOver;
 		}
 		
-		public FoodComponent.Builder saturationModifier(float saturationModifier) {
-			this.saturationModifier = saturationModifier;
-			return this;
-		}
+		public void onEat(Player player, ItemStack stack) {}
 		
-		public FoodComponent.Builder meat() {
-			this.meat = true;
-			return this;
-		}
-		
-		public FoodComponent.Builder alwaysEdible() {
-			this.alwaysEdible = true;
-			return this;
-		}
-		
-		public FoodComponent.Builder snack() {
-			this.snack = true;
-			return this;
-		}
-		
-		public FoodComponent.Builder drink() {
-			this.drink = true;
-			return this;
-		}
-		
-		public FoodComponent.Builder statusEffect(Potion effect, float chance) {
-			this.statusEffects.add(Pair.of(effect, chance));
-			return this;
-		}
-		
-		public FoodComponent.Builder turnsInto(Material turnsInto) {
-			this.turnsInto = turnsInto;
-			return this;
-		}
-		
-		public FoodComponent.Builder onEat(BiConsumer<Player, ItemStack> onEat) {
-			this.onEat = onEat;
-			return this;
-		}
-		
-		public FoodComponent build(Material material) {
-			FoodComponent component = new FoodComponent(hunger, saturationModifier, meat,
-					alwaysEdible, snack, drink, statusEffects, material, turnsInto, onEat);
-			FoodComponents.registerComponent(component);
-			return component;
+		public @Nullable ItemStack getLeftOver() {
+			return leftOver;
 		}
 	}
 }
