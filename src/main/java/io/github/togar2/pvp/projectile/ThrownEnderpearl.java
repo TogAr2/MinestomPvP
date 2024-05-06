@@ -1,10 +1,10 @@
 package io.github.togar2.pvp.projectile;
 
-import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.entity.Tracker;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
+import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
@@ -64,7 +64,7 @@ public class ThrownEnderpearl extends CustomEntityProjectile implements ItemHold
 	
 	@Override
 	public boolean onHit(Entity entity) {
-		EntityUtils.damage(entity, new Damage(DamageType.THROWN, this, getShooter(), null, 0));
+		((LivingEntity) entity).damage(new Damage(DamageType.THROWN, this, getShooter(), null, 0));
 		
 		teleportOwner();
 		return true;

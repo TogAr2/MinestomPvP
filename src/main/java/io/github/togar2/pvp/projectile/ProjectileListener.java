@@ -19,6 +19,7 @@ import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.metadata.LivingEntityMeta;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
@@ -227,42 +228,46 @@ public class ProjectileListener {
 		
 		if (config.isCrossbowEnabled()) node.addListener(PlayerTickEvent.class, event -> {
 			Player player = event.getPlayer();
-			if (EntityUtils.isChargingCrossbow(player)) {
-				Player.Hand hand = player.getPlayerMeta().getActiveHand();
-				ItemStack stack = player.getItemInHand(hand);
+			
+			// If not charging crossbow, return
+			LivingEntityMeta meta = (LivingEntityMeta) player.getEntityMeta();
+			if (!meta.isHandActive() || player.getItemInHand(meta.getActiveHand()).material() != Material.CROSSBOW)
+				return;
+			
+			Player.Hand hand = player.getPlayerMeta().getActiveHand();
+			ItemStack stack = player.getItemInHand(hand);
+			
+			int quickCharge = EnchantmentUtils.getLevel(Enchantment.QUICK_CHARGE, stack);
+			
+			long useDuration = System.currentTimeMillis() - player.getTag(Tracker.ITEM_USE_START_TIME);
+			long useTicks = useDuration / MinecraftServer.TICK_MS;
+			double progress = (getCrossbowUseDuration(stack) - useTicks) / (double) getCrossbowChargeDuration(stack);
+			
+			Byte startSoundPlayed = stack.getTag(START_SOUND_PLAYED);
+			Byte midLoadSoundPlayed = stack.getTag(MID_LOAD_SOUND_PLAYED);
+			if (startSoundPlayed == null) startSoundPlayed = (byte) 0;
+			if (midLoadSoundPlayed == null) midLoadSoundPlayed = (byte) 0;
+			
+			if (progress >= 0.2 && startSoundPlayed == (byte) 0) {
+				SoundEvent startSound = getCrossbowStartSound(quickCharge);
+				ViewUtil.viewersAndSelf(player).playSound(Sound.sound(
+						startSound, Sound.Source.PLAYER,
+						0.5f, 1.0f
+				), player);
 				
-				int quickCharge = EnchantmentUtils.getLevel(Enchantment.QUICK_CHARGE, stack);
+				stack = stack.withTag(START_SOUND_PLAYED, (byte) 1);
+				player.setItemInHand(hand, stack);
+			}
+			
+			SoundEvent midLoadSound = quickCharge == 0 ? SoundEvent.ITEM_CROSSBOW_LOADING_MIDDLE : null;
+			if (progress >= 0.5F && midLoadSound != null && midLoadSoundPlayed == (byte) 0) {
+				ViewUtil.viewersAndSelf(player).playSound(Sound.sound(
+						midLoadSound, Sound.Source.PLAYER,
+						0.5f, 1.0f
+				), player);
 				
-				long useDuration = System.currentTimeMillis() - player.getTag(Tracker.ITEM_USE_START_TIME);
-				long useTicks = useDuration / MinecraftServer.TICK_MS;
-				double progress = (getCrossbowUseDuration(stack) - useTicks) / (double) getCrossbowChargeDuration(stack);
-				
-				Byte startSoundPlayed = stack.getTag(START_SOUND_PLAYED);
-				Byte midLoadSoundPlayed = stack.getTag(MID_LOAD_SOUND_PLAYED);
-				if (startSoundPlayed == null) startSoundPlayed = (byte) 0;
-				if (midLoadSoundPlayed == null) midLoadSoundPlayed = (byte) 0;
-				
-				if (progress >= 0.2 && startSoundPlayed == (byte) 0) {
-					SoundEvent startSound = getCrossbowStartSound(quickCharge);
-					ViewUtil.viewersAndSelf(player).playSound(Sound.sound(
-							startSound, Sound.Source.PLAYER,
-							0.5f, 1.0f
-					), player);
-					
-					stack = stack.withTag(START_SOUND_PLAYED, (byte) 1);
-					player.setItemInHand(hand, stack);
-				}
-				
-				SoundEvent midLoadSound = quickCharge == 0 ? SoundEvent.ITEM_CROSSBOW_LOADING_MIDDLE : null;
-				if (progress >= 0.5F && midLoadSound != null && midLoadSoundPlayed == (byte) 0) {
-					ViewUtil.viewersAndSelf(player).playSound(Sound.sound(
-							midLoadSound, Sound.Source.PLAYER,
-							0.5f, 1.0f
-					), player);
-					
-					stack = stack.withTag(MID_LOAD_SOUND_PLAYED, (byte) 1);
-					player.setItemInHand(hand, stack);
-				}
+				stack = stack.withTag(MID_LOAD_SOUND_PLAYED, (byte) 1);
+				player.setItemInHand(hand, stack);
 			}
 		});
 		

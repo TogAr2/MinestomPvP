@@ -1,8 +1,8 @@
 package io.github.togar2.pvp.projectile;
 
-import io.github.togar2.pvp.entity.EntityUtils;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
+import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.entity.metadata.item.ThrownEggMeta;
@@ -20,7 +20,7 @@ public class ThrownEgg extends CustomEntityProjectile implements ItemHoldingProj
 	public boolean onHit(Entity entity) {
 		triggerStatus((byte) 3); // Egg particles
 		
-		EntityUtils.damage(entity, new Damage(DamageType.THROWN, this, getShooter(), null, 0));
+		((LivingEntity) entity).damage(new Damage(DamageType.THROWN, this, getShooter(), null, 0));
 		
 		return true;
 	}

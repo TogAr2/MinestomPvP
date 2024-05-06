@@ -122,6 +122,7 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 	@Override
 	public boolean onHit(@NotNull Entity entity) {
 		if (piercingIgnore.contains(entity.getEntityId())) return false;
+		if (!(entity instanceof LivingEntity living)) return false;
 		
 		ThreadLocalRandom random = ThreadLocalRandom.current();
 		
@@ -149,43 +150,41 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 				null, damage
 		);
 		
-		if (EntityUtils.damage(entity, damageObj)) {
+		if (living.damage(damageObj)) {
 			if (entity.getEntityType() == EntityType.ENDERMAN) return false;
 			
 			if (isOnFire()) {
 				EntityUtils.setOnFireForSeconds(entity, 5);
 			}
 			
-			if (entity instanceof LivingEntity living) {
-				if (getPiercingLevel() <= 0) {
-					living.setArrowCount(living.getArrowCount() + 1);
-				}
+			if (getPiercingLevel() <= 0) {
+				living.setArrowCount(living.getArrowCount() + 1);
+			}
+			
+			if (knockback > 0) {
+				Vec knockbackVec = getVelocity()
+						.mul(1, 0, 1)
+						.normalize().mul(knockback * 0.6);
+				knockbackVec = knockbackVec.add(0, 0.1, 0)
+						.mul(ServerFlag.SERVER_TICKS_PER_SECOND / 2.0);
 				
-				if (knockback > 0) {
-					Vec knockbackVec = getVelocity()
-							.mul(1, 0, 1)
-							.normalize().mul(knockback * 0.6);
-					knockbackVec = knockbackVec.add(0, 0.1, 0)
-							.mul(ServerFlag.SERVER_TICKS_PER_SECOND / 2.0);
-					
-					if (knockbackVec.lengthSquared() > 0) {
-						Vec newVel = living.getVelocity().add(knockbackVec);
-						living.setVelocity(newVel);
-					}
+				if (knockbackVec.lengthSquared() > 0) {
+					Vec newVel = living.getVelocity().add(knockbackVec);
+					living.setVelocity(newVel);
 				}
-				
-				if (shooter instanceof LivingEntity livingShooter) {
-					EnchantmentUtils.onUserDamaged(living, livingShooter);
-					EnchantmentUtils.onTargetDamaged(livingShooter, living);
-				}
-				
-				onHurt(living);
-				
-				if (living != shooter && living instanceof Player
-						&& shooter instanceof Player && !isSilent()) {
-					EffectManager.sendGameState((Player) shooter,
-							ChangeGameStatePacket.Reason.ARROW_HIT_PLAYER, 0.0F);
-				}
+			}
+			
+			if (shooter instanceof LivingEntity livingShooter) {
+				EnchantmentUtils.onUserDamaged(living, livingShooter);
+				EnchantmentUtils.onTargetDamaged(livingShooter, living);
+			}
+			
+			onHurt(living);
+			
+			if (living != shooter && living instanceof Player
+					&& shooter instanceof Player && !isSilent()) {
+				EffectManager.sendGameState((Player) shooter,
+						ChangeGameStatePacket.Reason.ARROW_HIT_PLAYER, 0.0F);
 			}
 			
 			if (!isSilent()) {

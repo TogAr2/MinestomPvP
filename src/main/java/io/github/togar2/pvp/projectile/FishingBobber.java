@@ -76,8 +76,6 @@ public class FishingBobber extends CustomEntityProjectile {
 				}
 			}
 		}
-		
-		//EntityUtils.updateProjectileRotation(this);
 	}
 	
 	@Override
@@ -92,7 +90,7 @@ public class FishingBobber extends CustomEntityProjectile {
 			
 			Pos posNow = this.position;
 			this.position = prevPos;
-			if (EntityUtils.damage(entity, new Damage(DamageType.GENERIC, null, null, null, 0))) {
+			if (((LivingEntity) entity).damage(new Damage(DamageType.GENERIC, null, null, null, 0))) {
 				entity.setVelocity(calculateLegacyKnockback(entity.getVelocity(), entity.getPosition()));
 			}
 			this.position = posNow;

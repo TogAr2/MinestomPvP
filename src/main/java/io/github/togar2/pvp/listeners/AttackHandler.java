@@ -76,14 +76,15 @@ public class AttackHandler {
 			custom.afterSprintAttack();
 		
 		float originalHealth = 0;
-		if (target instanceof LivingEntity livingTarget)
+		boolean damageSucceeded = false;
+		if (target instanceof LivingEntity livingTarget) {
 			originalHealth = livingTarget.getHealth();
-		
-		boolean damageSucceeded = EntityUtils.damage(target, new Damage(
-				attacker instanceof Player ? DamageType.PLAYER_ATTACK : DamageType.MOB_ATTACK,
-				attacker, attacker,
-				null, attack.damage()
-		));
+			damageSucceeded = livingTarget.damage(new Damage(
+					attacker instanceof Player ? DamageType.PLAYER_ATTACK : DamageType.MOB_ATTACK,
+					attacker, attacker,
+					null, attack.damage()
+			));
+		}
 		
 		if (!damageSucceeded) {
 			// No damage sound
@@ -96,8 +97,11 @@ public class AttackHandler {
 			return;
 		}
 		
+		// Target is always living now, because the damage would not have succeeded if it wasn't
+		LivingEntity living = (LivingEntity) target;
+		
 		// Knockback and sweeping
-		applyKnockback(attacker, target, attack.knockback(), config);
+		applyKnockback(attacker, living, attack.knockback(), config);
 		if (attack.sweeping()) applySweeping(attacker, target, attack.damage());
 		
 		if (target instanceof CustomPlayer customPlayer)
@@ -143,7 +147,7 @@ public class AttackHandler {
 		));
 		
 		// Thorns
-		if (target instanceof LivingEntity living) EnchantmentUtils.onUserDamaged(living, attacker);
+		EnchantmentUtils.onUserDamaged(living, attacker);
 		EnchantmentUtils.onTargetDamaged(attacker, target);
 		
 		// Damage item
@@ -152,22 +156,20 @@ public class AttackHandler {
 			ItemUtils.damageEquipment(attacker, EquipmentSlot.MAIN_HAND,
 					(tool.isSword() || tool == Tool.TRIDENT) ? 1 : 2);
 		
-		if (target instanceof LivingEntity living) {
-			if (attack.fireAspect() > 0)
-				EntityUtils.setOnFireForSeconds(target, attack.fireAspect() * 4);
-			
-			// Damage indicator particles
-			float damageDone = originalHealth - living.getHealth();
-			if (config.isDamageIndicatorParticlesEnabled() && damageDone > 2) {
-				int particleCount = (int) (damageDone * 0.5);
-				Pos targetPosition = target.getPosition();
-				target.sendPacketToViewersAndSelf(new ParticlePacket(
-						Particle.DAMAGE_INDICATOR, false,
-						targetPosition.x(), EntityUtils.getBodyY(target, 0.5), targetPosition.z(),
-						0.1f, 0, 0.1f,
-						0.2F, particleCount
-				));
-			}
+		if (attack.fireAspect() > 0)
+			EntityUtils.setOnFireForSeconds(target, attack.fireAspect() * 4);
+		
+		// Damage indicator particles
+		float damageDone = originalHealth - living.getHealth();
+		if (config.isDamageIndicatorParticlesEnabled() && damageDone > 2) {
+			int particleCount = (int) (damageDone * 0.5);
+			Pos targetPosition = target.getPosition();
+			target.sendPacketToViewersAndSelf(new ParticlePacket(
+					Particle.DAMAGE_INDICATOR, false,
+					targetPosition.x(), EntityUtils.getBodyY(target, 0.5), targetPosition.z(),
+					0.1f, 0, 0.1f,
+					0.2F, particleCount
+			));
 		}
 		
 		if (config.isExhaustionEnabled() && attacker instanceof Player player)
@@ -268,7 +270,7 @@ public class AttackHandler {
 		}
 	}
 	
-	protected void applyKnockback(LivingEntity attacker, Entity target,
+	protected void applyKnockback(LivingEntity attacker, LivingEntity target,
 	                                   int knockback, AttackConfig config) {
 		if (knockback <= 0) return;
 		
@@ -277,8 +279,7 @@ public class AttackHandler {
 			EventDispatcher.callCancellable(knockbackEvent, () -> {
 				LegacyKnockbackSettings settings = knockbackEvent.getSettings();
 				
-				float kbResistance = target instanceof LivingEntity living ?
-						living.getAttributeValue(Attribute.KNOCKBACK_RESISTANCE) : 0;
+				float kbResistance = target.getAttributeValue(Attribute.KNOCKBACK_RESISTANCE);
 				double horizontal = settings.extraHorizontal() * (1 - kbResistance) * knockback;
 				double vertical = settings.extraVertical() * (1 - kbResistance) * knockback;
 				
@@ -307,12 +308,6 @@ public class AttackHandler {
 					living.takeKnockback(strength,
 							Math.sin(Math.toRadians(attacker.getPosition().yaw())),
 							-Math.cos(Math.toRadians(attacker.getPosition().yaw()))
-					);
-				} else {
-					target.setVelocity(target.getVelocity().add(
-							-Math.sin(Math.toRadians(attacker.getPosition().yaw())) * strength,
-							0.1D,
-							Math.cos(Math.toRadians(attacker.getPosition().yaw())) * strength)
 					);
 				}
 			});

@@ -1,8 +1,8 @@
 package io.github.togar2.pvp.projectile;
 
-import io.github.togar2.pvp.entity.EntityUtils;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
+import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.entity.metadata.item.SnowballMeta;
@@ -21,7 +21,7 @@ public class Snowball extends CustomEntityProjectile implements ItemHoldingProje
 		triggerStatus((byte) 3); // Snowball particles
 		
 		int damage = entity.getEntityType() == EntityType.BLAZE ? 3 : 0;
-		EntityUtils.damage(entity, new Damage(DamageType.THROWN, this, getShooter(), null, damage));
+		((LivingEntity) entity).damage(new Damage(DamageType.THROWN, this, getShooter(), null, damage));
 		
 		return true;
 	}

@@ -9,7 +9,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.ServerFlag;
-import net.minestom.server.collision.SweepResult;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.*;
@@ -25,7 +24,6 @@ import net.minestom.server.item.Material;
 import net.minestom.server.tag.Tag;
 import net.minestom.server.utils.inventory.PlayerInventoryUtils;
 import net.minestom.server.utils.time.TimeUnit;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.time.Duration;
@@ -68,14 +66,6 @@ public class EntityUtils {
 		}
 	}
 	
-	public static boolean damage(Entity entity, Damage damage) {
-		if (entity instanceof LivingEntity) {
-			return ((LivingEntity) entity).damage(damage);
-		}
-		
-		return false;
-	}
-	
 	public static boolean blockedByShield(LivingEntity entity, Damage damage, DamageTypeInfo typeInfo, boolean legacy) {
 		Entity source = damage.getSource();
 		boolean piercing = false;
@@ -85,7 +75,10 @@ public class EntityUtils {
 			}
 		}
 		
-		if (!typeInfo.bypassesArmor() && !piercing && isBlocking(entity)) {
+		// If damage doesn't bypass armor, no piercing, and a shield is active
+		if (!typeInfo.bypassesArmor() && !piercing
+				&& entity.getEntityMeta() instanceof LivingEntityMeta meta
+				&& meta.isHandActive() && entity.getItemInHand(meta.getActiveHand()).material() == Material.SHIELD) {
 			if (legacy) return true;
 			
 			if (source != null) {
@@ -102,30 +95,6 @@ public class EntityUtils {
 		}
 		
 		return false;
-	}
-	
-	public static boolean isBlocking(LivingEntity entity) {
-		if (entity.getEntityMeta() instanceof LivingEntityMeta meta) {
-			if (meta.isHandActive()) {
-				return entity.getItemInHand(meta.getActiveHand()).material() == Material.SHIELD;
-			}
-		}
-		
-		return false;
-	}
-	
-	public static boolean isChargingCrossbow(LivingEntity entity) {
-		LivingEntityMeta meta = (LivingEntityMeta) entity.getEntityMeta();
-		
-		if (meta.isHandActive()) {
-			return entity.getItemInHand(meta.getActiveHand()).material() == Material.CROSSBOW;
-		}
-		
-		return false;
-	}
-	
-	public static Player.Hand getActiveHand(LivingEntity entity) {
-		return ((LivingEntityMeta) entity.getEntityMeta()).getActiveHand();
 	}
 	
 	public static Iterable<ItemStack> getArmorItems(LivingEntity entity) {
@@ -163,14 +132,12 @@ public class EntityUtils {
 		return entity.getPosition().y() + entity.getBoundingBox().height() * heightScale;
 	}
 	
-	public static @Nullable ItemEntity spawnItemAtLocation(Entity entity, ItemStack itemStack, double up) {
-		if (itemStack.isAir()) return null;
+	public static void spawnItemAtLocation(Entity entity, ItemStack itemStack, double up) {
+		if (itemStack.isAir()) return;
 		
 		ItemEntity item = new ItemEntity(itemStack);
 		item.setPickupDelay(10, TimeUnit.SERVER_TICK); // Default 0.5 seconds
 		item.setInstance(Objects.requireNonNull(entity.getInstance()), entity.getPosition().add(0, up, 0));
-		
-		return item;
 	}
 	
 	public static Pair<ItemStack, Integer> getProjectile(Player player, Predicate<ItemStack> predicate) {
@@ -268,18 +235,6 @@ public class EntityUtils {
 			field.set(livingEntity, lastDamage);
 		} catch (NoSuchFieldException | IllegalAccessException e) {
 			e.printStackTrace();
-		}
-	}
-
-	public static double getResFromCollision(SweepResult sweepResult) {
-		// Use reflection to get previousPosition field
-		try {
-			Field field = SweepResult.class.getDeclaredField("res");
-			field.setAccessible(true);
-			return (double) field.get(sweepResult);
-		} catch (NoSuchFieldException | IllegalAccessException e) {
-			e.printStackTrace();
-			return 0;
 		}
 	}
 }
