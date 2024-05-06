@@ -2,6 +2,8 @@ package io.github.togar2.pvp.test;
 
 import io.github.togar2.pvp.PvpExtension;
 import io.github.togar2.pvp.config.PvPConfig;
+import io.github.togar2.pvp.entity.CustomPlayer;
+import io.github.togar2.pvp.events.EntityKnockbackEvent;
 import io.github.togar2.pvp.explosion.PvpExplosionSupplier;
 import io.github.togar2.pvp.test.commands.Commands;
 import net.kyori.adventure.text.Component;
@@ -10,6 +12,8 @@ import net.minestom.server.attribute.Attribute;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.*;
+import net.minestom.server.entity.damage.EntityDamage;
+import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
@@ -20,7 +24,10 @@ import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.Material;
 import net.minestom.server.utils.NamespaceID;
+import net.minestom.server.utils.time.TimeUnit;
 import net.minestom.server.world.DimensionType;
+
+import java.util.Optional;
 
 public class PvpTest {
 	public static void main(String[] args) {
@@ -45,17 +52,17 @@ public class PvpTest {
 			entity.setInstance(instance, spawn);
 			entity.getAttribute(Attribute.MAX_HEALTH).setBaseValue(500);
 			entity.heal();
-//
-//			MinecraftServer.getSchedulerManager().buildTask(() -> {
-//				Optional<Player> player = MinecraftServer.getConnectionManager()
-//						.getOnlinePlayers().stream()
-//						.filter(p -> p.getDistanceSquared(entity) < 6)
-//						.findAny();
-//
-//				if (player.isPresent()) {
-//					if (!player.get().damage(CustomDamageType.mob(entity), 1.0F))
-//						return;
-//
+
+			MinecraftServer.getSchedulerManager().buildTask(() -> {
+				Optional<Player> player = MinecraftServer.getConnectionManager()
+						.getOnlinePlayers().stream()
+						.filter(p -> p.getDistanceSquared(entity) < 6)
+						.findAny();
+
+				if (player.isPresent()) {
+					if (!player.get().damage(new EntityDamage(entity, 1.0f)))
+						return;
+
 //					LegacyKnockbackEvent legacyKnockbackEvent = new LegacyKnockbackEvent(player.get(), entity, true);
 //					EventDispatcher.callCancellable(legacyKnockbackEvent, () -> {
 //						LegacyKnockbackSettings settings = legacyKnockbackEvent.getSettings();
@@ -66,15 +73,18 @@ public class PvpTest {
 //								Math.cos(entity.getPosition().yaw() * 3.1415927F / 180.0F) * 1 * settings.extraHorizontal()
 //						));
 //					});
-////					EntityKnockbackEvent entityKnockbackEvent = new EntityKnockbackEvent(player.get(), entity, true, false, 1 * 0.5F);
-////					EventDispatcher.callCancellable(entityKnockbackEvent, () -> {
-////						float strength = entityKnockbackEvent.getStrength();
-////						player.get().takeKnockback(strength, Math.sin(Math.toRadians(entity.getPosition().yaw())), -Math.cos(Math.toRadians(entity.getPosition().yaw())));
-////					});
-//				}
-//
-//				event.getPlayer().setFood(20);
-//			}).repeat(3, TimeUnit.SERVER_TICK).schedule();
+					EntityKnockbackEvent entityKnockbackEvent = new EntityKnockbackEvent(player.get(), entity, true, false, 1 * 0.5F);
+					EventDispatcher.callCancellable(entityKnockbackEvent, () -> {
+						float strength = entityKnockbackEvent.getStrength();
+						player.get().takeKnockback(strength, Math.sin(Math.toRadians(entity.getPosition().yaw())), -Math.cos(Math.toRadians(entity.getPosition().yaw())));
+					});
+					
+					if (player.get() instanceof CustomPlayer customPlayer)
+						customPlayer.sendImmediateVelocityUpdate();
+				}
+
+				event.getPlayer().setFood(20);
+			}).repeat(3, TimeUnit.SERVER_TICK).schedule();
 		});
 		
 		MinecraftServer.getGlobalEventHandler().addListener(PlayerSpawnEvent.class, event -> {

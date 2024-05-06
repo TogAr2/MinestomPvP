@@ -3,6 +3,7 @@ package io.github.togar2.pvp.damage.combat;
 import io.github.togar2.pvp.damage.DamageTypeInfo;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.entity.Tracker;
+import io.github.togar2.pvp.listeners.DamageListener;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
@@ -106,10 +107,7 @@ public class CombatManager {
 			fall = heaviestFall != null;
 		}
 		
-		if (!fall) {
-			//TODO return lastEntry.damageType().getDeathMessage(player);
-			return Component.empty();
-		}
+		if (!fall) return DamageListener.getAttackDeathMessage(player, lastEntry.damage());
 		
 		DamageTypeInfo heaviestFallInfo = DamageTypeInfo.of(heaviestFall.damage().getType());
 		if (heaviestFallInfo.fall() || heaviestFallInfo.outOfWorld()) {

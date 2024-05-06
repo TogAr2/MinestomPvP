@@ -21,14 +21,15 @@ public class DamageConfig extends ElementConfig<EntityInstanceEvent> {
 	private final boolean
 			fallDamageEnabled, equipmentDamageEnabled, shieldEnabled,
 			legacyShieldMechanics, armorEnabled, exhaustionEnabled,
-			legacyKnockback, soundsEnabled, damageAnimation, performDamage;
+			legacyKnockback, soundsEnabled, damageAnimation, performDamage,
+			deathMessagesEnabled;
 	private final int invulnerabilityTicks;
 	
 	public DamageConfig(boolean legacy, DamageHandler damageHandler, FallDamageHandler fallDamageHandler,
 	                    boolean fallDamageEnabled, boolean equipmentDamageEnabled,
 	                    boolean shieldEnabled, boolean legacyShieldMechanics, int invulnerabilityTicks,
 	                    boolean armorEnabled, boolean exhaustionEnabled, boolean legacyKnockback,
-	                    boolean soundsEnabled, boolean damageAnimation, boolean performDamage) {
+	                    boolean soundsEnabled, boolean damageAnimation, boolean performDamage, boolean deathMessages) {
 		super(legacy);
 		this.damageHandler = damageHandler;
 		this.fallDamageHandler = fallDamageHandler;
@@ -43,6 +44,7 @@ public class DamageConfig extends ElementConfig<EntityInstanceEvent> {
 		this.soundsEnabled = soundsEnabled;
 		this.damageAnimation = damageAnimation;
 		this.performDamage = performDamage;
+		this.deathMessagesEnabled = deathMessages;
 	}
 	
 	public DamageHandler getDamageHandler() {
@@ -95,6 +97,10 @@ public class DamageConfig extends ElementConfig<EntityInstanceEvent> {
 	
 	public boolean shouldPerformDamage() {
 		return performDamage;
+	}
+	
+	public boolean isDeathMessagesEnabled() {
+		return deathMessagesEnabled;
 	}
 	
 	@Override
