@@ -12,14 +12,13 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.damage.EntityDamage;
 import net.minestom.server.event.GlobalEventHandler;
-import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
-import net.minestom.server.event.player.PlayerSpawnEvent;
-import net.minestom.server.event.player.PlayerTickEvent;
-import net.minestom.server.event.player.PlayerUseItemOnBlockEvent;
+import net.minestom.server.event.player.*;
 import net.minestom.server.extras.lan.OpenToLAN;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.Material;
+import net.minestom.server.network.packet.server.common.KeepAlivePacket;
+import net.minestom.server.network.packet.server.play.*;
 import net.minestom.server.utils.NamespaceID;
 import net.minestom.server.utils.time.TimeUnit;
 import net.minestom.server.world.DimensionType;
@@ -90,6 +89,21 @@ public class PvpTest {
 			
 			event.getPlayer().setPermissionLevel(4);
 			//event.getPlayer().addEffect(new Potion(PotionEffect.REGENERATION, (byte) 10, CustomPotionEffect.PERMANENT));
+		});
+		
+		MinecraftServer.getGlobalEventHandler().addListener(PlayerPacketOutEvent.class, event -> {
+			if (event.getPacket() instanceof ActionBarPacket) return;
+			if (event.getPacket() instanceof UpdateHealthPacket) return;
+			if (event.getPacket() instanceof TimeUpdatePacket) return;
+			if (event.getPacket() instanceof PlayerInfoUpdatePacket) return;
+			if (event.getPacket() instanceof ChunkDataPacket) return;
+			if (event.getPacket() instanceof KeepAlivePacket) return;
+			if (event.getPacket() instanceof SetSlotPacket) return;
+			if (event.getPacket() instanceof WindowItemsPacket) return;
+			if (event.getPacket() instanceof EntitySoundEffectPacket) return;
+			if (event.getPacket() instanceof CollectItemPacket) return;
+			if (event.getPacket() instanceof DestroyEntitiesPacket) return;
+			System.out.println(event.getPacket());
 		});
 		
 		MinecraftServer.getCommandManager().register(new Command("shoot") {{

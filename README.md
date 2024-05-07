@@ -77,6 +77,8 @@ eventHandler.addChild(
 This example would result in potion effects and splash potions still working, but not drinkable potions.
 Everything else not to do with potions would be disabled as well, since it is using `PvPConfig.emptyBuilder()`.
 
+In case you want to customize mechanics in a way that is not currently possible with the configs, see [Customization](#customization).
+
 ### Legacy PvP
 
 Earlier minecraft versions (pre-1.9) used a different PvP system, which to this day is still preferred by some. *Legacy* is the term used to describe this type of PvP throughout the library.
@@ -125,6 +127,13 @@ It is possible to add your own features to this extension. For example, you can 
 
 You can use the class `Tool`, which contains all tools and their properties (not all properties are currently included, will change soon).
 The same applies to `ToolMaterial` (wood, stone, ...) and `ArmorMaterial`.
+
+In case you want to override mechanics in a way that is not currently possible with the configs, you can use the config to set a different handler. These handlers contain several protected methods which you can override in order to further customize the behaviour. This method is not recommended (when updating, you might miss out on changes because you have overridden a method), so only use it as a last resort. In most cases it might be better to just disable that specific part of MinestomPvP and write your own handling logic.
+
+The following handlers are currently available to override:
+- `AttackHandler` (set inside `AttackConfig`)
+- `DamageHandler` (set inside `DamageConfig`)
+- `FallDamageHandler` (set inside `DamageConfig`)
 
 ## Contributing
 
