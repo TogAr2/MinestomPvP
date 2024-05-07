@@ -63,23 +63,13 @@ public class FallDamageHandler {
 			if (entity instanceof Player player && !player.getGameMode().canTakeDamage()) return;
 			int damage = getFallDamage(entity, fallDistance);
 			if (damage > 0) {
-				if (entity instanceof Player player) {
-					entity.getViewersAsAudience().playSound(Sound.sound(
-							damage > 4 ?
-									SoundEvent.ENTITY_PLAYER_BIG_FALL :
-									SoundEvent.ENTITY_PLAYER_SMALL_FALL,
-							Sound.Source.PLAYER,
-							1.0f, 1.0f
-					), player);
-				} else {
-					entity.getViewersAsAudience().playSound(Sound.sound(
-							damage > 4 ?
-									SoundEvent.ENTITY_GENERIC_BIG_FALL :
-									SoundEvent.ENTITY_GENERIC_SMALL_FALL,
-							Sound.Source.HOSTILE,
-							1.0f, 1.0f
-					));
-				}
+				entity.getViewersAsAudience().playSound(Sound.sound(
+						damage > 4 ?
+								SoundEvent.ENTITY_PLAYER_BIG_FALL :
+								SoundEvent.ENTITY_PLAYER_SMALL_FALL,
+						entity instanceof  Player ? Sound.Source.PLAYER : Sound.Source.HOSTILE,
+						1.0f, 1.0f
+				), entity);
 				
 				entity.damage(DamageType.FALL, damage);
 			}
