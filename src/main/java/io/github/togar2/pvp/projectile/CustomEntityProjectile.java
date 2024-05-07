@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -195,6 +196,18 @@ public class CustomEntityProjectile extends Entity {
 	}
 	
 	@Override
+	protected void synchronizePosition() {
+		// For some reason, sending a synchronization when stuck means the position of the arrow will change slightly
+		// on the client even though the position on the server has not changed at all. Why? No clue.
+		// This check does solve the issue though.
+		if (isStuck()) return;
+		
+		super.synchronizePosition();
+	}
+	
+	private float prevYaw, prevPitch;
+	
+	@Override
 	protected void movementTick() {
 		// Mostly copied from Minestom
 		this.gravityTickCount = isStuck() ? 0 : gravityTickCount + 1;
@@ -205,6 +218,8 @@ public class CustomEntityProjectile extends Entity {
 			PhysicsResult physicsResult = ProjectileUtils.simulateMovement(position, diff, POINT_BOX,
 					instance.getWorldBorder(), instance, hasPhysics, previousPhysicsResult, true);
 			this.previousPhysicsResult = physicsResult;
+			
+			Pos newPosition = physicsResult.newPosition();
 			
 			if (!noClip) {
 				// We won't check collisions with self for first ticks of projectile's life, because it spawns in the
@@ -219,6 +234,8 @@ public class CustomEntityProjectile extends Entity {
 				if (entityResult.hasCollision() && entityResult.collisionShapes()[0] instanceof Entity collided) {
 					AtomicBoolean entityCollisionSucceeded = new AtomicBoolean();
 					
+					Vec prevVelocity = velocity;
+					
 					var event = new ProjectileCollideWithEntityEvent(this, Pos.fromPoint(entityResult.newPosition()), collided);
 					EventDispatcher.callCancellable(event, () -> entityCollisionSucceeded.set(onHit(collided)));
 					
@@ -227,6 +244,9 @@ public class CustomEntityProjectile extends Entity {
 						scheduler().scheduleNextProcess(this::remove);
 						// Prevent hitting blocks
 						return;
+					} else {
+						// If velocity has been changed because of bounce, prevent projectile from moving further
+						if (velocity != prevVelocity) newPosition = position;
 					}
 				}
 			}
@@ -234,7 +254,6 @@ public class CustomEntityProjectile extends Entity {
 			Chunk finalChunk = ChunkUtils.retrieve(instance, currentChunk, physicsResult.newPosition());
 			if (!ChunkUtils.isLoaded(finalChunk)) return;
 			
-			Pos newPosition = physicsResult.newPosition();
 			if (physicsResult.hasCollision() && !isStuck()) {
 				double signumX = physicsResult.collisionX() ? Math.signum(velocity.x()) : 0;
 				double signumY = physicsResult.collisionY() ? Math.signum(velocity.y()) : 0;
@@ -244,16 +263,16 @@ public class CustomEntityProjectile extends Entity {
 				Point collidedPosition = collisionDirection.add(physicsResult.newPosition()).apply(Vec.Operator.FLOOR);
 				Block block = instance.getBlock(collidedPosition);
 				
-				AtomicBoolean collisionSucceeded = new AtomicBoolean();
+				AtomicBoolean shouldRemove = new AtomicBoolean();
 				
 				var event = new ProjectileCollideWithBlockEvent(this, physicsResult.newPosition().withCoord(collidedPosition), block);
 				EventDispatcher.callCancellable(event, () -> {
 					setNoGravity(true);
 					this.collisionDirection = collisionDirection;
-					collisionSucceeded.set(onStuck());
+					shouldRemove.set(onStuck());
 				});
 				
-				if (collisionSucceeded.get()) {
+				if (shouldRemove.get()) {
 					// Don't remove now because rest of Entity#tick might throw errors
 					scheduler().scheduleNextProcess(this::remove);
 				}
@@ -267,14 +286,45 @@ public class CustomEntityProjectile extends Entity {
 			).sub(0, hasNoGravity() ? 0 : getAerodynamics().gravity() * ServerFlag.SERVER_TICKS_PER_SECOND, 0);
 			onGround = physicsResult.isOnGround();
 			
-			refreshPosition(newPosition, true, false);
+			float yaw = position.yaw();
+			float pitch = position.pitch();
 			
 			if (!noClip) {
-				float yaw = (float) Math.toDegrees(Math.atan2(diff.x(), diff.z()));
-				float pitch = (float) Math.toDegrees(Math.atan2(diff.y(), Math.sqrt(diff.x() * diff.x() + diff.z() * diff.z())));
-				refreshPosition(position.withView(yaw, pitch), false, false);
+				yaw = (float) Math.toDegrees(Math.atan2(diff.x(), diff.z()));
+				pitch = (float) Math.toDegrees(
+						Math.atan2(diff.y(), Math.sqrt(diff.x() * diff.x() + diff.z() * diff.z())));
+				
+				// Vanilla really likes to use variables from the render code
+				// on the server side in a way that does not make sense at all
+				yaw = lerp(prevYaw, yaw);
+				pitch = lerp(prevPitch, pitch);
 			}
+			
+			this.prevYaw = yaw;
+			this.prevPitch = pitch;
+			
+			refreshPosition(newPosition.withView(yaw, pitch), noClip, isStuck());
 		}
+	}
+	
+	private static float lerp(float first, float second) {
+		return first + (second - first) * 0.2f;
+	}
+	
+	@Override
+	public void setView(float yaw, float pitch) {
+		this.prevYaw = yaw;
+		this.prevPitch = pitch;
+		
+		super.setView(yaw, pitch);
+	}
+	
+	@Override
+	public @NotNull CompletableFuture<Void> teleport(@NotNull Pos position) {
+		this.prevYaw = position.yaw();
+		this.prevPitch = position.pitch();
+		
+		return super.teleport(position);
 	}
 	
 	protected int getUpdateInterval() {
