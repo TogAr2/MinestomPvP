@@ -41,11 +41,13 @@ public enum ArmorMaterial {
 	public int getProtectionAmount(EquipmentSlot slot, boolean legacy) {
 		int id;
 		switch (slot) {
-			case HELMET: id = 3; break;
-			case CHESTPLATE: id = 2; break;
-			case LEGGINGS: id = 1; break;
-			case BOOTS: id = 0; break;
-			default: return 0;
+			case HELMET -> id = 3;
+			case CHESTPLATE -> id = 2;
+			case LEGGINGS -> id = 1;
+			case BOOTS -> id = 0;
+			default -> {
+				return 0;
+			}
 		}
 		
 		return legacy ? this.legacyProtectionAmounts[id] : this.protectionAmounts[id];

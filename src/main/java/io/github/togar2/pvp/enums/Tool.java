@@ -51,7 +51,7 @@ public enum Tool {
 	
 	// We don't know the legacy attack damage for tridents, since they didn't exist
 	// 5.0 seems to be balanced
-	TRIDENT(null, 8.0F, 5.0F, -2.9000000953674316F);
+	TRIDENT(null, 8.0F, 5.0F, -2.9F);
 	
 	private final Material material;
 	private boolean isAxe = false;
@@ -88,11 +88,10 @@ public enum Tool {
 		
 		// Only add tool attributes if the material is a tool
 		if (tool != null) {
-			//Weapon attributes (attack damage, etc) do not apply in offhand
+			// Weapon attributes (attack damage, etc.) do not apply in offhand
 			if (slot == EquipmentSlot.MAIN_HAND) {
-				(legacy ? tool.legacyAttributeModifiers : tool.attributeModifiers).forEach((attribute, modifier) -> {
-					modifiers.computeIfAbsent(attribute, k -> new ArrayList<>()).add(modifier);
-				});
+				(legacy ? tool.legacyAttributeModifiers : tool.attributeModifiers).forEach((attribute, modifier) ->
+						modifiers.computeIfAbsent(attribute, k -> new ArrayList<>()).add(modifier));
 			}
 		}
 		

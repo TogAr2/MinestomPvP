@@ -70,7 +70,7 @@ public class FallFeatureImpl implements FallFeature {
 	
 	public void handleFallDamage(LivingEntity entity, Pos currPos, Pos newPos, boolean onGround) {
 		double dy = newPos.y() - currPos.y();
-		double fallDistance = entity.hasTag(FALL_DISTANCE) ? entity.getTag(FALL_DISTANCE) : 0.0;
+		double fallDistance = getFallDistance(entity);
 		
 		if ((entity instanceof Player player && player.isFlying())
 				|| entity.hasEffect(PotionEffect.LEVITATION)
