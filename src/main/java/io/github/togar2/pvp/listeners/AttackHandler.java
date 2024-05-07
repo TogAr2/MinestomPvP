@@ -42,7 +42,7 @@ public class AttackHandler {
 	public static final Tag<Long> LAST_ATTACKED_TICKS = Tag.Long("lastAttackedTicks");
 	public static final Tag<Integer> SPECTATING = Tag.Integer("spectating");
 	
-	protected float getAttackCooldownProgressPerTick(Player player) {
+	protected double getAttackCooldownProgressPerTick(Player player) {
 		return (1 / player.getAttributeValue(Attribute.ATTACK_SPEED)) * 20;
 	}
 	
