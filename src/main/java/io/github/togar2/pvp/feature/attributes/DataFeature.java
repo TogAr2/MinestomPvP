@@ -7,5 +7,5 @@ import net.minestom.server.entity.LivingEntity;
 public interface DataFeature<T> extends CombatFeature {
 	DataFeature<Attribute> NO_OP = (entity, attribute) -> 0;
 	
-	double getValue(LivingEntity entity, T attribute);
+	float getValue(LivingEntity entity, T attribute);
 }

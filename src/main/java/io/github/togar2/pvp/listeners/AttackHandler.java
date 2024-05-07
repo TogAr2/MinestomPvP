@@ -19,13 +19,9 @@ import net.minestom.server.attribute.Attribute;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
-import net.minestom.server.entity.Entity;
-import net.minestom.server.entity.EquipmentSlot;
-import net.minestom.server.entity.LivingEntity;
-import net.minestom.server.entity.Player;
+import net.minestom.server.entity.*;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
-import net.minestom.server.entity.metadata.other.ArmorStandMeta;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.network.packet.server.play.EntityAnimationPacket;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
@@ -271,7 +267,7 @@ public class AttackHandler {
 	}
 	
 	protected void applyKnockback(LivingEntity attacker, LivingEntity target,
-	                                   int knockback, AttackConfig config) {
+	                              int knockback, AttackConfig config) {
 		if (knockback <= 0) return;
 		
 		if (config.isLegacyKnockback()) {
@@ -299,17 +295,15 @@ public class AttackHandler {
 		} else {
 			EntityKnockbackEvent knockbackEvent = new EntityKnockbackEvent(
 					target, attacker,
-					true, false,
+					EntityKnockbackEvent.KnockbackType.ATTACK,
 					knockback * 0.5F
 			);
 			EventDispatcher.callCancellable(knockbackEvent, () -> {
 				float strength = knockbackEvent.getStrength();
-				if (target instanceof LivingEntity living) {
-					living.takeKnockback(strength,
-							Math.sin(Math.toRadians(attacker.getPosition().yaw())),
-							-Math.cos(Math.toRadians(attacker.getPosition().yaw()))
-					);
-				}
+				target.takeKnockback(strength,
+						Math.sin(Math.toRadians(attacker.getPosition().yaw())),
+						-Math.cos(Math.toRadians(attacker.getPosition().yaw()))
+				);
 			});
 		}
 		
@@ -332,14 +326,14 @@ public class AttackHandler {
 		for (Entity nearbyEntity : target.getInstance().getNearbyEntities(target.getPosition(), 2)) {
 			if (nearbyEntity == target || nearbyEntity == attacker) continue;
 			if (!(nearbyEntity instanceof LivingEntity living)) continue;
-			if (nearbyEntity.getEntityMeta() instanceof ArmorStandMeta) continue;
+			if (nearbyEntity.getEntityType() == EntityType.ARMOR_STAND) continue;
 			if (!boundingBox.intersectEntity(target.getPosition(), nearbyEntity)) continue;
 			
 			// Apply sweeping knockback and damage to the entity
 			if (attacker.getPosition().distanceSquared(nearbyEntity.getPosition()) < 9.0) {
 				EntityKnockbackEvent knockbackEvent = new EntityKnockbackEvent(
 						nearbyEntity, attacker,
-						false, true,
+						EntityKnockbackEvent.KnockbackType.SWEEPING,
 						0.4F
 				);
 				EventDispatcher.callCancellable(knockbackEvent, () -> nearbyEntity.takeKnockback(

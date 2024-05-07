@@ -342,7 +342,7 @@ public class DamageHandler {
 		} else {
 			EntityKnockbackEvent knockbackEvent = new EntityKnockbackEvent(
 					entity, directAttacker == null ? attacker : directAttacker,
-					false, false,
+					EntityKnockbackEvent.KnockbackType.DAMAGE,
 					0.4F
 			);
 			EventDispatcher.call(knockbackEvent);

@@ -47,8 +47,8 @@ public class DataFeatureImpl implements DataFeature<Attribute> {
 	}
 	
 	@Override
-	public double getValue(LivingEntity entity, Attribute attribute) {
-		return entity.getAttribute(attribute).getValue();
+	public float getValue(LivingEntity entity, Attribute attribute) {
+		return entity.getAttributeValue(attribute);
 	}
 	
 	private void changeArmorModifiers(LivingEntity entity, EquipmentSlot slot, ItemStack newItem) {
