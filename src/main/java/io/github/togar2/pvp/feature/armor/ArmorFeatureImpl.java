@@ -3,6 +3,8 @@ package io.github.togar2.pvp.feature.armor;
 import io.github.togar2.pvp.damage.DamageTypeInfo;
 import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.entity.EntityUtils;
+import io.github.togar2.pvp.feature.CombatVersion;
+import io.github.togar2.pvp.feature.IndependentFeature;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.damage.DamageType;
@@ -10,11 +12,11 @@ import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.TimedPotion;
 import net.minestom.server.utils.MathUtils;
 
-public class ArmorFeatureImpl implements ArmorFeature {
-	private final boolean legacy;
+public class ArmorFeatureImpl implements ArmorFeature, IndependentFeature {
+	private final CombatVersion version;
 	
-	public ArmorFeatureImpl(boolean legacy) {
-		this.legacy = legacy;
+	public ArmorFeatureImpl(CombatVersion version) {
+		this.version = version;
 	}
 	
 	@Override
@@ -28,7 +30,7 @@ public class ArmorFeatureImpl implements ArmorFeature {
 		if (typeInfo.bypassesArmor()) return amount;
 		
 		float armorValue = entity.getAttributeValue(Attribute.ARMOR);
-		if (legacy) {
+		if (version.legacy()) {
 			int armorMultiplier = 25 - (int) armorValue;
 			return (amount * (float) armorMultiplier) / 25;
 		} else {
@@ -55,7 +57,7 @@ public class ArmorFeatureImpl implements ArmorFeature {
 			return 0;
 		} else {
 			k = EnchantmentUtils.getProtectionAmount(EntityUtils.getArmorItems(entity), typeInfo);
-			if (!legacy) {
+			if (version.modern()) {
 				if (k > 0) {
 					amount = getDamageAfterProtectionEnchantment(amount, (float) k);
 				}

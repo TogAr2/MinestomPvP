@@ -1,5 +1,6 @@
 package io.github.togar2.pvp.enums;
 
+import io.github.togar2.pvp.feature.CombatVersion;
 import io.github.togar2.pvp.utils.ModifierUUID;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeModifier;
@@ -38,7 +39,7 @@ public enum ArmorMaterial {
 		this.items = items;
 	}
 	
-	public int getProtectionAmount(EquipmentSlot slot, boolean legacy) {
+	public int getProtectionAmount(EquipmentSlot slot, CombatVersion version) {
 		int id;
 		switch (slot) {
 			case HELMET -> id = 3;
@@ -50,7 +51,7 @@ public enum ArmorMaterial {
 			}
 		}
 		
-		return legacy ? this.legacyProtectionAmounts[id] : this.protectionAmounts[id];
+		return version.legacy() ? this.legacyProtectionAmounts[id] : this.protectionAmounts[id];
 	}
 	
 	public SoundEvent getEquipSound() {
@@ -65,7 +66,7 @@ public enum ArmorMaterial {
 		return this.knockbackResistance;
 	}
 	
-	public static Map<Attribute, List<AttributeModifier>> getAttributes(@Nullable ArmorMaterial material, EquipmentSlot slot, ItemStack item, boolean legacy) {
+	public static Map<Attribute, List<AttributeModifier>> getAttributes(@Nullable ArmorMaterial material, EquipmentSlot slot, ItemStack item, CombatVersion version) {
 		Map<Attribute, List<AttributeModifier>> modifiers = new HashMap<>();
 		for (ItemAttribute itemAttribute : item.meta().getAttributes()) {
 			if (EquipmentSlot.fromAttributeSlot(itemAttribute.slot()) == slot) {
@@ -78,7 +79,7 @@ public enum ArmorMaterial {
 		if (material != null) {
 			if (slot == getRequiredSlot(item.material())) {
 				UUID modifierUUID = getModifierUUID(slot);
-				modifiers.computeIfAbsent(Attribute.ARMOR, k -> new ArrayList<>()).add(new AttributeModifier(modifierUUID, "Armor modifier", material.getProtectionAmount(slot, legacy), AttributeOperation.ADDITION));
+				modifiers.computeIfAbsent(Attribute.ARMOR, k -> new ArrayList<>()).add(new AttributeModifier(modifierUUID, "Armor modifier", material.getProtectionAmount(slot, version), AttributeOperation.ADDITION));
 				modifiers.computeIfAbsent(Attribute.ARMOR_TOUGHNESS, k -> new ArrayList<>()).add(new AttributeModifier(modifierUUID, "Armor toughness", material.toughness, AttributeOperation.ADDITION));
 				if (material.knockbackResistance > 0) {
 					modifiers.computeIfAbsent(Attribute.KNOCKBACK_RESISTANCE, k -> new ArrayList<>()).add(new AttributeModifier(modifierUUID, "Armor knockback resistance", material.knockbackResistance, AttributeOperation.ADDITION));

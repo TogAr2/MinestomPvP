@@ -2,6 +2,7 @@ package io.github.togar2.pvp.enchantment.enchantments;
 
 import io.github.togar2.pvp.enchantment.CustomEnchantment;
 import io.github.togar2.pvp.entity.EntityGroup;
+import io.github.togar2.pvp.feature.CombatVersion;
 import io.github.togar2.pvp.potion.PotionListener;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
@@ -21,9 +22,9 @@ public class DamageEnchantment extends CustomEnchantment {
 	}
 	
 	@Override
-	public float getAttackDamage(short level, EntityGroup group, boolean legacy) {
+	public float getAttackDamage(short level, EntityGroup group, CombatVersion version) {
 		if (type == Type.ALL) {
-			if (legacy) return level * 1.25F;
+			if (version.legacy()) return level * 1.25F;
 			return 1.0F + (float) Math.max(0, level - 1) * 0.5F;
 		} else if (type == Type.UNDEAD && group == EntityGroup.UNDEAD) {
 			return (float) level * 2.5F;

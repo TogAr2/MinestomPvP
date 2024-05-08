@@ -2,6 +2,8 @@ package io.github.togar2.pvp.feature.food;
 
 import io.github.togar2.pvp.entity.PvpPlayer;
 import io.github.togar2.pvp.events.PlayerExhaustEvent;
+import io.github.togar2.pvp.feature.CombatVersion;
+import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.provider.ProviderForEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
@@ -18,15 +20,15 @@ import net.minestom.server.world.Difficulty;
 
 import java.util.Objects;
 
-public class ExhaustionFeatureImpl implements ExhaustionFeature {
+public class ExhaustionFeatureImpl implements ExhaustionFeature, RegistrableFeature {
 	public static final Tag<Float> EXHAUSTION = Tag.Float("exhaustion");
 	
 	private final ProviderForEntity<Difficulty> difficultyFeature;
-	private final boolean legacy;
+	private final CombatVersion version;
 	
-	public ExhaustionFeatureImpl(ProviderForEntity<Difficulty> difficultyFeature, boolean legacy) {
+	public ExhaustionFeatureImpl(ProviderForEntity<Difficulty> difficultyFeature, CombatVersion version) {
 		this.difficultyFeature = difficultyFeature;
-		this.legacy = legacy;
+		this.version = version;
 	}
 	
 	@Override
@@ -37,7 +39,7 @@ public class ExhaustionFeatureImpl implements ExhaustionFeature {
 		node.addListener(PlayerTickEvent.class, event -> onTick(event.getPlayer()));
 		
 		node.addListener(PlayerBlockBreakEvent.class, event ->
-				addExhaustion(event.getPlayer(), legacy ? 0.025f : 0.005f));
+				addExhaustion(event.getPlayer(), version.legacy() ? 0.025f : 0.005f));
 		
 		node.addListener(PlayerMoveEvent.class, this::onMove);
 	}
@@ -66,9 +68,9 @@ public class ExhaustionFeatureImpl implements ExhaustionFeature {
 		// Check if movement was a jump
 		if (yDiff > 0.0D && player.isOnGround()) {
 			if (player.isSprinting()) {
-				addExhaustion(player, legacy ? 0.8f : 0.2f);
+				addExhaustion(player, version.legacy() ? 0.8f : 0.2f);
 			} else {
-				addExhaustion(player, legacy ? 0.2f : 0.05f);
+				addExhaustion(player, version.legacy() ? 0.2f : 0.05f);
 			}
 			
 			//TODO this should DEFINITELY not be here... but where should it be?
@@ -97,11 +99,11 @@ public class ExhaustionFeatureImpl implements ExhaustionFeature {
 	
 	@Override
 	public void addAttackExhaustion(Player player) {
-		addExhaustion(player, legacy ? 0.3f: 0.1f);
+		addExhaustion(player, version.legacy() ? 0.3f: 0.1f);
 	}
 	
 	@Override
 	public void addDamageExhaustion(Player player, DamageType type) {
-		addExhaustion(player, (float) type.exhaustion() * (legacy ? 3 : 1));
+		addExhaustion(player, (float) type.exhaustion() * (version.legacy() ? 3 : 1));
 	}
 }

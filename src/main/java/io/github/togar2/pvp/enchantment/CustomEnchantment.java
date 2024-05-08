@@ -2,6 +2,7 @@ package io.github.togar2.pvp.enchantment;
 
 import io.github.togar2.pvp.damage.DamageTypeInfo;
 import io.github.togar2.pvp.entity.EntityGroup;
+import io.github.togar2.pvp.feature.CombatVersion;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
@@ -41,7 +42,7 @@ public class CustomEnchantment {
 		return 0;
 	}
 	
-	public float getAttackDamage(short level, EntityGroup group, boolean legacy) {
+	public float getAttackDamage(short level, EntityGroup group, CombatVersion version) {
 		return 0.0F;
 	}
 	

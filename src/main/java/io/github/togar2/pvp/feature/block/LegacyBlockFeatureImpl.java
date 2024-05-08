@@ -1,5 +1,8 @@
 package io.github.togar2.pvp.feature.block;
 
+import io.github.togar2.pvp.feature.CombatVersion;
+import io.github.togar2.pvp.feature.IndependentFeature;
+import io.github.togar2.pvp.feature.RegistrableFeature;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
@@ -8,7 +11,8 @@ import net.minestom.server.event.player.*;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.tag.Tag;
 
-public class LegacyBlockFeatureImpl extends BlockFeatureImpl implements LegacyBlockFeature {
+public class LegacyBlockFeatureImpl extends BlockFeatureImpl
+		implements LegacyBlockFeature, RegistrableFeature, IndependentFeature {
 	public static final Tag<Long> LAST_SWING_TIME = Tag.Long("lastSwingTime");
 	public static final Tag<Boolean> BLOCKING_SWORD = Tag.Boolean("blockingSword");
 	public static final Tag<ItemStack> BLOCK_REPLACEMENT_ITEM = Tag.ItemStack("blockReplacementItem");
@@ -16,7 +20,7 @@ public class LegacyBlockFeatureImpl extends BlockFeatureImpl implements LegacyBl
 	private final ItemStack blockingItem;
 	
 	public LegacyBlockFeatureImpl(ItemStack blockingItem) {
-		super(true);
+		super(CombatVersion.LEGACY);
 		this.blockingItem = blockingItem;
 	}
 	

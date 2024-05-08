@@ -1,5 +1,6 @@
 package io.github.togar2.pvp.enums;
 
+import io.github.togar2.pvp.feature.CombatVersion;
 import io.github.togar2.pvp.utils.ModifierUUID;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeModifier;
@@ -77,7 +78,7 @@ public enum Tool {
 		this.isSword = isSword;
 	}
 	
-	public static Map<Attribute, List<AttributeModifier>> getAttributes(@Nullable Tool tool, EquipmentSlot slot, ItemStack item, boolean legacy) {
+	public static Map<Attribute, List<AttributeModifier>> getAttributes(@Nullable Tool tool, EquipmentSlot slot, ItemStack item, CombatVersion version) {
 		Map<Attribute, List<AttributeModifier>> modifiers = new HashMap<>();
 		for (ItemAttribute itemAttribute : item.meta().getAttributes()) {
 			if (EquipmentSlot.fromAttributeSlot(itemAttribute.slot()) == slot) {
@@ -90,7 +91,7 @@ public enum Tool {
 		if (tool != null) {
 			// Weapon attributes (attack damage, etc.) do not apply in offhand
 			if (slot == EquipmentSlot.MAIN_HAND) {
-				(legacy ? tool.legacyAttributeModifiers : tool.attributeModifiers).forEach((attribute, modifier) ->
+				(version.legacy() ? tool.legacyAttributeModifiers : tool.attributeModifiers).forEach((attribute, modifier) ->
 						modifiers.computeIfAbsent(attribute, k -> new ArrayList<>()).add(modifier));
 			}
 		}

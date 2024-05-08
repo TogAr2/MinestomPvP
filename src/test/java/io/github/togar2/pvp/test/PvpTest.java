@@ -1,8 +1,8 @@
 package io.github.togar2.pvp.test;
 
 import io.github.togar2.pvp.PvpExtension;
-import io.github.togar2.pvp.config.PvPConfig;
 import io.github.togar2.pvp.explosion.PvpExplosionSupplier;
+import io.github.togar2.pvp.feature.CombatFeatureSet;
 import io.github.togar2.pvp.test.commands.Commands;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
@@ -130,10 +130,11 @@ public class PvpTest {
 		instance.setExplosionSupplier(PvpExplosionSupplier.INSTANCE);
 		
 		GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-		eventHandler.addChild(PvPConfig.defaultBuilder()
-				//.potion(PotionConfig.legacyBuilder().drinking(false))
-				.build().createNode()
-		);
+		eventHandler.addChild(CombatFeatureSet.DEFAULT_2.createNode());
+		//eventHandler.addChild(PvPConfig.defaultBuilder()
+		//		//.potion(PotionConfig.legacyBuilder().drinking(false))
+		//		.build().createNode()
+		//);
 		
 		//eventHandler.addChild(MinestomFluids.events());
 		

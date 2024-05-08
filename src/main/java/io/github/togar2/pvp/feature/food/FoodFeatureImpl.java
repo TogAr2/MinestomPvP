@@ -1,6 +1,8 @@
 package io.github.togar2.pvp.feature.food;
 
 import io.github.togar2.pvp.entity.Tracker;
+import io.github.togar2.pvp.feature.IndependentFeature;
+import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.food.FoodComponent;
 import io.github.togar2.pvp.food.FoodComponents;
 import io.github.togar2.pvp.utils.ViewUtil;
@@ -22,7 +24,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class FoodFeatureImpl implements FoodFeature {
+public class FoodFeatureImpl implements FoodFeature, RegistrableFeature, IndependentFeature {
 	@Override
 	public void init(EventNode<Event> node) {
 		node.addListener(PlayerPreEatEvent.class, event -> {

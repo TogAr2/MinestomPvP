@@ -1,6 +1,8 @@
 package io.github.togar2.pvp.feature.fall;
 
 import io.github.togar2.pvp.entity.EntityUtils;
+import io.github.togar2.pvp.feature.IndependentFeature;
+import io.github.togar2.pvp.feature.RegistrableFeature;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Point;
@@ -26,7 +28,7 @@ import net.minestom.server.potion.TimedPotion;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
 
-public class FallFeatureImpl implements FallFeature {
+public class FallFeatureImpl implements FallFeature, RegistrableFeature, IndependentFeature {
 	public static final Tag<Block> LAST_CLIMBED_BLOCK = Tag.Short("lastClimbedBlock").map(Block::fromStateId, Block::stateId);
 	public static final Tag<Double> FALL_DISTANCE = Tag.Double("fallDistance");
 	

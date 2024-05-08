@@ -4,6 +4,8 @@ import io.github.togar2.pvp.damage.DamageTypeInfo;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.events.EntityPreDeathEvent;
 import io.github.togar2.pvp.events.FinalDamageEvent;
+import io.github.togar2.pvp.feature.CombatVersion;
+import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.armor.ArmorFeature;
 import io.github.togar2.pvp.feature.block.BlockFeature;
 import io.github.togar2.pvp.feature.food.ExhaustionFeature;
@@ -21,7 +23,9 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
+import net.minestom.server.event.Event;
 import net.minestom.server.event.EventDispatcher;
+import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityDamageEvent;
 import net.minestom.server.network.packet.server.play.DamageEventPacket;
 import net.minestom.server.network.packet.server.play.SoundEffectPacket;
@@ -32,7 +36,7 @@ import net.minestom.server.world.Difficulty;
 
 import java.util.Objects;
 
-public class DamageFeatureImpl implements DamageFeature {
+public class DamageFeatureImpl implements DamageFeature, RegistrableFeature {
 	public static final Tag<Long> NEW_DAMAGE_TIME = Tag.Long("newDamageTime");
 	public static final Tag<Float> LAST_DAMAGE_AMOUNT = Tag.Float("lastDamageAmount");
 	
@@ -45,11 +49,11 @@ public class DamageFeatureImpl implements DamageFeature {
 	private final KnockbackFeature knockbackFeature;
 	private final TrackingFeature trackingFeature;
 	
-	private final boolean legacy;
+	private final CombatVersion version;
 	
 	public DamageFeatureImpl(ProviderForEntity<Difficulty> difficultyProvider, BlockFeature blockFeature,
 	                         ArmorFeature armorFeature, TotemFeature totemFeature, ExhaustionFeature exhaustionFeature,
-	                         KnockbackFeature knockbackFeature, TrackingFeature trackingFeature, boolean legacy) {
+	                         KnockbackFeature knockbackFeature, TrackingFeature trackingFeature, CombatVersion version) {
 		this.difficultyProvider = difficultyProvider;
 		this.blockFeature = blockFeature;
 		this.armorFeature = armorFeature;
@@ -57,7 +61,12 @@ public class DamageFeatureImpl implements DamageFeature {
 		this.exhaustionFeature = exhaustionFeature;
 		this.knockbackFeature = knockbackFeature;
 		this.trackingFeature = trackingFeature;
-		this.legacy = legacy;
+		this.version = version;
+	}
+	
+	@Override
+	public void init(EventNode<Event> node) {
+		node.addListener(EntityDamageEvent.class, this::handleDamage);
 	}
 	
 	protected void handleDamage(EntityDamageEvent event) {
@@ -131,7 +140,7 @@ public class DamageFeatureImpl implements DamageFeature {
 		}
 		
 		// Register damage to tracking feature
-		boolean register = legacy || amount > 0;
+		boolean register = version.legacy() || amount > 0;
 		if (register && entity instanceof Player player)
 			trackingFeature.recordDamage(player, attacker, damage);
 		

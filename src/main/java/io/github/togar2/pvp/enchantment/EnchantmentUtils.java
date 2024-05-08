@@ -3,6 +3,7 @@ package io.github.togar2.pvp.enchantment;
 import io.github.togar2.pvp.damage.DamageTypeInfo;
 import io.github.togar2.pvp.entity.EntityGroup;
 import io.github.togar2.pvp.enums.ArmorMaterial;
+import io.github.togar2.pvp.feature.CombatVersion;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
@@ -76,11 +77,11 @@ public class EnchantmentUtils {
 		return result.get();
 	}
 	
-	public static float getAttackDamage(ItemStack stack, EntityGroup group, boolean legacy) {
+	public static float getAttackDamage(ItemStack stack, EntityGroup group, CombatVersion version) {
 		AtomicReference<Float> result = new AtomicReference<>((float) 0);
 		stack.meta().getEnchantmentMap().forEach((enchantment, level) -> {
 			CustomEnchantment customEnchantment = CustomEnchantments.get(enchantment);
-			result.updateAndGet(v -> v + customEnchantment.getAttackDamage(level, group, legacy));
+			result.updateAndGet(v -> v + customEnchantment.getAttackDamage(level, group, version));
 		});
 		
 		return result.get();

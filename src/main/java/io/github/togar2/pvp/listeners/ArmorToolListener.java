@@ -4,6 +4,7 @@ import io.github.togar2.pvp.config.ArmorToolConfig;
 import io.github.togar2.pvp.config.PvPConfig;
 import io.github.togar2.pvp.enums.ArmorMaterial;
 import io.github.togar2.pvp.enums.Tool;
+import io.github.togar2.pvp.feature.CombatVersion;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeInstance;
 import net.minestom.server.attribute.AttributeModifier;
@@ -49,7 +50,7 @@ public class ArmorToolListener {
 		
 		//Add new armor
 		material = ArmorMaterial.fromMaterial(newItem.material());
-		addAttributeModifiers(entity, ArmorMaterial.getAttributes(material, slot, newItem, legacy));
+		addAttributeModifiers(entity, ArmorMaterial.getAttributes(material, slot, newItem, CombatVersion.fromLegacy(legacy)));
 	}
 	
 	private static void changeHandModifiers(LivingEntity entity, EquipmentSlot slot, ItemStack newItem, boolean legacy) {
@@ -60,7 +61,7 @@ public class ArmorToolListener {
 		
 		//Add new attribute modifiers
 		tool = Tool.fromMaterial(newItem.material());
-		addAttributeModifiers(entity, Tool.getAttributes(tool, slot, newItem, legacy));
+		addAttributeModifiers(entity, Tool.getAttributes(tool, slot, newItem, CombatVersion.fromLegacy(legacy)));
 	}
 	
 	private static void removeAttributeModifiers(LivingEntity entity, Map<Attribute, List<UUID>> modifiers) {

@@ -1,6 +1,8 @@
 package io.github.togar2.pvp.feature.food;
 
 import io.github.togar2.pvp.events.PlayerRegenerateEvent;
+import io.github.togar2.pvp.feature.CombatVersion;
+import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.provider.ProviderForEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
@@ -12,19 +14,19 @@ import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.tag.Tag;
 import net.minestom.server.world.Difficulty;
 
-public class RegenerationFeatureImpl implements RegenerationFeature {
+public class RegenerationFeatureImpl implements RegenerationFeature, RegistrableFeature {
 	public static final Tag<Integer> STARVATION_TICKS = Tag.Integer("starvationTicks");
 	
 	private final ExhaustionFeature exhaustionFeature;
 	private final ProviderForEntity<Difficulty> difficultyFeature;
-	private final boolean legacy;
+	private final CombatVersion version;
 	
 	public RegenerationFeatureImpl(ExhaustionFeature exhaustionFeature,
 	                               ProviderForEntity<Difficulty> difficultyFeature,
-	                               boolean legacy) {
+	                               CombatVersion version) {
 		this.exhaustionFeature = exhaustionFeature;
 		this.difficultyFeature = difficultyFeature;
-		this.legacy = legacy;
+		this.version = version;
 	}
 	
 	@Override
@@ -43,7 +45,7 @@ public class RegenerationFeatureImpl implements RegenerationFeature {
 		float health = player.getHealth();
 		int starvationTicks = player.getTag(STARVATION_TICKS);
 		
-		if (!legacy && player.getFoodSaturation() > 0 && health > 0
+		if (version.modern() && player.getFoodSaturation() > 0 && health > 0
 				&& health < player.getMaxHealth() && food >= 20) {
 			starvationTicks++;
 			if (starvationTicks >= 10) {
@@ -55,7 +57,7 @@ public class RegenerationFeatureImpl implements RegenerationFeature {
 				&& health < player.getMaxHealth()) {
 			starvationTicks++;
 			if (starvationTicks >= 80) {
-				regenerate(player, 1, legacy ? 3 : 6);
+				regenerate(player, 1, version.legacy() ? 3 : 6);
 				starvationTicks = 0;
 			}
 		} else if (food <= 0) {

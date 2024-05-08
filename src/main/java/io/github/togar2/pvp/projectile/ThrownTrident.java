@@ -3,6 +3,7 @@ package io.github.togar2.pvp.projectile;
 import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.entity.EntityGroup;
 import io.github.togar2.pvp.entity.EntityUtils;
+import io.github.togar2.pvp.feature.CombatVersion;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Vec;
@@ -78,7 +79,7 @@ public class ThrownTrident extends AbstractArrow {
 		if (!(entity instanceof LivingEntity living)) return false;
 		Entity shooter = getShooter();
 		
-		float damage = 8.0f + EnchantmentUtils.getAttackDamage(tridentItem, EntityGroup.ofEntity(living), legacy);
+		float damage = 8.0f + EnchantmentUtils.getAttackDamage(tridentItem, EntityGroup.ofEntity(living), CombatVersion.fromLegacy(legacy));
 		Damage damageObj = new Damage(DamageType.TRIDENT, this, shooter == null ? this : shooter, null, damage);
 		if (living.damage(damageObj) && shooter instanceof LivingEntity livingShooter) {
 			EnchantmentUtils.onUserDamaged(living, livingShooter);

@@ -6,6 +6,8 @@ import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.entity.PvpPlayer;
 import io.github.togar2.pvp.enums.Tool;
 import io.github.togar2.pvp.events.FinalAttackEvent;
+import io.github.togar2.pvp.feature.CombatVersion;
+import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.cooldown.CooldownFeature;
 import io.github.togar2.pvp.feature.food.ExhaustionFeature;
 import io.github.togar2.pvp.feature.knockback.KnockbackFeature;
@@ -28,7 +30,7 @@ import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
 import org.jetbrains.annotations.Nullable;
 
-public class AttackFeatureImpl implements AttackFeature {
+public class AttackFeatureImpl implements AttackFeature, RegistrableFeature {
 	private static final double MAX_DISTANCE_SQUARED = 36.0;
 	
 	private final CooldownFeature cooldownFeature;
@@ -38,17 +40,17 @@ public class AttackFeatureImpl implements AttackFeature {
 	private final SweepingFeature sweepingFeature;
 	private final KnockbackFeature knockbackFeature;
 	
-	private final boolean legacy;
+	private final CombatVersion version;
 	
 	public AttackFeatureImpl(CooldownFeature cooldownFeature, ExhaustionFeature exhaustionFeature,
 	                         CriticalFeature criticalFeature, SweepingFeature sweepingFeature,
-	                         KnockbackFeature knockbackFeature, boolean legacy) {
+	                         KnockbackFeature knockbackFeature, CombatVersion version) {
 		this.cooldownFeature = cooldownFeature;
 		this.exhaustionFeature = exhaustionFeature;
 		this.criticalFeature = criticalFeature;
 		this.sweepingFeature = sweepingFeature;
 		this.knockbackFeature = knockbackFeature;
-		this.legacy = legacy;
+		this.version = version;
 	}
 	
 	@Override
@@ -176,7 +178,7 @@ public class AttackFeatureImpl implements AttackFeature {
 		float magicalDamage = EnchantmentUtils.getAttackDamage(
 				attacker.getItemInMainHand(),
 				target instanceof LivingEntity living ? EntityGroup.ofEntity(living) : EntityGroup.DEFAULT,
-				legacy
+				version
 		);
 		
 		double cooldownProgress = 1;

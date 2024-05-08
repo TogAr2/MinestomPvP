@@ -3,6 +3,8 @@ package io.github.togar2.pvp.feature.knockback;
 import io.github.togar2.pvp.entity.PvpPlayer;
 import io.github.togar2.pvp.events.EntityKnockbackEvent;
 import io.github.togar2.pvp.events.LegacyKnockbackEvent;
+import io.github.togar2.pvp.feature.CombatVersion;
+import io.github.togar2.pvp.feature.IndependentFeature;
 import io.github.togar2.pvp.legacy.LegacyKnockbackSettings;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Vec;
@@ -16,12 +18,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class KnockbackFeatureImpl implements KnockbackFeature {
+public class KnockbackFeatureImpl implements KnockbackFeature, IndependentFeature {
 	//TODO this probably shouldn't work like this
-	private final boolean legacy;
+	private final CombatVersion version;
 	
-	public KnockbackFeatureImpl(boolean legacy) {
-		this.legacy = legacy;
+	public KnockbackFeatureImpl(CombatVersion version) {
+		this.version = version;
 	}
 	
 	@Override
@@ -40,7 +42,7 @@ public class KnockbackFeatureImpl implements KnockbackFeature {
 		}
 		
 		// Set the velocity
-		if (legacy) {
+		if (version.legacy()) {
 			if (!applyLegacyDamageKnockback(target, attacker, source, false, 1, dx, dz)) return false;
 		} else {
 			if (!applyModernKnockback(target, attacker, source,
@@ -101,13 +103,13 @@ public class KnockbackFeatureImpl implements KnockbackFeature {
 		if (knockback <= 0) return false;
 		
 		// If legacy, attacker velocity is reduced before the knockback
-		if (legacy && attacker instanceof PvpPlayer custom)
+		if (version.legacy() && attacker instanceof PvpPlayer custom)
 			custom.afterSprintAttack();
 		
 		double dx = Math.sin(Math.toRadians(attacker.getPosition().yaw()));
 		double dz = -Math.cos(Math.toRadians(attacker.getPosition().yaw()));
 		
-		if (legacy) {
+		if (version.legacy()) {
 			if (!applyLegacyDamageKnockback(
 					target, attacker, attacker,
 					true, knockback,
@@ -122,7 +124,7 @@ public class KnockbackFeatureImpl implements KnockbackFeature {
 		}
 		
 		// If not legacy, attacker velocity is reduced after the knockback
-		if (!legacy && attacker instanceof PvpPlayer custom)
+		if (version.modern() && attacker instanceof PvpPlayer custom)
 			custom.afterSprintAttack();
 		
 		attacker.setSprinting(false);

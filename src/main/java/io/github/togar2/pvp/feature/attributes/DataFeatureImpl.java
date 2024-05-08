@@ -2,6 +2,9 @@ package io.github.togar2.pvp.feature.attributes;
 
 import io.github.togar2.pvp.enums.ArmorMaterial;
 import io.github.togar2.pvp.enums.Tool;
+import io.github.togar2.pvp.feature.CombatVersion;
+import io.github.togar2.pvp.feature.IndependentFeature;
+import io.github.togar2.pvp.feature.RegistrableFeature;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeInstance;
 import net.minestom.server.attribute.AttributeModifier;
@@ -17,13 +20,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class DataFeatureImpl implements DataFeature<Attribute> {
+public class DataFeatureImpl implements DataFeature<Attribute>, RegistrableFeature, IndependentFeature {
 	//TODO this probably shouldn't work this way
 	// We probably want to store all the tools & armor separately per DataFeature
-	private final boolean legacy;
+	private final CombatVersion version;
 	
-	public DataFeatureImpl(boolean legacy) {
-		this.legacy = legacy;
+	public DataFeatureImpl(CombatVersion version) {
+		this.version = version;
 	}
 	
 	@Override
@@ -59,7 +62,7 @@ public class DataFeatureImpl implements DataFeature<Attribute> {
 		
 		//Add new armor
 		material = ArmorMaterial.fromMaterial(newItem.material());
-		addAttributeModifiers(entity, ArmorMaterial.getAttributes(material, slot, newItem, legacy));
+		addAttributeModifiers(entity, ArmorMaterial.getAttributes(material, slot, newItem, version));
 	}
 	
 	private void changeHandModifiers(LivingEntity entity, EquipmentSlot slot, ItemStack newItem) {
@@ -70,7 +73,7 @@ public class DataFeatureImpl implements DataFeature<Attribute> {
 		
 		//Add new attribute modifiers
 		tool = Tool.fromMaterial(newItem.material());
-		addAttributeModifiers(entity, Tool.getAttributes(tool, slot, newItem, legacy));
+		addAttributeModifiers(entity, Tool.getAttributes(tool, slot, newItem, version));
 	}
 	
 	private void removeAttributeModifiers(LivingEntity entity, Map<Attribute, List<UUID>> modifiers) {

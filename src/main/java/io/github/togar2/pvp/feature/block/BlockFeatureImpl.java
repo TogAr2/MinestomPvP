@@ -4,6 +4,8 @@ import io.github.togar2.pvp.damage.DamageTypeInfo;
 import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.enums.Tool;
 import io.github.togar2.pvp.events.DamageBlockEvent;
+import io.github.togar2.pvp.feature.CombatVersion;
+import io.github.togar2.pvp.feature.IndependentFeature;
 import io.github.togar2.pvp.utils.ItemUtils;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
@@ -21,11 +23,11 @@ import net.minestom.server.sound.SoundEvent;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class BlockFeatureImpl implements BlockFeature {
-	private final boolean legacy;
+public class BlockFeatureImpl implements BlockFeature, IndependentFeature {
+	private final CombatVersion version;
 	
-	public BlockFeatureImpl(boolean legacy) {
-		this.legacy = legacy;
+	public BlockFeatureImpl(CombatVersion version) {
+		this.version = version;
 	}
 	
 	protected boolean isPiercing(Damage damage) {
@@ -46,7 +48,7 @@ public class BlockFeatureImpl implements BlockFeature {
 		if (!info.bypassesArmor() && !isPiercing(damage)
 				&& entity.getEntityMeta() instanceof LivingEntityMeta meta
 				&& meta.isHandActive() && entity.getItemInHand(meta.getActiveHand()).material() == Material.SHIELD) {
-			if (legacy) return true;
+			if (version.legacy()) return true;
 			
 			if (damage.getSource() != null) {
 				Pos attackerPos = damage.getSource().getPosition();
@@ -68,9 +70,9 @@ public class BlockFeatureImpl implements BlockFeature {
 	@Override
 	public boolean applyBlock(LivingEntity entity, Damage damage) {
 		float amount = damage.getAmount();
-		float resultingDamage = legacy ? Math.max(0, (amount + 1) * 0.5f) : 0;
+		float resultingDamage = version.legacy() ? Math.max(0, (amount + 1) * 0.5f) : 0;
 		
-		DamageBlockEvent damageBlockEvent = new DamageBlockEvent(entity, amount, resultingDamage, !legacy);
+		DamageBlockEvent damageBlockEvent = new DamageBlockEvent(entity, amount, resultingDamage, version.modern());
 		EventDispatcher.call(damageBlockEvent);
 		if (damageBlockEvent.isCancelled()) return false;
 		damage.setAmount(damageBlockEvent.getResultingDamage());

@@ -1,6 +1,8 @@
 package io.github.togar2.pvp.feature.tracking;
 
 import io.github.togar2.pvp.damage.combat.CombatManager;
+import io.github.togar2.pvp.feature.IndependentFeature;
+import io.github.togar2.pvp.feature.RegistrableFeature;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
@@ -14,13 +16,16 @@ import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.tag.Tag;
 import org.jetbrains.annotations.Nullable;
 
-public class DeathMessageFeatureImpl implements TrackingFeature, DeathMessageFeature {
+public class DeathMessageFeatureImpl implements TrackingFeature,
+		DeathMessageFeature, RegistrableFeature, IndependentFeature {
 	public static final Tag<CombatManager> COMBAT_MANAGER = Tag.Transient("combatManager");
 	
 	@Override
 	public void init(EventNode<Event> node) {
-		node.addListener(AsyncPlayerConfigurationEvent.class, event ->
-				event.getPlayer().setTag(COMBAT_MANAGER, new CombatManager(event.getPlayer())));
+		node.addListener(AsyncPlayerConfigurationEvent.class, event -> {
+			event.getPlayer().setTag(COMBAT_MANAGER, new CombatManager(event.getPlayer()));
+			System.out.println(event.getPlayer().getTag(COMBAT_MANAGER));
+		});
 		
 		node.addListener(PlayerSpawnEvent.class, event -> event.getPlayer().getTag(COMBAT_MANAGER).reset());
 		

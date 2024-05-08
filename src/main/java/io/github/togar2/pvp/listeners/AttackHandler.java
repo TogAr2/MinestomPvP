@@ -9,6 +9,7 @@ import io.github.togar2.pvp.enums.Tool;
 import io.github.togar2.pvp.events.EntityKnockbackEvent;
 import io.github.togar2.pvp.events.FinalAttackEvent;
 import io.github.togar2.pvp.events.LegacyKnockbackEvent;
+import io.github.togar2.pvp.feature.CombatVersion;
 import io.github.togar2.pvp.feature.attack.AttackValues;
 import io.github.togar2.pvp.legacy.LegacyKnockbackSettings;
 import io.github.togar2.pvp.utils.ItemUtils;
@@ -178,7 +179,7 @@ public class AttackHandler {
 		float enchantedDamage = EnchantmentUtils.getAttackDamage(
 				attacker.getItemInMainHand(),
 				target instanceof LivingEntity living ? EntityGroup.ofEntity(living) : EntityGroup.DEFAULT,
-				config.isLegacy()
+				CombatVersion.fromLegacy(config.isLegacy())
 		);
 		
 		double cooldownProgress = 1;

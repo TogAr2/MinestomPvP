@@ -1,5 +1,7 @@
 package io.github.togar2.pvp.feature.cooldown;
 
+import io.github.togar2.pvp.feature.IndependentFeature;
+import io.github.togar2.pvp.feature.RegistrableFeature;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.Event;
@@ -10,7 +12,7 @@ import net.minestom.server.event.player.PlayerHandAnimationEvent;
 import net.minestom.server.tag.Tag;
 import net.minestom.server.utils.MathUtils;
 
-public class CooldownFeatureImpl implements CooldownFeature {
+public class CooldownFeatureImpl implements CooldownFeature, RegistrableFeature, IndependentFeature {
 	public static final Tag<Long> LAST_ATTACKED_TICKS = Tag.Long("lastAttackedTicks");
 	
 	@Override
