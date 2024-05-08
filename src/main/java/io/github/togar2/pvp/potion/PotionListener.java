@@ -137,7 +137,7 @@ public class PotionListener {
 			Player player = event.getPlayer();
 			ItemStack stack = event.getItemStack();
 			
-			FoodListener.triggerEatSounds(player, null);
+			FoodListener.triggerEatingSound(player, null);
 			
 			List<Potion> potions = getAllPotions(stack.meta(PotionMeta.class), config.isLegacy());
 			

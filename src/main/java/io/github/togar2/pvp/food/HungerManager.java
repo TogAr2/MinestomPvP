@@ -87,6 +87,7 @@ public class HungerManager {
 	}
 	
 	public static void addExhaustion(Player player, float exhaustion) {
+		if (!player.getGameMode().canTakeDamage()) return;
 		PlayerExhaustEvent playerExhaustEvent = new PlayerExhaustEvent(player, exhaustion);
 		EventDispatcher.callCancellable(playerExhaustEvent, () -> player.setTag(EXHAUSTION,
 				Math.min(player.getTag(EXHAUSTION) + playerExhaustEvent.getAmount(), 40)));

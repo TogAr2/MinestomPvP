@@ -27,6 +27,8 @@ import net.minestom.server.potion.TimedPotion;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
 
+import java.util.Objects;
+
 public class FallFeatureImpl implements FallFeature {
 	public static final Tag<Block> LAST_CLIMBED_BLOCK = Tag.Short("lastClimbedBlock").map(Block::fromStateId, Block::stateId);
 	public static final Tag<Double> FALL_DISTANCE = Tag.Double("fallDistance");
@@ -157,25 +159,11 @@ public class FallFeatureImpl implements FallFeature {
 	public boolean isClimbing(Entity entity) {
 		if (entity instanceof Player player && player.getGameMode() == GameMode.SPECTATOR) return false;
 		
-		Instance instance = entity.getInstance();
-		if (instance == null) return false;
+		var tag = MinecraftServer.getTagManager().getTag(net.minestom.server.gamedata.tags.Tag.BasicType.BLOCKS, "minecraft:climbable");
+		assert tag != null;
 		
-		Block block = instance.getBlock(entity.getPosition());
-		return block.compare(Block.LADDER)
-				|| block.compare(Block.VINE)
-				|| block.compare(Block.TWISTING_VINES)
-				|| block.compare(Block.TWISTING_VINES_PLANT)
-				|| block.compare(Block.WEEPING_VINES)
-				|| block.compare(Block.WEEPING_VINES_PLANT)
-				|| block.compare(Block.ACACIA_TRAPDOOR)
-				|| block.compare(Block.BIRCH_TRAPDOOR)
-				|| block.compare(Block.CRIMSON_TRAPDOOR)
-				|| block.compare(Block.DARK_OAK_TRAPDOOR)
-				|| block.compare(Block.IRON_TRAPDOOR)
-				|| block.compare(Block.JUNGLE_TRAPDOOR)
-				|| block.compare(Block.OAK_TRAPDOOR)
-				|| block.compare(Block.SPRUCE_TRAPDOOR)
-				|| block.compare(Block.WARPED_TRAPDOOR);
+		Block block = Objects.requireNonNull(entity.getInstance()).getBlock(entity.getPosition());
+		return tag.contains(block.namespace());
 	}
 	
 	protected Point getLandingPos(LivingEntity livingEntity, Pos position) {

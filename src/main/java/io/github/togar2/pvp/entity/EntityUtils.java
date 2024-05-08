@@ -109,23 +109,18 @@ public class EntityUtils {
 	}
 	
 	public static void addExhaustion(Player player, float exhaustion) {
-		if (!player.isInvulnerable() && player.getGameMode().canTakeDamage() && player.isOnline()) {
-			HungerManager.addExhaustion(player, exhaustion);
-		}
+		if (player.isOnline()) HungerManager.addExhaustion(player, exhaustion);
 	}
 	
 	//TODO needs improving
 	public static boolean isClimbing(Entity entity) {
 		if (entity instanceof Player player && player.getGameMode() == GameMode.SPECTATOR) return false;
 		
+		var tag = MinecraftServer.getTagManager().getTag(net.minestom.server.gamedata.tags.Tag.BasicType.BLOCKS, "minecraft:climbable");
+		assert tag != null;
+		
 		Block block = Objects.requireNonNull(entity.getInstance()).getBlock(entity.getPosition());
-		return block.compare(Block.LADDER) || block.compare(Block.VINE) || block.compare(Block.TWISTING_VINES)
-				|| block.compare(Block.TWISTING_VINES_PLANT) || block.compare(Block.WEEPING_VINES)
-				|| block.compare(Block.WEEPING_VINES_PLANT) || block.compare(Block.ACACIA_TRAPDOOR)
-				|| block.compare(Block.BIRCH_TRAPDOOR) || block.compare(Block.CRIMSON_TRAPDOOR)
-				|| block.compare(Block.DARK_OAK_TRAPDOOR) || block.compare(Block.IRON_TRAPDOOR)
-				|| block.compare(Block.JUNGLE_TRAPDOOR) || block.compare(Block.OAK_TRAPDOOR)
-				|| block.compare(Block.SPRUCE_TRAPDOOR) || block.compare(Block.WARPED_TRAPDOOR);
+		return tag.contains(block.namespace());
 	}
 	
 	public static double getBodyY(Entity entity, double heightScale) {

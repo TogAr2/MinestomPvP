@@ -67,7 +67,7 @@ public class FoodListener {
 			ThreadLocalRandom random = ThreadLocalRandom.current();
 			
 			if (config.isFoodSoundsEnabled()) {
-				triggerEatSounds(player, component);
+				triggerEatingSound(player, component);
 				
 				if (!component.isDrink() || event.getItemStack().material() == Material.HONEY_BOTTLE) {
 					ViewUtil.viewersAndSelf(player).playSound(Sound.sound(
@@ -106,7 +106,7 @@ public class FoodListener {
 			Player player = event.getPlayer();
 			if (player.isSilent() || !player.isEating()) return;
 			
-			eatSounds(player);
+			tickEatingSounds(player);
 		});
 		
 		if (config.isBlockBreakExhaustionEnabled()) node.addListener(EventListener.builder(PlayerBlockBreakEvent.class)
@@ -154,7 +154,7 @@ public class FoodListener {
 		return node;
 	}
 	
-	public static void eatSounds(Player player) {
+	public static void tickEatingSounds(Player player) {
 		ItemStack stack = player.getItemInHand(Objects.requireNonNull(player.getEatingHand()));
 		
 		FoodComponent component = FoodComponents.fromMaterial(stack.material());
@@ -169,10 +169,10 @@ public class FoodListener {
 		boolean shouldTrigger = canTrigger && remainingUseTicks % 4 == 0;
 		if (!shouldTrigger) return;
 		
-		triggerEatSounds(player, component);
+		triggerEatingSound(player, component);
 	}
 	
-	public static void triggerEatSounds(Player player, @Nullable FoodComponent component) {
+	public static void triggerEatingSound(Player player, @Nullable FoodComponent component) {
 		ThreadLocalRandom random = ThreadLocalRandom.current();
 		
 		if (component == null || component.isDrink()) { // null = potion
