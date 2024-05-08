@@ -5,5 +5,7 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.damage.DamageType;
 
 public interface ArmorFeature extends CombatFeature {
+	ArmorFeature NO_OP = (entity, type, amount) -> amount;
+	
 	float getDamageWithProtection(LivingEntity entity, DamageType type, float amount);
 }

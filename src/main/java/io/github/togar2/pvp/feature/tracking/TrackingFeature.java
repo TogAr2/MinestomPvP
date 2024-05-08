@@ -7,5 +7,7 @@ import net.minestom.server.entity.damage.Damage;
 import org.jetbrains.annotations.Nullable;
 
 public interface TrackingFeature extends CombatFeature {
+	TrackingFeature NO_OP = (player, attacker, damage) -> {};
+	
 	void recordDamage(Player player, @Nullable Entity attacker, Damage damage);
 }

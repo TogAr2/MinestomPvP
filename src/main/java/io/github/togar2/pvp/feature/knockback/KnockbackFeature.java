@@ -5,6 +5,23 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.damage.Damage;
 
 public interface KnockbackFeature extends CombatFeature {
+	KnockbackFeature NO_OP = new KnockbackFeature() {
+		@Override
+		public boolean applyDamageKnockback(Damage damage, LivingEntity target) {
+			return false;
+		}
+		
+		@Override
+		public boolean applyAttackKnockback(LivingEntity attacker, LivingEntity target, int knockback) {
+			return false;
+		}
+		
+		@Override
+		public boolean applySweepingKnockback(LivingEntity attacker, LivingEntity target) {
+			return false;
+		}
+	};
+	
 	/**
 	 * Apply base knockback to the target entity.
 	 *

@@ -8,6 +8,7 @@ import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
+import net.minestom.server.event.player.PlayerDeathEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.tag.Tag;
@@ -24,6 +25,12 @@ public class DeathMessageFeatureImpl implements TrackingFeature, DeathMessageFea
 		node.addListener(PlayerSpawnEvent.class, event -> event.getPlayer().getTag(COMBAT_MANAGER).reset());
 		
 		node.addListener(PlayerTickEvent.class, event -> event.getPlayer().getTag(COMBAT_MANAGER).tick());
+		
+		node.addListener(PlayerDeathEvent.class, event -> {
+			Component message = getDeathMessage(event.getPlayer());
+			event.setChatMessage(message);
+			event.setDeathText(message);
+		});
 	}
 	
 	@Override
@@ -33,7 +40,7 @@ public class DeathMessageFeatureImpl implements TrackingFeature, DeathMessageFea
 	}
 	
 	@Override
-	public Component getDeathMessage(Player player) {
+	public @Nullable Component getDeathMessage(Player player) {
 		return player.getTag(COMBAT_MANAGER).getDeathMessage();
 	}
 }
