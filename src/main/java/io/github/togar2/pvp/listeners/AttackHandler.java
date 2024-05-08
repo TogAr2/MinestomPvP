@@ -2,7 +2,6 @@ package io.github.togar2.pvp.listeners;
 
 import io.github.togar2.pvp.config.AttackConfig;
 import io.github.togar2.pvp.enchantment.EnchantmentUtils;
-import io.github.togar2.pvp.entity.CustomPlayer;
 import io.github.togar2.pvp.entity.EntityGroup;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.entity.PvpPlayer;
@@ -10,6 +9,7 @@ import io.github.togar2.pvp.enums.Tool;
 import io.github.togar2.pvp.events.EntityKnockbackEvent;
 import io.github.togar2.pvp.events.FinalAttackEvent;
 import io.github.togar2.pvp.events.LegacyKnockbackEvent;
+import io.github.togar2.pvp.feature.attack.AttackValues;
 import io.github.togar2.pvp.legacy.LegacyKnockbackSettings;
 import io.github.togar2.pvp.utils.ItemUtils;
 import io.github.togar2.pvp.utils.ViewUtil;
@@ -64,7 +64,7 @@ public class AttackHandler {
 		if (attacker.isDead()) return;
 		if (entity.getDistanceSquared(target) >= 36.0D) return;
 		
-		AttackValues attack = prepareAttack(attacker, target, config);
+		AttackValues.Final attack = prepareAttack(attacker, target, config);
 		if (attack == null) return; // Event cancelled
 		
 		// If legacy, attacker velocity is reduced before the knockback
@@ -98,9 +98,9 @@ public class AttackHandler {
 		
 		// Knockback and sweeping
 		applyKnockback(attacker, living, attack.knockback(), config);
-		if (attack.sweeping()) applySweeping(attacker, target, attack.damage());
+		if (attack.sweeping()) applySweeping(attacker, living, attack.damage());
 		
-		if (target instanceof CustomPlayer customPlayer)
+		if (target instanceof PvpPlayer customPlayer)
 			customPlayer.sendImmediateVelocityUpdate();
 		
 		// Play attack sounds
@@ -172,16 +172,8 @@ public class AttackHandler {
 			EntityUtils.addExhaustion(player, config.isLegacy() ? 0.3f: 0.1f);
 	}
 	
-	protected record AttackValues(
-			float damage, boolean strong,
-			boolean sprint, int knockback,
-			boolean critical, boolean magical,
-			int fireAspect, boolean sweeping,
-			boolean sounds, boolean playSoundsOnFail
-	) {}
-	
-	protected @Nullable AttackValues prepareAttack(LivingEntity attacker, Entity target,
-	                                                    AttackConfig config) {
+	protected @Nullable AttackValues.Final prepareAttack(LivingEntity attacker, Entity target,
+	                                                     AttackConfig config) {
 		float damage = attacker.getAttributeValue(Attribute.ATTACK_DAMAGE);
 		float enchantedDamage = EnchantmentUtils.getAttackDamage(
 				attacker.getItemInMainHand(),
@@ -225,7 +217,7 @@ public class AttackHandler {
 		
 		if (sprintAttack) knockback++;
 		
-		return new AttackValues(
+		return new AttackValues.Final(
 				damage, strongAttack, sprintAttack, knockback, critical,
 				enchantedDamage > 0, fireAspect, sweeping,
 				finalAttackEvent.hasAttackSounds(),
@@ -246,7 +238,7 @@ public class AttackHandler {
 	}
 	
 	protected boolean shouldSweep(LivingEntity attacker, boolean strongAttack,
-	                                   boolean critical, boolean sprintAttack) {
+	                              boolean critical, boolean sprintAttack) {
 		if (!strongAttack || critical || sprintAttack || !attacker.isOnGround()) return false;
 		
 		Pos previousPosition = EntityUtils.getPreviousPosition(attacker);
@@ -314,7 +306,7 @@ public class AttackHandler {
 		attacker.setSprinting(false);
 	}
 	
-	protected void applySweeping(LivingEntity attacker, Entity target, float damage) {
+	protected void applySweeping(LivingEntity attacker, LivingEntity target, float damage) {
 		float sweepingMultiplier = 0;
 		int sweepingLevel = EnchantmentUtils.getSweeping(attacker);
 		if (sweepingLevel > 0) sweepingMultiplier = 1.0f - (1.0f / (float) (sweepingLevel + 1));

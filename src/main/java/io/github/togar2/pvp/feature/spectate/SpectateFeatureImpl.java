@@ -1,4 +1,4 @@
-package io.github.togar2.pvp.feature.attack;
+package io.github.togar2.pvp.feature.spectate;
 
 import io.github.togar2.pvp.events.PlayerSpectateEvent;
 import io.github.togar2.pvp.listeners.AttackHandler;

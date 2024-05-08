@@ -1,11 +1,10 @@
 package io.github.togar2.pvp.feature.fall;
 
+import io.github.togar2.pvp.entity.EntityUtils;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.entity.Entity;
-import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
@@ -26,8 +25,6 @@ import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.TimedPotion;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
-
-import java.util.Objects;
 
 public class FallFeatureImpl implements FallFeature {
 	public static final Tag<Block> LAST_CLIMBED_BLOCK = Tag.Short("lastClimbedBlock").map(Block::fromStateId, Block::stateId);
@@ -60,7 +57,7 @@ public class FallFeatureImpl implements FallFeature {
 		
 		node.addListener(PlayerMoveEvent.class, event -> {
 			Player player = event.getPlayer();
-			if (isClimbing(player)) {
+			if (EntityUtils.isClimbing(player)) {
 				player.setTag(LAST_CLIMBED_BLOCK, player.getInstance().getBlock(player.getPosition()));
 				player.setTag(FALL_DISTANCE, 0.0);
 			}
@@ -154,16 +151,6 @@ public class FallFeatureImpl implements FallFeature {
 	@Override
 	public Block getLastClimbedBlock(LivingEntity entity) {
 		return entity.hasTag(LAST_CLIMBED_BLOCK) ? entity.getTag(LAST_CLIMBED_BLOCK) : Block.AIR;
-	}
-	
-	public boolean isClimbing(Entity entity) {
-		if (entity instanceof Player player && player.getGameMode() == GameMode.SPECTATOR) return false;
-		
-		var tag = MinecraftServer.getTagManager().getTag(net.minestom.server.gamedata.tags.Tag.BasicType.BLOCKS, "minecraft:climbable");
-		assert tag != null;
-		
-		Block block = Objects.requireNonNull(entity.getInstance()).getBlock(entity.getPosition());
-		return tag.contains(block.namespace());
 	}
 	
 	protected Point getLandingPos(LivingEntity livingEntity, Pos position) {

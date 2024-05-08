@@ -93,4 +93,9 @@ public class ExhaustionFeatureImpl implements ExhaustionFeature {
 		EventDispatcher.callCancellable(playerExhaustEvent, () -> player.setTag(EXHAUSTION,
 				Math.min(player.getTag(EXHAUSTION) + playerExhaustEvent.getAmount(), 40)));
 	}
+	
+	@Override
+	public void addAttackExhaustion(Player player) {
+		addExhaustion(player, legacy ? 0.3f: 0.1f);
+	}
 }

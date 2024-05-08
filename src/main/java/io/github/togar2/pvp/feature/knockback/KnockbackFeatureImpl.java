@@ -100,6 +100,10 @@ public class KnockbackFeatureImpl implements KnockbackFeature {
 	public boolean applyAttackKnockback(LivingEntity attacker, LivingEntity target, int knockback) {
 		if (knockback <= 0) return false;
 		
+		// If legacy, attacker velocity is reduced before the knockback
+		if (legacy && attacker instanceof PvpPlayer custom)
+			custom.afterSprintAttack();
+		
 		double dx = Math.sin(Math.toRadians(attacker.getPosition().yaw()));
 		double dz = -Math.cos(Math.toRadians(attacker.getPosition().yaw()));
 		

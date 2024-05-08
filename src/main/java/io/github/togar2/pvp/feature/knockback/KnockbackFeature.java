@@ -23,5 +23,12 @@ public interface KnockbackFeature extends CombatFeature {
 	 */
 	boolean applyAttackKnockback(LivingEntity attacker, LivingEntity target, int knockback);
 	
+	/**
+	 * Applies sweeping knockback to the target entity.
+	 *
+	 * @param attacker the attacker that caused the knockback
+	 * @param target the entity that is receiving the knockback
+	 * @return true if the target entity was knocked back, false otherwise
+	 */
 	boolean applySweepingKnockback(LivingEntity attacker, LivingEntity target);
 }
