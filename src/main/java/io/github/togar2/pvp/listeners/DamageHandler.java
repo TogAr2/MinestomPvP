@@ -261,7 +261,7 @@ public class DamageHandler {
 		
 		float resultingDamage = config.isLegacyShieldMechanics() ? Math.max(0, (amount + 1) * 0.5f) : 0;
 		
-		DamageBlockEvent damageBlockEvent = new DamageBlockEvent(entity, amount, resultingDamage);
+		DamageBlockEvent damageBlockEvent = new DamageBlockEvent(entity, amount, resultingDamage, !config.isLegacyShieldMechanics());
 		EventDispatcher.call(damageBlockEvent);
 		if (damageBlockEvent.isCancelled()) return Pair.of(false, amount);
 		

@@ -4,6 +4,7 @@ import io.github.togar2.pvp.entity.PvpPlayer;
 import io.github.togar2.pvp.events.PlayerExhaustEvent;
 import io.github.togar2.pvp.feature.provider.ProviderForEntity;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.Event;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventNode;
@@ -97,5 +98,10 @@ public class ExhaustionFeatureImpl implements ExhaustionFeature {
 	@Override
 	public void addAttackExhaustion(Player player) {
 		addExhaustion(player, legacy ? 0.3f: 0.1f);
+	}
+	
+	@Override
+	public void addDamageExhaustion(Player player, DamageType type) {
+		addExhaustion(player, (float) type.exhaustion() * (legacy ? 3 : 1));
 	}
 }

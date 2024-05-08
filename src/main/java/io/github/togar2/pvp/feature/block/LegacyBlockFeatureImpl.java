@@ -8,7 +8,7 @@ import net.minestom.server.event.player.*;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.tag.Tag;
 
-public class LegacyBlockFeatureImpl implements LegacyBlockFeature {
+public class LegacyBlockFeatureImpl extends BlockFeatureImpl implements LegacyBlockFeature {
 	public static final Tag<Long> LAST_SWING_TIME = Tag.Long("lastSwingTime");
 	public static final Tag<Boolean> BLOCKING_SWORD = Tag.Boolean("blockingSword");
 	public static final Tag<ItemStack> BLOCK_REPLACEMENT_ITEM = Tag.ItemStack("blockReplacementItem");
@@ -16,6 +16,7 @@ public class LegacyBlockFeatureImpl implements LegacyBlockFeature {
 	private final ItemStack blockingItem;
 	
 	public LegacyBlockFeatureImpl(ItemStack blockingItem) {
+		super(true);
 		this.blockingItem = blockingItem;
 	}
 	
