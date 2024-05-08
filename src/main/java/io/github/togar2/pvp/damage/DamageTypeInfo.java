@@ -38,7 +38,6 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 			put(DamageType.DROWN, new DamageTypeInfo().bypassesArmor(true));
 			put(DamageType.STARVE, new DamageTypeInfo().bypassesArmor(true).unblockable(true));
 			put(DamageType.FALL, new DamageTypeInfo().bypassesArmor(true).fall(true));
-			//TODO put(DamageType.ENDER_PEARL, new DamageTypeInfo().bypassesArmor(true).fall(true));
 			put(DamageType.FLY_INTO_WALL, new DamageTypeInfo().bypassesArmor(true));
 			put(DamageType.OUT_OF_WORLD, new DamageTypeInfo().bypassesArmor(true).outOfWorld(true));
 			put(DamageType.GENERIC, new DamageTypeInfo().bypassesArmor(true));

@@ -42,10 +42,8 @@ import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class DamageHandler {
-	public static final Tag<Long> LAST_DAMAGE_TIME = Tag.Long("lastDamageTime");
 	public static final Tag<Long> NEW_DAMAGE_TIME = Tag.Long("newDamageTime");
 	public static final Tag<Float> LAST_DAMAGE_AMOUNT = Tag.Float("lastDamageAmount");
-	public static final Tag<Integer> LAST_DAMAGED_BY = Tag.Integer("lastDamagedBy");
 	
 	/**
 	 * The main method of the damage handler
@@ -84,11 +82,6 @@ public class DamageHandler {
 			amount *= 0.75F;
 		}
 		
-		if (entity instanceof Player && attacker instanceof LivingEntity) {
-			entity.setTag(DamageHandler.LAST_DAMAGED_BY, attacker.getEntityId());
-			entity.setTag(DamageHandler.LAST_DAMAGE_TIME, System.currentTimeMillis());
-		}
-		
 		// Invulnerability ticks
 		boolean hurtSoundAndAnimation = true;
 		float amountBeforeProcessing = amount;
@@ -116,7 +109,7 @@ public class DamageHandler {
 		
 		boolean register = config.isLegacy() || amount > 0;
 		if (register && entity instanceof Player)
-			Tracker.combatManager.get(entity.getUuid()).recordDamage(damage);
+			Tracker.combatManager.get(entity.getUuid()).recordDamage(attacker == null ? -1 : attacker.getEntityId(), damage);
 		
 		if (finalDamageEvent.isCancelled()) {
 			event.setCancelled(true);

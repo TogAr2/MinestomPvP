@@ -5,10 +5,8 @@ import io.github.togar2.pvp.food.HungerManager;
 import io.github.togar2.pvp.legacy.SwordBlockHandler;
 import io.github.togar2.pvp.listeners.AttackHandler;
 import io.github.togar2.pvp.listeners.AttackManager;
-import io.github.togar2.pvp.listeners.DamageHandler;
 import io.github.togar2.pvp.potion.PotionListener;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventFilter;
@@ -106,27 +104,7 @@ public class Tracker {
 				player.removeTag(LAST_CLIMBED_BLOCK);
 			}
 			
-			if (player.isDead()) {
-				Tracker.combatManager.get(uuid).recheckStatus();
-			}
-			if (player.getAliveTicks() % 20 == 0 && player.isOnline()) {
-				Tracker.combatManager.get(uuid).recheckStatus();
-			}
-			
-			if (player.hasTag(DamageHandler.LAST_DAMAGED_BY)) {
-				Integer lastDamagedById = player.getTag(DamageHandler.LAST_DAMAGED_BY);
-				if (lastDamagedById == null) {
-					player.removeTag(DamageHandler.LAST_DAMAGED_BY);
-				} else {
-					Entity lastDamagedBy = Entity.getEntity(lastDamagedById);
-					if (lastDamagedBy instanceof LivingEntity living && living.isDead()) {
-						player.removeTag(DamageHandler.LAST_DAMAGED_BY);
-					} else if (System.currentTimeMillis() - player.getTag(DamageHandler.LAST_DAMAGE_TIME) > 5000) {
-						// After 5 seconds of no attack the last damaged by does not count anymore
-						player.removeTag(DamageHandler.LAST_DAMAGED_BY);
-					}
-				}
-			}
+			Tracker.combatManager.get(uuid).tick();
 			
 			AttackManager.spectateTick(player);
 		});
