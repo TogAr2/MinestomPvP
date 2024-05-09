@@ -306,6 +306,14 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 		super.noClip = noClip;
 	}
 	
+	public PickupMode getPickupMode() {
+		return pickupMode;
+	}
+	
+	public void setPickupMode(PickupMode pickupMode) {
+		this.pickupMode = pickupMode;
+	}
+	
 	public enum PickupMode {
 		DISALLOWED,
 		ALLOWED,

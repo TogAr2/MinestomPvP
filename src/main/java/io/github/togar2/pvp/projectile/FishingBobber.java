@@ -1,6 +1,7 @@
 package io.github.togar2.pvp.projectile;
 
 import io.github.togar2.pvp.entity.EntityUtils;
+import io.github.togar2.pvp.feature.projectile.VanillaFishingRodFeature;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -182,8 +183,12 @@ public class FishingBobber extends CustomEntityProjectile {
 	public void remove() {
 		Entity shooter = getShooter();
 		if (shooter != null) {
+			//TODO temp
 			if (fishingBobbers.get(shooter.getUuid()) == this) {
 				fishingBobbers.remove(getShooter().getUuid());
+			}
+			if (shooter.getTag(VanillaFishingRodFeature.FISHING_BOBBER) == this) {
+				shooter.removeTag(VanillaFishingRodFeature.FISHING_BOBBER);
 			}
 		}
 		
