@@ -4,6 +4,7 @@ import io.github.togar2.pvp.potion.PotionListener;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffect;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
 import io.github.togar2.pvp.potion.item.CustomPotionType;
+import io.github.togar2.pvp.utils.CombatVersion;
 import io.github.togar2.pvp.utils.EffectManager;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Pos;
@@ -92,7 +93,7 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.effect());
 				if (customPotionEffect.isInstant()) {
 					customPotionEffect.applyInstantEffect(this, getShooter(),
-							entity,potion.amplifier(), proximity, legacy);
+							entity,potion.amplifier(), proximity, CombatVersion.fromLegacy(legacy));
 				} else {
 					int duration = potion.duration();
 					if (legacy) duration = (int) Math.floor(duration * 0.75);
