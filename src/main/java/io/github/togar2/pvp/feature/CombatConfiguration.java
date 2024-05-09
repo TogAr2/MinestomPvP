@@ -8,25 +8,54 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 public class CombatConfiguration {
 	private final Set<ConstructableFeature> features = new HashSet<>();
 	
-	public CombatConfiguration add(IndependentFeature feature) {
-		features.add(new ConstructedFeature(feature));
+	public CombatConfiguration add(ConstructableFeature feature) {
+		features.add(feature);
 		return this;
 	}
 	
-	public CombatConfiguration add(Class<? extends CombatFeature> clazz) {
+	public CombatConfiguration add(IndependentFeature feature) {
+		return add(wrap(feature));
+	}
+	
+	public CombatConfiguration add(Class<? extends CombatFeature> clazz, IndependentFeature... override) {
+		return add(wrapIndependentOverride(clazz, override));
+	}
+	
+	public static ConstructableFeature wrap(IndependentFeature feature) {
+		return new ConstructedFeature(feature);
+	}
+	
+	public static ConstructableFeature wrapIndependentOverride(Class<? extends CombatFeature> clazz, IndependentFeature... override) {
+		ConstructableFeature[] overrideArray = new ConstructableFeature[override.length];
+		for (int i = 0; i < override.length; i++) {
+			overrideArray[i] = wrap(override[i]);
+		}
+		return wrap(clazz, overrideArray);
+	}
+	
+	@SafeVarargs
+	public static ConstructableFeature wrapLazyOverride(Class<? extends CombatFeature> clazz, Class<? extends CombatFeature>... override) {
+		ConstructableFeature[] overrideArray = new ConstructableFeature[override.length];
+		for (int i = 0; i < override.length; i++) {
+			overrideArray[i] = wrap(override[i]);
+		}
+		return wrap(clazz, overrideArray);
+	}
+	
+	public static ConstructableFeature wrap(Class<? extends CombatFeature> clazz, ConstructableFeature... override) {
 		if (clazz.getDeclaredConstructors().length != 1)
 			throw new RuntimeException("Cannot determine how to construct " + clazz.getTypeName());
 		
 		//noinspection unchecked
-		add((Constructor<CombatFeature>) clazz.getDeclaredConstructors()[0]);
-		return this;
+		return wrap((Constructor<CombatFeature>) clazz.getDeclaredConstructors()[0], override);
 	}
 	
-	public CombatConfiguration add(Constructor<CombatFeature> constructor) {
+	public static ConstructableFeature wrap(Constructor<CombatFeature> constructor, ConstructableFeature... override) {
 		Class<?>[] parameterTypes = constructor.getParameterTypes();
 		
 		for (Class<?> type : parameterTypes) {
@@ -36,8 +65,20 @@ public class CombatConfiguration {
 			}
 		}
 		
-		features.add(new LazyFeatureInit(constructor, parameterTypes));
-		return this;
+		for (ConstructableFeature overrideFeature : override) {
+			boolean found = false;
+			for (Class<?> parameterType : parameterTypes) {
+				if (parameterType.isAssignableFrom(overrideFeature.featureClass)) {
+					found = true;
+					break;
+				}
+			}
+			
+			if (!found) throw new RuntimeException("Constructor of " + constructor.getDeclaringClass().getTypeName()
+					+ " does not take argument of type " + overrideFeature.featureClass.getTypeName());
+		}
+		
+		return new LazyFeatureInit(constructor, parameterTypes, override);
 	}
 	
 	public CombatFeatureSet build() {
@@ -47,7 +88,7 @@ public class CombatConfiguration {
 		List<ConstructableFeature> buildOrder = getBuildOrder();
 		for (ConstructableFeature feature : buildOrder) {
 			try {
-				result.add(feature.construct());
+				result.add(feature.construct(this::getFeatureOf));
 			} catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
 				throw new RuntimeException(e);
 			}
@@ -91,11 +132,13 @@ public class CombatConfiguration {
 			visiting.add(current);
 			
 			for (Class<?> dependClass : lazy.dependsOn) {
-				ConstructableFeature dependFeature = getFeatureOf(dependClass);
+				ConstructableFeature dependFeature = lazy.getOverrideOf(dependClass);
+				if (dependFeature == null) dependFeature = getFeatureOf(dependClass);
+				
 				if (dependFeature == null) throw new RuntimeException("A feature of type " + dependClass.getTypeName()
 						+ " is required for " + current.featureClass.getTypeName());
 				
-				visit(order, visiting, lazy);
+				visit(order, visiting, dependFeature);
 			}
 			
 			visiting.remove(current);
@@ -106,24 +149,25 @@ public class CombatConfiguration {
 	
 	private @Nullable ConstructableFeature getFeatureOf(Class<?> clazz) {
 		for (ConstructableFeature feature : features) {
-			if (clazz.isAssignableFrom(feature.getClass()))
+			if (clazz.isAssignableFrom(feature.featureClass))
 				return feature;
 		}
 		
 		return null;
 	}
 	
-	private sealed abstract static class ConstructableFeature {
+	public sealed abstract static class ConstructableFeature {
 		private final Class<?> featureClass;
 		
 		public ConstructableFeature(Class<?> featureClass) {
 			this.featureClass = featureClass;
 		}
 		
-		abstract CombatFeature construct() throws InvocationTargetException, InstantiationException, IllegalAccessException;
+		abstract CombatFeature construct(Function<Class<?>, @Nullable ConstructableFeature> getter) throws
+				InvocationTargetException, InstantiationException, IllegalAccessException;
 	}
 	
-	static final class ConstructedFeature extends ConstructableFeature {
+	private static final class ConstructedFeature extends ConstructableFeature {
 		private final CombatFeature feature;
 		
 		private ConstructedFeature(CombatFeature feature) {
@@ -132,30 +176,44 @@ public class CombatConfiguration {
 		}
 		
 		@Override
-		CombatFeature construct() {
+		CombatFeature construct(Function<Class<?>, @Nullable ConstructableFeature> getter) {
 			return feature;
 		}
 	}
 	
-	final class LazyFeatureInit extends ConstructableFeature {
+	private static final class LazyFeatureInit extends ConstructableFeature {
 		private final Constructor<CombatFeature> constructor;
 		private final Class<?>[] dependsOn;
+		private final ConstructableFeature[] override;
 		
-		public LazyFeatureInit(Constructor<CombatFeature> constructor, Class<?>[] dependsOn) {
+		public LazyFeatureInit(Constructor<CombatFeature> constructor, Class<?>[] dependsOn,
+		                       ConstructableFeature[] override) {
 			super(constructor.getDeclaringClass());
 			this.constructor = constructor;
 			this.dependsOn = dependsOn;
+			this.override = override;
+		}
+		
+		public @Nullable ConstructableFeature getOverrideOf(Class<?> clazz) {
+			for (ConstructableFeature feature : override) {
+				if (clazz.isAssignableFrom(feature.featureClass))
+					return feature;
+			}
+			
+			return null;
 		}
 		
 		@Override
-		CombatFeature construct() throws InvocationTargetException, InstantiationException, IllegalAccessException {
+		CombatFeature construct(Function<Class<?>, @Nullable ConstructableFeature> getter) throws
+				InvocationTargetException, InstantiationException, IllegalAccessException {
 			Object[] initArgs = new Object[dependsOn.length];
 			
 			for (int i = 0; i < dependsOn.length; i++) {
 				Class<?> dependClass = dependsOn[i];
-				ConstructableFeature dependFeature = getFeatureOf(dependClass);
+				ConstructableFeature dependFeature = getOverrideOf(dependClass);
+				if (dependFeature == null) dependFeature = getter.apply(dependClass);
 				assert dependFeature != null;
-				initArgs[i] = dependFeature.construct();
+				initArgs[i] = dependFeature.construct(getter);
 			}
 			
 			return constructor.newInstance(initArgs);

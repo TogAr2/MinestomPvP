@@ -21,4 +21,9 @@ public final class CombatVersion implements IndependentFeature {
 	public static CombatVersion fromLegacy(boolean legacy) {
 		return legacy ? LEGACY : MODERN;
 	}
+	
+	@Override
+	public String toString() {
+		return "CombatVersion[legacy=" + legacy + "]";
+	}
 }

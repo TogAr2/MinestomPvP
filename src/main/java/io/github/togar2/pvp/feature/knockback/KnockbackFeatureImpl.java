@@ -102,6 +102,8 @@ public class KnockbackFeatureImpl implements KnockbackFeature, IndependentFeatur
 	public boolean applyAttackKnockback(LivingEntity attacker, LivingEntity target, int knockback) {
 		if (knockback <= 0) return false;
 		
+		System.out.println(version);
+		
 		// If legacy, attacker velocity is reduced before the knockback
 		if (version.legacy() && attacker instanceof PvpPlayer custom)
 			custom.afterSprintAttack();
