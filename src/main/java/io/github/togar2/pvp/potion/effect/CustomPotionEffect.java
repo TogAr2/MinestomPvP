@@ -3,6 +3,7 @@ package io.github.togar2.pvp.potion.effect;
 import io.github.togar2.pvp.entity.EntityGroup;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.food.HungerManager;
+import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeInstance;
 import net.minestom.server.attribute.AttributeModifier;
@@ -52,7 +53,7 @@ public class CustomPotionEffect {
 		return this;
 	}
 	
-	public void applyUpdateEffect(LivingEntity entity, byte amplifier, boolean legacy) {
+	public void applyUpdateEffect(LivingEntity entity, byte amplifier, CombatVersion version) {
 		if (potionEffect == PotionEffect.REGENERATION) {
 			if (entity.getHealth() < entity.getMaxHealth()) {
 				entity.setHealth(entity.getHealth() + 1);
@@ -70,7 +71,7 @@ public class CustomPotionEffect {
 		
 		if (entity instanceof Player player) {
 			if (potionEffect == PotionEffect.HUNGER) {
-				EntityUtils.addExhaustion(player, legacy ? 0.025F : 0.005F * (float) (amplifier + 1));
+				EntityUtils.addExhaustion(player, version.legacy() ? 0.025F : 0.005F * (float) (amplifier + 1));
 				return;
 			} else if (potionEffect == PotionEffect.SATURATION) {
 				if (player.isOnline()) HungerManager.add(player, amplifier + 1, 1.0F);
@@ -89,11 +90,11 @@ public class CustomPotionEffect {
 		}
 	}
 	
-	public void applyInstantEffect(@Nullable Entity source, @Nullable Entity attacker, LivingEntity target, byte amplifier, double proximity, boolean legacy) {
+	public void applyInstantEffect(@Nullable Entity source, @Nullable Entity attacker, LivingEntity target, byte amplifier, double proximity, CombatVersion version) {
 		EntityGroup targetGroup = EntityGroup.ofEntity(target);
 		
 		if (potionEffect != PotionEffect.INSTANT_DAMAGE && potionEffect != PotionEffect.INSTANT_HEALTH) {
-			applyUpdateEffect(target, amplifier, legacy);
+			applyUpdateEffect(target, amplifier, version);
 			return;
 		}
 		
@@ -138,9 +139,9 @@ public class CustomPotionEffect {
 		return false;
 	}
 	
-	public void onApplied(LivingEntity entity, byte amplifier, boolean legacy) {
+	public void onApplied(LivingEntity entity, byte amplifier, CombatVersion version) {
 		Map<Attribute, AttributeModifier> modifiers;
-		if (legacy && legacyAttributeModifiers != null) {
+		if (version.legacy() && legacyAttributeModifiers != null) {
 			modifiers = legacyAttributeModifiers;
 		} else {
 			modifiers = attributeModifiers;
@@ -153,9 +154,9 @@ public class CustomPotionEffect {
 		});
 	}
 	
-	public void onRemoved(LivingEntity entity, byte amplifier, boolean legacy) {
+	public void onRemoved(LivingEntity entity, byte amplifier, CombatVersion version) {
 		Map<Attribute, AttributeModifier> modifiers;
-		if (legacy && legacyAttributeModifiers != null) {
+		if (version.legacy() && legacyAttributeModifiers != null) {
 			modifiers = legacyAttributeModifiers;
 		} else {
 			modifiers = attributeModifiers;

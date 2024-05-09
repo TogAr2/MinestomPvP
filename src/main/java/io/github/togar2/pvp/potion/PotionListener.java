@@ -9,6 +9,8 @@ import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
 import io.github.togar2.pvp.potion.item.CustomPotionType;
 import io.github.togar2.pvp.potion.item.CustomPotionTypes;
 import io.github.togar2.pvp.projectile.ThrownPotion;
+import io.github.togar2.pvp.utils.CombatVersion;
+import io.github.togar2.pvp.utils.PotionUtils;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
@@ -70,7 +72,7 @@ public class PotionListener {
 						byte amplifier = potion.potion().amplifier();
 						
 						if (customPotionEffect.canApplyUpdateEffect(durationLeft, amplifier)) {
-							customPotionEffect.applyUpdateEffect(entity, amplifier, config.isLegacy());
+							customPotionEffect.applyUpdateEffect(entity, amplifier, CombatVersion.fromLegacy(config.isLegacy()));
 						}
 					}
 					
@@ -102,7 +104,7 @@ public class PotionListener {
 			
 			if (config.isApplyEffectEnabled()) {
 				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(event.getPotion().effect());
-				customPotionEffect.onApplied(entity, event.getPotion().amplifier(), config.isLegacy());
+				customPotionEffect.onApplied(entity, event.getPotion().amplifier(), CombatVersion.fromLegacy(config.isLegacy()));
 			}
 			
 			updatePotionVisibility(entity, config.isParticlesEnabled());
@@ -113,7 +115,7 @@ public class PotionListener {
 			
 			if (config.isApplyEffectEnabled()) {
 				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(event.getPotion().effect());
-				customPotionEffect.onRemoved(entity, event.getPotion().amplifier(), config.isLegacy());
+				customPotionEffect.onRemoved(entity, event.getPotion().amplifier(), CombatVersion.fromLegacy(config.isLegacy()));
 			}
 			
 			//Delay update 1 tick because we need to have the removing effect removed
@@ -147,7 +149,7 @@ public class PotionListener {
 				
 				if (customPotionEffect.isInstant()) {
 					if (config.isInstantEffectEnabled()) customPotionEffect.applyInstantEffect(
-							player, player, player, potion.amplifier(), 1.0, config.isLegacy());
+							player, player, player, potion.amplifier(), 1.0, CombatVersion.fromLegacy(config.isLegacy()));
 				} else {
 					player.addEffect(potion);
 				}
@@ -225,7 +227,7 @@ public class PotionListener {
 			} else {
 				ambient = containsOnlyAmbientEffects(effects);
 				if (particlesEnabled) {
-					color = getPotionColor(effects.stream().map(TimedPotion::potion).collect(Collectors.toList()));
+					color = PotionUtils.getPotionColor(effects.stream().map(TimedPotion::potion).collect(Collectors.toList()));
 				} else {
 					color = 0;
 				}
@@ -260,39 +262,7 @@ public class PotionListener {
 		if (meta.getColor() != null) {
 			return meta.getColor().asRGB();
 		} else {
-			return meta.getPotionType() == PotionType.EMPTY ? 16253176 : getPotionColor(getAllPotions(meta, legacy));
-		}
-	}
-	
-	public static int getPotionColor(Collection<Potion> effects) {
-		if (effects.isEmpty()) {
-			return 3694022;
-		}
-		
-		float r = 0.0F;
-		float g = 0.0F;
-		float b = 0.0F;
-		int totalAmplifier = 0;
-		
-		for (Potion potion : effects) {
-			if (potion.hasParticles()) {
-				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.effect());
-				int color = customPotionEffect.getColor();
-				int amplifier = potion.amplifier() + 1;
-				r += (float) (amplifier * (color >> 16 & 255)) / 255.0F;
-				g += (float) (amplifier * (color >> 8 & 255)) / 255.0F;
-				b += (float) (amplifier * (color & 255)) / 255.0F;
-				totalAmplifier += amplifier;
-			}
-		}
-		
-		if (totalAmplifier == 0) {
-			return 0;
-		} else {
-			r = r / (float) totalAmplifier * 255.0F;
-			g = g / (float) totalAmplifier * 255.0F;
-			b = b / (float) totalAmplifier * 255.0F;
-			return (int) r << 16 | (int) g << 8 | (int) b;
+			return meta.getPotionType() == PotionType.EMPTY ? 16253176 : PotionUtils.getPotionColor(getAllPotions(meta, legacy));
 		}
 	}
 	

@@ -116,7 +116,7 @@ public class VanillaFoodFeature implements FoodFeature, RegistrableFeature, Comb
 		addFood(player, foodComponent.getNutrition(), foodComponent.getSaturationModifier());
 	}
 	
-	public static void tickEatingSounds(Player player) {
+	protected void tickEatingSounds(Player player) {
 		ItemStack stack = player.getItemInHand(Objects.requireNonNull(player.getEatingHand()));
 		
 		FoodComponent component = FoodComponents.fromMaterial(stack.material());
@@ -134,7 +134,7 @@ public class VanillaFoodFeature implements FoodFeature, RegistrableFeature, Comb
 		triggerEatingSound(player, component);
 	}
 	
-	public static void triggerEatingSound(Player player, @Nullable FoodComponent component) {
+	protected void triggerEatingSound(Player player, @Nullable FoodComponent component) {
 		ThreadLocalRandom random = ThreadLocalRandom.current();
 		
 		if (component == null || component.isDrink()) { // null = potion
