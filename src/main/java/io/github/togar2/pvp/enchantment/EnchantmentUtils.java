@@ -3,7 +3,7 @@ package io.github.togar2.pvp.enchantment;
 import io.github.togar2.pvp.damage.DamageTypeInfo;
 import io.github.togar2.pvp.entity.EntityGroup;
 import io.github.togar2.pvp.enums.ArmorMaterial;
-import io.github.togar2.pvp.feature.CombatVersion;
+import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;

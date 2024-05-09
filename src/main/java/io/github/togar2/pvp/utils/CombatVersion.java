@@ -1,6 +1,8 @@
-package io.github.togar2.pvp.feature;
+package io.github.togar2.pvp.utils;
 
-public final class CombatVersion implements IndependentFeature {
+import io.github.togar2.pvp.feature.CombatFeature;
+
+public final class CombatVersion implements CombatFeature {
 	public static CombatVersion MODERN = new CombatVersion(false);
 	public static CombatVersion LEGACY = new CombatVersion(true);
 	

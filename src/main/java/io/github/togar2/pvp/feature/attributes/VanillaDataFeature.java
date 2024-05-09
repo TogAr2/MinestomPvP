@@ -2,9 +2,9 @@ package io.github.togar2.pvp.feature.attributes;
 
 import io.github.togar2.pvp.enums.ArmorMaterial;
 import io.github.togar2.pvp.enums.Tool;
-import io.github.togar2.pvp.feature.CombatVersion;
-import io.github.togar2.pvp.feature.IndependentFeature;
+import io.github.togar2.pvp.feature.CombatFeature;
 import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeInstance;
 import net.minestom.server.attribute.AttributeModifier;
@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class DataFeatureImpl implements DataFeature<Attribute>, RegistrableFeature, IndependentFeature {
+public class VanillaDataFeature implements DataFeature<Attribute>, RegistrableFeature, CombatFeature {
 	//TODO this probably shouldn't work this way
 	// We probably want to store all the tools & armor separately per DataFeature
 	private final CombatVersion version;
 	
-	public DataFeatureImpl(CombatVersion version) {
+	public VanillaDataFeature(CombatVersion version) {
 		this.version = version;
 	}
 	
@@ -49,6 +49,7 @@ public class DataFeatureImpl implements DataFeature<Attribute>, RegistrableFeatu
 		}
 	}
 	
+	//TODO use instead of direct attributes
 	@Override
 	public float getValue(LivingEntity entity, Attribute attribute) {
 		return entity.getAttributeValue(attribute);

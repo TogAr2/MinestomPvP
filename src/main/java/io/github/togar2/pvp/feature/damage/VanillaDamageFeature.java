@@ -4,7 +4,6 @@ import io.github.togar2.pvp.damage.DamageTypeInfo;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.events.EntityPreDeathEvent;
 import io.github.togar2.pvp.events.FinalDamageEvent;
-import io.github.togar2.pvp.feature.CombatVersion;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.armor.ArmorFeature;
 import io.github.togar2.pvp.feature.block.BlockFeature;
@@ -14,6 +13,7 @@ import io.github.togar2.pvp.feature.provider.ProviderForEntity;
 import io.github.togar2.pvp.feature.totem.TotemFeature;
 import io.github.togar2.pvp.feature.tracking.TrackingFeature;
 import io.github.togar2.pvp.listeners.DamageHandler;
+import io.github.togar2.pvp.utils.CombatVersion;
 import io.github.togar2.pvp.utils.ItemUtils;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
@@ -36,7 +36,7 @@ import net.minestom.server.world.Difficulty;
 
 import java.util.Objects;
 
-public class DamageFeatureImpl implements DamageFeature, RegistrableFeature {
+public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 	public static final Tag<Long> NEW_DAMAGE_TIME = Tag.Long("newDamageTime");
 	public static final Tag<Float> LAST_DAMAGE_AMOUNT = Tag.Float("lastDamageAmount");
 	
@@ -51,9 +51,9 @@ public class DamageFeatureImpl implements DamageFeature, RegistrableFeature {
 	
 	private final CombatVersion version;
 	
-	public DamageFeatureImpl(ProviderForEntity<Difficulty> difficultyProvider, BlockFeature blockFeature,
-	                         ArmorFeature armorFeature, TotemFeature totemFeature, ExhaustionFeature exhaustionFeature,
-	                         KnockbackFeature knockbackFeature, TrackingFeature trackingFeature, CombatVersion version) {
+	public VanillaDamageFeature(ProviderForEntity<Difficulty> difficultyProvider, BlockFeature blockFeature,
+	                            ArmorFeature armorFeature, TotemFeature totemFeature, ExhaustionFeature exhaustionFeature,
+	                            KnockbackFeature knockbackFeature, TrackingFeature trackingFeature, CombatVersion version) {
 		this.difficultyProvider = difficultyProvider;
 		this.blockFeature = blockFeature;
 		this.armorFeature = armorFeature;

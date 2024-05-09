@@ -1,17 +1,17 @@
 package io.github.togar2.pvp.feature.attack;
 
 import io.github.togar2.pvp.entity.EntityUtils;
-import io.github.togar2.pvp.feature.CombatVersion;
-import io.github.togar2.pvp.feature.IndependentFeature;
+import io.github.togar2.pvp.feature.CombatFeature;
+import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.potion.PotionEffect;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class CriticalFeatureImpl implements CriticalFeature, IndependentFeature {
+public class VanillaCriticalFeature implements CriticalFeature, CombatFeature {
 	private final CombatVersion version;
 	
-	public CriticalFeatureImpl(CombatVersion version) {
+	public VanillaCriticalFeature(CombatVersion version) {
 		this.version = version;
 	}
 	

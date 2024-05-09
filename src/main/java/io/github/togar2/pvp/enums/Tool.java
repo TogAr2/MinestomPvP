@@ -1,6 +1,6 @@
 package io.github.togar2.pvp.enums;
 
-import io.github.togar2.pvp.feature.CombatVersion;
+import io.github.togar2.pvp.utils.CombatVersion;
 import io.github.togar2.pvp.utils.ModifierUUID;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeModifier;

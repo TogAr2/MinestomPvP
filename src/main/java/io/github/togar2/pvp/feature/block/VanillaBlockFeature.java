@@ -4,8 +4,8 @@ import io.github.togar2.pvp.damage.DamageTypeInfo;
 import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.enums.Tool;
 import io.github.togar2.pvp.events.DamageBlockEvent;
-import io.github.togar2.pvp.feature.CombatVersion;
-import io.github.togar2.pvp.feature.IndependentFeature;
+import io.github.togar2.pvp.feature.CombatFeature;
+import io.github.togar2.pvp.utils.CombatVersion;
 import io.github.togar2.pvp.utils.ItemUtils;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
@@ -23,10 +23,10 @@ import net.minestom.server.sound.SoundEvent;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class BlockFeatureImpl implements BlockFeature, IndependentFeature {
+public class VanillaBlockFeature implements BlockFeature, CombatFeature {
 	private final CombatVersion version;
 	
-	public BlockFeatureImpl(CombatVersion version) {
+	public VanillaBlockFeature(CombatVersion version) {
 		this.version = version;
 	}
 	

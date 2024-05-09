@@ -1,7 +1,7 @@
 package io.github.togar2.pvp.feature.tracking;
 
 import io.github.togar2.pvp.damage.combat.CombatManager;
-import io.github.togar2.pvp.feature.IndependentFeature;
+import io.github.togar2.pvp.feature.CombatFeature;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.entity.Entity;
@@ -16,8 +16,8 @@ import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.tag.Tag;
 import org.jetbrains.annotations.Nullable;
 
-public class DeathMessageFeatureImpl implements TrackingFeature,
-		DeathMessageFeature, RegistrableFeature, IndependentFeature {
+public class VanillaDeathMessageFeature implements TrackingFeature,
+		DeathMessageFeature, RegistrableFeature, CombatFeature {
 	public static final Tag<CombatManager> COMBAT_MANAGER = Tag.Transient("combatManager");
 	
 	@Override

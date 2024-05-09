@@ -3,8 +3,8 @@ package io.github.togar2.pvp.feature.armor;
 import io.github.togar2.pvp.damage.DamageTypeInfo;
 import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.entity.EntityUtils;
-import io.github.togar2.pvp.feature.CombatVersion;
-import io.github.togar2.pvp.feature.IndependentFeature;
+import io.github.togar2.pvp.feature.CombatFeature;
+import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.damage.DamageType;
@@ -12,10 +12,10 @@ import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.TimedPotion;
 import net.minestom.server.utils.MathUtils;
 
-public class ArmorFeatureImpl implements ArmorFeature, IndependentFeature {
+public class VanillaArmorFeature implements ArmorFeature, CombatFeature {
 	private final CombatVersion version;
 	
-	public ArmorFeatureImpl(CombatVersion version) {
+	public VanillaArmorFeature(CombatVersion version) {
 		this.version = version;
 	}
 	

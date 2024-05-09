@@ -1,9 +1,9 @@
 package io.github.togar2.pvp.feature.food;
 
 import io.github.togar2.pvp.events.PlayerRegenerateEvent;
-import io.github.togar2.pvp.feature.CombatVersion;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.provider.ProviderForEntity;
+import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.Event;
@@ -14,16 +14,16 @@ import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.tag.Tag;
 import net.minestom.server.world.Difficulty;
 
-public class RegenerationFeatureImpl implements RegenerationFeature, RegistrableFeature {
+public class VanillaRegenerationFeature implements RegenerationFeature, RegistrableFeature {
 	public static final Tag<Integer> STARVATION_TICKS = Tag.Integer("starvationTicks");
 	
 	private final ExhaustionFeature exhaustionFeature;
 	private final ProviderForEntity<Difficulty> difficultyFeature;
 	private final CombatVersion version;
 	
-	public RegenerationFeatureImpl(ExhaustionFeature exhaustionFeature,
-	                               ProviderForEntity<Difficulty> difficultyFeature,
-	                               CombatVersion version) {
+	public VanillaRegenerationFeature(ExhaustionFeature exhaustionFeature,
+	                                  ProviderForEntity<Difficulty> difficultyFeature,
+	                                  CombatVersion version) {
 		this.exhaustionFeature = exhaustionFeature;
 		this.difficultyFeature = difficultyFeature;
 		this.version = version;

@@ -1,7 +1,7 @@
 package io.github.togar2.pvp.feature.spectate;
 
 import io.github.togar2.pvp.events.PlayerSpectateEvent;
-import io.github.togar2.pvp.feature.IndependentFeature;
+import io.github.togar2.pvp.feature.CombatFeature;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.listeners.AttackHandler;
 import net.minestom.server.entity.Entity;
@@ -15,7 +15,7 @@ import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.tag.Tag;
 
-public class SpectateFeatureImpl implements SpectateFeature, RegistrableFeature, IndependentFeature {
+public class VanillaSpectateFeature implements SpectateFeature, RegistrableFeature, CombatFeature {
 	public static final Tag<Integer> SPECTATING = Tag.Integer("spectating");
 	
 	@Override

@@ -4,7 +4,7 @@ import io.github.togar2.pvp.config.ArmorToolConfig;
 import io.github.togar2.pvp.config.PvPConfig;
 import io.github.togar2.pvp.enums.ArmorMaterial;
 import io.github.togar2.pvp.enums.Tool;
-import io.github.togar2.pvp.feature.CombatVersion;
+import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeInstance;
 import net.minestom.server.attribute.AttributeModifier;

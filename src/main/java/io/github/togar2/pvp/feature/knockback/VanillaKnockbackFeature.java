@@ -3,9 +3,9 @@ package io.github.togar2.pvp.feature.knockback;
 import io.github.togar2.pvp.entity.PvpPlayer;
 import io.github.togar2.pvp.events.EntityKnockbackEvent;
 import io.github.togar2.pvp.events.LegacyKnockbackEvent;
-import io.github.togar2.pvp.feature.CombatVersion;
-import io.github.togar2.pvp.feature.IndependentFeature;
+import io.github.togar2.pvp.feature.CombatFeature;
 import io.github.togar2.pvp.legacy.LegacyKnockbackSettings;
+import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
@@ -18,11 +18,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class KnockbackFeatureImpl implements KnockbackFeature, IndependentFeature {
+public class VanillaKnockbackFeature implements KnockbackFeature, CombatFeature {
 	//TODO this probably shouldn't work like this
 	private final CombatVersion version;
 	
-	public KnockbackFeatureImpl(CombatVersion version) {
+	public VanillaKnockbackFeature(CombatVersion version) {
 		this.version = version;
 	}
 	

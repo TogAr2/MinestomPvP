@@ -3,7 +3,7 @@ package io.github.togar2.pvp.projectile;
 import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.entity.EntityGroup;
 import io.github.togar2.pvp.entity.EntityUtils;
-import io.github.togar2.pvp.feature.CombatVersion;
+import io.github.togar2.pvp.utils.CombatVersion;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Vec;

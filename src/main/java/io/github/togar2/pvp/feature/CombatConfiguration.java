@@ -18,19 +18,19 @@ public class CombatConfiguration {
 		return this;
 	}
 	
-	public CombatConfiguration add(IndependentFeature feature) {
+	public CombatConfiguration add(CombatFeature feature) {
 		return add(wrap(feature));
 	}
 	
-	public CombatConfiguration add(Class<? extends CombatFeature> clazz, IndependentFeature... override) {
+	public CombatConfiguration add(Class<? extends CombatFeature> clazz, CombatFeature... override) {
 		return add(wrapIndependentOverride(clazz, override));
 	}
 	
-	public static ConstructableFeature wrap(IndependentFeature feature) {
+	public static ConstructableFeature wrap(CombatFeature feature) {
 		return new ConstructedFeature(feature);
 	}
 	
-	public static ConstructableFeature wrapIndependentOverride(Class<? extends CombatFeature> clazz, IndependentFeature... override) {
+	public static ConstructableFeature wrapIndependentOverride(Class<? extends CombatFeature> clazz, CombatFeature... override) {
 		ConstructableFeature[] overrideArray = new ConstructableFeature[override.length];
 		for (int i = 0; i < override.length; i++) {
 			overrideArray[i] = wrap(override[i]);
@@ -83,7 +83,6 @@ public class CombatConfiguration {
 	
 	public CombatFeatureSet build() {
 		List<CombatFeature> result = new ArrayList<>(features.size());
-		System.out.println("build start");
 		
 		List<ConstructableFeature> buildOrder = getBuildOrder();
 		for (ConstructableFeature feature : buildOrder) {
@@ -94,7 +93,6 @@ public class CombatConfiguration {
 			}
 		}
 		
-		System.out.println("build done");
 		return new CombatFeatureSet(result.toArray(CombatFeature[]::new));
 	}
 	

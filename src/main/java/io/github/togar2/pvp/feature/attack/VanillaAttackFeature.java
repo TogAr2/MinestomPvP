@@ -6,11 +6,11 @@ import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.entity.PvpPlayer;
 import io.github.togar2.pvp.enums.Tool;
 import io.github.togar2.pvp.events.FinalAttackEvent;
-import io.github.togar2.pvp.feature.CombatVersion;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.cooldown.CooldownFeature;
 import io.github.togar2.pvp.feature.food.ExhaustionFeature;
 import io.github.togar2.pvp.feature.knockback.KnockbackFeature;
+import io.github.togar2.pvp.utils.CombatVersion;
 import io.github.togar2.pvp.utils.ItemUtils;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.audience.Audience;
@@ -30,7 +30,7 @@ import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
 import org.jetbrains.annotations.Nullable;
 
-public class AttackFeatureImpl implements AttackFeature, RegistrableFeature {
+public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 	private static final double MAX_DISTANCE_SQUARED = 36.0;
 	
 	private final CooldownFeature cooldownFeature;
@@ -42,9 +42,9 @@ public class AttackFeatureImpl implements AttackFeature, RegistrableFeature {
 	
 	private final CombatVersion version;
 	
-	public AttackFeatureImpl(CooldownFeature cooldownFeature, ExhaustionFeature exhaustionFeature,
-	                         CriticalFeature criticalFeature, SweepingFeature sweepingFeature,
-	                         KnockbackFeature knockbackFeature, CombatVersion version) {
+	public VanillaAttackFeature(CooldownFeature cooldownFeature, ExhaustionFeature exhaustionFeature,
+	                            CriticalFeature criticalFeature, SweepingFeature sweepingFeature,
+	                            KnockbackFeature knockbackFeature, CombatVersion version) {
 		this.cooldownFeature = cooldownFeature;
 		this.exhaustionFeature = exhaustionFeature;
 		this.criticalFeature = criticalFeature;
