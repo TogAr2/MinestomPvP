@@ -8,13 +8,13 @@ import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.armor.ArmorFeature;
 import io.github.togar2.pvp.feature.block.BlockFeature;
 import io.github.togar2.pvp.feature.food.ExhaustionFeature;
+import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.feature.knockback.KnockbackFeature;
 import io.github.togar2.pvp.feature.provider.ProviderForEntity;
 import io.github.togar2.pvp.feature.totem.TotemFeature;
 import io.github.togar2.pvp.feature.tracking.TrackingFeature;
 import io.github.togar2.pvp.listeners.DamageHandler;
 import io.github.togar2.pvp.utils.CombatVersion;
-import io.github.togar2.pvp.utils.ItemUtils;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
@@ -48,12 +48,14 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 	private final ExhaustionFeature exhaustionFeature;
 	private final KnockbackFeature knockbackFeature;
 	private final TrackingFeature trackingFeature;
+	private final ItemDamageFeature itemDamageFeature;
 	
 	private final CombatVersion version;
 	
 	public VanillaDamageFeature(ProviderForEntity<Difficulty> difficultyProvider, BlockFeature blockFeature,
 	                            ArmorFeature armorFeature, TotemFeature totemFeature, ExhaustionFeature exhaustionFeature,
-	                            KnockbackFeature knockbackFeature, TrackingFeature trackingFeature, CombatVersion version) {
+	                            KnockbackFeature knockbackFeature, TrackingFeature trackingFeature,
+	                            ItemDamageFeature itemDamageFeature, CombatVersion version) {
 		this.difficultyProvider = difficultyProvider;
 		this.blockFeature = blockFeature;
 		this.armorFeature = armorFeature;
@@ -61,6 +63,7 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 		this.exhaustionFeature = exhaustionFeature;
 		this.knockbackFeature = knockbackFeature;
 		this.trackingFeature = trackingFeature;
+		this.itemDamageFeature = itemDamageFeature;
 		this.version = version;
 	}
 	
@@ -104,7 +107,7 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 		}
 		
 		if (typeInfo.damagesHelmet() && !entity.getEquipment(EquipmentSlot.HELMET).isAir()) {
-			ItemUtils.damageArmor(entity, typeInfo, amount, EquipmentSlot.HELMET);
+			itemDamageFeature.damageArmor(entity, damage.getType(), amount, EquipmentSlot.HELMET);
 			amount *= 0.75F;
 		}
 		

@@ -1,9 +1,9 @@
 package io.github.togar2.pvp.feature.projectile;
 
 import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.projectile.FishingBobber;
 import io.github.togar2.pvp.utils.CombatVersion;
-import io.github.togar2.pvp.utils.ItemUtils;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.ServerFlag;
@@ -27,9 +27,12 @@ import java.util.concurrent.ThreadLocalRandom;
 public class VanillaFishingRodFeature implements FishingRodFeature, RegistrableFeature {
 	public static final Tag<FishingBobber> FISHING_BOBBER = Tag.Transient("fishingBobber");
 	
+	private final ItemDamageFeature itemDamageFeature;
+	
 	private final CombatVersion version;
 	
-	public VanillaFishingRodFeature(CombatVersion version) {
+	public VanillaFishingRodFeature(ItemDamageFeature itemDamageFeature, CombatVersion version) {
+		this.itemDamageFeature = itemDamageFeature;
 		this.version = version;
 	}
 	
@@ -44,7 +47,7 @@ public class VanillaFishingRodFeature implements FishingRodFeature, RegistrableF
 			if (player.hasTag(FISHING_BOBBER)) {
 				int durability = player.getTag(FISHING_BOBBER).retrieve();
 				if (!player.isCreative())
-					ItemUtils.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
+					itemDamageFeature.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
 							EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, durability);
 				
 				ViewUtil.viewersAndSelf(player).playSound(Sound.sound(

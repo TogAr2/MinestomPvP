@@ -20,7 +20,7 @@ public class LegacyVanillaBlockFeature extends VanillaBlockFeature
 	private final ItemStack blockingItem;
 	
 	public LegacyVanillaBlockFeature(ItemStack blockingItem) {
-		super(CombatVersion.LEGACY);
+		super(itemDamageFeature, CombatVersion.LEGACY);
 		this.blockingItem = blockingItem;
 	}
 	

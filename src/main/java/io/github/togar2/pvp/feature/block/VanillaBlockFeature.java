@@ -5,8 +5,8 @@ import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.enums.Tool;
 import io.github.togar2.pvp.events.DamageBlockEvent;
 import io.github.togar2.pvp.feature.CombatFeature;
+import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.utils.CombatVersion;
-import io.github.togar2.pvp.utils.ItemUtils;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -24,9 +24,12 @@ import net.minestom.server.sound.SoundEvent;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class VanillaBlockFeature implements BlockFeature, CombatFeature {
+	private final ItemDamageFeature itemDamageFeature;
+	
 	private final CombatVersion version;
 	
-	public VanillaBlockFeature(CombatVersion version) {
+	public VanillaBlockFeature(ItemDamageFeature itemDamageFeature, CombatVersion version) {
+		this.itemDamageFeature = itemDamageFeature;
 		this.version = version;
 	}
 	
@@ -77,11 +80,10 @@ public class VanillaBlockFeature implements BlockFeature, CombatFeature {
 		if (damageBlockEvent.isCancelled()) return false;
 		damage.setAmount(damageBlockEvent.getResultingDamage());
 		
-		//TODO equipment damage feature
 		if (amount >= 3) {
 			int shieldDamage = 1 + (int) Math.floor(amount);
 			Player.Hand hand = ((LivingEntityMeta) entity.getEntityMeta()).getActiveHand();
-			ItemUtils.damageEquipment(
+			itemDamageFeature.damageEquipment(
 					entity,
 					hand == Player.Hand.MAIN ?
 							EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND,

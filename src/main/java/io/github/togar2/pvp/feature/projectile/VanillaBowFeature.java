@@ -4,11 +4,11 @@ import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.projectile.AbstractArrow;
 import io.github.togar2.pvp.projectile.Arrow;
 import io.github.togar2.pvp.projectile.SpectralArrow;
 import io.github.togar2.pvp.utils.CombatVersion;
-import io.github.togar2.pvp.utils.ItemUtils;
 import io.github.togar2.pvp.utils.ViewUtil;
 import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.sound.Sound;
@@ -31,9 +31,12 @@ import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class VanillaBowFeature implements BowFeature, RegistrableFeature {
+	private final ItemDamageFeature itemDamageFeature;
+	
 	private final CombatVersion version;
 	
-	public VanillaBowFeature(CombatVersion version) {
+	public VanillaBowFeature(ItemDamageFeature itemDamageFeature, CombatVersion version) {
+		this.itemDamageFeature = itemDamageFeature;
 		this.version = version;
 	}
 	
@@ -84,7 +87,7 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 			if (EnchantmentUtils.getLevel(Enchantment.FLAME, stack) > 0)
 				EntityUtils.setOnFireForSeconds(arrow, 100);
 			
-			ItemUtils.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
+			itemDamageFeature.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
 					EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, 1);
 			
 			boolean reallyInfinite = infinite && projectile.material() == Material.ARROW;

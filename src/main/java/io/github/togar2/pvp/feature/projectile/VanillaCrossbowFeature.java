@@ -4,11 +4,11 @@ import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.projectile.AbstractArrow;
 import io.github.togar2.pvp.projectile.Arrow;
 import io.github.togar2.pvp.projectile.SpectralArrow;
 import io.github.togar2.pvp.utils.CombatVersion;
-import io.github.togar2.pvp.utils.ItemUtils;
 import io.github.togar2.pvp.utils.ViewUtil;
 import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.sound.Sound;
@@ -38,9 +38,12 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 	private static final Tag<Boolean> START_SOUND_PLAYED = Tag.Transient("StartSoundPlayed");
 	private static final Tag<Boolean> MID_LOAD_SOUND_PLAYED = Tag.Transient("MidLoadSoundPlayed");
 	
+	private final ItemDamageFeature itemDamageFeature;
+	
 	private final CombatVersion version;
 	
-	public VanillaCrossbowFeature(CombatVersion version) {
+	public VanillaCrossbowFeature(ItemDamageFeature itemDamageFeature, CombatVersion version) {
+		this.itemDamageFeature = itemDamageFeature;
 		this.version = version;
 	}
 	
@@ -278,7 +281,7 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 		
 		arrow.shootFrom(position, power, spread);
 		
-		ItemUtils.damageEquipment(player, hand == Player.Hand.MAIN ?
+		itemDamageFeature.damageEquipment(player, hand == Player.Hand.MAIN ?
 				EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, firework ? 3 : 1);
 		
 		ViewUtil.viewersAndSelf(player).playSound(Sound.sound(

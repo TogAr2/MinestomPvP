@@ -9,9 +9,9 @@ import io.github.togar2.pvp.events.FinalAttackEvent;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.cooldown.CooldownFeature;
 import io.github.togar2.pvp.feature.food.ExhaustionFeature;
+import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.feature.knockback.KnockbackFeature;
 import io.github.togar2.pvp.utils.CombatVersion;
-import io.github.togar2.pvp.utils.ItemUtils;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;
@@ -35,6 +35,7 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 	
 	private final CooldownFeature cooldownFeature;
 	private final ExhaustionFeature exhaustionFeature;
+	private final ItemDamageFeature itemDamageFeature;
 	
 	private final CriticalFeature criticalFeature;
 	private final SweepingFeature sweepingFeature;
@@ -43,10 +44,12 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 	private final CombatVersion version;
 	
 	public VanillaAttackFeature(CooldownFeature cooldownFeature, ExhaustionFeature exhaustionFeature,
-	                            CriticalFeature criticalFeature, SweepingFeature sweepingFeature,
-	                            KnockbackFeature knockbackFeature, CombatVersion version) {
+	                            ItemDamageFeature itemDamageFeature, CriticalFeature criticalFeature,
+	                            SweepingFeature sweepingFeature, KnockbackFeature knockbackFeature,
+	                            CombatVersion version) {
 		this.cooldownFeature = cooldownFeature;
 		this.exhaustionFeature = exhaustionFeature;
+		this.itemDamageFeature = itemDamageFeature;
 		this.criticalFeature = criticalFeature;
 		this.sweepingFeature = sweepingFeature;
 		this.knockbackFeature = knockbackFeature;
@@ -147,7 +150,7 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 		
 		// Damage item
 		Tool tool = Tool.fromMaterial(attacker.getItemInMainHand().material());
-		if (tool != null) ItemUtils.damageEquipment(attacker, EquipmentSlot.MAIN_HAND,
+		if (tool != null) itemDamageFeature.damageEquipment(attacker, EquipmentSlot.MAIN_HAND,
 					(tool.isSword() || tool == Tool.TRIDENT) ? 1 : 2);
 		
 		if (attack.fireAspect() > 0)
