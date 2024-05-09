@@ -49,7 +49,6 @@ public class VanillaDataFeature implements DataFeature<Attribute>, RegistrableFe
 		}
 	}
 	
-	//TODO use instead of direct attributes
 	@Override
 	public float getValue(LivingEntity entity, Attribute attribute) {
 		return entity.getAttributeValue(attribute);

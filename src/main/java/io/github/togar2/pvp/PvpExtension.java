@@ -1,9 +1,9 @@
 package io.github.togar2.pvp;
 
-import io.github.togar2.pvp.config.PvPConfig;
 import io.github.togar2.pvp.enchantment.CustomEnchantments;
 import io.github.togar2.pvp.entity.CustomPlayer;
 import io.github.togar2.pvp.entity.Tracker;
+import io.github.togar2.pvp.feature.CombatFeatures;
 import io.github.togar2.pvp.food.FoodComponents;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
 import io.github.togar2.pvp.potion.item.CustomPotionTypes;
@@ -12,18 +12,18 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeInstance;
 import net.minestom.server.entity.Player;
+import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
-import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.network.packet.client.play.ClientUseItemPacket;
 
 public class PvpExtension {
 	
-	public static EventNode<EntityInstanceEvent> events() {
-		return PvPConfig.DEFAULT.createNode();
+	public static EventNode<Event> events() {
+		return CombatFeatures.MODERN_VANILLA.createNode();
 	}
 	
-	public static EventNode<EntityInstanceEvent> legacyEvents() {
-		return PvPConfig.LEGACY.createNode();
+	public static EventNode<Event> legacyEvents() {
+		return CombatFeatures.LEGACY_VANILLA.createNode();
 	}
 	
 	/**

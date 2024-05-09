@@ -16,10 +16,10 @@ import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
 
-public class SweepingFeatureImpl implements SweepingFeature {
+public class VanillaSweepingFeature implements SweepingFeature {
 	private final KnockbackFeature knockbackFeature;
 	
-	public SweepingFeatureImpl(KnockbackFeature knockbackFeature) {
+	public VanillaSweepingFeature(KnockbackFeature knockbackFeature) {
 		this.knockbackFeature = knockbackFeature;
 	}
 	

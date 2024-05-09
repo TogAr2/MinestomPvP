@@ -10,7 +10,7 @@ import io.github.togar2.pvp.feature.block.BlockFeature;
 import io.github.togar2.pvp.feature.food.ExhaustionFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.feature.knockback.KnockbackFeature;
-import io.github.togar2.pvp.feature.provider.ProviderForEntity;
+import io.github.togar2.pvp.feature.provider.DifficultyProvider;
 import io.github.togar2.pvp.feature.totem.TotemFeature;
 import io.github.togar2.pvp.feature.tracking.TrackingFeature;
 import io.github.togar2.pvp.listeners.DamageHandler;
@@ -32,7 +32,6 @@ import net.minestom.server.network.packet.server.play.SoundEffectPacket;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
-import net.minestom.server.world.Difficulty;
 
 import java.util.Objects;
 
@@ -40,7 +39,7 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 	public static final Tag<Long> NEW_DAMAGE_TIME = Tag.Long("newDamageTime");
 	public static final Tag<Float> LAST_DAMAGE_AMOUNT = Tag.Float("lastDamageAmount");
 	
-	private final ProviderForEntity<Difficulty> difficultyProvider;
+	private final DifficultyProvider difficultyProvider;
 	
 	private final BlockFeature blockFeature;
 	private final ArmorFeature armorFeature;
@@ -52,7 +51,7 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 	
 	private final CombatVersion version;
 	
-	public VanillaDamageFeature(ProviderForEntity<Difficulty> difficultyProvider, BlockFeature blockFeature,
+	public VanillaDamageFeature(DifficultyProvider difficultyProvider, BlockFeature blockFeature,
 	                            ArmorFeature armorFeature, TotemFeature totemFeature, ExhaustionFeature exhaustionFeature,
 	                            KnockbackFeature knockbackFeature, TrackingFeature trackingFeature,
 	                            ItemDamageFeature itemDamageFeature, CombatVersion version) {
