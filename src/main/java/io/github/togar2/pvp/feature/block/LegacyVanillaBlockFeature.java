@@ -1,7 +1,8 @@
 package io.github.togar2.pvp.feature.block;
 
 import io.github.togar2.pvp.feature.CombatFeature;
-import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.CombatSetup;
+import io.github.togar2.pvp.feature.EntityInstanceFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.entity.Player;
@@ -9,11 +10,12 @@ import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.item.ItemUpdateStateEvent;
 import net.minestom.server.event.player.*;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.tag.Tag;
 
 public class LegacyVanillaBlockFeature extends VanillaBlockFeature
-		implements LegacyBlockFeature, RegistrableFeature, CombatFeature {
+		implements LegacyBlockFeature, EntityInstanceFeature, CombatFeature {
 	public static final Tag<Long> LAST_SWING_TIME = Tag.Long("lastSwingTime");
 	public static final Tag<Boolean> BLOCKING_SWORD = Tag.Boolean("blockingSword");
 	public static final Tag<ItemStack> BLOCK_REPLACEMENT_ITEM = Tag.ItemStack("blockReplacementItem");
@@ -25,13 +27,16 @@ public class LegacyVanillaBlockFeature extends VanillaBlockFeature
 		this.blockingItem = blockingItem;
 	}
 	
-	@Override
-	public void init(EventNode<Event> node) {
+	@CombatSetup
+	private static void setup(EventNode<Event> node) {
 		node.addListener(AsyncPlayerConfigurationEvent.class, event -> {
 			event.getPlayer().setTag(LAST_SWING_TIME, 0L);
 			event.getPlayer().setTag(BLOCKING_SWORD, false);
 		});
-		
+	}
+	
+	@Override
+	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(PlayerUseItemEvent.class, this::handleUseItem);
 		node.addListener(ItemUpdateStateEvent.class, this::handleUpdateState);
 		node.addListener(PlayerSwapItemEvent.class, this::handleSwapItem);

@@ -3,34 +3,34 @@ package io.github.togar2.pvp.feature.attributes;
 import io.github.togar2.pvp.enums.ArmorMaterial;
 import io.github.togar2.pvp.enums.Tool;
 import io.github.togar2.pvp.feature.CombatFeature;
-import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.EntityInstanceFeature;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeInstance;
 import net.minestom.server.attribute.AttributeModifier;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
-import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.item.EntityEquipEvent;
 import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.item.ItemStack;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class VanillaDataFeature implements DataFeature<Attribute>, RegistrableFeature, CombatFeature {
+public class VanillaEquipmentFeature implements DataFeature<Attribute>, EntityInstanceFeature, CombatFeature {
 	//TODO this probably shouldn't work this way
 	// We probably want to store all the tools & armor separately per DataFeature
 	private final CombatVersion version;
 	
-	public VanillaDataFeature(CombatVersion version) {
+	public VanillaEquipmentFeature(CombatVersion version) {
 		this.version = version;
 	}
 	
 	@Override
-	public void init(EventNode<Event> node) {
+	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(EntityEquipEvent.class, this::onEquip);
 		node.addListener(PlayerChangeHeldSlotEvent.class, event -> changeHandModifiers(
 				event.getPlayer(), EquipmentSlot.MAIN_HAND,
@@ -38,7 +38,7 @@ public class VanillaDataFeature implements DataFeature<Attribute>, RegistrableFe
 		));
 	}
 	
-	public void onEquip(EntityEquipEvent event) {
+	protected void onEquip(EntityEquipEvent event) {
 		if (!(event.getEntity() instanceof LivingEntity entity)) return;
 		
 		//TODO all things related to tools and attributes need an overhaul. This is temporary

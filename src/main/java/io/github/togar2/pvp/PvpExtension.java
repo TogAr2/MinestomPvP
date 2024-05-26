@@ -3,6 +3,7 @@ package io.github.togar2.pvp;
 import io.github.togar2.pvp.enchantment.CustomEnchantments;
 import io.github.togar2.pvp.entity.CustomPlayer;
 import io.github.togar2.pvp.entity.Tracker;
+import io.github.togar2.pvp.feature.CombatFeatureRegistry;
 import io.github.togar2.pvp.feature.CombatFeatures;
 import io.github.togar2.pvp.food.FoodComponents;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
@@ -54,6 +55,7 @@ public class PvpExtension {
 		CustomPotionEffects.registerAll();
 		CustomPotionTypes.registerAll();
 		
+		CombatFeatureRegistry.init();
 		Tracker.register(MinecraftServer.getGlobalEventHandler());
 		MinecraftServer.getConnectionManager().setPlayerProvider(CustomPlayer::new);
 		MinecraftServer.getPacketListenerManager().setPlayListener(ClientUseItemPacket.class, PvPUseItemListener::useItemListener);

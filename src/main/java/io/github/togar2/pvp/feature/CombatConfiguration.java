@@ -1,52 +1,20 @@
 package io.github.togar2.pvp.feature;
 
-import io.github.togar2.pvp.feature.armor.VanillaArmorFeature;
-import io.github.togar2.pvp.feature.attack.VanillaAttackFeature;
-import io.github.togar2.pvp.feature.attack.VanillaCriticalFeature;
-import io.github.togar2.pvp.feature.attack.VanillaSweepingFeature;
-import io.github.togar2.pvp.feature.attributes.VanillaDataFeature;
-import io.github.togar2.pvp.feature.block.VanillaBlockFeature;
-import io.github.togar2.pvp.feature.cooldown.VanillaCooldownFeature;
-import io.github.togar2.pvp.feature.damage.VanillaDamageFeature;
-import io.github.togar2.pvp.feature.effect.VanillaEffectFeature;
-import io.github.togar2.pvp.feature.fall.VanillaFallFeature;
-import io.github.togar2.pvp.feature.food.VanillaExhaustionFeature;
-import io.github.togar2.pvp.feature.food.VanillaFoodFeature;
-import io.github.togar2.pvp.feature.food.VanillaRegenerationFeature;
-import io.github.togar2.pvp.feature.item.VanillaItemDamageFeature;
-import io.github.togar2.pvp.feature.knockback.VanillaKnockbackFeature;
-import io.github.togar2.pvp.feature.potion.VanillaPotionFeature;
-import io.github.togar2.pvp.feature.projectile.VanillaBowFeature;
-import io.github.togar2.pvp.feature.projectile.VanillaCrossbowFeature;
-import io.github.togar2.pvp.feature.projectile.VanillaFishingRodFeature;
-import io.github.togar2.pvp.feature.projectile.VanillaItemProjectileFeature;
-import io.github.togar2.pvp.feature.spectate.VanillaSpectateFeature;
-import io.github.togar2.pvp.feature.totem.VanillaTotemFeature;
-import io.github.togar2.pvp.feature.tracking.VanillaDeathMessageFeature;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 public class CombatConfiguration {
 	private final Set<ConstructableFeature> features = new HashSet<>();
 	
-	public CombatConfiguration addAllVanilla() {
-		return addAll(
-				VanillaArmorFeature.class, VanillaAttackFeature.class, VanillaCriticalFeature.class,
-				VanillaSweepingFeature.class, VanillaDataFeature.class, VanillaBlockFeature.class,
-				VanillaCooldownFeature.class, VanillaDamageFeature.class, VanillaEffectFeature.class,
-				VanillaFallFeature.class, VanillaExhaustionFeature.class, VanillaFoodFeature.class,
-				VanillaRegenerationFeature.class, VanillaItemDamageFeature.class, VanillaKnockbackFeature.class,
-				VanillaPotionFeature.class, VanillaBowFeature.class, VanillaCrossbowFeature.class,
-				VanillaFishingRodFeature.class, VanillaItemProjectileFeature.class, VanillaSpectateFeature.class,
-				VanillaTotemFeature.class, VanillaDeathMessageFeature.class
-		);
+	public final CombatConfiguration addAll(Collection<Class<? extends CombatFeature>> classes) {
+		for (Class<? extends CombatFeature> clazz : classes) {
+			add(clazz);
+		}
+		return this;
 	}
 	
 	@SafeVarargs

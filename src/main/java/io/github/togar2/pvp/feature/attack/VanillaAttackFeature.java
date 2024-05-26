@@ -6,7 +6,7 @@ import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.entity.PvpPlayer;
 import io.github.togar2.pvp.enums.Tool;
 import io.github.togar2.pvp.events.FinalAttackEvent;
-import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.EntityInstanceFeature;
 import io.github.togar2.pvp.feature.cooldown.CooldownFeature;
 import io.github.togar2.pvp.feature.food.ExhaustionFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
@@ -20,17 +20,17 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
-import net.minestom.server.event.Event;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityAttackEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.network.packet.server.play.EntityAnimationPacket;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
 import org.jetbrains.annotations.Nullable;
 
-public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
+public class VanillaAttackFeature implements AttackFeature, EntityInstanceFeature {
 	private static final double MAX_DISTANCE_SQUARED = 36.0;
 	
 	private final CooldownFeature cooldownFeature;
@@ -57,7 +57,7 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 	}
 	
 	@Override
-	public void init(EventNode<Event> node) {
+	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(EntityAttackEvent.class, event -> {
 			if (event.getEntity() instanceof Player player
 					&& player.getGameMode() != GameMode.SPECTATOR
