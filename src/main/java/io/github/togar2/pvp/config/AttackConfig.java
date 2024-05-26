@@ -1,7 +1,15 @@
 package io.github.togar2.pvp.config;
 
+import io.github.togar2.pvp.feature.CombatConfiguration;
+import io.github.togar2.pvp.feature.attack.VanillaAttackFeature;
+import io.github.togar2.pvp.feature.attack.VanillaCriticalFeature;
+import io.github.togar2.pvp.feature.attack.VanillaSweepingFeature;
+import io.github.togar2.pvp.feature.cooldown.VanillaCooldownFeature;
+import io.github.togar2.pvp.feature.food.VanillaExhaustionFeature;
+import io.github.togar2.pvp.feature.item.VanillaItemDamageFeature;
+import io.github.togar2.pvp.feature.knockback.VanillaKnockbackFeature;
 import io.github.togar2.pvp.listeners.AttackHandler;
-import io.github.togar2.pvp.listeners.AttackManager;
+import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 
@@ -68,7 +76,16 @@ public class AttackConfig extends ElementConfig<EntityInstanceEvent> {
 	
 	@Override
 	public EventNode<EntityInstanceEvent> createNode() {
-		return AttackManager.events(this);
+		return new CombatConfiguration()
+				.add(VanillaAttackFeature.class)
+				.add(VanillaCooldownFeature.class)
+				.add(VanillaExhaustionFeature.class)
+				.add(VanillaItemDamageFeature.class)
+				.add(VanillaCriticalFeature.class)
+				.add(VanillaSweepingFeature.class)
+				.add(VanillaKnockbackFeature.class)
+				.add(CombatVersion.fromLegacy(isLegacy()))
+				.build().createNode();
 	}
 	
 	/**

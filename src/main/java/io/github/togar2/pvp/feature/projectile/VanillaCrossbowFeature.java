@@ -18,11 +18,11 @@ import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
-import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.item.ItemUpdateStateEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.item.Enchantment;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
@@ -48,7 +48,7 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 	}
 	
 	@Override
-	public void init(EventNode<Event> node) {
+	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(PlayerUseItemEvent.class, event -> {
 			ItemStack stack = event.getItemStack();
 			if (stack.material() != Material.CROSSBOW) return;

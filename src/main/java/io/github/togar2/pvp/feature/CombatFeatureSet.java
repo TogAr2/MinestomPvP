@@ -1,10 +1,9 @@
 package io.github.togar2.pvp.feature;
 
-import net.minestom.server.event.Event;
-import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 
-public class CombatFeatureSet implements RegistrableFeature<Event> {
+public class CombatFeatureSet implements RegistrableFeature {
 	private final CombatFeature[] features;
 	
 	public CombatFeatureSet(CombatFeature... features) {
@@ -12,15 +11,10 @@ public class CombatFeatureSet implements RegistrableFeature<Event> {
 	}
 	
 	@Override
-	public void init(EventNode<Event> node) {
+	public void init(EventNode<EntityInstanceEvent> node) {
 		for (CombatFeature feature : features) {
-			if (!(feature instanceof RegistrableFeature<?> registrable)) continue;
+			if (!(feature instanceof RegistrableFeature registrable)) continue;
 			node.addChild(registrable.createNode());
 		}
-	}
-	
-	@Override
-	public EventFilter<Event, ?> getEventFilter() {
-		return EventFilter.ALL;
 	}
 }

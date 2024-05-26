@@ -6,7 +6,7 @@ import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.entity.PvpPlayer;
 import io.github.togar2.pvp.enums.Tool;
 import io.github.togar2.pvp.events.FinalAttackEvent;
-import io.github.togar2.pvp.feature.EntityInstanceFeature;
+import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.cooldown.CooldownFeature;
 import io.github.togar2.pvp.feature.food.ExhaustionFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
@@ -30,7 +30,7 @@ import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
 import org.jetbrains.annotations.Nullable;
 
-public class VanillaAttackFeature implements AttackFeature, EntityInstanceFeature {
+public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 	private static final double MAX_DISTANCE_SQUARED = 36.0;
 	
 	private final CooldownFeature cooldownFeature;

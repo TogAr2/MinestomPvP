@@ -11,11 +11,11 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.Player;
-import net.minestom.server.event.Event;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityShootEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.item.Material;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
@@ -37,7 +37,7 @@ public class VanillaFishingRodFeature implements FishingRodFeature, RegistrableF
 	}
 	
 	@Override
-	public void init(EventNode<Event> node) {
+	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(PlayerUseItemEvent.class, event -> {
 			if (event.getItemStack().material() != Material.FISHING_ROD) return;
 			

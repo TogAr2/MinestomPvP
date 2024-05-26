@@ -9,11 +9,11 @@ import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
-import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.item.ItemUpdateStateEvent;
 import net.minestom.server.event.player.PlayerPreEatEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.sound.SoundEvent;
@@ -26,7 +26,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class VanillaFoodFeature implements FoodFeature, RegistrableFeature, CombatFeature {
 	@Override
-	public void init(EventNode<Event> node) {
+	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(PlayerPreEatEvent.class, event -> {
 			if (event.getItemStack().material() != Material.MILK_BUCKET
 					&& !event.getItemStack().material().isFood())

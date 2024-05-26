@@ -1,16 +1,19 @@
 package io.github.togar2.pvp.feature;
 
-import net.minestom.server.event.Event;
+import net.minestom.server.entity.Entity;
 import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
+import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 
-public interface RegistrableFeature<T extends Event> extends CombatFeature {
-	void init(EventNode<T> node);
+public interface RegistrableFeature extends CombatFeature {
+	EventFilter<EntityInstanceEvent, Entity> ENTITY_INSTANCE_FILTER = EventFilter
+			.from(EntityInstanceEvent.class, Entity.class, EntityEvent::getEntity);
 	
-	EventFilter<T, ?> getEventFilter();
+	void init(EventNode<EntityInstanceEvent> node);
 	
-	default EventNode<T> createNode() {
-		EventNode<T> node = EventNode.type(getClass().getTypeName(), getEventFilter());
+	default EventNode<EntityInstanceEvent> createNode() {
+		var node = EventNode.type(getClass().getTypeName(), ENTITY_INSTANCE_FILTER);
 		init(node);
 		return node;
 	}

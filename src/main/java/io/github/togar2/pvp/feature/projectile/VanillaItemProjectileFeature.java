@@ -8,9 +8,9 @@ import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
-import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.player.PlayerUseItemEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.sound.SoundEvent;
@@ -20,7 +20,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class VanillaItemProjectileFeature implements ItemProjectileFeature, RegistrableFeature {
 	@Override
-	public void init(EventNode<Event> node) {
+	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(PlayerUseItemEvent.class, event -> {
 			if (event.getItemStack().material() != Material.SNOWBALL
 					&& event.getItemStack().material() != Material.EGG

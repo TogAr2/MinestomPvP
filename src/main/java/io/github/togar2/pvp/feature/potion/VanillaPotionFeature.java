@@ -15,12 +15,12 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
-import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.item.ItemUpdateStateEvent;
 import net.minestom.server.event.player.PlayerPreEatEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.item.metadata.PotionMeta;
@@ -46,7 +46,7 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 	}
 	
 	@Override
-	public void init(EventNode<Event> node) {
+	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(PlayerPreEatEvent.class, event -> {
 			if (event.getItemStack().material() == Material.POTION) {
 				event.setEatingTime((long) USE_TICKS * MinecraftServer.TICK_MS); // Potion use time is always 32 ticks

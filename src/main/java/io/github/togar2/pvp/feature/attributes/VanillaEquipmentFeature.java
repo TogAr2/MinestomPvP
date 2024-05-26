@@ -2,8 +2,7 @@ package io.github.togar2.pvp.feature.attributes;
 
 import io.github.togar2.pvp.enums.ArmorMaterial;
 import io.github.togar2.pvp.enums.Tool;
-import io.github.togar2.pvp.feature.CombatFeature;
-import io.github.togar2.pvp.feature.EntityInstanceFeature;
+import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeInstance;
@@ -20,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class VanillaEquipmentFeature implements DataFeature<Attribute>, EntityInstanceFeature, CombatFeature {
+public class VanillaEquipmentFeature implements DataFeature<Attribute>, RegistrableFeature {
 	//TODO this probably shouldn't work this way
 	// We probably want to store all the tools & armor separately per DataFeature
 	private final CombatVersion version;

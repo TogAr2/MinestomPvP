@@ -12,13 +12,13 @@ import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
-import net.minestom.server.event.Event;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityDeathEvent;
 import net.minestom.server.event.entity.EntityPotionAddEvent;
 import net.minestom.server.event.entity.EntityPotionRemoveEvent;
 import net.minestom.server.event.entity.EntityTickEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.TimedPotion;
 import net.minestom.server.tag.Tag;
@@ -39,7 +39,7 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 	}
 	
 	@Override
-	public void init(EventNode<Event> node) {
+	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(EntityDeathEvent.class, event ->
 				event.getEntity().clearEffects());
 		

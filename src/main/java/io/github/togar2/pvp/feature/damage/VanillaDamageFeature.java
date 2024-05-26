@@ -23,10 +23,10 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
-import net.minestom.server.event.Event;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityDamageEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.network.packet.server.play.DamageEventPacket;
 import net.minestom.server.network.packet.server.play.SoundEffectPacket;
 import net.minestom.server.potion.PotionEffect;
@@ -67,7 +67,7 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 	}
 	
 	@Override
-	public void init(EventNode<Event> node) {
+	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(EntityDamageEvent.class, this::handleDamage);
 	}
 	

@@ -4,11 +4,11 @@ import io.github.togar2.pvp.feature.CombatFeature;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.entity.Player;
-import net.minestom.server.event.Event;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
 import net.minestom.server.event.player.PlayerHandAnimationEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.tag.Tag;
 import net.minestom.server.utils.MathUtils;
 
@@ -16,7 +16,7 @@ public class VanillaCooldownFeature implements CooldownFeature, RegistrableFeatu
 	public static final Tag<Long> LAST_ATTACKED_TICKS = Tag.Long("lastAttackedTicks");
 	
 	@Override
-	public void init(EventNode<Event> node) {
+	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(EventListener.builder(PlayerHandAnimationEvent.class).handler(event ->
 				resetCooldownProgress(event.getPlayer())).build());
 		

@@ -10,13 +10,13 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
-import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityTickEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.event.player.PlayerRespawnEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.gamedata.tags.TagManager;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
@@ -33,7 +33,7 @@ public class VanillaFallFeature implements FallFeature, RegistrableFeature, Comb
 	public static final Tag<Double> FALL_DISTANCE = Tag.Double("fallDistance");
 	
 	@Override
-	public void init(EventNode<Event> node) {
+	public void init(EventNode<EntityInstanceEvent> node) {
 		// For living non-player entities, handle fall damage every tick
 		node.addListener(EntityTickEvent.class, event -> {
 			if (!(event.getEntity() instanceof LivingEntity livingEntity)) return;

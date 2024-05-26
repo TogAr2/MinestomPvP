@@ -8,18 +8,18 @@ import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
-import net.minestom.server.event.Event;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.tag.Tag;
 
 public class VanillaSpectateFeature implements SpectateFeature, RegistrableFeature, CombatFeature {
 	public static final Tag<Integer> SPECTATING = Tag.Integer("spectating");
 	
 	@Override
-	public void init(EventNode<Event> node) {
+	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(EntityAttackEvent.class, event -> {
 			if (event.getEntity() instanceof Player player && player.getGameMode() == GameMode.SPECTATOR)
 				makeSpectate(player, event.getTarget());

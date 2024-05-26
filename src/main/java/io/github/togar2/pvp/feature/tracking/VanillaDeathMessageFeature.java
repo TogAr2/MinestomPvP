@@ -7,12 +7,12 @@ import net.kyori.adventure.text.Component;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.Damage;
-import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerDeathEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.tag.Tag;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,7 +21,7 @@ public class VanillaDeathMessageFeature implements TrackingFeature,
 	public static final Tag<CombatManager> COMBAT_MANAGER = Tag.Transient("combatManager");
 	
 	@Override
-	public void init(EventNode<Event> node) {
+	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(AsyncPlayerConfigurationEvent.class, event -> {
 			event.getPlayer().setTag(COMBAT_MANAGER, new CombatManager(event.getPlayer()));
 			System.out.println(event.getPlayer().getTag(COMBAT_MANAGER));

@@ -17,10 +17,10 @@ import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.Player;
-import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.item.ItemUpdateStateEvent;
 import net.minestom.server.event.player.PlayerItemAnimationEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.item.Enchantment;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
@@ -41,7 +41,7 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 	}
 	
 	@Override
-	public void init(EventNode<Event> node) {
+	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(PlayerItemAnimationEvent.class, event -> {
 			if (event.getItemAnimationType() == PlayerItemAnimationEvent.ItemAnimationType.BOW) {
 				if (!event.getPlayer().isCreative()

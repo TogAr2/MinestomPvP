@@ -6,11 +6,11 @@ import io.github.togar2.pvp.feature.provider.DifficultyProvider;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
-import net.minestom.server.event.Event;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.tag.Tag;
 import net.minestom.server.world.Difficulty;
 
@@ -30,7 +30,7 @@ public class VanillaRegenerationFeature implements RegenerationFeature, Registra
 	}
 	
 	@Override
-	public void init(EventNode<Event> node) {
+	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(AsyncPlayerConfigurationEvent.class, event ->
 				event.getPlayer().setTag(STARVATION_TICKS, 0));
 		
