@@ -10,10 +10,15 @@ public interface RegistrableFeature extends CombatFeature {
 	EventFilter<EntityInstanceEvent, Entity> ENTITY_INSTANCE_FILTER = EventFilter
 			.from(EntityInstanceEvent.class, Entity.class, EntityEvent::getEntity);
 	
+	default int getPriority() {
+		return 0;
+	}
+	
 	void init(EventNode<EntityInstanceEvent> node);
 	
 	default EventNode<EntityInstanceEvent> createNode() {
 		var node = EventNode.type(getClass().getTypeName(), ENTITY_INSTANCE_FILTER);
+		node.setPriority(getPriority());
 		init(node);
 		return node;
 	}

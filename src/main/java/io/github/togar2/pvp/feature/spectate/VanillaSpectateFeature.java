@@ -19,6 +19,13 @@ public class VanillaSpectateFeature implements SpectateFeature, RegistrableFeatu
 	public static final Tag<Integer> SPECTATING = Tag.Integer("spectating");
 	
 	@Override
+	public int getPriority() {
+		// Make sure events are called on this node before on VanillaAttackFeature
+		// This seems to be the only way to have 'dependencies' without overcomplicating
+		return -1;
+	}
+	
+	@Override
 	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(EntityAttackEvent.class, event -> {
 			if (event.getEntity() instanceof Player player && player.getGameMode() == GameMode.SPECTATOR)

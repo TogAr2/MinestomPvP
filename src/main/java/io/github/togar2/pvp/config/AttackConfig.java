@@ -8,6 +8,7 @@ import io.github.togar2.pvp.feature.cooldown.VanillaCooldownFeature;
 import io.github.togar2.pvp.feature.food.VanillaExhaustionFeature;
 import io.github.togar2.pvp.feature.item.VanillaItemDamageFeature;
 import io.github.togar2.pvp.feature.knockback.VanillaKnockbackFeature;
+import io.github.togar2.pvp.feature.spectate.VanillaSpectateFeature;
 import io.github.togar2.pvp.listeners.AttackHandler;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.event.EventNode;
@@ -77,6 +78,7 @@ public class AttackConfig extends ElementConfig<EntityInstanceEvent> {
 	@Override
 	public EventNode<EntityInstanceEvent> createNode() {
 		return new CombatConfiguration()
+				.add(VanillaSpectateFeature.class)
 				.add(VanillaAttackFeature.class)
 				.add(VanillaCooldownFeature.class)
 				.add(VanillaExhaustionFeature.class)
