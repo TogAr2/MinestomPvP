@@ -9,6 +9,7 @@ import io.github.togar2.pvp.feature.block.VanillaBlockFeature;
 import io.github.togar2.pvp.feature.cooldown.VanillaCooldownFeature;
 import io.github.togar2.pvp.feature.damage.VanillaDamageFeature;
 import io.github.togar2.pvp.feature.effect.VanillaEffectFeature;
+import io.github.togar2.pvp.feature.explosion.VanillaExplosionFeature;
 import io.github.togar2.pvp.feature.fall.VanillaFallFeature;
 import io.github.togar2.pvp.feature.food.VanillaExhaustionFeature;
 import io.github.togar2.pvp.feature.food.VanillaFoodFeature;
@@ -33,11 +34,11 @@ public class CombatFeatures {
 			VanillaArmorFeature.class, VanillaAttackFeature.class, VanillaCriticalFeature.class,
 			VanillaSweepingFeature.class, VanillaEquipmentFeature.class, VanillaBlockFeature.class,
 			VanillaCooldownFeature.class, VanillaDamageFeature.class, VanillaEffectFeature.class,
-			VanillaFallFeature.class, VanillaExhaustionFeature.class, VanillaFoodFeature.class,
-			VanillaRegenerationFeature.class, VanillaItemDamageFeature.class, VanillaKnockbackFeature.class,
-			VanillaPotionFeature.class, VanillaBowFeature.class, VanillaCrossbowFeature.class,
-			VanillaFishingRodFeature.class, VanillaItemProjectileFeature.class, VanillaSpectateFeature.class,
-			VanillaTotemFeature.class, VanillaDeathMessageFeature.class
+			VanillaExplosionFeature.class, VanillaFallFeature.class, VanillaExhaustionFeature.class,
+			VanillaFoodFeature.class, VanillaRegenerationFeature.class, VanillaItemDamageFeature.class,
+			VanillaKnockbackFeature.class, VanillaPotionFeature.class, VanillaBowFeature.class,
+			VanillaCrossbowFeature.class, VanillaFishingRodFeature.class, VanillaItemProjectileFeature.class,
+			VanillaSpectateFeature.class, VanillaTotemFeature.class, VanillaDeathMessageFeature.class
 	);
 	
 	public static final RegistrableFeature MODERN_VANILLA = getVanilla(CombatVersion.MODERN, DifficultyProvider.DEFAULT);

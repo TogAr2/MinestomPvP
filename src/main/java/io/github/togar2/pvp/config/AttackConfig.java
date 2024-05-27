@@ -8,6 +8,7 @@ import io.github.togar2.pvp.feature.cooldown.VanillaCooldownFeature;
 import io.github.togar2.pvp.feature.food.VanillaExhaustionFeature;
 import io.github.togar2.pvp.feature.item.VanillaItemDamageFeature;
 import io.github.togar2.pvp.feature.knockback.VanillaKnockbackFeature;
+import io.github.togar2.pvp.feature.provider.DifficultyProvider;
 import io.github.togar2.pvp.feature.spectate.VanillaSpectateFeature;
 import io.github.togar2.pvp.listeners.AttackHandler;
 import io.github.togar2.pvp.utils.CombatVersion;
@@ -86,6 +87,7 @@ public class AttackConfig extends ElementConfig<EntityInstanceEvent> {
 				.add(VanillaCriticalFeature.class)
 				.add(VanillaSweepingFeature.class)
 				.add(VanillaKnockbackFeature.class)
+				.add(DifficultyProvider.DEFAULT)
 				.add(CombatVersion.fromLegacy(isLegacy()))
 				.build().createNode();
 	}

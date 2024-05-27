@@ -1,8 +1,8 @@
 package io.github.togar2.pvp.test;
 
 import io.github.togar2.pvp.PvpExtension;
-import io.github.togar2.pvp.explosion.PvpExplosionSupplier;
 import io.github.togar2.pvp.feature.CombatFeatures;
+import io.github.togar2.pvp.feature.explosion.VanillaExplosionSupplier;
 import io.github.togar2.pvp.test.commands.Commands;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
@@ -127,7 +127,7 @@ public class PvpTest {
 //		MinecraftServer.getGlobalEventHandler().addListener(LegacyKnockbackEvent.class,
 //				event -> event.setSettings(settings));
 		
-		instance.setExplosionSupplier(PvpExplosionSupplier.INSTANCE);
+		instance.setExplosionSupplier(VanillaExplosionSupplier.INSTANCE);
 		
 		GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
 		eventHandler.addChild(CombatFeatures.MODERN_VANILLA.createNode());

@@ -1,7 +1,8 @@
-package io.github.togar2.pvp.explosion;
+package io.github.togar2.pvp.feature.explosion;
 
-import io.github.togar2.pvp.config.ExplosionConfig;
-import io.github.togar2.pvp.config.PvPConfig;
+import io.github.togar2.pvp.explosion.CrystalEntity;
+import io.github.togar2.pvp.explosion.TntEntity;
+import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.utils.ItemUtils;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
@@ -23,12 +24,12 @@ import net.minestom.server.sound.SoundEvent;
 import org.jetbrains.annotations.Nullable;
 import org.jglrxavpok.hephaistos.nbt.NBT;
 
-public class ExplosionListener {
+public class VanillaExplosionFeature implements ExplosionFeature, RegistrableFeature {
+	public final VanillaExplosionSupplier SUPPLIER = new VanillaExplosionSupplier(this);
 	
-	public static EventNode<EntityInstanceEvent> events(ExplosionConfig config) {
-		EventNode<EntityInstanceEvent> node = EventNode.type("explosion-events", PvPConfig.ENTITY_INSTANCE_FILTER);
-		
-		if (config.isTntEnabled()) node.addListener(PlayerUseItemOnBlockEvent.class, event -> {
+	@Override
+	public void init(EventNode<EntityInstanceEvent> node) {
+		node.addListener(PlayerUseItemOnBlockEvent.class, event -> {
 			ItemStack stack = event.getItemStack();
 			Instance instance = event.getInstance();
 			Point position = event.getPosition();
@@ -38,7 +39,7 @@ public class ExplosionListener {
 			Block block = instance.getBlock(position);
 			if (!block.compare(Block.TNT)) return;
 			
-			primeTnt(instance, position, player, 80);
+			primeExplosive(instance, position, player, 80);
 			instance.setBlock(position, Block.AIR);
 			
 			if (!player.isCreative()) {
@@ -51,7 +52,7 @@ public class ExplosionListener {
 			}
 		});
 		
-		if (config.isCrystalEnabled()) node.addListener(PlayerUseItemOnBlockEvent.class, event -> {
+		node.addListener(PlayerUseItemOnBlockEvent.class, event -> {
 			if (event.getItemStack().material() != Material.END_CRYSTAL) return;
 			Instance instance = event.getInstance();
 			Block block = instance.getBlock(event.getPosition());
@@ -72,7 +73,7 @@ public class ExplosionListener {
 				event.getPlayer().setItemInHand(event.getHand(), event.getItemStack().consume(1));
 		});
 		
-		if (config.isAnchorEnabled()) node.addListener(PlayerBlockInteractEvent.class, event -> {
+		node.addListener(PlayerBlockInteractEvent.class, event -> {
 			Instance instance = event.getInstance();
 			Block block = instance.getBlock(event.getBlockPosition());
 			Player player = event.getPlayer();
@@ -116,12 +117,11 @@ public class ExplosionListener {
 			
 			event.setBlockingItemUse(true);
 		});
-		
-		return node;
 	}
 	
-	public static void primeTnt(Instance instance, Point blockPosition, @Nullable LivingEntity causingEntity, int fuse) {
-		TntEntity entity = new TntEntity(causingEntity);
+	@Override
+	public void primeExplosive(Instance instance, Point blockPosition, @Nullable LivingEntity cause, int fuse) {
+		TntEntity entity = new TntEntity(cause);
 		entity.setFuse(fuse);
 		entity.setInstance(instance, blockPosition.add(0.5, 0, 0.5));
 		entity.getViewersAsAudience().playSound(Sound.sound(

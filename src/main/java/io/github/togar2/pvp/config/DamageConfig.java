@@ -1,8 +1,19 @@
 package io.github.togar2.pvp.config;
 
+import io.github.togar2.pvp.feature.CombatConfiguration;
+import io.github.togar2.pvp.feature.armor.VanillaArmorFeature;
+import io.github.togar2.pvp.feature.block.VanillaBlockFeature;
+import io.github.togar2.pvp.feature.damage.VanillaDamageFeature;
+import io.github.togar2.pvp.feature.fall.VanillaFallFeature;
+import io.github.togar2.pvp.feature.food.VanillaExhaustionFeature;
+import io.github.togar2.pvp.feature.item.VanillaItemDamageFeature;
+import io.github.togar2.pvp.feature.knockback.VanillaKnockbackFeature;
+import io.github.togar2.pvp.feature.provider.DifficultyProvider;
+import io.github.togar2.pvp.feature.totem.VanillaTotemFeature;
+import io.github.togar2.pvp.feature.tracking.VanillaDeathMessageFeature;
 import io.github.togar2.pvp.listeners.DamageHandler;
-import io.github.togar2.pvp.listeners.DamageListener;
 import io.github.togar2.pvp.listeners.FallDamageHandler;
+import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 
@@ -105,7 +116,19 @@ public class DamageConfig extends ElementConfig<EntityInstanceEvent> {
 	
 	@Override
 	public EventNode<EntityInstanceEvent> createNode() {
-		return DamageListener.events(this);
+		return new CombatConfiguration()
+				.add(VanillaDamageFeature.class)
+				.add(VanillaBlockFeature.class)
+				.add(VanillaArmorFeature.class)
+				.add(VanillaTotemFeature.class)
+				.add(VanillaExhaustionFeature.class)
+				.add(VanillaKnockbackFeature.class)
+				.add(VanillaDeathMessageFeature.class)
+				.add(VanillaItemDamageFeature.class)
+				.add(VanillaFallFeature.class)
+				.add(DifficultyProvider.DEFAULT)
+				.add(CombatVersion.fromLegacy(isLegacy()))
+				.build().createNode();
 	}
 	
 	/**

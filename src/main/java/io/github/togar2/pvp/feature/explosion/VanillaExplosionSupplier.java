@@ -1,4 +1,4 @@
-package io.github.togar2.pvp.explosion;
+package io.github.togar2.pvp.feature.explosion;
 
 import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.entity.PvpPlayer;
@@ -29,10 +29,11 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-public final class PvpExplosionSupplier implements ExplosionSupplier {
-	public static final PvpExplosionSupplier INSTANCE = new PvpExplosionSupplier();
+public final class VanillaExplosionSupplier implements ExplosionSupplier {
+	private final ExplosionFeature feature;
 	
-	private PvpExplosionSupplier() {
+	VanillaExplosionSupplier(ExplosionFeature feature) {
+		this.feature = feature;
 	}
 	
 	@Override
@@ -73,7 +74,7 @@ public final class PvpExplosionSupplier implements ExplosionSupplier {
 										
 										if (!block.isAir()) {
 											double explosionResistance = block.registry().explosionResistance();
-											strengthLeft -= (explosionResistance + 0.3F) * 0.3F;
+											strengthLeft -= (float) ((explosionResistance + 0.3F) * 0.3F);
 											
 											if (strengthLeft > 0.0F) {
 												Vec blockPosition = position.apply(Vec.Operator.FLOOR);
@@ -193,7 +194,7 @@ public final class PvpExplosionSupplier implements ExplosionSupplier {
 				for (int i = 0; i < blocks.size(); i++) {
 					final var pos = blocks.get(i);
 					if (instance.getBlock(pos).compare(Block.TNT)) {
-						ExplosionListener.primeTnt(instance, pos, getCausingEntity(instance),
+						feature.primeExplosive(instance, pos, getCausingEntity(instance),
 								ThreadLocalRandom.current().nextInt(20) + 10);
 					}
 					instance.setBlock(pos, Block.AIR);
