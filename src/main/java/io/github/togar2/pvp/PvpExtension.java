@@ -13,17 +13,16 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeInstance;
 import net.minestom.server.entity.Player;
-import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.network.packet.client.play.ClientUseItemPacket;
 
 public class PvpExtension {
-	
-	public static EventNode<Event> events() {
+	public static EventNode<EntityInstanceEvent> events() {
 		return CombatFeatures.MODERN_VANILLA.createNode();
 	}
 	
-	public static EventNode<Event> legacyEvents() {
+	public static EventNode<EntityInstanceEvent> legacyEvents() {
 		return CombatFeatures.LEGACY_VANILLA.createNode();
 	}
 	

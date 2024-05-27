@@ -13,8 +13,6 @@ import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityTickEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
-import net.minestom.server.event.player.PlayerRespawnEvent;
-import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.gamedata.tags.TagManager;
@@ -28,9 +26,14 @@ import net.minestom.server.potion.TimedPotion;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
 
-public class VanillaFallFeature implements FallFeature, RegistrableFeature, CombatFeature {
+public class VanillaFallFeature implements FallFeature, CombatFeature, RegistrableFeature {
 	public static final Tag<Block> LAST_CLIMBED_BLOCK = Tag.Short("lastClimbedBlock").map(Block::fromStateId, Block::stateId);
 	public static final Tag<Double> FALL_DISTANCE = Tag.Double("fallDistance");
+	
+	@Override
+	public void initPlayer(Player player, boolean firstInit) {
+		player.setTag(FALL_DISTANCE, 0.0);
+	}
 	
 	@Override
 	public void init(EventNode<EntityInstanceEvent> node) {
@@ -64,9 +67,6 @@ public class VanillaFallFeature implements FallFeature, RegistrableFeature, Comb
 				player.setTag(FALL_DISTANCE, 0.0);
 			}
 		});
-		
-		node.addListener(PlayerSpawnEvent.class, event -> event.getPlayer().setTag(FALL_DISTANCE, 0.0));
-		node.addListener(PlayerRespawnEvent.class, event -> event.getPlayer().setTag(FALL_DISTANCE, 0.0));
 	}
 	
 	public void handleFallDamage(LivingEntity entity, Pos currPos, Pos newPos, boolean onGround) {

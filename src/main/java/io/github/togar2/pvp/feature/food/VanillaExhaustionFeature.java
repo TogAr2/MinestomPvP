@@ -9,7 +9,6 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventNode;
-import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerBlockBreakEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
@@ -32,10 +31,12 @@ public class VanillaExhaustionFeature implements ExhaustionFeature, RegistrableF
 	}
 	
 	@Override
+	public void initPlayer(Player player, boolean firstInit) {
+		player.setTag(EXHAUSTION, 0.0f);
+	}
+	
+	@Override
 	public void init(EventNode<EntityInstanceEvent> node) {
-		node.addListener(AsyncPlayerConfigurationEvent.class, event ->
-				event.getPlayer().setTag(EXHAUSTION, 0.0f));
-		
 		node.addListener(PlayerTickEvent.class, event -> onTick(event.getPlayer()));
 		
 		node.addListener(PlayerBlockBreakEvent.class, event ->

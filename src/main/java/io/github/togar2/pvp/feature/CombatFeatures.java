@@ -25,7 +25,6 @@ import io.github.togar2.pvp.feature.spectate.VanillaSpectateFeature;
 import io.github.togar2.pvp.feature.totem.VanillaTotemFeature;
 import io.github.togar2.pvp.feature.tracking.VanillaDeathMessageFeature;
 import io.github.togar2.pvp.utils.CombatVersion;
-import net.minestom.server.event.Event;
 
 import java.util.List;
 
@@ -41,17 +40,11 @@ public class CombatFeatures {
 			VanillaTotemFeature.class, VanillaDeathMessageFeature.class
 	);
 	
-	static {
-		for (Class<? extends CombatFeature> clazz : VANILLA) {
-			CombatFeatureRegistry.register(clazz);
-		}
-	}
+	public static final RegistrableFeature MODERN_VANILLA = getVanilla(CombatVersion.MODERN, DifficultyProvider.DEFAULT);
 	
-	public static final RegistrableFeature<Event> MODERN_VANILLA = getVanilla(CombatVersion.MODERN, DifficultyProvider.DEFAULT);
+	public static final RegistrableFeature LEGACY_VANILLA = getVanilla(CombatVersion.LEGACY, DifficultyProvider.DEFAULT);
 	
-	public static final RegistrableFeature<Event> LEGACY_VANILLA = getVanilla(CombatVersion.LEGACY, DifficultyProvider.DEFAULT);
-	
-	public static RegistrableFeature<Event> getVanilla(CombatVersion version, DifficultyProvider difficultyProvider) {
+	public static RegistrableFeature getVanilla(CombatVersion version, DifficultyProvider difficultyProvider) {
 		return new CombatConfiguration()
 				.add(version).add(difficultyProvider)
 				.addAll(VANILLA)

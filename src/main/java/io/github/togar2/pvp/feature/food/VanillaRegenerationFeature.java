@@ -8,7 +8,6 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventNode;
-import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.tag.Tag;
@@ -30,10 +29,12 @@ public class VanillaRegenerationFeature implements RegenerationFeature, Registra
 	}
 	
 	@Override
+	public void initPlayer(Player player, boolean firstInit) {
+		player.setTag(STARVATION_TICKS, 0);
+	}
+	
+	@Override
 	public void init(EventNode<EntityInstanceEvent> node) {
-		node.addListener(AsyncPlayerConfigurationEvent.class, event ->
-				event.getPlayer().setTag(STARVATION_TICKS, 0));
-		
 		node.addListener(PlayerTickEvent.class, event -> onTick(event.getPlayer()));
 	}
 	

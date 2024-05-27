@@ -12,7 +12,7 @@ import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.tag.Tag;
 import net.minestom.server.utils.MathUtils;
 
-public class VanillaCooldownFeature implements CooldownFeature, RegistrableFeature, CombatFeature {
+public class VanillaCooldownFeature implements CooldownFeature, CombatFeature, RegistrableFeature {
 	public static final Tag<Long> LAST_ATTACKED_TICKS = Tag.Long("lastAttackedTicks");
 	
 	@Override

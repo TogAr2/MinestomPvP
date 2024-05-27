@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class VanillaFoodFeature implements FoodFeature, RegistrableFeature, CombatFeature {
+public class VanillaFoodFeature implements FoodFeature, CombatFeature, RegistrableFeature {
 	@Override
 	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(PlayerPreEatEvent.class, event -> {

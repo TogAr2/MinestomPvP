@@ -1,14 +1,15 @@
 package io.github.togar2.pvp.feature.block;
 
-import io.github.togar2.pvp.feature.CombatSetup;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.entity.Player;
-import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.item.ItemUpdateStateEvent;
-import net.minestom.server.event.player.*;
+import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
+import net.minestom.server.event.player.PlayerHandAnimationEvent;
+import net.minestom.server.event.player.PlayerSwapItemEvent;
+import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.tag.Tag;
@@ -26,12 +27,10 @@ public class LegacyVanillaBlockFeature extends VanillaBlockFeature
 		this.blockingItem = blockingItem;
 	}
 	
-	@CombatSetup
-	private static void setup(EventNode<Event> node) {
-		node.addListener(AsyncPlayerConfigurationEvent.class, event -> {
-			event.getPlayer().setTag(LAST_SWING_TIME, 0L);
-			event.getPlayer().setTag(BLOCKING_SWORD, false);
-		});
+	@Override
+	public void initPlayer(Player player, boolean firstInit) {
+		player.setTag(LAST_SWING_TIME, 0L);
+		player.setTag(BLOCKING_SWORD, false);
 	}
 	
 	@Override

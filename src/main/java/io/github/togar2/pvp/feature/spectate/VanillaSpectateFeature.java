@@ -15,7 +15,7 @@ import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.tag.Tag;
 
-public class VanillaSpectateFeature implements SpectateFeature, RegistrableFeature, CombatFeature {
+public class VanillaSpectateFeature implements SpectateFeature, CombatFeature, RegistrableFeature {
 	public static final Tag<Integer> SPECTATING = Tag.Integer("spectating");
 	
 	@Override
