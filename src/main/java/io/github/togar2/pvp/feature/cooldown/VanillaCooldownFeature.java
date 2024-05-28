@@ -1,9 +1,9 @@
 package io.github.togar2.pvp.feature.cooldown;
 
 import io.github.togar2.pvp.feature.CombatFeature;
+import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
-import io.github.togar2.pvp.feature.config.FeatureType;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventListener;

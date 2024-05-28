@@ -2,9 +2,9 @@ package io.github.togar2.pvp.feature.spectate;
 
 import io.github.togar2.pvp.events.PlayerSpectateEvent;
 import io.github.togar2.pvp.feature.CombatFeature;
+import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
-import io.github.togar2.pvp.feature.config.FeatureType;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.LivingEntity;

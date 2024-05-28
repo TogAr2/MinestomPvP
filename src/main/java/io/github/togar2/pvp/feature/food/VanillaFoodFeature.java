@@ -2,9 +2,9 @@ package io.github.togar2.pvp.feature.food;
 
 import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.feature.CombatFeature;
+import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
-import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.food.FoodComponent;
 import io.github.togar2.pvp.food.FoodComponents;
 import io.github.togar2.pvp.utils.ViewUtil;

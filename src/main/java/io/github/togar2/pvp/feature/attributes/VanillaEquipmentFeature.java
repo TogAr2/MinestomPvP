@@ -2,10 +2,10 @@ package io.github.togar2.pvp.feature.attributes;
 
 import io.github.togar2.pvp.enums.ArmorMaterial;
 import io.github.togar2.pvp.enums.Tool;
+import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
-import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeInstance;

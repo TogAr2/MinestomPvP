@@ -154,7 +154,7 @@ public class FoodComponents {
 		int nutrition = foodProperties.getInt("nutrition");
 		float saturationModifier = (float) foodProperties.getDouble("saturationModifier");
 		
-		//noinspection unchecked
+		@SuppressWarnings("unchecked")
 		List<Map<String, Object>> serialized = (List<Map<String, Object>>) foodProperties.asMap().get("effects");
 		List<FoodComponent.FoodEffect> effects = new ArrayList<>();
 		

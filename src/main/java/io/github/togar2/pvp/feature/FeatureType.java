@@ -1,6 +1,5 @@
-package io.github.togar2.pvp.feature.config;
+package io.github.togar2.pvp.feature;
 
-import io.github.togar2.pvp.feature.CombatFeature;
 import io.github.togar2.pvp.feature.armor.ArmorFeature;
 import io.github.togar2.pvp.feature.attack.AttackFeature;
 import io.github.togar2.pvp.feature.attack.CriticalFeature;

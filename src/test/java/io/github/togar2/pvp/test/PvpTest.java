@@ -1,7 +1,7 @@
 package io.github.togar2.pvp.test;
 
 import io.github.togar2.pvp.PvpExtension;
-import io.github.togar2.pvp.feature.config.CombatFeatures;
+import io.github.togar2.pvp.feature.CombatFeatures;
 import io.github.togar2.pvp.feature.explosion.VanillaExplosionFeature;
 import io.github.togar2.pvp.test.commands.Commands;
 import net.kyori.adventure.text.Component;

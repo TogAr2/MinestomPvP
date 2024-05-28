@@ -2,9 +2,9 @@ package io.github.togar2.pvp.feature.explosion;
 
 import io.github.togar2.pvp.explosion.CrystalEntity;
 import io.github.togar2.pvp.explosion.TntEntity;
+import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
-import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.utils.ItemUtils;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;

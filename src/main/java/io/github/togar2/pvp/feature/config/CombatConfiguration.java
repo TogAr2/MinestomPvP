@@ -2,6 +2,7 @@ package io.github.togar2.pvp.feature.config;
 
 import io.github.togar2.pvp.feature.CombatFeature;
 import io.github.togar2.pvp.feature.CombatFeatureSet;
+import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.provider.DifficultyProvider;
 import io.github.togar2.pvp.utils.CombatVersion;
 import org.jetbrains.annotations.Nullable;
@@ -98,7 +99,9 @@ public class CombatConfiguration {
 		
 		FeatureConfiguration configuration = new FeatureConfiguration();
 		for (ConstructableFeature feature : buildOrder) {
-			result.add(feature.construct(configuration));
+			CombatFeature currentResult = feature.construct(configuration);
+			result.add(currentResult);
+			configuration.add(feature.type, currentResult);
 		}
 		
 		return new CombatFeatureSet(result.toArray(CombatFeature[]::new));

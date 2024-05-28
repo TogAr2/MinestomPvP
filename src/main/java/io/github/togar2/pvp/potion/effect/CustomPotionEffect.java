@@ -1,8 +1,6 @@
 package io.github.togar2.pvp.potion.effect;
 
 import io.github.togar2.pvp.entity.EntityGroup;
-import io.github.togar2.pvp.entity.EntityUtils;
-import io.github.togar2.pvp.food.HungerManager;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeInstance;
@@ -71,10 +69,10 @@ public class CustomPotionEffect {
 		
 		if (entity instanceof Player player) {
 			if (potionEffect == PotionEffect.HUNGER) {
-				EntityUtils.addExhaustion(player, version.legacy() ? 0.025F : 0.005F * (float) (amplifier + 1));
+				//TODO feature EntityUtils.addExhaustion(player, version.legacy() ? 0.025F : 0.005F * (float) (amplifier + 1));
 				return;
 			} else if (potionEffect == PotionEffect.SATURATION) {
-				if (player.isOnline()) HungerManager.add(player, amplifier + 1, 1.0F);
+				//TODO feature HungerManager.add(player, amplifier + 1, 1.0F);
 				return;
 			}
 		}

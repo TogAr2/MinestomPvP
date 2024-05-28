@@ -2,7 +2,6 @@ package io.github.togar2.pvp.entity;
 
 import io.github.togar2.pvp.damage.DamageTypeInfo;
 import io.github.togar2.pvp.enchantment.enchantments.ProtectionEnchantment;
-import io.github.togar2.pvp.food.HungerManager;
 import io.github.togar2.pvp.projectile.Arrow;
 import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.text.Component;
@@ -106,10 +105,6 @@ public class EntityUtils {
 		}
 		
 		return list;
-	}
-	
-	public static void addExhaustion(Player player, float exhaustion) {
-		if (player.isOnline()) HungerManager.addExhaustion(player, exhaustion);
 	}
 	
 	//TODO needs improving

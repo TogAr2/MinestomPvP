@@ -1,9 +1,9 @@
 package io.github.togar2.pvp.feature.block;
 
+import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
-import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventNode;

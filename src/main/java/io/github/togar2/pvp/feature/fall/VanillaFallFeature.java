@@ -2,9 +2,9 @@ package io.github.togar2.pvp.feature.fall;
 
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.feature.CombatFeature;
+import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
-import io.github.togar2.pvp.feature.config.FeatureType;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Point;

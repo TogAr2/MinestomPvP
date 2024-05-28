@@ -2,8 +2,8 @@ package io.github.togar2.pvp.feature.totem;
 
 import io.github.togar2.pvp.events.TotemUseEvent;
 import io.github.togar2.pvp.feature.CombatFeature;
+import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
-import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.potion.PotionListener;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;

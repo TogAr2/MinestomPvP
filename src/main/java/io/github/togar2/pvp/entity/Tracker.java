@@ -1,7 +1,6 @@
 package io.github.togar2.pvp.entity;
 
 import io.github.togar2.pvp.damage.combat.CombatManager;
-import io.github.togar2.pvp.food.HungerManager;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventFilter;
@@ -69,8 +68,6 @@ public class Tracker {
 		node.addListener(AsyncPlayerConfigurationEvent.class, event -> {
 			UUID uuid = event.getPlayer().getUuid();
 			
-			event.getPlayer().setTag(HungerManager.EXHAUSTION, 0F);
-			event.getPlayer().setTag(HungerManager.STARVATION_TICKS, 0);
 			Tracker.cooldownEnd.put(uuid, new HashMap<>());
 			Tracker.combatManager.put(uuid, new CombatManager(event.getPlayer()));
 		});

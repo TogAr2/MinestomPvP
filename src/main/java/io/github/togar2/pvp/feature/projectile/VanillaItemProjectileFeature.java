@@ -1,9 +1,9 @@
 package io.github.togar2.pvp.feature.projectile;
 
 import io.github.togar2.pvp.entity.Tracker;
+import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
-import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.projectile.*;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;

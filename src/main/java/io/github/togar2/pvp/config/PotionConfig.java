@@ -1,62 +1,20 @@
 package io.github.togar2.pvp.config;
 
+import io.github.togar2.pvp.feature.CombatFeatures;
 import io.github.togar2.pvp.feature.config.CombatConfiguration;
-import io.github.togar2.pvp.feature.config.CombatFeatures;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 
 /**
- * Creates an EventNode with potion events.
- * This includes potion drinking, potion splashing and effects
- * for potion add and remove (like glowing and invisibility).
+ * @deprecated use {@link CombatConfiguration} instead
  */
+@Deprecated
 public class PotionConfig extends ElementConfig<EntityInstanceEvent> {
-	public static final PotionConfig DEFAULT = defaultBuilder().build();
-	public static final PotionConfig LEGACY = legacyBuilder().build();
+	public static final PotionConfig DEFAULT = new PotionConfig(false);
+	public static final PotionConfig LEGACY = new PotionConfig(true);
 	
-	private final boolean
-			updateEffectEnabled, applyEffectEnabled, instantEffectEnabled,
-			drinkingEnabled, splashEnabled, lingeringEnabled, particlesEnabled;
-	
-	PotionConfig(boolean legacy, boolean updateEffectEnabled, boolean applyEffectEnabled,
-	             boolean instantEffectEnabled, boolean drinkingEnabled, boolean splashEnabled,
-	             boolean lingeringEnabled, boolean particlesEnabled) {
+	PotionConfig(boolean legacy) {
 		super(legacy);
-		this.updateEffectEnabled = updateEffectEnabled;
-		this.applyEffectEnabled = applyEffectEnabled;
-		this.instantEffectEnabled = instantEffectEnabled;
-		this.drinkingEnabled = drinkingEnabled;
-		this.splashEnabled = splashEnabled;
-		this.lingeringEnabled = lingeringEnabled;
-		this.particlesEnabled = particlesEnabled;
-	}
-	
-	public boolean isUpdateEffectEnabled() {
-		return updateEffectEnabled;
-	}
-	
-	public boolean isApplyEffectEnabled() {
-		return applyEffectEnabled;
-	}
-	
-	public boolean isInstantEffectEnabled() {
-		return instantEffectEnabled;
-	}
-	
-	public boolean isDrinkingEnabled() {
-		return drinkingEnabled;
-	}
-	
-	public boolean isSplashEnabled() {
-		return splashEnabled;
-	}
-	
-	public boolean isLingeringEnabled() {
-		return lingeringEnabled;
-	}
-	
-	public boolean isParticlesEnabled() {
-		return particlesEnabled;
 	}
 	
 	@Override
@@ -65,32 +23,5 @@ public class PotionConfig extends ElementConfig<EntityInstanceEvent> {
 				.add(CombatFeatures.VANILLA_EFFECT)
 				.add(CombatFeatures.VANILLA_POTION)
 				.build().createNode();
-	}
-	
-	/**
-	 * Creates a builder with the default options.
-	 *
-	 * @return A builder with default options
-	 */
-	public static PotionConfigBuilder defaultBuilder() {
-		return new PotionConfigBuilder(false).defaultOptions();
-	}
-	
-	/**
-	 * Creates a builder with the legacy options.
-	 *
-	 * @return A builder with legacy options
-	 */
-	public static PotionConfigBuilder legacyBuilder() {
-		return new PotionConfigBuilder(true).defaultOptions();
-	}
-	
-	/**
-	 * Creates an empty builder which has everything disabled.
-	 *
-	 * @return An empty builder
-	 */
-	public static PotionConfigBuilder emptyBuilder(boolean legacy) {
-		return new PotionConfigBuilder(legacy);
 	}
 }

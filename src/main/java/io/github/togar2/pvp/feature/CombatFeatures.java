@@ -1,6 +1,5 @@
-package io.github.togar2.pvp.feature.config;
+package io.github.togar2.pvp.feature;
 
-import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.armor.VanillaArmorFeature;
 import io.github.togar2.pvp.feature.attack.VanillaAttackFeature;
 import io.github.togar2.pvp.feature.attack.VanillaCriticalFeature;
@@ -8,6 +7,8 @@ import io.github.togar2.pvp.feature.attack.VanillaSweepingFeature;
 import io.github.togar2.pvp.feature.attributes.VanillaEquipmentFeature;
 import io.github.togar2.pvp.feature.block.LegacyVanillaBlockFeature;
 import io.github.togar2.pvp.feature.block.VanillaBlockFeature;
+import io.github.togar2.pvp.feature.config.CombatConfiguration;
+import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.cooldown.VanillaCooldownFeature;
 import io.github.togar2.pvp.feature.damage.VanillaDamageFeature;
 import io.github.togar2.pvp.feature.effect.VanillaEffectFeature;

@@ -1,6 +1,7 @@
 package io.github.togar2.pvp.feature.config;
 
 import io.github.togar2.pvp.feature.CombatFeature;
+import io.github.togar2.pvp.feature.FeatureType;
 import net.minestom.server.entity.Player;
 import org.jetbrains.annotations.Nullable;
 

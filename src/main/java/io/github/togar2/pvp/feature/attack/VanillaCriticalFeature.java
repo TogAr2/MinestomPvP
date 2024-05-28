@@ -2,9 +2,9 @@ package io.github.togar2.pvp.feature.attack;
 
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.feature.CombatFeature;
+import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
-import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.potion.PotionEffect;

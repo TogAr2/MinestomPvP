@@ -2,10 +2,10 @@ package io.github.togar2.pvp.feature.food;
 
 import io.github.togar2.pvp.entity.PvpPlayer;
 import io.github.togar2.pvp.events.PlayerExhaustEvent;
+import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
-import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.feature.provider.DifficultyProvider;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.entity.Player;

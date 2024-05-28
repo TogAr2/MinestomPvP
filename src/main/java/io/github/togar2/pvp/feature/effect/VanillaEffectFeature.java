@@ -1,10 +1,10 @@
 package io.github.togar2.pvp.feature.effect;
 
 import io.github.togar2.pvp.events.PotionVisibilityEvent;
+import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
-import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffect;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
 import io.github.togar2.pvp.utils.CombatVersion;
