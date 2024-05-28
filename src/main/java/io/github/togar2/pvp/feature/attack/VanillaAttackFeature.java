@@ -10,7 +10,7 @@ import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
-import io.github.togar2.pvp.feature.cooldown.CooldownFeature;
+import io.github.togar2.pvp.feature.cooldown.AttackCooldownFeature;
 import io.github.togar2.pvp.feature.food.ExhaustionFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.feature.knockback.KnockbackFeature;
@@ -36,13 +36,13 @@ import org.jetbrains.annotations.Nullable;
 public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaAttackFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.ATTACK, VanillaAttackFeature::new,
-			FeatureType.COOLDOWN, FeatureType.EXHAUSTION, FeatureType.ITEM_DAMAGE,
+			FeatureType.ATTACK_COOLDOWN, FeatureType.EXHAUSTION, FeatureType.ITEM_DAMAGE,
 			FeatureType.CRITICAL, FeatureType.SWEEPING, FeatureType.KNOCKBACK, FeatureType.VERSION
 	);
 	
 	private static final double MAX_DISTANCE_SQUARED = 36.0;
 	
-	private final CooldownFeature cooldownFeature;
+	private final AttackCooldownFeature cooldownFeature;
 	private final ExhaustionFeature exhaustionFeature;
 	private final ItemDamageFeature itemDamageFeature;
 	
@@ -53,7 +53,7 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 	private final CombatVersion version;
 	
 	public VanillaAttackFeature(FeatureConfiguration configuration) {
-		this.cooldownFeature = configuration.get(FeatureType.COOLDOWN);
+		this.cooldownFeature = configuration.get(FeatureType.ATTACK_COOLDOWN);
 		this.exhaustionFeature = configuration.get(FeatureType.EXHAUSTION);
 		this.itemDamageFeature = configuration.get(FeatureType.ITEM_DAMAGE);
 		this.criticalFeature = configuration.get(FeatureType.CRITICAL);

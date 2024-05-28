@@ -1,13 +1,13 @@
 package io.github.togar2.pvp.feature.block;
 
 import io.github.togar2.pvp.damage.DamageTypeInfo;
-import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.enums.Tool;
 import io.github.togar2.pvp.events.DamageBlockEvent;
 import io.github.togar2.pvp.feature.CombatFeature;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.cooldown.ItemCooldownFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.kyori.adventure.sound.Sound;
@@ -29,15 +29,16 @@ import java.util.concurrent.ThreadLocalRandom;
 public class VanillaBlockFeature implements BlockFeature, CombatFeature {
 	public static final DefinedFeature<VanillaBlockFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.BLOCK, VanillaBlockFeature::new,
-			FeatureType.ITEM_DAMAGE, FeatureType.VERSION
+			FeatureType.ITEM_DAMAGE, FeatureType.ITEM_COOLDOWN, FeatureType.VERSION
 	);
 	
 	private final ItemDamageFeature itemDamageFeature;
-	
+	private final ItemCooldownFeature itemCooldownFeature;
 	private final CombatVersion version;
 	
 	public VanillaBlockFeature(FeatureConfiguration configuration) {
 		this.itemDamageFeature = configuration.get(FeatureType.ITEM_DAMAGE);
+		this.itemCooldownFeature = configuration.get(FeatureType.ITEM_COOLDOWN);
 		this.version = configuration.get(FeatureType.VERSION);
 	}
 	
@@ -132,8 +133,8 @@ public class VanillaBlockFeature implements BlockFeature, CombatFeature {
 		}
 	}
 	
-	protected static void disableShield(Player player) {
-		Tracker.setCooldown(player, Material.SHIELD, 100);
+	protected void disableShield(Player player) {
+		itemCooldownFeature.setCooldown(player, Material.SHIELD, 100);
 		
 		// Shield disable status
 		player.triggerStatus((byte) 30);

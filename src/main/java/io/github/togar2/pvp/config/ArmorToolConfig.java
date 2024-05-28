@@ -21,6 +21,7 @@ public class ArmorToolConfig extends ElementConfig<EntityInstanceEvent> {
 	public EventNode<EntityInstanceEvent> createNode() {
 		return new CombatConfiguration().legacy(isLegacy())
 				.add(CombatFeatures.VANILLA_EQUIPMENT)
+				.add(CombatFeatures.VANILLA_ITEM_COOLDOWN)
 				.build().createNode();
 	}
 }

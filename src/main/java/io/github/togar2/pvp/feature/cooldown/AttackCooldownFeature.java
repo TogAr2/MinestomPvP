@@ -3,8 +3,8 @@ package io.github.togar2.pvp.feature.cooldown;
 import io.github.togar2.pvp.feature.CombatFeature;
 import net.minestom.server.entity.Player;
 
-public interface CooldownFeature extends CombatFeature {
-	CooldownFeature NO_OP = new CooldownFeature() {
+public interface AttackCooldownFeature extends CombatFeature {
+	AttackCooldownFeature NO_OP = new AttackCooldownFeature() {
 		@Override
 		public void resetCooldownProgress(Player player) {
 		}

@@ -14,9 +14,9 @@ import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.tag.Tag;
 import net.minestom.server.utils.MathUtils;
 
-public class VanillaCooldownFeature implements CooldownFeature, CombatFeature, RegistrableFeature {
-	public static final DefinedFeature<VanillaCooldownFeature> DEFINED = new DefinedFeature<>(
-			FeatureType.COOLDOWN, configuration -> new VanillaCooldownFeature()
+public class VanillaAttackCooldownFeature implements AttackCooldownFeature, CombatFeature, RegistrableFeature {
+	public static final DefinedFeature<VanillaAttackCooldownFeature> DEFINED = new DefinedFeature<>(
+			FeatureType.ATTACK_COOLDOWN, configuration -> new VanillaAttackCooldownFeature()
 	);
 	
 	public static final Tag<Long> LAST_ATTACKED_TICKS = Tag.Long("lastAttackedTicks");

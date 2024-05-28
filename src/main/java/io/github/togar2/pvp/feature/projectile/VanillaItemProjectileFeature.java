@@ -1,9 +1,10 @@
 package io.github.togar2.pvp.feature.projectile;
 
-import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
+import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.cooldown.ItemCooldownFeature;
 import io.github.togar2.pvp.projectile.*;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
@@ -22,8 +23,15 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class VanillaItemProjectileFeature implements ItemProjectileFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaItemProjectileFeature> DEFINED = new DefinedFeature<>(
-			FeatureType.ITEM_PROJECTILE, configuration -> new VanillaItemProjectileFeature()
+			FeatureType.ITEM_PROJECTILE, VanillaItemProjectileFeature::new,
+			FeatureType.ITEM_COOLDOWN
 	);
+	
+	private final ItemCooldownFeature itemCooldownFeature;
+	
+	public VanillaItemProjectileFeature(FeatureConfiguration configuration) {
+		this.itemCooldownFeature = configuration.get(FeatureType.ITEM_COOLDOWN);
+	}
 	
 	@Override
 	public void init(EventNode<EntityInstanceEvent> node) {
@@ -35,12 +43,6 @@ public class VanillaItemProjectileFeature implements ItemProjectileFeature, Regi
 			
 			Player player = event.getPlayer();
 			ItemStack stack = event.getItemStack();
-			
-			//TODO add cooldown feature
-			if (Tracker.hasCooldown(player, stack.material())) {
-				event.setCancelled(true);
-				return;
-			}
 			
 			boolean snowball = stack.material() == Material.SNOWBALL;
 			boolean enderpearl = stack.material() == Material.ENDER_PEARL;
@@ -68,7 +70,7 @@ public class VanillaItemProjectileFeature implements ItemProjectileFeature, Regi
 			), player);
 			
 			if (enderpearl) {
-				Tracker.setCooldown(player, Material.ENDER_PEARL, 20);
+				itemCooldownFeature.setCooldown(player, Material.ENDER_PEARL, 20);
 			}
 			
 			Pos position = player.getPosition().add(0, player.getEyeHeight(), 0);

@@ -9,7 +9,8 @@ import io.github.togar2.pvp.feature.block.LegacyVanillaBlockFeature;
 import io.github.togar2.pvp.feature.block.VanillaBlockFeature;
 import io.github.togar2.pvp.feature.config.CombatConfiguration;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
-import io.github.togar2.pvp.feature.cooldown.VanillaCooldownFeature;
+import io.github.togar2.pvp.feature.cooldown.VanillaAttackCooldownFeature;
+import io.github.togar2.pvp.feature.cooldown.VanillaItemCooldownFeature;
 import io.github.togar2.pvp.feature.damage.VanillaDamageFeature;
 import io.github.togar2.pvp.feature.effect.VanillaEffectFeature;
 import io.github.togar2.pvp.feature.explosion.VanillaExplosionFeature;
@@ -36,7 +37,8 @@ public class CombatFeatures {
 	public static final DefinedFeature<VanillaSweepingFeature> VANILLA_SWEEPING = VanillaSweepingFeature.DEFINED;
 	public static final DefinedFeature<VanillaEquipmentFeature> VANILLA_EQUIPMENT = VanillaEquipmentFeature.DEFINED;
 	public static final DefinedFeature<VanillaBlockFeature> VANILLA_BLOCK = VanillaBlockFeature.DEFINED;
-	public static final DefinedFeature<VanillaCooldownFeature> VANILLA_COOLDOWN = VanillaCooldownFeature.DEFINED;
+	public static final DefinedFeature<VanillaAttackCooldownFeature> VANILLA_ATTACK_COOLDOWN = VanillaAttackCooldownFeature.DEFINED;
+	public static final DefinedFeature<VanillaItemCooldownFeature> VANILLA_ITEM_COOLDOWN = VanillaItemCooldownFeature.DEFINED;
 	public static final DefinedFeature<VanillaDamageFeature> VANILLA_DAMAGE = VanillaDamageFeature.DEFINED;
 	public static final DefinedFeature<VanillaEffectFeature> VANILLA_EFFECT = VanillaEffectFeature.DEFINED;
 	public static final DefinedFeature<VanillaExplosionFeature> VANILLA_EXPLOSION = VanillaExplosionFeature.DEFINED;
@@ -60,12 +62,12 @@ public class CombatFeatures {
 	
 	private static final List<DefinedFeature<?>> VANILLA = List.of(
 			VANILLA_ARMOR, VANILLA_ATTACK, VANILLA_CRITICAL, VANILLA_SWEEPING,
-			VANILLA_EQUIPMENT, VANILLA_BLOCK, VANILLA_COOLDOWN, VANILLA_DAMAGE,
-			VANILLA_EFFECT, VANILLA_EXPLOSION, VANILLA_FALL, VANILLA_EXHAUSTION,
-			VANILLA_FOOD, VANILLA_REGENERATION, VANILLA_ITEM_DAMAGE, VANILLA_KNOCKBACK,
-			VANILLA_POTION, VANILLA_BOW, VANILLA_CROSSBOW, VANILLA_FISHING_ROD,
-			VANILLA_ITEM_PROJECTILE, VANILLA_TRIDENT, VANILLA_SPECTATE, VANILLA_TOTEM,
-			VANILLA_DEATH_MESSAGE
+			VANILLA_EQUIPMENT, VANILLA_BLOCK, VANILLA_ATTACK_COOLDOWN, VANILLA_ITEM_COOLDOWN,
+			VANILLA_DAMAGE, VANILLA_EFFECT, VANILLA_EXPLOSION, VANILLA_FALL,
+			VANILLA_EXHAUSTION, VANILLA_FOOD, VANILLA_REGENERATION, VANILLA_ITEM_DAMAGE,
+			VANILLA_KNOCKBACK, VANILLA_POTION, VANILLA_BOW, VANILLA_CROSSBOW,
+			VANILLA_FISHING_ROD, VANILLA_ITEM_PROJECTILE, VANILLA_TRIDENT, VANILLA_SPECTATE,
+			VANILLA_TOTEM, VANILLA_DEATH_MESSAGE
 	);
 	
 	public static final RegistrableFeature MODERN_VANILLA = getVanilla(CombatVersion.MODERN, DifficultyProvider.DEFAULT).build();

@@ -1,7 +1,6 @@
 package io.github.togar2.pvp.food;
 
 import io.github.togar2.pvp.entity.EntityUtils;
-import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.potion.PotionListener;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
@@ -104,7 +103,7 @@ public class FoodComponents {
 				}
 			}
 			
-			Tracker.setCooldown(player, Material.CHORUS_FRUIT, 20);
+			//TODO feature Tracker.setCooldown(player, Material.CHORUS_FRUIT, 20);
 		}
 	};
 	

@@ -22,7 +22,7 @@ public class AttackConfig extends ElementConfig<EntityInstanceEvent> {
 		return new CombatConfiguration().legacy(isLegacy())
 				.add(CombatFeatures.VANILLA_SPECTATE)
 				.add(CombatFeatures.VANILLA_ATTACK)
-				.add(CombatFeatures.VANILLA_COOLDOWN)
+				.add(CombatFeatures.VANILLA_ATTACK_COOLDOWN)
 				.add(CombatFeatures.VANILLA_EXHAUSTION)
 				.add(CombatFeatures.VANILLA_ITEM_DAMAGE)
 				.add(CombatFeatures.VANILLA_CRITICAL)
