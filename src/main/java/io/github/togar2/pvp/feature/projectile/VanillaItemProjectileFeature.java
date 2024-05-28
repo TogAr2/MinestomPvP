@@ -71,7 +71,7 @@ public class VanillaItemProjectileFeature implements ItemProjectileFeature, Regi
 				Tracker.setCooldown(player, Material.ENDER_PEARL, 20);
 			}
 			
-			Pos position = player.getPosition().add(0D, player.getEyeHeight() - 0.1, 0D);
+			Pos position = player.getPosition().add(0, player.getEyeHeight(), 0);
 			projectile.setInstance(Objects.requireNonNull(player.getInstance()), position);
 			
 			projectile.shootFromRotation(position.pitch(), position.yaw(), 0, 1.5, 1.0);

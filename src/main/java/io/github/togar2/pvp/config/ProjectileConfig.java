@@ -62,12 +62,12 @@ public class ProjectileConfig extends ElementConfig<EntityInstanceEvent> {
 	
 	@Override
 	public EventNode<EntityInstanceEvent> createNode() {
-		//todo trident
 		return new CombatConfiguration().legacy(isLegacy())
 				.add(CombatFeatures.VANILLA_BOW)
 				.add(CombatFeatures.VANILLA_CROSSBOW)
 				.add(CombatFeatures.VANILLA_FISHING_ROD)
 				.add(CombatFeatures.VANILLA_ITEM_PROJECTILE)
+				.add(CombatFeatures.VANILLA_TRIDENT)
 				.build().createNode();
 	}
 	

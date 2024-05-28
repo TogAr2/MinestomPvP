@@ -129,14 +129,14 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 		ThrownPotion thrownPotion = new ThrownPotion(player, version.legacy());
 		thrownPotion.setItem(stack);
 		
-		Pos position = player.getPosition().add(0D, player.getEyeHeight() - 0.1, 0D);
+		Pos position = player.getPosition().add(0, player.getEyeHeight(), 0);
 		thrownPotion.setInstance(Objects.requireNonNull(player.getInstance()), position);
 		
 		thrownPotion.shootFromRotation(position.pitch(), position.yaw(), -20, 0.5, 1.0);
 		
 		Vec playerVel = player.getVelocity();
 		thrownPotion.setVelocity(thrownPotion.getVelocity().add(playerVel.x(),
-				player.isOnGround() ? 0.0D : playerVel.y(), playerVel.z()));
+				player.isOnGround() ? 0.0 : playerVel.y(), playerVel.z()));
 		
 		if (!player.isCreative()) {
 			player.setItemInHand(hand, stack.withAmount(stack.amount() - 1));
