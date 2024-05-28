@@ -19,13 +19,13 @@ import org.jetbrains.annotations.Nullable;
 public class VanillaDeathMessageFeature implements TrackingFeature,
 		DeathMessageFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaDeathMessageFeature> DEFINED = new DefinedFeature<>(
-			FeatureType.DEATH_MESSAGE, configuration -> new VanillaDeathMessageFeature()
+			FeatureType.DEATH_MESSAGE, configuration -> new VanillaDeathMessageFeature(),
+			VanillaDeathMessageFeature::initPlayer
 	);
 	
 	public static final Tag<CombatManager> COMBAT_MANAGER = Tag.Transient("combatManager");
 	
-	@Override
-	public void initPlayer(Player player, boolean firstInit) {
+	public static void initPlayer(Player player, boolean firstInit) {
 		if (firstInit) player.setTag(COMBAT_MANAGER, new CombatManager(player));
 	}
 	

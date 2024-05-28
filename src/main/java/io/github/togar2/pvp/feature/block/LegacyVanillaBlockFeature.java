@@ -21,6 +21,7 @@ public class LegacyVanillaBlockFeature extends VanillaBlockFeature
 		implements LegacyBlockFeature, RegistrableFeature {
 	public static final DefinedFeature<LegacyVanillaBlockFeature> SHIELD = new DefinedFeature<>(
 			FeatureType.LEGACY_BLOCK, configuration -> new LegacyVanillaBlockFeature(configuration, ItemStack.of(Material.SHIELD)),
+			LegacyVanillaBlockFeature::initPlayer,
 			FeatureType.ITEM_DAMAGE
 	);
 	
@@ -35,8 +36,7 @@ public class LegacyVanillaBlockFeature extends VanillaBlockFeature
 		this.blockingItem = blockingItem;
 	}
 	
-	@Override
-	public void initPlayer(Player player, boolean firstInit) {
+	public static void initPlayer(Player player, boolean firstInit) {
 		player.setTag(LAST_SWING_TIME, 0L);
 		player.setTag(BLOCKING_SWORD, false);
 	}

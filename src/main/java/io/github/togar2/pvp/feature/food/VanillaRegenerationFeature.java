@@ -19,6 +19,7 @@ import net.minestom.server.world.Difficulty;
 public class VanillaRegenerationFeature implements RegenerationFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaRegenerationFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.REGENERATION, VanillaRegenerationFeature::new,
+			VanillaRegenerationFeature::initPlayer,
 			FeatureType.EXHAUSTION, FeatureType.DIFFICULTY, FeatureType.VERSION
 	);
 	
@@ -34,8 +35,7 @@ public class VanillaRegenerationFeature implements RegenerationFeature, Registra
 		this.version = configuration.get(FeatureType.VERSION);
 	}
 	
-	@Override
-	public void initPlayer(Player player, boolean firstInit) {
+	public static void initPlayer(Player player, boolean firstInit) {
 		player.setTag(STARVATION_TICKS, 0);
 	}
 	

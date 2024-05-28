@@ -25,6 +25,7 @@ import java.util.Objects;
 public class VanillaExhaustionFeature implements ExhaustionFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaExhaustionFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.EXHAUSTION, VanillaExhaustionFeature::new,
+			VanillaExhaustionFeature::initPlayer,
 			FeatureType.DIFFICULTY, FeatureType.VERSION
 	);
 	
@@ -38,8 +39,7 @@ public class VanillaExhaustionFeature implements ExhaustionFeature, RegistrableF
 		this.version = configuration.get(FeatureType.VERSION);
 	}
 	
-	@Override
-	public void initPlayer(Player player, boolean firstInit) {
+	public static void initPlayer(Player player, boolean firstInit) {
 		player.setTag(EXHAUSTION, 0.0f);
 	}
 	

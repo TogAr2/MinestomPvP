@@ -27,8 +27,9 @@ import org.jetbrains.annotations.Nullable;
 import org.jglrxavpok.hephaistos.nbt.NBT;
 
 public class VanillaExplosionFeature implements ExplosionFeature, RegistrableFeature {
+	public static final VanillaExplosionFeature INSTANCE = new VanillaExplosionFeature();
 	public static final DefinedFeature<VanillaExplosionFeature> DEFINED = new DefinedFeature<>(
-			FeatureType.EXPLOSION, configuration -> new VanillaExplosionFeature()
+			FeatureType.EXPLOSION, configuration -> INSTANCE
 	);
 	
 	private final VanillaExplosionSupplier explosionSupplier = new VanillaExplosionSupplier(this);
