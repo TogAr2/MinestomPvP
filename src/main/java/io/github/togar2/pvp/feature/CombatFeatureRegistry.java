@@ -29,7 +29,7 @@ public class CombatFeatureRegistry {
 			initNode.addListener(PlayerRespawnEvent.class, event -> feature.initPlayer(event.getPlayer(), false));
 		}
 		
-		var node = net.minestom.server.event.EventNode.type(feature.getClass().getTypeName(), ENTITY_INSTANCE_FILTER);
+		var node = EventNode.type(feature.getClass().getTypeName(), ENTITY_INSTANCE_FILTER);
 		node.setPriority(feature.getPriority());
 		feature.init(node);
 		return node;

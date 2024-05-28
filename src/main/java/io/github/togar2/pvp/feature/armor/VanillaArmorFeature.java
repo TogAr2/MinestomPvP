@@ -4,6 +4,8 @@ import io.github.togar2.pvp.damage.DamageTypeInfo;
 import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.feature.CombatFeature;
+import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.entity.LivingEntity;
@@ -15,8 +17,8 @@ import net.minestom.server.utils.MathUtils;
 public class VanillaArmorFeature implements ArmorFeature, CombatFeature {
 	private final CombatVersion version;
 	
-	public VanillaArmorFeature(CombatVersion version) {
-		this.version = version;
+	public VanillaArmorFeature(FeatureConfiguration configuration) {
+		this.version = configuration.get(FeatureType.VERSION);
 	}
 	
 	@Override

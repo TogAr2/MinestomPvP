@@ -4,6 +4,8 @@ import io.github.togar2.pvp.entity.PvpPlayer;
 import io.github.togar2.pvp.events.EntityKnockbackEvent;
 import io.github.togar2.pvp.events.LegacyKnockbackEvent;
 import io.github.togar2.pvp.feature.CombatFeature;
+import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.legacy.LegacyKnockbackSettings;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.attribute.Attribute;
@@ -22,8 +24,8 @@ public class VanillaKnockbackFeature implements KnockbackFeature, CombatFeature 
 	//TODO this probably shouldn't work like this
 	private final CombatVersion version;
 	
-	public VanillaKnockbackFeature(CombatVersion version) {
-		this.version = version;
+	public VanillaKnockbackFeature(FeatureConfiguration configuration) {
+		this.version = configuration.get(FeatureType.VERSION);
 	}
 	
 	@Override

@@ -3,6 +3,8 @@ package io.github.togar2.pvp.feature.attributes;
 import io.github.togar2.pvp.enums.ArmorMaterial;
 import io.github.togar2.pvp.enums.Tool;
 import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeInstance;
@@ -24,8 +26,8 @@ public class VanillaEquipmentFeature implements DataFeature<Attribute>, Registra
 	// We probably want to store all the tools & armor separately per DataFeature
 	private final CombatVersion version;
 	
-	public VanillaEquipmentFeature(CombatVersion version) {
-		this.version = version;
+	public VanillaEquipmentFeature(FeatureConfiguration configuration) {
+		this.version = configuration.get(FeatureType.VERSION);
 	}
 	
 	@Override

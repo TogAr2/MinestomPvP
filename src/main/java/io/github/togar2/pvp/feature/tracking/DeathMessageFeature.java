@@ -6,5 +6,7 @@ import net.minestom.server.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public interface DeathMessageFeature extends CombatFeature {
+	DeathMessageFeature NO_OP = player -> null;
+	
 	@Nullable Component getDeathMessage(Player player);
 }

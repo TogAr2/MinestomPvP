@@ -7,5 +7,7 @@ import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.Nullable;
 
 public interface ExplosionFeature extends CombatFeature {
+	ExplosionFeature NO_OP = (instance, blockPosition, cause, fuse) -> {};
+	
 	void primeExplosive(Instance instance, Point blockPosition, @Nullable LivingEntity cause, int fuse);
 }

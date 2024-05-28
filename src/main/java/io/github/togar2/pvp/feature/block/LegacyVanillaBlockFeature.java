@@ -1,7 +1,8 @@
 package io.github.togar2.pvp.feature.block;
 
 import io.github.togar2.pvp.feature.RegistrableFeature;
-import io.github.togar2.pvp.feature.item.ItemDamageFeature;
+import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventNode;
@@ -22,8 +23,8 @@ public class LegacyVanillaBlockFeature extends VanillaBlockFeature
 	
 	private final ItemStack blockingItem;
 	
-	public LegacyVanillaBlockFeature(ItemDamageFeature itemDamageFeature, ItemStack blockingItem) {
-		super(itemDamageFeature, CombatVersion.LEGACY);
+	public LegacyVanillaBlockFeature(FeatureConfiguration configuration, ItemStack blockingItem) {
+		super(configuration.add(FeatureType.VERSION, CombatVersion.LEGACY));
 		this.blockingItem = blockingItem;
 	}
 	

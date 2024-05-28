@@ -28,4 +28,5 @@ public final class CombatVersion implements CombatFeature {
 	public String toString() {
 		return "CombatVersion[legacy=" + legacy + "]";
 	}
+	
 }

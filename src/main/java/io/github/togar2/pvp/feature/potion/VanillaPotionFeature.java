@@ -2,6 +2,8 @@ package io.github.togar2.pvp.feature.potion;
 
 import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffect;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
 import io.github.togar2.pvp.potion.item.CustomPotionType;
@@ -41,8 +43,8 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 	
 	private final CombatVersion version;
 	
-	public VanillaPotionFeature(CombatVersion version) {
-		this.version = version;
+	public VanillaPotionFeature(FeatureConfiguration configuration) {
+		this.version = configuration.get(FeatureType.VERSION);
 	}
 	
 	@Override

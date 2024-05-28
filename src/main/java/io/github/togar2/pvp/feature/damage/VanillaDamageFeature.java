@@ -7,6 +7,8 @@ import io.github.togar2.pvp.events.FinalDamageEvent;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.armor.ArmorFeature;
 import io.github.togar2.pvp.feature.block.BlockFeature;
+import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.feature.food.ExhaustionFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.feature.knockback.KnockbackFeature;
@@ -51,19 +53,16 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 	
 	private final CombatVersion version;
 	
-	public VanillaDamageFeature(DifficultyProvider difficultyProvider, BlockFeature blockFeature,
-	                            ArmorFeature armorFeature, TotemFeature totemFeature, ExhaustionFeature exhaustionFeature,
-	                            KnockbackFeature knockbackFeature, TrackingFeature trackingFeature,
-	                            ItemDamageFeature itemDamageFeature, CombatVersion version) {
-		this.difficultyProvider = difficultyProvider;
-		this.blockFeature = blockFeature;
-		this.armorFeature = armorFeature;
-		this.totemFeature = totemFeature;
-		this.exhaustionFeature = exhaustionFeature;
-		this.knockbackFeature = knockbackFeature;
-		this.trackingFeature = trackingFeature;
-		this.itemDamageFeature = itemDamageFeature;
-		this.version = version;
+	public VanillaDamageFeature(FeatureConfiguration configuration) {
+		this.difficultyProvider = configuration.get(FeatureType.DIFFICULTY);
+		this.blockFeature = configuration.get(FeatureType.BLOCK);
+		this.armorFeature = configuration.get(FeatureType.ARMOR);
+		this.totemFeature = configuration.get(FeatureType.TOTEM);
+		this.exhaustionFeature = configuration.get(FeatureType.EXHAUSTION);
+		this.knockbackFeature = configuration.get(FeatureType.KNOCKBACK);
+		this.trackingFeature = configuration.get(FeatureType.TRACKING);
+		this.itemDamageFeature = configuration.get(FeatureType.ITEM_DAMAGE);
+		this.version = configuration.get(FeatureType.VERSION);
 	}
 	
 	@Override

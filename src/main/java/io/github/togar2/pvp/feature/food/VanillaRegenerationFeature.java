@@ -2,6 +2,8 @@ package io.github.togar2.pvp.feature.food;
 
 import io.github.togar2.pvp.events.PlayerRegenerateEvent;
 import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.feature.provider.DifficultyProvider;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.entity.Player;
@@ -20,12 +22,10 @@ public class VanillaRegenerationFeature implements RegenerationFeature, Registra
 	private final DifficultyProvider difficultyFeature;
 	private final CombatVersion version;
 	
-	public VanillaRegenerationFeature(ExhaustionFeature exhaustionFeature,
-	                                  DifficultyProvider difficultyFeature,
-	                                  CombatVersion version) {
-		this.exhaustionFeature = exhaustionFeature;
-		this.difficultyFeature = difficultyFeature;
-		this.version = version;
+	public VanillaRegenerationFeature(FeatureConfiguration configuration) {
+		this.exhaustionFeature = configuration.get(FeatureType.EXHAUSTION);
+		this.difficultyFeature = configuration.get(FeatureType.DIFFICULTY);
+		this.version = configuration.get(FeatureType.VERSION);
 	}
 	
 	@Override

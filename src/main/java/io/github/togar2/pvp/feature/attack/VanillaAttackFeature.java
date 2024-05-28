@@ -7,6 +7,8 @@ import io.github.togar2.pvp.entity.PvpPlayer;
 import io.github.togar2.pvp.enums.Tool;
 import io.github.togar2.pvp.events.FinalAttackEvent;
 import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.feature.cooldown.CooldownFeature;
 import io.github.togar2.pvp.feature.food.ExhaustionFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
@@ -43,17 +45,14 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 	
 	private final CombatVersion version;
 	
-	public VanillaAttackFeature(CooldownFeature cooldownFeature, ExhaustionFeature exhaustionFeature,
-	                            ItemDamageFeature itemDamageFeature, CriticalFeature criticalFeature,
-	                            SweepingFeature sweepingFeature, KnockbackFeature knockbackFeature,
-	                            CombatVersion version) {
-		this.cooldownFeature = cooldownFeature;
-		this.exhaustionFeature = exhaustionFeature;
-		this.itemDamageFeature = itemDamageFeature;
-		this.criticalFeature = criticalFeature;
-		this.sweepingFeature = sweepingFeature;
-		this.knockbackFeature = knockbackFeature;
-		this.version = version;
+	public VanillaAttackFeature(FeatureConfiguration configuration) {
+		this.cooldownFeature = configuration.get(FeatureType.COOLDOWN);
+		this.exhaustionFeature = configuration.get(FeatureType.EXHAUSTION);
+		this.itemDamageFeature = configuration.get(FeatureType.ITEM_DAMAGE);
+		this.criticalFeature = configuration.get(FeatureType.CRITICAL);
+		this.sweepingFeature = configuration.get(FeatureType.SWEEPING);
+		this.knockbackFeature = configuration.get(FeatureType.KNOCKBACK);
+		this.version = configuration.get(FeatureType.VERSION);
 	}
 	
 	@Override

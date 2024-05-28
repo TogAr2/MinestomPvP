@@ -4,6 +4,8 @@ import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.projectile.AbstractArrow;
 import io.github.togar2.pvp.projectile.Arrow;
@@ -42,9 +44,9 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 	
 	private final CombatVersion version;
 	
-	public VanillaCrossbowFeature(ItemDamageFeature itemDamageFeature, CombatVersion version) {
-		this.itemDamageFeature = itemDamageFeature;
-		this.version = version;
+	public VanillaCrossbowFeature(FeatureConfiguration configuration) {
+		this.itemDamageFeature = configuration.get(FeatureType.ITEM_DAMAGE);
+		this.version = configuration.get(FeatureType.VERSION);
 	}
 	
 	@Override

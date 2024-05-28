@@ -1,6 +1,8 @@
 package io.github.togar2.pvp.feature.projectile;
 
 import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.projectile.FishingBobber;
 import io.github.togar2.pvp.utils.CombatVersion;
@@ -31,9 +33,9 @@ public class VanillaFishingRodFeature implements FishingRodFeature, RegistrableF
 	
 	private final CombatVersion version;
 	
-	public VanillaFishingRodFeature(ItemDamageFeature itemDamageFeature, CombatVersion version) {
-		this.itemDamageFeature = itemDamageFeature;
-		this.version = version;
+	public VanillaFishingRodFeature(FeatureConfiguration configuration) {
+		this.itemDamageFeature = configuration.get(FeatureType.ITEM_DAMAGE);
+		this.version = configuration.get(FeatureType.VERSION);
 	}
 	
 	@Override

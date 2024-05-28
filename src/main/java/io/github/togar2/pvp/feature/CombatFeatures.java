@@ -6,6 +6,7 @@ import io.github.togar2.pvp.feature.attack.VanillaCriticalFeature;
 import io.github.togar2.pvp.feature.attack.VanillaSweepingFeature;
 import io.github.togar2.pvp.feature.attributes.VanillaEquipmentFeature;
 import io.github.togar2.pvp.feature.block.VanillaBlockFeature;
+import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.cooldown.VanillaCooldownFeature;
 import io.github.togar2.pvp.feature.damage.VanillaDamageFeature;
 import io.github.togar2.pvp.feature.effect.VanillaEffectFeature;
@@ -30,6 +31,8 @@ import io.github.togar2.pvp.utils.CombatVersion;
 import java.util.List;
 
 public class CombatFeatures {
+	public static final DefinedFeature<VanillaArmorFeature> VANILLA_ARMOR = new DefinedFeature<>();
+	
 	private static final List<Class<? extends CombatFeature>> VANILLA = List.of(
 			VanillaArmorFeature.class, VanillaAttackFeature.class, VanillaCriticalFeature.class,
 			VanillaSweepingFeature.class, VanillaEquipmentFeature.class, VanillaBlockFeature.class,

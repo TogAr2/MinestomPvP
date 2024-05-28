@@ -25,7 +25,11 @@ import org.jetbrains.annotations.Nullable;
 import org.jglrxavpok.hephaistos.nbt.NBT;
 
 public class VanillaExplosionFeature implements ExplosionFeature, RegistrableFeature {
-	public final VanillaExplosionSupplier SUPPLIER = new VanillaExplosionSupplier(this);
+	private final VanillaExplosionSupplier explosionSupplier = new VanillaExplosionSupplier(this);
+	
+	public VanillaExplosionSupplier getExplosionSupplier() {
+		return explosionSupplier;
+	}
 	
 	@Override
 	public void init(EventNode<EntityInstanceEvent> node) {

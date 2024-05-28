@@ -5,6 +5,8 @@ import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.enums.Tool;
 import io.github.togar2.pvp.events.DamageBlockEvent;
 import io.github.togar2.pvp.feature.CombatFeature;
+import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.kyori.adventure.sound.Sound;
@@ -28,9 +30,9 @@ public class VanillaBlockFeature implements BlockFeature, CombatFeature {
 	
 	private final CombatVersion version;
 	
-	public VanillaBlockFeature(ItemDamageFeature itemDamageFeature, CombatVersion version) {
-		this.itemDamageFeature = itemDamageFeature;
-		this.version = version;
+	public VanillaBlockFeature(FeatureConfiguration configuration) {
+		this.itemDamageFeature = configuration.get(FeatureType.ITEM_DAMAGE);
+		this.version = configuration.get(FeatureType.VERSION);
 	}
 	
 	protected boolean isPiercing(Damage damage) {
