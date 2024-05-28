@@ -4,7 +4,7 @@ import io.github.togar2.pvp.enchantment.CustomEnchantments;
 import io.github.togar2.pvp.entity.CustomPlayer;
 import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.feature.CombatFeatureRegistry;
-import io.github.togar2.pvp.feature.CombatFeatures;
+import io.github.togar2.pvp.feature.config.CombatFeatures;
 import io.github.togar2.pvp.food.FoodComponents;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
 import io.github.togar2.pvp.potion.item.CustomPotionTypes;

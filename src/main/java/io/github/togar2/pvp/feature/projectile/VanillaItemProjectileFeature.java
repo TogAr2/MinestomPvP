@@ -2,6 +2,8 @@ package io.github.togar2.pvp.feature.projectile;
 
 import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.config.DefinedFeature;
+import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.projectile.*;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
@@ -19,6 +21,10 @@ import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class VanillaItemProjectileFeature implements ItemProjectileFeature, RegistrableFeature {
+	public static final DefinedFeature<VanillaItemProjectileFeature> DEFINED = new DefinedFeature<>(
+			FeatureType.ITEM_PROJECTILE, configuration -> new VanillaItemProjectileFeature()
+	);
+	
 	@Override
 	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(PlayerUseItemEvent.class, event -> {

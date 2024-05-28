@@ -2,6 +2,7 @@ package io.github.togar2.pvp.feature.effect;
 
 import io.github.togar2.pvp.events.PotionVisibilityEvent;
 import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffect;
@@ -32,6 +33,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
+	public static final DefinedFeature<VanillaEffectFeature> DEFINED = new DefinedFeature<>(
+			FeatureType.EFFECT, VanillaEffectFeature::new,
+			FeatureType.VERSION
+	);
+	
 	public static final Tag<Map<PotionEffect, Integer>> DURATION_LEFT = Tag.Transient("effectDurationLeft");
 	
 	private final CombatVersion version;

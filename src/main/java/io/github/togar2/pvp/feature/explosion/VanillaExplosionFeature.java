@@ -3,6 +3,8 @@ package io.github.togar2.pvp.feature.explosion;
 import io.github.togar2.pvp.explosion.CrystalEntity;
 import io.github.togar2.pvp.explosion.TntEntity;
 import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.config.DefinedFeature;
+import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.utils.ItemUtils;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
@@ -25,6 +27,10 @@ import org.jetbrains.annotations.Nullable;
 import org.jglrxavpok.hephaistos.nbt.NBT;
 
 public class VanillaExplosionFeature implements ExplosionFeature, RegistrableFeature {
+	public static final DefinedFeature<VanillaExplosionFeature> DEFINED = new DefinedFeature<>(
+			FeatureType.EXPLOSION, configuration -> new VanillaExplosionFeature()
+	);
+	
 	private final VanillaExplosionSupplier explosionSupplier = new VanillaExplosionSupplier(this);
 	
 	public VanillaExplosionSupplier getExplosionSupplier() {

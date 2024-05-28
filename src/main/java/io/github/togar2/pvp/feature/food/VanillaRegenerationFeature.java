@@ -2,6 +2,7 @@ package io.github.togar2.pvp.feature.food;
 
 import io.github.togar2.pvp.events.PlayerRegenerateEvent;
 import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.feature.provider.DifficultyProvider;
@@ -16,6 +17,11 @@ import net.minestom.server.tag.Tag;
 import net.minestom.server.world.Difficulty;
 
 public class VanillaRegenerationFeature implements RegenerationFeature, RegistrableFeature {
+	public static final DefinedFeature<VanillaRegenerationFeature> DEFINED = new DefinedFeature<>(
+			FeatureType.REGENERATION, VanillaRegenerationFeature::new,
+			FeatureType.EXHAUSTION, FeatureType.DIFFICULTY, FeatureType.VERSION
+	);
+	
 	public static final Tag<Integer> STARVATION_TICKS = Tag.Integer("starvationTicks");
 	
 	private final ExhaustionFeature exhaustionFeature;

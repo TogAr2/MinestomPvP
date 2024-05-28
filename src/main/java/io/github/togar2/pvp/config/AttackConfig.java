@@ -1,17 +1,8 @@
 package io.github.togar2.pvp.config;
 
-import io.github.togar2.pvp.feature.CombatConfiguration;
-import io.github.togar2.pvp.feature.attack.VanillaAttackFeature;
-import io.github.togar2.pvp.feature.attack.VanillaCriticalFeature;
-import io.github.togar2.pvp.feature.attack.VanillaSweepingFeature;
-import io.github.togar2.pvp.feature.cooldown.VanillaCooldownFeature;
-import io.github.togar2.pvp.feature.food.VanillaExhaustionFeature;
-import io.github.togar2.pvp.feature.item.VanillaItemDamageFeature;
-import io.github.togar2.pvp.feature.knockback.VanillaKnockbackFeature;
-import io.github.togar2.pvp.feature.provider.DifficultyProvider;
-import io.github.togar2.pvp.feature.spectate.VanillaSpectateFeature;
+import io.github.togar2.pvp.feature.config.CombatConfiguration;
+import io.github.togar2.pvp.feature.config.CombatFeatures;
 import io.github.togar2.pvp.listeners.AttackHandler;
-import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 
@@ -78,17 +69,15 @@ public class AttackConfig extends ElementConfig<EntityInstanceEvent> {
 	
 	@Override
 	public EventNode<EntityInstanceEvent> createNode() {
-		return new CombatConfiguration()
-				.add(VanillaSpectateFeature.class)
-				.add(VanillaAttackFeature.class)
-				.add(VanillaCooldownFeature.class)
-				.add(VanillaExhaustionFeature.class)
-				.add(VanillaItemDamageFeature.class)
-				.add(VanillaCriticalFeature.class)
-				.add(VanillaSweepingFeature.class)
-				.add(VanillaKnockbackFeature.class)
-				.add(DifficultyProvider.DEFAULT)
-				.add(CombatVersion.fromLegacy(isLegacy()))
+		return new CombatConfiguration().legacy(isLegacy())
+				.add(CombatFeatures.VANILLA_SPECTATE)
+				.add(CombatFeatures.VANILLA_ATTACK)
+				.add(CombatFeatures.VANILLA_COOLDOWN)
+				.add(CombatFeatures.VANILLA_EXHAUSTION)
+				.add(CombatFeatures.VANILLA_ITEM_DAMAGE)
+				.add(CombatFeatures.VANILLA_CRITICAL)
+				.add(CombatFeatures.VANILLA_SWEEPING)
+				.add(CombatFeatures.VANILLA_KNOCKBACK)
 				.build().createNode();
 	}
 	

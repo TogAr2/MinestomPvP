@@ -4,6 +4,7 @@ import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
@@ -37,11 +38,15 @@ import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeature {
+	public static final DefinedFeature<VanillaCrossbowFeature> DEFINED = new DefinedFeature<>(
+			FeatureType.CROSSBOW, VanillaCrossbowFeature::new,
+			FeatureType.ITEM_DAMAGE, FeatureType.VERSION
+	);
+	
 	private static final Tag<Boolean> START_SOUND_PLAYED = Tag.Transient("StartSoundPlayed");
 	private static final Tag<Boolean> MID_LOAD_SOUND_PLAYED = Tag.Transient("MidLoadSoundPlayed");
 	
 	private final ItemDamageFeature itemDamageFeature;
-	
 	private final CombatVersion version;
 	
 	public VanillaCrossbowFeature(FeatureConfiguration configuration) {

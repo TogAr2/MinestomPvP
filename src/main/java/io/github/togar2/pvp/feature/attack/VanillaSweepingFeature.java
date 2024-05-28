@@ -3,6 +3,7 @@ package io.github.togar2.pvp.feature.attack;
 import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.enums.Tool;
+import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.feature.knockback.KnockbackFeature;
@@ -19,6 +20,11 @@ import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
 
 public class VanillaSweepingFeature implements SweepingFeature {
+	public static final DefinedFeature<VanillaSweepingFeature> DEFINED = new DefinedFeature<>(
+			FeatureType.SWEEPING, VanillaSweepingFeature::new,
+			FeatureType.KNOCKBACK
+	);
+	
 	private final KnockbackFeature knockbackFeature;
 	
 	public VanillaSweepingFeature(FeatureConfiguration configuration) {

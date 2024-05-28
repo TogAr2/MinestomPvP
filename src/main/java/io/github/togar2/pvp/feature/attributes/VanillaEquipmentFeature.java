@@ -3,6 +3,7 @@ package io.github.togar2.pvp.feature.attributes;
 import io.github.togar2.pvp.enums.ArmorMaterial;
 import io.github.togar2.pvp.enums.Tool;
 import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.utils.CombatVersion;
@@ -22,6 +23,11 @@ import java.util.Map;
 import java.util.UUID;
 
 public class VanillaEquipmentFeature implements DataFeature<Attribute>, RegistrableFeature {
+	public static final DefinedFeature<VanillaEquipmentFeature> DEFINED = new DefinedFeature<>(
+			FeatureType.EQUIPMENT_DATA, VanillaEquipmentFeature::new,
+			FeatureType.VERSION
+	);
+	
 	//TODO this probably shouldn't work this way
 	// We probably want to store all the tools & armor separately per DataFeature
 	private final CombatVersion version;

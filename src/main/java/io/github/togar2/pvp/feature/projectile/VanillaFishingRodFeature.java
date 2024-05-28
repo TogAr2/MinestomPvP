@@ -1,6 +1,7 @@
 package io.github.togar2.pvp.feature.projectile;
 
 import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
@@ -27,10 +28,14 @@ import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class VanillaFishingRodFeature implements FishingRodFeature, RegistrableFeature {
+	public static final DefinedFeature<VanillaFishingRodFeature> DEFINED = new DefinedFeature<>(
+			FeatureType.FISHING_ROD, VanillaFishingRodFeature::new,
+			FeatureType.ITEM_DAMAGE, FeatureType.VERSION
+	);
+	
 	public static final Tag<FishingBobber> FISHING_BOBBER = Tag.Transient("fishingBobber");
 	
 	private final ItemDamageFeature itemDamageFeature;
-	
 	private final CombatVersion version;
 	
 	public VanillaFishingRodFeature(FeatureConfiguration configuration) {

@@ -3,6 +3,8 @@ package io.github.togar2.pvp.feature.fall;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.feature.CombatFeature;
 import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.config.DefinedFeature;
+import io.github.togar2.pvp.feature.config.FeatureType;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Point;
@@ -27,6 +29,10 @@ import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
 
 public class VanillaFallFeature implements FallFeature, CombatFeature, RegistrableFeature {
+	public static final DefinedFeature<VanillaFallFeature> DEFINED = new DefinedFeature<>(
+			FeatureType.FALL, configuration -> new VanillaFallFeature()
+	);
+	
 	public static final Tag<Block> LAST_CLIMBED_BLOCK = Tag.Short("lastClimbedBlock").map(Block::fromStateId, Block::stateId);
 	public static final Tag<Double> FALL_DISTANCE = Tag.Double("fallDistance");
 	

@@ -3,6 +3,7 @@ package io.github.togar2.pvp.feature.food;
 import io.github.togar2.pvp.entity.PvpPlayer;
 import io.github.togar2.pvp.events.PlayerExhaustEvent;
 import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.feature.provider.DifficultyProvider;
@@ -22,6 +23,11 @@ import net.minestom.server.world.Difficulty;
 import java.util.Objects;
 
 public class VanillaExhaustionFeature implements ExhaustionFeature, RegistrableFeature {
+	public static final DefinedFeature<VanillaExhaustionFeature> DEFINED = new DefinedFeature<>(
+			FeatureType.EXHAUSTION, VanillaExhaustionFeature::new,
+			FeatureType.DIFFICULTY, FeatureType.VERSION
+	);
+	
 	public static final Tag<Float> EXHAUSTION = Tag.Float("exhaustion");
 	
 	private final DifficultyProvider difficultyFeature;

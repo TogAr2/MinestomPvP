@@ -3,6 +3,8 @@ package io.github.togar2.pvp.feature.food;
 import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.feature.CombatFeature;
 import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.config.DefinedFeature;
+import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.food.FoodComponent;
 import io.github.togar2.pvp.food.FoodComponents;
 import io.github.togar2.pvp.utils.ViewUtil;
@@ -25,6 +27,10 @@ import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class VanillaFoodFeature implements FoodFeature, CombatFeature, RegistrableFeature {
+	public static final DefinedFeature<VanillaFoodFeature> DEFINED = new DefinedFeature<>(
+			FeatureType.FOOD, configuration -> new VanillaFoodFeature()
+	);
+	
 	@Override
 	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(PlayerPreEatEvent.class, event -> {

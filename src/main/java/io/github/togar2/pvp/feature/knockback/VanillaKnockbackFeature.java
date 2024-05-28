@@ -4,6 +4,7 @@ import io.github.togar2.pvp.entity.PvpPlayer;
 import io.github.togar2.pvp.events.EntityKnockbackEvent;
 import io.github.togar2.pvp.events.LegacyKnockbackEvent;
 import io.github.togar2.pvp.feature.CombatFeature;
+import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.legacy.LegacyKnockbackSettings;
@@ -21,6 +22,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class VanillaKnockbackFeature implements KnockbackFeature, CombatFeature {
+	public static final DefinedFeature<VanillaKnockbackFeature> DEFINED = new DefinedFeature<>(
+			FeatureType.KNOCKBACK, VanillaKnockbackFeature::new,
+			FeatureType.VERSION
+	);
+	
 	//TODO this probably shouldn't work like this
 	private final CombatVersion version;
 	

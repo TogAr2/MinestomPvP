@@ -2,6 +2,8 @@ package io.github.togar2.pvp.feature.totem;
 
 import io.github.togar2.pvp.events.TotemUseEvent;
 import io.github.togar2.pvp.feature.CombatFeature;
+import io.github.togar2.pvp.feature.config.DefinedFeature;
+import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.potion.PotionListener;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
@@ -13,6 +15,10 @@ import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 
 public class VanillaTotemFeature implements TotemFeature, CombatFeature {
+	public static final DefinedFeature<VanillaTotemFeature> DEFINED = new DefinedFeature<>(
+			FeatureType.TOTEM, configuration -> new VanillaTotemFeature()
+	);
+	
 	@Override
 	public boolean tryProtect(LivingEntity entity, DamageType type) {
 		if (type == DamageType.OUT_OF_WORLD) return false;

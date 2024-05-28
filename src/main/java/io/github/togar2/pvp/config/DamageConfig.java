@@ -1,19 +1,9 @@
 package io.github.togar2.pvp.config;
 
-import io.github.togar2.pvp.feature.CombatConfiguration;
-import io.github.togar2.pvp.feature.armor.VanillaArmorFeature;
-import io.github.togar2.pvp.feature.block.VanillaBlockFeature;
-import io.github.togar2.pvp.feature.damage.VanillaDamageFeature;
-import io.github.togar2.pvp.feature.fall.VanillaFallFeature;
-import io.github.togar2.pvp.feature.food.VanillaExhaustionFeature;
-import io.github.togar2.pvp.feature.item.VanillaItemDamageFeature;
-import io.github.togar2.pvp.feature.knockback.VanillaKnockbackFeature;
-import io.github.togar2.pvp.feature.provider.DifficultyProvider;
-import io.github.togar2.pvp.feature.totem.VanillaTotemFeature;
-import io.github.togar2.pvp.feature.tracking.VanillaDeathMessageFeature;
+import io.github.togar2.pvp.feature.config.CombatConfiguration;
+import io.github.togar2.pvp.feature.config.CombatFeatures;
 import io.github.togar2.pvp.listeners.DamageHandler;
 import io.github.togar2.pvp.listeners.FallDamageHandler;
-import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 
@@ -116,18 +106,16 @@ public class DamageConfig extends ElementConfig<EntityInstanceEvent> {
 	
 	@Override
 	public EventNode<EntityInstanceEvent> createNode() {
-		return new CombatConfiguration()
-				.add(VanillaDamageFeature.class)
-				.add(VanillaBlockFeature.class)
-				.add(VanillaArmorFeature.class)
-				.add(VanillaTotemFeature.class)
-				.add(VanillaExhaustionFeature.class)
-				.add(VanillaKnockbackFeature.class)
-				.add(VanillaDeathMessageFeature.class)
-				.add(VanillaItemDamageFeature.class)
-				.add(VanillaFallFeature.class)
-				.add(DifficultyProvider.DEFAULT)
-				.add(CombatVersion.fromLegacy(isLegacy()))
+		return new CombatConfiguration().legacy(isLegacy())
+				.add(CombatFeatures.VANILLA_DAMAGE)
+				.add(CombatFeatures.VANILLA_BLOCK)
+				.add(CombatFeatures.VANILLA_ARMOR)
+				.add(CombatFeatures.VANILLA_TOTEM)
+				.add(CombatFeatures.VANILLA_EXHAUSTION)
+				.add(CombatFeatures.VANILLA_KNOCKBACK)
+				.add(CombatFeatures.VANILLA_DEATH_MESSAGE)
+				.add(CombatFeatures.VANILLA_ITEM_DAMAGE)
+				.add(CombatFeatures.VANILLA_FALL)
 				.build().createNode();
 	}
 	

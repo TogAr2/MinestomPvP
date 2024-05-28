@@ -37,7 +37,7 @@ public record FeatureType<F extends CombatFeature>(String name, F noopFeature) {
 	public static final FeatureType<AttackFeature> ATTACK = of("ATTACK", AttackFeature.NO_OP);
 	public static final FeatureType<CriticalFeature> CRITICAL = of("CRITICAL", CriticalFeature.NO_OP);
 	public static final FeatureType<SweepingFeature> SWEEPING = of("SWEEPING", SweepingFeature.NO_OP);
-	public static final FeatureType<DataFeature<Attribute>> DATA = of("DATA", DataFeature.NO_OP);
+	public static final FeatureType<DataFeature<Attribute>> EQUIPMENT_DATA = of("EQUIPMENT_DATA", DataFeature.NO_OP);
 	public static final FeatureType<BlockFeature> BLOCK = of("BLOCK", BlockFeature.NO_OP);
 	public static final FeatureType<LegacyBlockFeature> LEGACY_BLOCK = of("LEGACY_BLOCK", LegacyBlockFeature.NO_OP);
 	public static final FeatureType<CooldownFeature> COOLDOWN = of("COOLDOWN", CooldownFeature.NO_OP);

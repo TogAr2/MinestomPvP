@@ -4,6 +4,7 @@ import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
@@ -33,8 +34,12 @@ import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class VanillaBowFeature implements BowFeature, RegistrableFeature {
-	private final ItemDamageFeature itemDamageFeature;
+	public static final DefinedFeature<VanillaBowFeature> DEFINED = new DefinedFeature<>(
+			FeatureType.BOW, VanillaBowFeature::new,
+			FeatureType.ITEM_DAMAGE, FeatureType.VERSION
+	);
 	
+	private final ItemDamageFeature itemDamageFeature;
 	private final CombatVersion version;
 	
 	public VanillaBowFeature(FeatureConfiguration configuration) {

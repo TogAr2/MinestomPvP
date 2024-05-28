@@ -4,6 +4,8 @@ import io.github.togar2.pvp.damage.DamageTypeInfo;
 import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.enums.ArmorMaterial;
 import io.github.togar2.pvp.events.EquipmentDamageEvent;
+import io.github.togar2.pvp.feature.config.DefinedFeature;
+import io.github.togar2.pvp.feature.config.FeatureType;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.damage.DamageType;
@@ -14,6 +16,10 @@ import net.minestom.server.item.ItemStack;
 import java.util.function.Consumer;
 
 public class VanillaItemDamageFeature implements ItemDamageFeature {
+	public static final DefinedFeature<VanillaItemDamageFeature> DEFINED = new DefinedFeature<>(
+			FeatureType.ITEM_DAMAGE, configuration -> new VanillaItemDamageFeature()
+	);
+	
 	protected ItemStack damage(ItemStack stack, int amount) {
 		if (amount == 0 || stack.material().registry().maxDamage() <= 0)
 			return stack;

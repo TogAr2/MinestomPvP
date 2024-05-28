@@ -2,6 +2,8 @@ package io.github.togar2.pvp.feature.config;
 
 import io.github.togar2.pvp.feature.CombatFeature;
 import io.github.togar2.pvp.feature.CombatFeatureSet;
+import io.github.togar2.pvp.feature.provider.DifficultyProvider;
+import io.github.togar2.pvp.utils.CombatVersion;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -21,6 +23,22 @@ public class CombatConfiguration {
 			add(constructor);
 		}
 		return this;
+	}
+	
+	public CombatConfiguration version(CombatVersion version) {
+		return add(FeatureType.VERSION, version);
+	}
+	
+	/**
+	 * @deprecated use {@link #version(CombatVersion)} instead
+	 */
+	@Deprecated
+	public CombatConfiguration legacy(boolean legacy) {
+		return version(CombatVersion.fromLegacy(legacy));
+	}
+	
+	public CombatConfiguration difficulty(DifficultyProvider difficulty) {
+		return add(FeatureType.DIFFICULTY, difficulty);
 	}
 	
 	public CombatConfiguration add(ConstructableFeature feature) {

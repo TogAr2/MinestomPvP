@@ -2,6 +2,7 @@ package io.github.togar2.pvp.feature.potion;
 
 import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffect;
@@ -38,6 +39,11 @@ import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
+	public static final DefinedFeature<VanillaPotionFeature> DEFINED = new DefinedFeature<>(
+			FeatureType.POTION, VanillaPotionFeature::new,
+			FeatureType.VERSION
+	);
+	
 	private static final int USE_TICKS = 32;
 	private static final ItemStack GLASS_BOTTLE = ItemStack.of(Material.GLASS_BOTTLE);
 	

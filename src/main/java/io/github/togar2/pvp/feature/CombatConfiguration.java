@@ -4,26 +4,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 public class CombatConfiguration {
 	private final Set<ConstructableFeature> features = new HashSet<>();
-	
-	public final CombatConfiguration addAll(Collection<Class<? extends CombatFeature>> classes) {
-		for (Class<? extends CombatFeature> clazz : classes) {
-			add(clazz);
-		}
-		return this;
-	}
-	
-	@SafeVarargs
-	public final CombatConfiguration addAll(Class<? extends CombatFeature>... classes) {
-		for (Class<? extends CombatFeature> clazz : classes) {
-			add(clazz);
-		}
-		return this;
-	}
 	
 	public CombatConfiguration add(ConstructableFeature feature) {
 		features.add(feature);
@@ -43,15 +31,6 @@ public class CombatConfiguration {
 	}
 	
 	public static ConstructableFeature wrapIndependentOverride(Class<? extends CombatFeature> clazz, CombatFeature... override) {
-		ConstructableFeature[] overrideArray = new ConstructableFeature[override.length];
-		for (int i = 0; i < override.length; i++) {
-			overrideArray[i] = wrap(override[i]);
-		}
-		return wrap(clazz, overrideArray);
-	}
-	
-	@SafeVarargs
-	public static ConstructableFeature wrapLazyOverride(Class<? extends CombatFeature> clazz, Class<? extends CombatFeature>... override) {
 		ConstructableFeature[] overrideArray = new ConstructableFeature[override.length];
 		for (int i = 0; i < override.length; i++) {
 			overrideArray[i] = wrap(override[i]);

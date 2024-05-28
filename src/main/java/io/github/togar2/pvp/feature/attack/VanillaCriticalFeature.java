@@ -2,6 +2,7 @@ package io.github.togar2.pvp.feature.attack;
 
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.feature.CombatFeature;
+import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.utils.CombatVersion;
@@ -11,6 +12,11 @@ import net.minestom.server.potion.PotionEffect;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class VanillaCriticalFeature implements CriticalFeature, CombatFeature {
+	public static final DefinedFeature<VanillaCriticalFeature> DEFINED = new DefinedFeature<>(
+			FeatureType.CRITICAL, VanillaCriticalFeature::new,
+			FeatureType.VERSION
+	);
+	
 	private final CombatVersion version;
 	
 	public VanillaCriticalFeature(FeatureConfiguration configuration) {

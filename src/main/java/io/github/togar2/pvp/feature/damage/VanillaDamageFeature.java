@@ -7,6 +7,7 @@ import io.github.togar2.pvp.events.FinalDamageEvent;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.armor.ArmorFeature;
 import io.github.togar2.pvp.feature.block.BlockFeature;
+import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.config.FeatureType;
 import io.github.togar2.pvp.feature.food.ExhaustionFeature;
@@ -38,6 +39,13 @@ import net.minestom.server.tag.Tag;
 import java.util.Objects;
 
 public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
+	public static final DefinedFeature<VanillaDamageFeature> DEFINED = new DefinedFeature<>(
+			FeatureType.DAMAGE, VanillaDamageFeature::new,
+			FeatureType.DIFFICULTY, FeatureType.BLOCK, FeatureType.ARMOR, FeatureType.TOTEM,
+			FeatureType.EXHAUSTION, FeatureType.KNOCKBACK, FeatureType.TRACKING,
+			FeatureType.ITEM_DAMAGE, FeatureType.VERSION
+	);
+	
 	public static final Tag<Long> NEW_DAMAGE_TIME = Tag.Long("newDamageTime");
 	public static final Tag<Float> LAST_DAMAGE_AMOUNT = Tag.Float("lastDamageAmount");
 	

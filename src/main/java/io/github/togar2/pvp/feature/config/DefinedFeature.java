@@ -8,11 +8,11 @@ public record DefinedFeature<F extends CombatFeature>(
 		FeatureType<?> featureType, Set<FeatureType<?>> dependencies,
 		Constructor<F> constructor) {
 	
-	public DefinedFeature(FeatureType<?> featureType, Constructor<F> constructor, FeatureType<?>... dependencies) {
+	public DefinedFeature(FeatureType<? super F> featureType, Constructor<F> constructor, FeatureType<?>... dependencies) {
 		this(featureType, Set.of(dependencies), constructor);
 	}
 	
-	public F construct(FeatureConfiguration configuration) {
+	F construct(FeatureConfiguration configuration) {
 		return constructor.construct(configuration);
 	}
 	
