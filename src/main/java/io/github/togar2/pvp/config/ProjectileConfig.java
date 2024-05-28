@@ -68,6 +68,7 @@ public class ProjectileConfig extends ElementConfig<EntityInstanceEvent> {
 				.add(CombatFeatures.VANILLA_FISHING_ROD)
 				.add(CombatFeatures.VANILLA_ITEM_PROJECTILE)
 				.add(CombatFeatures.VANILLA_TRIDENT)
+				.add(CombatFeatures.VANILLA_ITEM_DAMAGE)
 				.build().createNode();
 	}
 	

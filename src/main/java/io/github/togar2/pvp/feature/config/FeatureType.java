@@ -28,7 +28,7 @@ import io.github.togar2.pvp.feature.tracking.TrackingFeature;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.attribute.Attribute;
 
-public record FeatureType<F extends CombatFeature>(String name, F noopFeature) {
+public record FeatureType<F extends CombatFeature>(String name, F defaultFeature) {
 	public static final FeatureType<CombatVersion> VERSION = of("VERSION", CombatVersion.MODERN);
 	public static final FeatureType<ArmorFeature> ARMOR = of("ARMOR", ArmorFeature.NO_OP);
 	public static final FeatureType<AttackFeature> ATTACK = of("ATTACK", AttackFeature.NO_OP);

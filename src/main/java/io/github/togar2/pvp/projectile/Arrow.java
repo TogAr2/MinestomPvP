@@ -5,6 +5,8 @@ import io.github.togar2.pvp.potion.effect.CustomPotionEffect;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
 import io.github.togar2.pvp.potion.item.CustomPotionType;
 import io.github.togar2.pvp.potion.item.CustomPotionTypes;
+import io.github.togar2.pvp.utils.CombatVersion;
+import io.github.togar2.pvp.utils.PotionUtils;
 import net.minestom.server.color.Color;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
@@ -53,7 +55,7 @@ public class Arrow extends AbstractArrow {
 				if (potionType == PotionType.EMPTY && customEffects.isEmpty()) {
 					setColor(-1);
 				} else {
-					setColor(PotionListener.getPotionColor(
+					setColor(PotionUtils.getPotionColor(
 							PotionListener.getAllPotions(potionType, customEffects, legacy)));
 				}
 			} else {
@@ -94,7 +96,7 @@ public class Arrow extends AbstractArrow {
 				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.effect());
 				if (customPotionEffect.isInstant()) {
 					customPotionEffect.applyInstantEffect(this, null,
-							entity, potion.amplifier(), 1.0D, legacy);
+							entity, potion.amplifier(), 1.0D, CombatVersion.fromLegacy(legacy));
 				} else {
 					int duration = Math.max(potion.duration() / 8, 1);
 					entity.addEffect(new Potion(potion.effect(), potion.amplifier(), duration, potion.flags()));
@@ -116,7 +118,7 @@ public class Arrow extends AbstractArrow {
 					CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.effect());
 					if (customPotionEffect.isInstant()) {
 						customPotionEffect.applyInstantEffect(this, null,
-								entity, potion.amplifier(), 1.0D, legacy);
+								entity, potion.amplifier(), 1.0D, CombatVersion.fromLegacy(legacy));
 					} else {
 						entity.addEffect(new Potion(potion.effect(), potion.amplifier(),
 								potion.duration(), potion.flags()));
@@ -144,8 +146,9 @@ public class Arrow extends AbstractArrow {
 	}
 	
 	public void addPotion(net.minestom.server.potion.CustomPotionEffect effect) {
+		//TODO replace all potion color things with PotionFeature
 		potion.getCustomPotionEffects().add(effect);
-		setColor(PotionListener.getPotionColor(
+		setColor(PotionUtils.getPotionColor(
 				PotionListener.getAllPotions(potion.getPotionType(), potion.getCustomPotionEffects(), legacy)));
 	}
 	

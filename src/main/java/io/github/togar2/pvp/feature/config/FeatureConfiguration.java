@@ -25,7 +25,7 @@ public class FeatureConfiguration {
 	
 	@SuppressWarnings("unchecked")
 	public <T extends CombatFeature> @NotNull T get(FeatureType<T> type) {
-		return (T) combatFeatures.computeIfAbsent(type, FeatureType::noopFeature);
+		return (T) combatFeatures.computeIfAbsent(type, FeatureType::defaultFeature);
 	}
 	
 	@SuppressWarnings("unchecked")
