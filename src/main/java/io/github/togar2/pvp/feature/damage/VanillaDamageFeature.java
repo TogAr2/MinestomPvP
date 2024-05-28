@@ -16,7 +16,6 @@ import io.github.togar2.pvp.feature.knockback.KnockbackFeature;
 import io.github.togar2.pvp.feature.provider.DifficultyProvider;
 import io.github.togar2.pvp.feature.totem.TotemFeature;
 import io.github.togar2.pvp.feature.tracking.TrackingFeature;
-import io.github.togar2.pvp.listeners.DamageHandler;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
@@ -121,9 +120,9 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 		
 		// Invulnerability ticks
 		boolean hurtSoundAndAnimation = true;
-		long newDamageTime = entity.hasTag(DamageHandler.NEW_DAMAGE_TIME) ? entity.getTag(DamageHandler.NEW_DAMAGE_TIME) : -10000;
+		long newDamageTime = entity.hasTag(NEW_DAMAGE_TIME) ? entity.getTag(NEW_DAMAGE_TIME) : -10000;
 		if (entity.getAliveTicks() - newDamageTime < 0) {
-			float lastDamage = entity.hasTag(DamageHandler.LAST_DAMAGE_AMOUNT) ? entity.getTag(DamageHandler.LAST_DAMAGE_AMOUNT) : 0;
+			float lastDamage = entity.hasTag(LAST_DAMAGE_AMOUNT) ? entity.getTag(LAST_DAMAGE_AMOUNT) : 0;
 			
 			if (amount <= lastDamage) {
 				event.setCancelled(true);

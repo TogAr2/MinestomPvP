@@ -5,7 +5,6 @@ import io.github.togar2.pvp.feature.CombatFeature;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureType;
-import io.github.togar2.pvp.listeners.AttackHandler;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.LivingEntity;
@@ -42,7 +41,7 @@ public class VanillaSpectateFeature implements SpectateFeature, CombatFeature, R
 	}
 	
 	protected void spectateTick(Player player) {
-		Integer spectatingId = player.getTag(AttackHandler.SPECTATING);
+		Integer spectatingId = player.getTag(SPECTATING);
 		if (spectatingId == null) return;
 		Entity spectating = Entity.getEntity(spectatingId);
 		if (spectating == null || spectating == player) return;

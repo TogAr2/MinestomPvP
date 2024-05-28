@@ -100,6 +100,8 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 			tickDrinkingSounds(player);
 		});
 		
+		
+		
 		node.addListener(PlayerUseItemEvent.class, event -> {
 			if (event.getItemStack().material() != Material.SPLASH_POTION) return;
 			

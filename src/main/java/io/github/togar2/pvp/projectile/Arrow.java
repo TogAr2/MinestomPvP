@@ -109,7 +109,7 @@ public class Arrow extends AbstractArrow {
 		potion.getCustomPotionEffects().stream().map(customPotion ->
 				new Potion(Objects.requireNonNull(PotionEffect.fromId(customPotion.id())),
 						customPotion.amplifier(), customPotion.duration(),
-						PotionListener.createFlags(
+						PotionUtils.createFlags(
 								customPotion.isAmbient(),
 								customPotion.showParticles(),
 								customPotion.showIcon()

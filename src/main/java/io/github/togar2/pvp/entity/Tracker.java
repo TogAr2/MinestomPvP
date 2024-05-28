@@ -2,18 +2,11 @@ package io.github.togar2.pvp.entity;
 
 import io.github.togar2.pvp.damage.combat.CombatManager;
 import io.github.togar2.pvp.food.HungerManager;
-import io.github.togar2.pvp.legacy.SwordBlockHandler;
-import io.github.togar2.pvp.listeners.AttackHandler;
-import io.github.togar2.pvp.listeners.AttackManager;
-import io.github.togar2.pvp.potion.PotionListener;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityFireEvent;
-import net.minestom.server.event.instance.AddEntityToInstanceEvent;
-import net.minestom.server.event.instance.RemoveEntityFromInstanceEvent;
 import net.minestom.server.event.player.*;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.instance.block.Block;
@@ -23,7 +16,6 @@ import net.minestom.server.tag.Tag;
 import net.minestom.server.utils.time.TimeUnit;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class Tracker {
 	public static final Tag<Long> ITEM_USE_START_TIME = Tag.Long("itemUseStartTime");
@@ -77,9 +69,6 @@ public class Tracker {
 		node.addListener(AsyncPlayerConfigurationEvent.class, event -> {
 			UUID uuid = event.getPlayer().getUuid();
 			
-			event.getPlayer().setTag(AttackHandler.LAST_ATTACKED_TICKS, 0L);
-			event.getPlayer().setTag(SwordBlockHandler.LAST_SWING_TIME, 0L);
-			event.getPlayer().setTag(SwordBlockHandler.BLOCKING_SWORD, false);
 			event.getPlayer().setTag(HungerManager.EXHAUSTION, 0F);
 			event.getPlayer().setTag(HungerManager.STARVATION_TICKS, 0);
 			Tracker.cooldownEnd.put(uuid, new HashMap<>());
@@ -105,8 +94,6 @@ public class Tracker {
 			}
 			
 			Tracker.combatManager.get(uuid).tick();
-			
-			AttackManager.spectateTick(player);
 		});
 		
 		node.addListener(PlayerUseItemEvent.class, event -> {
@@ -139,14 +126,6 @@ public class Tracker {
 		node.addListener(EntityFireEvent.class, event ->
 				event.getEntity().setTag(EntityUtils.FIRE_EXTINGUISH_TIME,
 						System.currentTimeMillis() + event.getFireTime(TimeUnit.MILLISECOND)));
-		
-		node.addListener(AddEntityToInstanceEvent.class, event -> {
-			if (event.getEntity() instanceof LivingEntity)
-				PotionListener.durationLeftMap.put(event.getEntity().getUuid(), new ConcurrentHashMap<>());
-		});
-		
-		node.addListener(RemoveEntityFromInstanceEvent.class, event ->
-				PotionListener.durationLeftMap.remove(event.getEntity().getUuid()));
 		
 		MinecraftServer.getSchedulerManager()
 				.buildTask(Tracker::updateCooldown)
