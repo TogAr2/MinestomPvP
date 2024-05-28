@@ -1,14 +1,15 @@
 package io.github.togar2.pvp.config;
 
-import io.github.togar2.pvp.food.FoodListener;
+import io.github.togar2.pvp.feature.config.CombatConfiguration;
+import io.github.togar2.pvp.feature.config.CombatFeatures;
 import net.minestom.server.event.EventNode;
-import net.minestom.server.event.trait.PlayerInstanceEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 
 /**
  * Creates an EventNode with food events.
  * This includes eating and exhaustion for movement and block breaking.
  */
-public class FoodConfig extends ElementConfig<PlayerInstanceEvent> {
+public class FoodConfig extends ElementConfig<EntityInstanceEvent> {
 	public static final FoodConfig DEFAULT = defaultBuilder().build();
 	public static final FoodConfig LEGACY = legacyBuilder().build();
 	
@@ -53,8 +54,12 @@ public class FoodConfig extends ElementConfig<PlayerInstanceEvent> {
 	}
 	
 	@Override
-	public EventNode<PlayerInstanceEvent> createNode() {
-		return FoodListener.events(this);
+	public EventNode<EntityInstanceEvent> createNode() {
+		return new CombatConfiguration().legacy(isLegacy())
+				.add(CombatFeatures.VANILLA_FOOD)
+				.add(CombatFeatures.VANILLA_EXHAUSTION)
+				.add(CombatFeatures.VANILLA_REGENERATION)
+				.build().createNode();
 	}
 	
 	/**

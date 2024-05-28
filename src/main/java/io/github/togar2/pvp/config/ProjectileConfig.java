@@ -1,15 +1,16 @@
 package io.github.togar2.pvp.config;
 
-import io.github.togar2.pvp.projectile.ProjectileListener;
+import io.github.togar2.pvp.feature.config.CombatConfiguration;
+import io.github.togar2.pvp.feature.config.CombatFeatures;
 import net.minestom.server.event.EventNode;
-import net.minestom.server.event.trait.PlayerInstanceEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 
 /**
  * Creates an EventNode with projectile events.
  * This includes fishing rods, snowballs, eggs,
  * ender pearls, bows and crossbows.
  */
-public class ProjectileConfig extends ElementConfig<PlayerInstanceEvent> {
+public class ProjectileConfig extends ElementConfig<EntityInstanceEvent> {
 	public static final ProjectileConfig DEFAULT = defaultBuilder().build();
 	public static final ProjectileConfig LEGACY = legacyBuilder().build();
 	
@@ -60,8 +61,14 @@ public class ProjectileConfig extends ElementConfig<PlayerInstanceEvent> {
 	}
 	
 	@Override
-	public EventNode<PlayerInstanceEvent> createNode() {
-		return ProjectileListener.events(this);
+	public EventNode<EntityInstanceEvent> createNode() {
+		//todo trident
+		return new CombatConfiguration().legacy(isLegacy())
+				.add(CombatFeatures.VANILLA_BOW)
+				.add(CombatFeatures.VANILLA_CROSSBOW)
+				.add(CombatFeatures.VANILLA_FISHING_ROD)
+				.add(CombatFeatures.VANILLA_ITEM_PROJECTILE)
+				.build().createNode();
 	}
 	
 	/**
