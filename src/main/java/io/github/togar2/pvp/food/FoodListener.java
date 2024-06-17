@@ -13,6 +13,7 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.item.ItemUpdateStateEvent;
+import net.minestom.server.event.item.ItemUsageCompleteEvent;
 import net.minestom.server.event.player.*;
 import net.minestom.server.event.trait.PlayerInstanceEvent;
 import net.minestom.server.instance.block.Block;
@@ -38,6 +39,7 @@ public class FoodListener {
 		
 		node.addListener(EventListener.builder(PlayerPreEatEvent.class).handler(event -> {
 			if (!config.isFoodEnabled()) {
+				System.out.println("cancelled food listener");
 				event.setCancelled(true);
 				return;
 			}
@@ -94,7 +96,10 @@ public class FoodListener {
 					event.getPlayer().setItemInHand(event.getHand(), stack.withAmount(stack.amount() - 1));
 				}
 			}
-		}).filter(event -> event.getItemStack().has(ItemComponent.FOOD)).build()); //May also be a potion
+		}).filter(event -> 
+				event.getItemStack().has(ItemComponent.FOOD) ||
+				event.getItemStack().material() == Material.MILK_BUCKET
+		).build());
 		
 		if (config.isFoodSoundsEnabled()) node.addListener(PlayerTickEvent.class, event -> {
 			Player player = event.getPlayer();
