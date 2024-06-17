@@ -13,10 +13,7 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.item.ItemUpdateStateEvent;
-import net.minestom.server.event.player.PlayerBlockBreakEvent;
-import net.minestom.server.event.player.PlayerMoveEvent;
-import net.minestom.server.event.player.PlayerPreEatEvent;
-import net.minestom.server.event.player.PlayerTickEvent;
+import net.minestom.server.event.player.*;
 import net.minestom.server.event.trait.PlayerInstanceEvent;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemComponent;
@@ -51,15 +48,10 @@ public class FoodListener {
 			if (foodComponent == null || (event.getPlayer().getGameMode() != GameMode.CREATIVE
 					&& !foodComponent.isAlwaysEdible() && event.getPlayer().getFood() == 20)) {
 				event.setCancelled(true);
-				return;
 			}
-			
-			event.setEatingTime((long) getUseTime(foodComponent) * MinecraftServer.TICK_MS);
 		}).filter(event -> event.getItemStack().has(ItemComponent.FOOD)).build());
 		
-		node.addListener(EventListener.builder(ItemUpdateStateEvent.class).handler(event -> {
-			if (!event.getPlayer().isEating()) return; // Temporary hack, waiting on Minestom PR #2128
-
+		node.addListener(EventListener.builder(PlayerEatEvent.class).handler(event -> {
 			Player player = event.getPlayer();
 			ItemStack stack = event.getItemStack();
 			HungerManager.eat(player, stack.material());
