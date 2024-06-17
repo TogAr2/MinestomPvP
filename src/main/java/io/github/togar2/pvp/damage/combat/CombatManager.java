@@ -10,16 +10,21 @@ import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.Damage;
+import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.network.packet.server.play.EndCombatEventPacket;
 import net.minestom.server.network.packet.server.play.EnterCombatEventPacket;
+import net.minestom.server.registry.DynamicRegistry;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CombatManager {
+	private static final DynamicRegistry<DamageType> DAMAGE_TYPE_REGISTRY = MinecraftServer.getDamageTypeRegistry();
+
 	private final List<CombatEntry> entries = new ArrayList<>();
 	private final Player player;
 	private long lastDamageTime;
@@ -99,7 +104,7 @@ public class CombatManager {
 		
 		CombatEntry heaviestFall = null;
 		CombatEntry lastEntry = entries.get(entries.size() - 1);
-		DamageTypeInfo lastInfo = DamageTypeInfo.of(lastEntry.damage().getType());
+		DamageTypeInfo lastInfo = DamageTypeInfo.of(DAMAGE_TYPE_REGISTRY.get(lastEntry.damage().getType()));
 		
 		boolean fall = false;
 		if (lastInfo.fall()) {
@@ -109,7 +114,7 @@ public class CombatManager {
 		
 		if (!fall) return DamageListener.getAttackDeathMessage(player, lastEntry.damage());
 		
-		DamageTypeInfo heaviestFallInfo = DamageTypeInfo.of(heaviestFall.damage().getType());
+		DamageTypeInfo heaviestFallInfo = DamageTypeInfo.of(DAMAGE_TYPE_REGISTRY.get(heaviestFall.damage().getType()));
 		if (heaviestFallInfo.fall() || heaviestFallInfo.outOfWorld()) {
 			return Component.translatable("death.fell.accident." + heaviestFall.getMessageFallLocation(), getEntityName());
 		}
@@ -119,15 +124,15 @@ public class CombatManager {
 		
 		if (firstAttacker != null && firstAttacker != lastAttacker) {
 			ItemStack weapon = firstAttacker instanceof LivingEntity ? ((LivingEntity) firstAttacker).getItemInMainHand() : ItemStack.AIR;
-			if (!weapon.isAir() && weapon.getDisplayName() != null) {
-				return Component.translatable("death.fell.assist.item", getEntityName(), EntityUtils.getName(firstAttacker), weapon.getDisplayName());
+			if (!weapon.isAir() && weapon.get(ItemComponent.CUSTOM_NAME) != null) {
+				return Component.translatable("death.fell.assist.item", getEntityName(), EntityUtils.getName(firstAttacker), weapon.get(ItemComponent.CUSTOM_NAME));
 			} else {
 				return Component.translatable("death.fell.assist", getEntityName(), EntityUtils.getName(firstAttacker));
 			}
 		} else if (lastAttacker != null) {
 			ItemStack weapon = lastAttacker instanceof LivingEntity ? ((LivingEntity) lastAttacker).getItemInMainHand() : ItemStack.AIR;
-			if (!weapon.isAir() && weapon.getDisplayName() != null) {
-				return Component.translatable("death.fell.finish.item", getEntityName(), EntityUtils.getName(lastAttacker), weapon.getDisplayName());
+			if (!weapon.isAir() && weapon.get(ItemComponent.CUSTOM_NAME)!= null) {
+				return Component.translatable("death.fell.finish.item", getEntityName(), EntityUtils.getName(lastAttacker), weapon.get(ItemComponent.CUSTOM_NAME));
 			} else {
 				return Component.translatable("death.fell.finish", getEntityName(), EntityUtils.getName(lastAttacker));
 			}
@@ -168,7 +173,7 @@ public class CombatManager {
 		
 		for (int i = 0; i < entries.size(); i++) {
 			CombatEntry entry = entries.get(i);
-			DamageTypeInfo info = DamageTypeInfo.of(entry.damage().getType());
+			DamageTypeInfo info = DamageTypeInfo.of(DAMAGE_TYPE_REGISTRY.get(entry.damage().getType()));
 			
 			if ((info.fall() || info.outOfWorld())
 					&& entry.getFallDistance() > 0.0 && (mostDamageEntry == null || entry.getFallDistance() > highestFall)) {

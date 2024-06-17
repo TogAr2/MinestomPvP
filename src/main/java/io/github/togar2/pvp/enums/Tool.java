@@ -1,13 +1,15 @@
 package io.github.togar2.pvp.enums;
 
-import io.github.togar2.pvp.utils.ModifierUUID;
-import net.minestom.server.attribute.Attribute;
-import net.minestom.server.attribute.AttributeModifier;
-import net.minestom.server.attribute.AttributeOperation;
+import io.github.togar2.pvp.utils.ModifierId;
 import net.minestom.server.entity.EquipmentSlot;
+import net.minestom.server.entity.attribute.Attribute;
+import net.minestom.server.entity.attribute.AttributeModifier;
+import net.minestom.server.entity.attribute.AttributeOperation;
+import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import net.minestom.server.item.attribute.ItemAttribute;
+import net.minestom.server.item.component.AttributeList;
+import net.minestom.server.utils.NamespaceID;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -65,10 +67,10 @@ public enum Tool {
 		float finalLegacyAttackDamage = legacyAttackDamage + (toolMaterial == null ? 0 : toolMaterial.getAttackDamage());
 		this.material = Material.fromNamespaceId(this.name().toLowerCase());
 		
-		this.attributeModifiers.put(Attribute.ATTACK_DAMAGE, new AttributeModifier(ModifierUUID.ATTACK_DAMAGE_MODIFIER_ID, "Tool modifier", finalAttackDamage, AttributeOperation.ADDITION));
-		this.attributeModifiers.put(Attribute.ATTACK_SPEED, new AttributeModifier(ModifierUUID.ATTACK_SPEED_MODIFIER_ID, "Tool modifier", attackSpeed, AttributeOperation.ADDITION));
+		this.attributeModifiers.put(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier(ModifierId.ATTACK_DAMAGE_MODIFIER_ID, finalAttackDamage, AttributeOperation.ADD_VALUE));
+		this.attributeModifiers.put(Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(ModifierId.ATTACK_SPEED_MODIFIER_ID, attackSpeed, AttributeOperation.ADD_VALUE));
 		
-		this.legacyAttributeModifiers.put(Attribute.ATTACK_DAMAGE, new AttributeModifier(ModifierUUID.ATTACK_DAMAGE_MODIFIER_ID, "Tool modifier", finalLegacyAttackDamage, AttributeOperation.ADDITION));
+		this.legacyAttributeModifiers.put(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier(ModifierId.ATTACK_DAMAGE_MODIFIER_ID, finalLegacyAttackDamage, AttributeOperation.ADD_VALUE));
 	}
 	
 	Tool(@Nullable ToolMaterial toolMaterial, float attackDamage, float legacyAttackDamage, float attackSpeed, boolean isAxe, boolean isSword) {
@@ -79,10 +81,10 @@ public enum Tool {
 	
 	public static Map<Attribute, List<AttributeModifier>> getAttributes(@Nullable Tool tool, EquipmentSlot slot, ItemStack item, boolean legacy) {
 		Map<Attribute, List<AttributeModifier>> modifiers = new HashMap<>();
-		for (ItemAttribute itemAttribute : item.meta().getAttributes()) {
-			if (EquipmentSlot.fromAttributeSlot(itemAttribute.slot()) == slot) {
-				modifiers.computeIfAbsent(itemAttribute.attribute(), k -> new ArrayList<>())
-						.add(new AttributeModifier(itemAttribute.uuid(), itemAttribute.name(), (float) itemAttribute.amount(), itemAttribute.operation()));
+		for (AttributeList.Modifier itemModifier : item.get(ItemComponent.ATTRIBUTE_MODIFIERS).modifiers()) {
+			if (itemModifier.slot().contains(slot)) {
+				modifiers.computeIfAbsent(itemModifier.attribute(), k -> new ArrayList<>())
+						.add(itemModifier.modifier());
 			}
 		}
 		
@@ -99,18 +101,18 @@ public enum Tool {
 		return modifiers;
 	}
 	
-	public static Map<Attribute, List<UUID>> getAttributeIds(@Nullable Tool tool, EquipmentSlot slot, ItemStack item) {
-		Map<Attribute, List<UUID>> modifiers = new HashMap<>();
-		for (ItemAttribute itemAttribute : item.meta().getAttributes()) {
-			if (EquipmentSlot.fromAttributeSlot(itemAttribute.slot()) == slot) {
-				modifiers.computeIfAbsent(itemAttribute.attribute(), k -> new ArrayList<>()).add(itemAttribute.uuid());
+	public static Map<Attribute, List<NamespaceID>> getAttributeIds(@Nullable Tool tool, EquipmentSlot slot, ItemStack item) {
+		Map<Attribute, List<NamespaceID>> modifiers = new HashMap<>();
+		for (AttributeList.Modifier itemModifier : item.get(ItemComponent.ATTRIBUTE_MODIFIERS).modifiers()) {
+			if (itemModifier.slot().contains(slot)) {
+				modifiers.computeIfAbsent(itemModifier.attribute(), k -> new ArrayList<>()).add(itemModifier.modifier().id());
 			}
 		}
 		
 		if (tool != null) {
 			if (slot == EquipmentSlot.MAIN_HAND) {
-				modifiers.computeIfAbsent(Attribute.ATTACK_DAMAGE, k -> new ArrayList<>()).add(ModifierUUID.ATTACK_DAMAGE_MODIFIER_ID);
-				modifiers.computeIfAbsent(Attribute.ATTACK_SPEED, k -> new ArrayList<>()).add(ModifierUUID.ATTACK_SPEED_MODIFIER_ID);
+				modifiers.computeIfAbsent(Attribute.GENERIC_ATTACK_DAMAGE, k -> new ArrayList<>()).add(ModifierId.ATTACK_DAMAGE_MODIFIER_ID);
+				modifiers.computeIfAbsent(Attribute.GENERIC_ATTACK_SPEED, k -> new ArrayList<>()).add(ModifierId.ATTACK_SPEED_MODIFIER_ID);
 			}
 		}
 		

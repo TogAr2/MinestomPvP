@@ -4,21 +4,21 @@ import io.github.togar2.pvp.config.ArmorToolConfig;
 import io.github.togar2.pvp.config.PvPConfig;
 import io.github.togar2.pvp.enums.ArmorMaterial;
 import io.github.togar2.pvp.enums.Tool;
-import net.minestom.server.attribute.Attribute;
-import net.minestom.server.attribute.AttributeInstance;
-import net.minestom.server.attribute.AttributeModifier;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
+import net.minestom.server.entity.attribute.Attribute;
+import net.minestom.server.entity.attribute.AttributeInstance;
+import net.minestom.server.entity.attribute.AttributeModifier;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.item.EntityEquipEvent;
 import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.item.ItemStack;
+import net.minestom.server.utils.NamespaceID;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public class ArmorToolListener {
 	
@@ -64,15 +64,15 @@ public class ArmorToolListener {
 		addAttributeModifiers(entity, Tool.getAttributes(tool, slot, newItem, legacy));
 	}
 	
-	private static void removeAttributeModifiers(LivingEntity entity, Map<Attribute, List<UUID>> modifiers) {
-		for (Map.Entry<Attribute, List<UUID>> entry : modifiers.entrySet()) {
+	private static void removeAttributeModifiers(LivingEntity entity, Map<Attribute, List<NamespaceID>> modifiers) {
+		for (Map.Entry<Attribute, List<NamespaceID>> entry : modifiers.entrySet()) {
 			AttributeInstance attribute = entity.getAttribute(entry.getKey());
 			List<AttributeModifier> toRemove = new ArrayList<>();
 			
-			List<UUID> idsToRemove = entry.getValue();
+			List<NamespaceID> idsToRemove = entry.getValue();
 			
-			attribute.getModifiers().forEach((modifier) -> {
-				if (idsToRemove.contains(modifier.getId())) {
+			attribute.modifiers().forEach((modifier) -> {
+				if (idsToRemove.contains(modifier.id())) {
 					toRemove.add(modifier);
 				}
 			});

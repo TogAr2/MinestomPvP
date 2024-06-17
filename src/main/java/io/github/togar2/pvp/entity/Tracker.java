@@ -13,7 +13,7 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
-import net.minestom.server.event.entity.EntityFireEvent;
+import net.minestom.server.event.entity.EntitySetFireEvent;
 import net.minestom.server.event.instance.AddEntityToInstanceEvent;
 import net.minestom.server.event.instance.RemoveEntityFromInstanceEvent;
 import net.minestom.server.event.player.*;
@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Tracker {
 	public static final Tag<Long> ITEM_USE_START_TIME = Tag.Long("itemUseStartTime");
-	public static final Tag<Block> LAST_CLIMBED_BLOCK = Tag.Short("lastClimbedBlock").map(Block::fromStateId, Block::stateId);
+	public static final Tag<Block> LAST_CLIMBED_BLOCK = Tag.Integer("lastClimbedBlock").map(Block::fromStateId, Block::stateId);
 	public static final Tag<Double> FALL_DISTANCE = Tag.Double("fallDistance");
 	
 	public static final Map<UUID, Map<Material, Long>> cooldownEnd = new HashMap<>();
@@ -38,6 +38,9 @@ public class Tracker {
 	public static boolean hasCooldown(Player player, Material material) {
 		Map<Material, Long> cooldownMap = cooldownEnd.get(player.getUuid());
 		
+		if (cooldownMap == null) {
+			System.out.println("null for uuid " + player.getUuid());
+		}
 		return cooldownMap.containsKey(material) && cooldownMap.get(material) > System.currentTimeMillis();
 	}
 	
@@ -84,6 +87,7 @@ public class Tracker {
 			event.getPlayer().setTag(SwordBlockHandler.BLOCKING_SWORD, false);
 			event.getPlayer().setTag(HungerManager.EXHAUSTION, 0F);
 			event.getPlayer().setTag(HungerManager.STARVATION_TICKS, 0);
+			System.out.println("register for uuid " + uuid);
 			Tracker.cooldownEnd.put(uuid, new HashMap<>());
 			Tracker.combatManager.put(uuid, new CombatManager(event.getPlayer()));
 		});
@@ -118,7 +122,7 @@ public class Tracker {
 				if (lastDamagedById == null) {
 					player.removeTag(DamageHandler.LAST_DAMAGED_BY);
 				} else {
-					Entity lastDamagedBy = Entity.getEntity(lastDamagedById);
+					Entity lastDamagedBy = EntityUtils.findEntityById(lastDamagedById);
 					if (lastDamagedBy instanceof LivingEntity living && living.isDead()) {
 						player.removeTag(DamageHandler.LAST_DAMAGED_BY);
 					} else if (System.currentTimeMillis() - player.getTag(DamageHandler.LAST_DAMAGE_TIME) > 5000) {
@@ -158,9 +162,9 @@ public class Tracker {
 		node.addListener(PlayerSpawnEvent.class, event -> event.getPlayer().setTag(FALL_DISTANCE, 0.0));
 		node.addListener(PlayerRespawnEvent.class, event -> event.getPlayer().setTag(FALL_DISTANCE, 0.0));
 		
-		node.addListener(EntityFireEvent.class, event ->
+		node.addListener(EntitySetFireEvent.class, event ->
 				event.getEntity().setTag(EntityUtils.FIRE_EXTINGUISH_TIME,
-						System.currentTimeMillis() + event.getFireTime(TimeUnit.MILLISECOND)));
+						event.getEntity().getAliveTicks() + event.getFireTicks()));
 		
 		node.addListener(AddEntityToInstanceEvent.class, event -> {
 			if (event.getEntity() instanceof LivingEntity)

@@ -15,10 +15,7 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
-import net.minestom.server.entity.Entity;
-import net.minestom.server.entity.EquipmentSlot;
-import net.minestom.server.entity.LivingEntity;
-import net.minestom.server.entity.Player;
+import net.minestom.server.entity.*;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventListener;
@@ -31,15 +28,16 @@ import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.event.trait.PlayerInstanceEvent;
 import net.minestom.server.instance.EntityTracker;
-import net.minestom.server.item.Enchantment;
+import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import net.minestom.server.item.metadata.CrossbowMeta;
+import net.minestom.server.item.enchant.Enchantment;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
 import net.minestom.server.utils.MathUtils;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -59,7 +57,7 @@ public class ProjectileListener {
 			
 			if (FishingBobber.fishingBobbers.containsKey(player.getUuid())) {
 				int durability = FishingBobber.fishingBobbers.get(player.getUuid()).retrieve();
-				if (!player.isCreative())
+				if (player.getGameMode() != GameMode.CREATIVE)
 					ItemUtils.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
 							EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, durability);
 				
@@ -187,7 +185,7 @@ public class ProjectileListener {
 			projectile.setVelocity(projectile.getVelocity().add(playerVel.x(),
 					player.isOnGround() ? 0.0D : playerVel.y(), playerVel.z()));
 			
-			if (!player.isCreative()) {
+			if (player.getGameMode() != GameMode.CREATIVE) {
 				player.setItemInHand(event.getHand(), stack.withAmount(stack.amount() - 1));
 			}
 		}).filter(event -> event.getItemStack().material() == Material.SNOWBALL
@@ -197,13 +195,13 @@ public class ProjectileListener {
 		
 		if (config.isCrossbowEnabled()) node.addListener(EventListener.builder(PlayerUseItemEvent.class).handler(event -> {
 			ItemStack stack = event.getItemStack();
-			if (stack.meta(CrossbowMeta.class).isCharged()) {
+			if (!stack.get(ItemComponent.CHARGED_PROJECTILES,List.of()).isEmpty()) {
 				// Make sure the animation event is not called, because this is not an animation
 				event.setCancelled(true);
 				
 				stack = performCrossbowShooting(event.getPlayer(), event.getHand(), stack,
 						getCrossbowPower(stack), 1.0, config.isLegacy());
-				event.getPlayer().setItemInHand(event.getHand(), setCrossbowCharged(stack, false));
+				event.getPlayer().setItemInHand(event.getHand(), stack);
 			} else {
 				if (EntityUtils.getProjectile(event.getPlayer(),
 						Arrow.ARROW_OR_FIREWORK_PREDICATE, Arrow.ARROW_PREDICATE).first().isAir()) {
@@ -219,7 +217,7 @@ public class ProjectileListener {
 		
 		node.addListener(PlayerItemAnimationEvent.class, event -> {
 			if (event.getItemAnimationType() == PlayerItemAnimationEvent.ItemAnimationType.BOW) {
-				if (!event.getPlayer().isCreative()
+				if (event.getPlayer().getGameMode() != GameMode.CREATIVE
 						&& EntityUtils.getProjectile(event.getPlayer(), Arrow.ARROW_PREDICATE).first().isAir()) {
 					event.setCancelled(true);
 				}
@@ -274,7 +272,7 @@ public class ProjectileListener {
 		if (config.isBowEnabled()) node.addListener(EventListener.builder(ItemUpdateStateEvent.class).handler(event -> {
 			Player player = event.getPlayer();
 			ItemStack stack = event.getItemStack();
-			boolean infinite = player.isCreative() || EnchantmentUtils.getLevel(Enchantment.INFINITY, stack) > 0;
+			boolean infinite = player.getGameMode() == GameMode.CREATIVE || EnchantmentUtils.getLevel(Enchantment.INFINITY, stack) > 0;
 			
 			Pair<ItemStack, Integer> projectilePair = EntityUtils.getProjectile(player, Arrow.ARROW_PREDICATE);
 			ItemStack projectile = projectilePair.first();
@@ -315,7 +313,7 @@ public class ProjectileListener {
 					EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, 1);
 			
 			boolean reallyInfinite = infinite && projectile.material() == Material.ARROW;
-			if (reallyInfinite || player.isCreative()
+			if (reallyInfinite || player.getGameMode() == GameMode.CREATIVE
 					&& (projectile.material() == Material.SPECTRAL_ARROW
 					|| projectile.material() == Material.TIPPED_ARROW)) {
 				arrow.pickupMode = AbstractArrow.PickupMode.CREATIVE_ONLY;
@@ -335,7 +333,7 @@ public class ProjectileListener {
 					1.0f, 1.0f / (random.nextFloat() * 0.4f + 1.2f) + (float) power * 0.5f
 			), player);
 			
-			if (!reallyInfinite && !player.isCreative() && projectileSlot >= 0) {
+			if (!reallyInfinite && player.getGameMode() != GameMode.CREATIVE && projectileSlot >= 0) {
 				player.getInventory().setItemStack(projectileSlot,
 						projectile.withAmount(projectile.amount() - 1));
 			}
@@ -350,13 +348,12 @@ public class ProjectileListener {
 			if (quickCharge < 6) {
 				long useDuration = System.currentTimeMillis() - player.getTag(Tracker.ITEM_USE_START_TIME);
 				double power = getCrossbowPowerForTime(useDuration, stack);
-				if (!(power >= 1.0F) || stack.meta(CrossbowMeta.class).isCharged())
+				if (!(power >= 1.0F) || !stack.get(ItemComponent.CHARGED_PROJECTILES,List.of()).isEmpty())
 					return;
 			}
 			
 			stack = loadCrossbowProjectiles(player, stack);
 			if (stack == null) return;
-			stack = setCrossbowCharged(stack, true);
 			
 			ThreadLocalRandom random = ThreadLocalRandom.current();
 			ViewUtil.viewersAndSelf(player).playSound(Sound.sound(
@@ -423,7 +420,7 @@ public class ProjectileListener {
 						SoundEvent.ITEM_TRIDENT_THROW, Sound.Source.PLAYER,
 						1.0f, 1.0f
 				), trident);
-				if (!player.isCreative()) player.setItemInHand(event.getHand(), stack.consume(1));
+				if (player.getGameMode() != GameMode.CREATIVE) player.setItemInHand(event.getHand(), stack.consume(1));
 			}
 		}).filter(event -> event.getItemStack().material() == Material.TRIDENT).build());
 		
@@ -491,25 +488,19 @@ public class ProjectileListener {
 		return power;
 	}
 	
-	public static ItemStack setCrossbowCharged(ItemStack stack, boolean charged) {
-		return stack.withMeta(CrossbowMeta.class, meta -> meta.charged(charged));
-	}
-	
 	public static ItemStack setCrossbowProjectile(ItemStack stack, ItemStack projectile) {
-		return stack.withMeta(CrossbowMeta.class, meta -> meta.projectile(projectile));
+		return stack.with(ItemComponent.CHARGED_PROJECTILES, List.of(projectile));
 	}
 	
 	public static ItemStack setCrossbowProjectiles(ItemStack stack, ItemStack projectile1,
 	                                               ItemStack projectile2, ItemStack projectile3) {
-		return stack.withMeta(CrossbowMeta.class, meta -> meta.projectiles(projectile1, projectile2, projectile3));
+		return stack.with(ItemComponent.CHARGED_PROJECTILES, List.of(projectile1, projectile2, projectile3));
 	}
 	
 	public static boolean crossbowContainsProjectile(ItemStack stack, Material projectile) {
-		CrossbowMeta meta = stack.meta(CrossbowMeta.class);
-		if (meta.getProjectiles().get(0).material() == projectile) return true;
-		if (meta.getProjectiles().size() < 2) return false;
-		if (meta.getProjectiles().get(1).material() == projectile) return true;
-		return meta.getProjectiles().get(2).material() == projectile;
+		return stack.get(ItemComponent.CHARGED_PROJECTILES, List.of())
+				.stream()
+				.anyMatch(itemStack -> itemStack.material() == projectile);
 	}
 	
 	public static int getCrossbowUseDuration(ItemStack stack) {
@@ -538,7 +529,7 @@ public class ProjectileListener {
 		ItemStack projectile = pair.first();
 		int projectileSlot = pair.second();
 		
-		if (projectile.isAir() && player.isCreative()) {
+		if (projectile.isAir() && player.getGameMode() == GameMode.CREATIVE) {
 			projectile = Arrow.DEFAULT_ARROW;
 			projectileSlot = -1;
 		}
@@ -549,7 +540,7 @@ public class ProjectileListener {
 			stack = setCrossbowProjectile(stack, projectile);
 		}
 		
-		if (!player.isCreative() && projectileSlot >= 0) {
+		if (player.getGameMode() != GameMode.CREATIVE && projectileSlot >= 0) {
 			player.getInventory().setItemStack(projectileSlot, projectile.withAmount(projectile.amount() - 1));
 		}
 		
@@ -558,23 +549,23 @@ public class ProjectileListener {
 	
 	public static ItemStack performCrossbowShooting(Player player, Player.Hand hand, ItemStack stack,
 	                                           double power, double spread, boolean legacy) {
-		CrossbowMeta meta = stack.meta(CrossbowMeta.class);
-		ItemStack projectile = meta.getProjectiles().get(0);
+		List<ItemStack> projectiles = stack.get(ItemComponent.CHARGED_PROJECTILES);
+		ItemStack projectile = projectiles.get(0);
 		if (!projectile.isAir()) {
 			shootCrossbowProjectile(player, hand, stack, projectile, 1.0F, power, spread, 0.0F, legacy);
 		}
 		
-		if (meta.getProjectiles().size() > 2) {
+		if (projectiles.size() > 2) {
 			ThreadLocalRandom random = ThreadLocalRandom.current();
 			boolean firstHighPitch = random.nextBoolean();
 			float firstPitch = getRandomShotPitch(firstHighPitch, random);
 			float secondPitch = getRandomShotPitch(!firstHighPitch, random);
 			
-			projectile = meta.getProjectiles().get(1);
+			projectile = projectiles.get(1);
 			if (!projectile.isAir()) {
 				shootCrossbowProjectile(player, hand, stack, projectile, firstPitch, power, spread, -10.0F, legacy);
 			}
-			projectile = meta.getProjectiles().get(2);
+			projectile = projectiles.get(2);
 			if (!projectile.isAir()) {
 				shootCrossbowProjectile(player, hand, stack, projectile, secondPitch, power, spread, 10.0F, legacy);
 			}
@@ -590,7 +581,7 @@ public class ProjectileListener {
 		if (firework) return; //TODO firework
 		
 		AbstractArrow arrow = getCrossbowArrow(player, crossbowStack, projectile, legacy);
-		if (player.isCreative() || yaw != 0.0) {
+		if (player.getGameMode() == GameMode.CREATIVE || yaw != 0.0) {
 			arrow.pickupMode = AbstractArrow.PickupMode.CREATIVE_ONLY;
 		}
 		

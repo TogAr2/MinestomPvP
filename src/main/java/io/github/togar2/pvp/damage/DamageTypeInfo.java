@@ -4,6 +4,7 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
+import net.minestom.server.registry.DynamicRegistry;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +28,7 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 	}
 	
 	//TODO check source and add missing
-	public static final Map<DamageType, DamageTypeInfo> INFO_MAP = new HashMap<>() {
+	public static final Map<DynamicRegistry.Key<DamageType>, DamageTypeInfo> INFO_MAP = new HashMap<>() {
 		{
 			put(DamageType.IN_FIRE, new DamageTypeInfo().bypassesArmor(true).fire(true));
 			put(DamageType.ON_FIRE, new DamageTypeInfo().bypassesArmor(true).fire(true));

@@ -1,6 +1,7 @@
 package io.github.togar2.pvp.explosion;
 
 import io.github.togar2.pvp.damage.DamageTypeInfo;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.damage.Damage;
@@ -42,7 +43,7 @@ public class CrystalEntity extends LivingEntity {
 		
 		remove();
 		if (instance.getExplosionSupplier() != null
-				&& !DamageTypeInfo.of(damage.getType()).explosive()) {
+				&& !DamageTypeInfo.of(MinecraftServer.getDamageTypeRegistry().get(damage.getType())).explosive()) {
 			instance.explode((float) position.x(), (float) position.y(), (float) position.z(), 6.0f);
 		}
 		

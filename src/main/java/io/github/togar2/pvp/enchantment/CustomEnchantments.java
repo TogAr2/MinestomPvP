@@ -5,15 +5,16 @@ import io.github.togar2.pvp.enchantment.enchantments.ImpalingEnchantment;
 import io.github.togar2.pvp.enchantment.enchantments.ProtectionEnchantment;
 import io.github.togar2.pvp.enchantment.enchantments.ThornsEnchantment;
 import net.minestom.server.entity.EquipmentSlot;
-import net.minestom.server.item.Enchantment;
+import net.minestom.server.item.enchant.Enchantment;
+import net.minestom.server.registry.DynamicRegistry;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class CustomEnchantments {
-	private static final Map<Enchantment, CustomEnchantment> ENCHANTMENTS = new HashMap<>();
+	private static final Map<DynamicRegistry.Key<Enchantment>, CustomEnchantment> ENCHANTMENTS = new HashMap<>();
 	
-	public static CustomEnchantment get(Enchantment enchantment) {
+	public static CustomEnchantment get(DynamicRegistry.Key<Enchantment> enchantment) {
 		return ENCHANTMENTS.get(enchantment);
 	}
 	
@@ -48,7 +49,7 @@ public class CustomEnchantments {
 				new CustomEnchantment(Enchantment.KNOCKBACK, EquipmentSlot.MAIN_HAND),
 				new CustomEnchantment(Enchantment.FIRE_ASPECT, EquipmentSlot.MAIN_HAND),
 				new CustomEnchantment(Enchantment.LOOTING, EquipmentSlot.MAIN_HAND),
-				new CustomEnchantment(Enchantment.SWEEPING, EquipmentSlot.MAIN_HAND),
+				new CustomEnchantment(Enchantment.SWEEPING_EDGE, EquipmentSlot.MAIN_HAND),
 				new CustomEnchantment(Enchantment.EFFICIENCY, EquipmentSlot.MAIN_HAND),
 				new CustomEnchantment(Enchantment.SILK_TOUCH, EquipmentSlot.MAIN_HAND),
 				new CustomEnchantment(Enchantment.UNBREAKING, EquipmentSlot.MAIN_HAND),

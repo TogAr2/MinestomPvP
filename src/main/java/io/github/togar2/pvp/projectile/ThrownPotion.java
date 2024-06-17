@@ -12,9 +12,9 @@ import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.metadata.item.ThrownPotionMeta;
+import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import net.minestom.server.item.metadata.PotionMeta;
 import net.minestom.server.potion.Potion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,9 +48,8 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 	
 	public void splash(@Nullable Entity entity) {
 		ItemStack item = getItem();
-		
-		PotionMeta meta = item.meta(PotionMeta.class);
-		List<Potion> potions = PotionListener.getAllPotions(meta, legacy);
+
+		List<Potion> potions = PotionListener.getAllPotions(item.get(ItemComponent.POTION_CONTENTS), legacy);
 		
 		if (!potions.isEmpty()) {
 			if (item.material() == Material.LINGERING_POTION) {

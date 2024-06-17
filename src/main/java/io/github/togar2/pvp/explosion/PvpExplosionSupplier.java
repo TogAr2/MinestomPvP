@@ -3,6 +3,7 @@ package io.github.togar2.pvp.explosion;
 import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.entity.PvpPlayer;
 import io.github.togar2.pvp.events.ExplosionEvent;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.collision.CollisionUtils;
@@ -23,7 +24,6 @@ import net.minestom.server.instance.block.Block;
 import net.minestom.server.network.packet.server.play.ExplosionPacket;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jglrxavpok.hephaistos.nbt.NBTCompound;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -37,7 +37,7 @@ public final class PvpExplosionSupplier implements ExplosionSupplier {
 	
 	@Override
 	public Explosion createExplosion(float centerX, float centerY, float centerZ,
-	                                 float strength, @Nullable NBTCompound additionalData) {
+	                                 float strength, @Nullable CompoundBinaryTag additionalData) {
 		return new Explosion(centerX, centerY, centerZ, strength) {
 			private final Map<Player, Vec> playerKnockback = new HashMap<>();
 			
@@ -47,8 +47,8 @@ public final class PvpExplosionSupplier implements ExplosionSupplier {
 				ThreadLocalRandom random = ThreadLocalRandom.current();
 				
 				boolean breakBlocks = true;
-				if (additionalData != null && additionalData.contains("breakBlocks"))
-					breakBlocks = Objects.requireNonNull(additionalData.getByte("breakBlocks")) == (byte) 1;
+				if (additionalData != null && additionalData.keySet().contains("breakBlocks"))
+					breakBlocks = additionalData.getByte("breakBlocks") == (byte) 1;
 				
 				if (breakBlocks) {
 					for (int x = 0; x < 16; ++x) {
@@ -127,8 +127,8 @@ public final class PvpExplosionSupplier implements ExplosionSupplier {
 				Vec centerPoint = new Vec(this.getCenterX(), this.getCenterY(), this.getCenterZ());
 				
 				boolean anchor = false;
-				if (additionalData != null && additionalData.contains("anchor")) {
-					anchor = Boolean.TRUE.equals(additionalData.getBoolean("anchor"));
+				if (additionalData != null && additionalData.keySet().contains("anchor")) {
+					anchor = additionalData.getBoolean("anchor");
 				}
 				
 				Damage damageObj;
@@ -215,8 +215,8 @@ public final class PvpExplosionSupplier implements ExplosionSupplier {
 				}
 				playerKnockback.clear();
 				
-				if (additionalData != null && additionalData.contains("fire")) {
-					if (Boolean.TRUE.equals(additionalData.getBoolean("fire"))) {
+				if (additionalData != null && additionalData.keySet().contains("fire")) {
+					if (additionalData.getBoolean("fire")) {
 						ThreadLocalRandom random = ThreadLocalRandom.current();
 						for (Point point : blocks) {
 							if (random.nextInt(3) != 0
@@ -234,8 +234,8 @@ public final class PvpExplosionSupplier implements ExplosionSupplier {
 			
 			private LivingEntity getCausingEntity(Instance instance) {
 				LivingEntity causingEntity = null;
-				if (additionalData != null && additionalData.contains("causingEntity")) {
-					UUID causingUuid = UUID.fromString(Objects.requireNonNull(additionalData.getString("causingEntity")));
+				if (additionalData != null && additionalData.keySet().contains("causingEntity")) {
+					UUID causingUuid = UUID.fromString(additionalData.getString("causingEntity"));
 					causingEntity = (LivingEntity) instance.getEntities().stream()
 							.filter(entity -> entity instanceof LivingEntity
 									&& entity.getUuid().equals(causingUuid))

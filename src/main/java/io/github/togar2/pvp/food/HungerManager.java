@@ -5,6 +5,7 @@ import io.github.togar2.pvp.events.PlayerExhaustEvent;
 import io.github.togar2.pvp.events.PlayerRegenerateEvent;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.item.Material;
@@ -46,7 +47,7 @@ public class HungerManager {
 		if (config.isNaturalRegenerationEnabled()) {
 			int starvationTicks = player.getTag(STARVATION_TICKS);
 			if (!config.isLegacy() && player.getFoodSaturation() > 0 && player.getHealth() > 0
-					&& player.getHealth() < player.getMaxHealth() && player.getFood() >= 20) {
+					&& player.getHealth() < player.getAttributeValue(Attribute.GENERIC_MAX_HEALTH) && player.getFood() >= 20) {
 				starvationTicks++;
 				if (starvationTicks >= 10) {
 					float amount = Math.min(player.getFoodSaturation(), 6);
@@ -54,7 +55,7 @@ public class HungerManager {
 					starvationTicks = 0;
 				}
 			} else if (player.getFood() >= 18 && player.getHealth() > 0
-					&& player.getHealth() < player.getMaxHealth()) {
+					&& player.getHealth() < player.getAttributeValue(Attribute.GENERIC_MAX_HEALTH)) {
 				starvationTicks++;
 				if (starvationTicks >= 80) {
 					regenerate(player, 1, config.isLegacy() ? 3 : 6);

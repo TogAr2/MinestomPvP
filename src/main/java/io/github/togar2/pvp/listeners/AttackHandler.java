@@ -15,7 +15,6 @@ import io.github.togar2.pvp.utils.ItemUtils;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;
-import net.minestom.server.attribute.Attribute;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -23,6 +22,7 @@ import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.entity.metadata.other.ArmorStandMeta;
@@ -43,7 +43,7 @@ public class AttackHandler {
 	public static final Tag<Integer> SPECTATING = Tag.Integer("spectating");
 	
 	protected float getAttackCooldownProgressPerTick(Player player) {
-		return (1 / player.getAttributeValue(Attribute.ATTACK_SPEED)) * 20;
+		return (float) ((1 / player.getAttributeValue(Attribute.GENERIC_ATTACK_SPEED)) * 20);
 	}
 	
 	@SuppressWarnings({"UnstableApiUsage"})
@@ -186,7 +186,7 @@ public class AttackHandler {
 	
 	protected @Nullable AttackValues prepareAttack(LivingEntity attacker, Entity target,
 	                                                    AttackConfig config) {
-		float damage = attacker.getAttributeValue(Attribute.ATTACK_DAMAGE);
+		float damage = (float) attacker.getAttributeValue(Attribute.GENERIC_ATTACK_DAMAGE);
 		float enchantedDamage = EnchantmentUtils.getAttackDamage(
 				attacker.getItemInMainHand(),
 				target instanceof LivingEntity living ? EntityGroup.ofEntity(living) : EntityGroup.DEFAULT,
@@ -256,7 +256,7 @@ public class AttackHandler {
 		Pos previousPosition = EntityUtils.getPreviousPosition(attacker);
 		if (previousPosition == null) return false;
 		double lastMoveDistance = previousPosition.distance(attacker.getPosition()) * 0.6;
-		if (lastMoveDistance >= attacker.getAttributeValue(Attribute.MOVEMENT_SPEED)) return false;
+		if (lastMoveDistance >= attacker.getAttributeValue(Attribute.GENERIC_MOVEMENT_SPEED)) return false;
 		
 		Tool tool = Tool.fromMaterial(attacker.getItemInMainHand().material());
 		return tool != null && tool.isSword();
@@ -279,7 +279,7 @@ public class AttackHandler {
 			EventDispatcher.callCancellable(knockbackEvent, () -> {
 				LegacyKnockbackSettings settings = knockbackEvent.getSettings();
 				
-				float kbResistance = target.getAttributeValue(Attribute.KNOCKBACK_RESISTANCE);
+				float kbResistance = (float) target.getAttributeValue(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
 				double horizontal = settings.extraHorizontal() * (1 - kbResistance) * knockback;
 				double vertical = settings.extraVertical() * (1 - kbResistance) * knockback;
 				

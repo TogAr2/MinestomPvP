@@ -13,13 +13,13 @@ import io.github.togar2.pvp.utils.ItemUtils;
 import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
@@ -57,7 +57,7 @@ public class DamageHandler {
 		
 		Damage damage = event.getDamage();
 		float amount = damage.getAmount();
-		DamageTypeInfo typeInfo = DamageTypeInfo.of(damage.getType());
+		DamageTypeInfo typeInfo = DamageTypeInfo.of(MinecraftServer.getDamageTypeRegistry().get(damage.getType()));
 		if (event.getEntity() instanceof Player && typeInfo.shouldScaleWithDifficulty(damage))
 			amount = scaleWithDifficulty(amount);
 		
@@ -127,7 +127,7 @@ public class DamageHandler {
 		// Exhaustion from damage
 		if (config.isExhaustionEnabled() && amountBeforeProcessing != 0 && entity instanceof Player)
 			EntityUtils.addExhaustion((Player) entity,
-					(float) damage.getType().exhaustion() * (config.isLegacy() ? 3 : 1));
+					(float) MinecraftServer.getDamageTypeRegistry().get(damage.getType()).exhaustion() * (config.isLegacy() ? 3 : 1));
 		
 		if (register) entity.setTag(DamageHandler.LAST_DAMAGE_AMOUNT, amountBeforeProcessing);
 		
@@ -136,7 +136,7 @@ public class DamageHandler {
 			
 			entity.sendPacketToViewersAndSelf(new DamageEventPacket(
 					entity.getEntityId(),
-					damage.getType().id(),
+					MinecraftServer.getDamageTypeRegistry().getId(damage.getType()),
 					damage.getAttacker() == null ? 0 : damage.getAttacker().getEntityId() + 1,
 					damage.getSource() == null ? 0 : damage.getSource().getEntityId() + 1,
 					null
@@ -193,14 +193,14 @@ public class DamageHandler {
 		
 		// Play sound (copied from Minestom, because of complications with cancelling)
 		if (config.isSoundsEnabled() && sound != null) entity.sendPacketToViewersAndSelf(new SoundEffectPacket(
-				sound, null, entity instanceof Player ? Sound.Source.PLAYER : Sound.Source.HOSTILE,
+				sound, entity instanceof Player ? Sound.Source.PLAYER : Sound.Source.HOSTILE,
 				entity.getPosition(),
 				//TODO seed randomizing?
 				1.0f, 1.0f, 0
 		));
 		
 		if (death && !event.isCancelled()) {
-			EntityPreDeathEvent entityPreDeathEvent = new EntityPreDeathEvent(entity, damage.getType());
+			EntityPreDeathEvent entityPreDeathEvent = new EntityPreDeathEvent(entity, MinecraftServer.getDamageTypeRegistry().get(damage.getType()));
 			EventDispatcher.call(entityPreDeathEvent);
 			if (entityPreDeathEvent.isCancelled()) event.setCancelled(true);
 			if (entityPreDeathEvent.isCancelDeath()) amount = 0;
@@ -326,7 +326,7 @@ public class DamageHandler {
 			
 			LegacyKnockbackSettings settings = legacyKnockbackEvent.getSettings();
 			
-			float kbResistance = entity.getAttributeValue(Attribute.KNOCKBACK_RESISTANCE);
+			float kbResistance = (float) entity.getAttributeValue(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
 			double horizontal = settings.horizontal() * (1 - kbResistance);
 			double vertical = settings.vertical() * (1 - kbResistance);
 			Vec horizontalModifier = new Vec(finalDx, finalDz).normalize().mul(horizontal);
@@ -400,15 +400,15 @@ public class DamageHandler {
 		if (config.isArmorDisabled()) return amount;
 		if (typeInfo.bypassesArmor()) return amount;
 		
-		float armorValue = entity.getAttributeValue(Attribute.ARMOR);
+		float armorValue = (float) entity.getAttributeValue(Attribute.GENERIC_ARMOR);
 		if (config.isLegacy()) {
 			int armorMultiplier = 25 - (int) armorValue;
 			return (amount * (float) armorMultiplier) / 25;
 		} else {
 			return getDamageLeft(
 					amount, (float) Math.floor(armorValue),
-					entity.getAttributeValue(Attribute.ARMOR_TOUGHNESS)
-			);
+                    (float) entity.getAttributeValue(Attribute.GENERIC_ARMOR_TOUGHNESS)
+            );
 		}
 	}
 	

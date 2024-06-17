@@ -4,11 +4,14 @@ import io.github.togar2.pvp.config.ExplosionConfig;
 import io.github.togar2.pvp.config.PvPConfig;
 import io.github.togar2.pvp.utils.ItemUtils;
 import io.github.togar2.pvp.utils.ViewUtil;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.sound.Sound;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
+import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventNode;
@@ -21,7 +24,6 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.sound.SoundEvent;
 import org.jetbrains.annotations.Nullable;
-import org.jglrxavpok.hephaistos.nbt.NBT;
 
 public class ExplosionListener {
 	
@@ -41,7 +43,7 @@ public class ExplosionListener {
 			primeTnt(instance, position, player);
 			instance.setBlock(position, Block.AIR);
 			
-			if (!player.isCreative()) {
+			if (player.getGameMode() != GameMode.CREATIVE) {
 				if (stack.material() == Material.FLINT_AND_STEEL) {
 					ItemUtils.damageEquipment(player, event.getHand() == Player.Hand.MAIN
 							? EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, 1);
@@ -68,7 +70,7 @@ public class ExplosionListener {
 			CrystalEntity entity = new CrystalEntity();
 			entity.setInstance(instance, above.add(0.5, 0, 0.5));
 			
-			if (!event.getPlayer().isCreative())
+			if (event.getPlayer().getGameMode() != GameMode.CREATIVE)
 				event.getPlayer().setItemInHand(event.getHand(), event.getItemStack().consume(1));
 		});
 		
@@ -94,7 +96,7 @@ public class ExplosionListener {
 						1.0f, 1.0f
 				), event.getBlockPosition().add( 0.5, 0.5, 0.5));
 				
-				if (!player.isCreative())
+				if (player.getGameMode() != GameMode.CREATIVE)
 					player.setItemInHand(event.getHand(), player.getItemInHand(event.getHand()).consume(1));
 				
 				event.setBlockingItemUse(true);
@@ -103,14 +105,17 @@ public class ExplosionListener {
 			
 			if (charges == 0) return;
 			
-			if (instance.getExplosionSupplier() != null && !instance.getDimensionType().isRespawnAnchorSafe()) {
+			if (instance.getExplosionSupplier() != null && MinecraftServer.getDimensionTypeRegistry().get(instance.getDimensionType()).respawnAnchorWorks()) {
 				instance.setBlock(event.getBlockPosition(), Block.AIR);
 				instance.explode(
 						(float) (event.getBlockPosition().x() + 0.5),
 						(float) (event.getBlockPosition().y() + 0.5),
 						(float) (event.getBlockPosition().z() + 0.5),
 						5.0f,
-						NBT.Compound(NBT -> NBT.setByte("fire", (byte) 1).setByte("anchor", (byte) 1))
+						CompoundBinaryTag.builder()
+								.putByte("fire", (byte) 1)
+								.putByte("anchor", (byte) 1)
+								.build()
 				);
 			}
 			

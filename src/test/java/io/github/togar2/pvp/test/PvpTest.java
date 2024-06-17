@@ -8,10 +8,10 @@ import io.github.togar2.pvp.explosion.PvpExplosionSupplier;
 import io.github.togar2.pvp.test.commands.Commands;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.attribute.Attribute;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.*;
+import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.entity.damage.EntityDamage;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.GlobalEventHandler;
@@ -35,10 +35,10 @@ public class PvpTest {
 		//MinestomFluids.init();
 		//VelocityProxy.enable("tj7MulOtnIDe");
 		
-		DimensionType fullbright = DimensionType.builder(NamespaceID.from("idk")).ambientLight(1.0f).build();
-		MinecraftServer.getDimensionTypeManager().addDimension(fullbright);
+		DimensionType fullbright = DimensionType.builder().ambientLight(1.0f).build();
+		MinecraftServer.getDimensionTypeRegistry().register(NamespaceID.from("idk"), fullbright);
 		
-		Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(fullbright);
+		Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(MinecraftServer.getDimensionTypeRegistry().getKey(fullbright));
 		instance.setGenerator(new DemoGenerator());
 		instance.enableAutoChunkLoad(true);
 		
@@ -49,7 +49,7 @@ public class PvpTest {
 			
 			EntityCreature entity = new EntityCreature(EntityType.ZOMBIE);
 			entity.setInstance(instance, spawn);
-			entity.getAttribute(Attribute.MAX_HEALTH).setBaseValue(500);
+			entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(500);
 			entity.heal();
 
 			MinecraftServer.getSchedulerManager().buildTask(() -> {

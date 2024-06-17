@@ -10,8 +10,9 @@ import net.minestom.server.entity.*;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.entity.metadata.projectile.ThrownTridentMeta;
-import net.minestom.server.item.Enchantment;
+import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
+import net.minestom.server.item.enchant.Enchantment;
 import net.minestom.server.sound.SoundEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,7 +31,7 @@ public class ThrownTrident extends AbstractArrow {
 		ThrownTridentMeta meta = ((ThrownTridentMeta) getEntityMeta());
 		meta.setLoyaltyLevel(
 				EnchantmentUtils.getLevel(Enchantment.LOYALTY, tridentItem));
-		meta.setHasEnchantmentGlint(!tridentItem.meta().getEnchantmentMap().isEmpty());
+		meta.setHasEnchantmentGlint(!tridentItem.get(ItemComponent.ENCHANTMENTS).enchantments().isEmpty());
 	}
 	
 	@Override

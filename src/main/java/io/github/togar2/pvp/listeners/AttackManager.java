@@ -2,6 +2,7 @@ package io.github.togar2.pvp.listeners;
 
 import io.github.togar2.pvp.config.AttackConfig;
 import io.github.togar2.pvp.config.PvPConfig;
+import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.events.PlayerSpectateEvent;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.GameMode;
@@ -55,7 +56,7 @@ public class AttackManager {
 	public static void spectateTick(Player player) {
 		Integer spectatingId = player.getTag(AttackHandler.SPECTATING);
 		if (spectatingId == null) return;
-		Entity spectating = Entity.getEntity(spectatingId);
+		Entity spectating = EntityUtils.findEntityById(spectatingId);
 		if (spectating == null || spectating == player) return;
 		
 		// This is to make sure other players don't see the player standing still while spectating

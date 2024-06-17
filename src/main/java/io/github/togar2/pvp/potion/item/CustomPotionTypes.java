@@ -23,7 +23,7 @@ public class CustomPotionTypes {
 	
 	public static void registerAll() {
 		register(
-				new CustomPotionType(PotionType.EMPTY),
+				new CustomPotionType(PotionType.MUNDANE),
 				new CustomPotionType(PotionType.WATER),
 				new CustomPotionType(PotionType.MUNDANE),
 				new CustomPotionType(PotionType.THICK),

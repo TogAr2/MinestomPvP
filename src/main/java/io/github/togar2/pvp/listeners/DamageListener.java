@@ -8,6 +8,7 @@ import io.github.togar2.pvp.entity.Tracker;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
@@ -20,7 +21,9 @@ import net.minestom.server.event.entity.EntityTickEvent;
 import net.minestom.server.event.player.PlayerDeathEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
+import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
+import net.minestom.server.registry.DynamicRegistry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -72,7 +75,7 @@ public class DamageListener {
 			return Component.translatable("death.attack.badRespawnPoint.message", killed.getName(), BAD_RESPAWN_POINT_MESSAGE);
 		}
 		
-		String id = "death.attack." + damage.getType().messageId();
+		String id = "death.attack." + MinecraftServer.getDamageTypeRegistry().get(damage.getType()).messageId();
 		
 		Entity source = damage.getSource();
 		Entity attacker = damage.getAttacker();
@@ -80,8 +83,8 @@ public class DamageListener {
 		if (source != null) {
 			Component ownerName = attacker == null ? EntityUtils.getName(source) : EntityUtils.getName(attacker);
 			ItemStack weapon = source instanceof LivingEntity living ? living.getItemInMainHand() : ItemStack.AIR;
-			if (!weapon.isAir() && weapon.getDisplayName() != null) {
-				return Component.translatable(id + ".item", EntityUtils.getName(killed), ownerName, weapon.getDisplayName());
+			if (!weapon.isAir() && weapon.get(ItemComponent.CUSTOM_NAME) != null) {
+				return Component.translatable(id + ".item", EntityUtils.getName(killed), ownerName, weapon.get(ItemComponent.CUSTOM_NAME));
 			} else {
 				return Component.translatable(id, EntityUtils.getName(killed), ownerName);
 			}
@@ -101,7 +104,7 @@ public class DamageListener {
 		if (killer == null) {
 			Integer lastDamagedById = killed.getTag(DamageHandler.LAST_DAMAGED_BY);
 			if (lastDamagedById != null) {
-				Entity entity = Entity.getEntity(lastDamagedById);
+				Entity entity = EntityUtils.findEntityById(lastDamagedById);
 				if (entity instanceof LivingEntity living) killer = living;
 			}
 		}
@@ -109,8 +112,8 @@ public class DamageListener {
 		return killer;
 	}
 	
-	private static void displayAnimation(LivingEntity entity, DamageType type, DamageTypeInfo typeInfo,
-	                                     boolean shield, DamageConfig config) {
+	private static void displayAnimation(LivingEntity entity, DynamicRegistry.Key<DamageType> type, DamageTypeInfo typeInfo,
+										 boolean shield, DamageConfig config) {
 		if (shield) {
 			entity.triggerStatus((byte) 29);
 			return;

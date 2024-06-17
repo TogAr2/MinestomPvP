@@ -8,10 +8,7 @@ import net.kyori.adventure.sound.Sound;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
-import net.minestom.server.entity.Entity;
-import net.minestom.server.entity.EntityType;
-import net.minestom.server.entity.LivingEntity;
-import net.minestom.server.entity.Player;
+import net.minestom.server.entity.*;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.entity.metadata.projectile.AbstractArrowMeta;
@@ -47,7 +44,7 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 		super(shooter, entityType);
 		
 		if (shooter instanceof Player) {
-			pickupMode = ((Player) shooter).isCreative() ? PickupMode.CREATIVE_ONLY : PickupMode.ALLOWED;
+			pickupMode = ((Player) shooter).getGameMode() == GameMode.CREATIVE ? PickupMode.CREATIVE_ONLY : PickupMode.ALLOWED;
 		}
 	}
 	
@@ -238,13 +235,13 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 		
 		return switch (pickupMode) {
 			case ALLOWED -> true;
-			case CREATIVE_ONLY -> player == null || player.isCreative();
+			case CREATIVE_ONLY -> player == null || player.getGameMode() == GameMode.CREATIVE;
 			default -> false;
 		};
 	}
 	
 	public boolean pickup(Player player) {
-		return player.isCreative() || player.getInventory().addItemStack(getPickupItem());
+		return player.getGameMode() == GameMode.CREATIVE || player.getInventory().addItemStack(getPickupItem());
 	}
 	
 	protected abstract ItemStack getPickupItem();

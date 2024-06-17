@@ -3,21 +3,21 @@ package io.github.togar2.pvp.potion.effect;
 import io.github.togar2.pvp.entity.EntityGroup;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.food.HungerManager;
-import net.minestom.server.attribute.Attribute;
-import net.minestom.server.attribute.AttributeInstance;
-import net.minestom.server.attribute.AttributeModifier;
-import net.minestom.server.attribute.AttributeOperation;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.attribute.Attribute;
+import net.minestom.server.entity.attribute.AttributeInstance;
+import net.minestom.server.entity.attribute.AttributeModifier;
+import net.minestom.server.entity.attribute.AttributeOperation;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.potion.PotionEffect;
+import net.minestom.server.utils.NamespaceID;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class CustomPotionEffect {
 	public static final int PERMANENT = 32767;
@@ -40,21 +40,21 @@ public class CustomPotionEffect {
 		return color;
 	}
 	
-	public CustomPotionEffect addAttributeModifier(Attribute attribute, String uuid, float amount, AttributeOperation operation) {
-		attributeModifiers.put(attribute, new AttributeModifier(UUID.fromString(uuid), potionEffect.name(), amount, operation));
+	public CustomPotionEffect addAttributeModifier(Attribute attribute, NamespaceID namespaceID, float amount, AttributeOperation operation) {
+		attributeModifiers.put(attribute, new AttributeModifier(namespaceID, amount, operation));
 		return this;
 	}
 	
-	public CustomPotionEffect addLegacyAttributeModifier(Attribute attribute, String uuid, float amount, AttributeOperation operation) {
+	public CustomPotionEffect addLegacyAttributeModifier(Attribute attribute, NamespaceID namespaceID, float amount, AttributeOperation operation) {
 		if (legacyAttributeModifiers == null)
 			legacyAttributeModifiers = new HashMap<>();
-		legacyAttributeModifiers.put(attribute, new AttributeModifier(UUID.fromString(uuid), potionEffect.name(), amount, operation));
+		legacyAttributeModifiers.put(attribute, new AttributeModifier(namespaceID, amount, operation));
 		return this;
 	}
 	
 	public void applyUpdateEffect(LivingEntity entity, byte amplifier, boolean legacy) {
 		if (potionEffect == PotionEffect.REGENERATION) {
-			if (entity.getHealth() < entity.getMaxHealth()) {
+			if (entity.getHealth() < entity.getAttributeValue(Attribute.GENERIC_MAX_HEALTH)) {
 				entity.setHealth(entity.getHealth() + 1);
 			}
 			return;
@@ -149,7 +149,7 @@ public class CustomPotionEffect {
 		modifiers.forEach((attribute, modifier) -> {
 			AttributeInstance instance = entity.getAttribute(attribute);
 			instance.removeModifier(modifier);
-			instance.addModifier(new AttributeModifier(modifier.getId(), potionEffect.name() + " " + amplifier, adjustModifierAmount(amplifier, modifier), modifier.getOperation()));
+			instance.addModifier(new AttributeModifier(modifier.id(), adjustModifierAmount(amplifier, modifier), modifier.operation()));
 		});
 	}
 	
@@ -166,6 +166,6 @@ public class CustomPotionEffect {
 	}
 	
 	private double adjustModifierAmount(byte amplifier, AttributeModifier modifier) {
-		return modifier.getAmount() * (amplifier + 1);
+		return modifier.amount() * (amplifier + 1);
 	}
 }

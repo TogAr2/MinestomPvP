@@ -3,7 +3,7 @@ package io.github.togar2.pvp.enchantment.enchantments;
 import io.github.togar2.pvp.enchantment.CustomEnchantment;
 import io.github.togar2.pvp.entity.EntityGroup;
 import net.minestom.server.entity.EquipmentSlot;
-import net.minestom.server.item.Enchantment;
+import net.minestom.server.item.enchant.Enchantment;
 
 public class ImpalingEnchantment extends CustomEnchantment {
 	public ImpalingEnchantment(EquipmentSlot... slotTypes) {
@@ -11,7 +11,7 @@ public class ImpalingEnchantment extends CustomEnchantment {
 	}
 	
 	@Override
-	public float getAttackDamage(short level, EntityGroup group, boolean legacy) {
+	public float getAttackDamage(int level, EntityGroup group, boolean legacy) {
 		return group == EntityGroup.AQUATIC ? (float) level * 2.5F : 0.0F;
 	}
 }

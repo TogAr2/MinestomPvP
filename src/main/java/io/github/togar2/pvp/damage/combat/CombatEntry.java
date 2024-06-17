@@ -3,6 +3,7 @@ package io.github.togar2.pvp.damage.combat;
 import io.github.togar2.pvp.damage.DamageTypeInfo;
 import io.github.togar2.pvp.entity.EntityUtils;
 import net.kyori.adventure.text.Component;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.damage.Damage;
@@ -15,7 +16,7 @@ public record CombatEntry(Damage damage, @Nullable String fallLocation, double f
 	}
 	
 	public double getFallDistance() {
-		DamageTypeInfo info = DamageTypeInfo.of(damage.getType());
+		DamageTypeInfo info = DamageTypeInfo.of(MinecraftServer.getDamageTypeRegistry().get(damage.getType()));
 		return info.outOfWorld() ? Double.MAX_VALUE : fallDistance;
 	}
 	

@@ -7,46 +7,46 @@ import io.github.togar2.pvp.events.EquipmentDamageEvent;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.event.EventDispatcher;
-import net.minestom.server.item.Enchantment;
+import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
+import net.minestom.server.item.enchant.Enchantment;
 
 import java.util.function.Consumer;
 
 public class ItemUtils {
 	
 	public static ItemStack damage(ItemStack stack, int amount) {
-		if (amount == 0 || stack.material().registry().maxDamage() <= 0)
+		if (amount == 0 || stack.material().prototype().get(ItemComponent.MAX_DAMAGE) <= 0)
 			return stack;
-		
-		return stack.withMeta(meta -> {
-			int unbreaking = EnchantmentUtils.getLevel(Enchantment.UNBREAKING, stack);
-			int preventAmount = 0;
-			int newAmount = amount;
-			
-			if (unbreaking > 0) {
-				for (int i = 0; i < newAmount; i++) {
-					if (EnchantmentUtils.shouldNotBreak(stack, unbreaking)) {
-						preventAmount++;
-					}
+
+		int unbreaking = EnchantmentUtils.getLevel(Enchantment.UNBREAKING, stack);
+		int preventAmount = 0;
+		int newAmount = amount;
+
+		if (unbreaking > 0) {
+			for (int i = 0; i < newAmount; i++) {
+				if (EnchantmentUtils.shouldNotBreak(stack, unbreaking)) {
+					preventAmount++;
 				}
 			}
-			
-			newAmount -= preventAmount;
-			if (newAmount <= 0) return;
-			
-			meta.damage(stack.meta().getDamage() + newAmount);
-		});
+		}
+
+		newAmount -= preventAmount;
+		if (newAmount <= 0) return stack;
+		
+		int newDamage = stack.get(ItemComponent.DAMAGE) + newAmount;
+		return stack.with(ItemComponent.DAMAGE, newDamage);
 	}
 	
 	public static <T extends LivingEntity> ItemStack damage(ItemStack stack, int amount,
 	                                                        T entity, Consumer<T> breakCallback) {
-		if (amount == 0 || stack.material().registry().maxDamage() <= 0)
+		if (amount == 0 || stack.material().prototype().get(ItemComponent.MAX_DAMAGE) <= 0)
 			return stack;
 		
 		ItemStack newStack = damage(stack, amount);
-		if (newStack.meta().getDamage() >= stack.material().registry().maxDamage()) {
+		if (newStack.get(ItemComponent.DAMAGE) >= stack.material().prototype().get(ItemComponent.MAX_DAMAGE)) {
 			breakCallback.accept(entity);
-			newStack = newStack.withAmount(i -> i - 1).withMeta(meta -> meta.damage(0));
+			newStack = newStack.withAmount(i -> i - 1).with(ItemComponent.DAMAGE, 0);
 		}
 		
 		return newStack;

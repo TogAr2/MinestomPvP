@@ -29,9 +29,10 @@ import net.minestom.server.event.item.ItemUpdateStateEvent;
 import net.minestom.server.event.player.PlayerPreEatEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
+import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import net.minestom.server.item.metadata.PotionMeta;
+import net.minestom.server.item.component.PotionContents;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.PotionType;
@@ -139,7 +140,7 @@ public class PotionListener {
 			
 			FoodListener.triggerEatSounds(player, null);
 			
-			List<Potion> potions = getAllPotions(stack.meta(PotionMeta.class), config.isLegacy());
+			List<Potion> potions = getAllPotions(stack.get(ItemComponent.POTION_CONTENTS), config.isLegacy());
 			
 			//Apply the potions
 			for (Potion potion : potions) {
@@ -153,7 +154,7 @@ public class PotionListener {
 				}
 			}
 			
-			if (!player.isCreative()) {
+			if (player.getGameMode() != GameMode.CREATIVE) {
 				if (stack.amount() == 1) {
 					player.setItemInHand(event.getHand(), GLASS_BOTTLE);
 				} else {
@@ -202,7 +203,7 @@ public class PotionListener {
 		thrownPotion.setVelocity(thrownPotion.getVelocity().add(playerVel.x(),
 				player.isOnGround() ? 0.0D : playerVel.y(), playerVel.z()));
 		
-		if (!player.isCreative()) {
+		if (player.getGameMode() != GameMode.CREATIVE) {
 			player.setItemInHand(hand, stack.withAmount(stack.amount() - 1));
 		}
 	}
@@ -238,7 +239,7 @@ public class PotionListener {
 			LivingEntityMeta meta = (LivingEntityMeta) entity.getEntityMeta();
 			
 			meta.setPotionEffectAmbient(potionVisibilityEvent.isAmbient());
-			meta.setPotionEffectColor(potionVisibilityEvent.getColor());
+			// meta.setPotionEffectColor(potionVisibilityEvent.getColor()); // TODO changed in 1.21, I don't know what it is now
 			meta.setInvisible(potionVisibilityEvent.isInvisible());
 		});
 	}
@@ -256,12 +257,25 @@ public class PotionListener {
 	}
 	
 	public static int getColor(ItemStack stack, boolean legacy) {
+		PotionContents potionContents = stack.get(ItemComponent.POTION_CONTENTS);
+		if (potionContents.customColor() != null) {
+			int red = potionContents.customColor().red();
+			int green = potionContents.customColor().green();
+			int blue = potionContents.customColor().blue();
+			
+			return (red << 16) | (green << 8) | blue;
+		} else {
+			return potionContents.potion() == PotionType.MUNDANE ? 16253176 : getPotionColor(getAllPotions(potionContents, legacy));
+		}
+		/*
 		PotionMeta meta = stack.meta(PotionMeta.class);
 		if (meta.getColor() != null) {
 			return meta.getColor().asRGB();
 		} else {
 			return meta.getPotionType() == PotionType.EMPTY ? 16253176 : getPotionColor(getAllPotions(meta, legacy));
 		}
+		
+		 */
 	}
 	
 	public static int getPotionColor(Collection<Potion> effects) {
@@ -296,8 +310,8 @@ public class PotionListener {
 		}
 	}
 	
-	public static List<Potion> getAllPotions(PotionMeta meta, boolean legacy) {
-		return getAllPotions(meta.getPotionType(), meta.getCustomPotionEffects(), legacy);
+	public static List<Potion> getAllPotions(PotionContents potionContents, boolean legacy) {
+		return getAllPotions(potionContents.potion(), potionContents.customEffects(), legacy);
 	}
 	
 	public static List<Potion> getAllPotions(PotionType potionType,
@@ -312,7 +326,7 @@ public class PotionListener {
 		}
 		
 		potions.addAll(customEffects.stream().map((customPotion) ->
-				new Potion(Objects.requireNonNull(PotionEffect.fromId(customPotion.id())),
+				new Potion(Objects.requireNonNull(customPotion.id()),
 						customPotion.amplifier(), customPotion.duration(),
 						createFlags(
 								customPotion.isAmbient(),

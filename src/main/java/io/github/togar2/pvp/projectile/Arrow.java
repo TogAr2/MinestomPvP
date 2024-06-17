@@ -5,14 +5,16 @@ import io.github.togar2.pvp.potion.effect.CustomPotionEffect;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
 import io.github.togar2.pvp.potion.item.CustomPotionType;
 import io.github.togar2.pvp.potion.item.CustomPotionTypes;
+import net.kyori.adventure.util.RGBLike;
 import net.minestom.server.color.Color;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.metadata.projectile.ArrowMeta;
+import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import net.minestom.server.item.metadata.PotionMeta;
+import net.minestom.server.item.component.PotionContents;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.PotionType;
@@ -32,25 +34,25 @@ public class Arrow extends AbstractArrow {
 			stack.material() == Material.FIREWORK_ROCKET);
 	
 	private final boolean legacy;
-	private PotionMeta potion;
+	private PotionContents potion;
 	private boolean fixedColor;
 	
 	public Arrow(@Nullable Entity shooter, boolean legacy) {
 		super(shooter, EntityType.ARROW);
 		this.legacy = legacy;
-		this.potion = new PotionMeta(new PotionMeta.Builder().potionType(PotionType.EMPTY));
+		this.potion = new PotionContents(PotionType.MUNDANE);
 	}
 	
 	public void inheritEffects(ItemStack stack) {
-		if (stack.material() == Material.TIPPED_ARROW) {
-			PotionMeta potionMeta = new PotionMeta(stack.meta());
-			PotionType potionType = potionMeta.getPotionType();
-			List<net.minestom.server.potion.CustomPotionEffect> customEffects = potionMeta.getCustomPotionEffects();
-			Color color = potionMeta.getColor();
+		if (stack.material() == Material.TIPPED_ARROW && stack.has(ItemComponent.POTION_CONTENTS)) {
+			PotionContents potionContents = new PotionContents(stack.get(ItemComponent.POTION_CONTENTS).potion());
+			PotionType potionType = potionContents.potion();
+			List<net.minestom.server.potion.CustomPotionEffect> customEffects = potionContents.customEffects();
+			RGBLike color = potionContents.customColor();
 			
 			if (color == null) {
 				fixedColor = false;
-				if (potionType == PotionType.EMPTY && customEffects.isEmpty()) {
+				if (potionType == PotionType.MUNDANE && customEffects.isEmpty()) {
 					setColor(-1);
 				} else {
 					setColor(PotionListener.getPotionColor(
@@ -58,17 +60,20 @@ public class Arrow extends AbstractArrow {
 				}
 			} else {
 				fixedColor = true;
-				setColor(color.asRGB());
+				
+				int red = color.red();
+				int green = color.green();
+				int blue = color.blue();
+				
+				setColor((red << 16) | (green << 8) | blue);
 			}
 			
-			PotionMeta.Builder builder = new PotionMeta.Builder().effects(customEffects);
-			builder.potionType(potionType);
-			potion = new PotionMeta(builder);
+			potion = new PotionContents(potionType, null, customEffects);
 		} else if (stack.material() == Material.ARROW) {
 			fixedColor = false;
 			setColor(-1);
 			
-			potion = new PotionMeta(new PotionMeta.Builder().potionType(PotionType.EMPTY));
+			potion = new PotionContents(PotionType.MUNDANE);
 		}
 	}
 	
@@ -76,19 +81,19 @@ public class Arrow extends AbstractArrow {
 	public void update(long time) {
 		super.update(time);
 		
-		if (onGround && stuckTime >= 600 && !potion.getCustomPotionEffects().isEmpty()) {
+		if (onGround && stuckTime >= 600 && !potion.customEffects().isEmpty()) {
 			triggerStatus((byte) 0);
 			
 			fixedColor = false;
 			setColor(-1);
 			
-			potion = new PotionMeta(new PotionMeta.Builder().potionType(PotionType.EMPTY));
+			potion = new PotionContents(PotionType.MUNDANE);
 		}
 	}
 	
 	@Override
 	protected void onHurt(LivingEntity entity) {
-		CustomPotionType customPotionType = CustomPotionTypes.get(potion.getPotionType());
+		CustomPotionType customPotionType = CustomPotionTypes.get(potion.potion());
 		if (customPotionType != null) {
 			for (Potion potion : legacy ? customPotionType.getLegacyEffects() : customPotionType.getEffects()) {
 				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.effect());
@@ -102,10 +107,10 @@ public class Arrow extends AbstractArrow {
 			}
 		}
 		
-		if (potion.getCustomPotionEffects().isEmpty()) return;
+		if (potion.customEffects().isEmpty()) return;
 		
-		potion.getCustomPotionEffects().stream().map(customPotion ->
-				new Potion(Objects.requireNonNull(PotionEffect.fromId(customPotion.id())),
+		potion.customEffects().stream().map(customPotion ->
+				new Potion(Objects.requireNonNull(customPotion.id()),
 						customPotion.amplifier(), customPotion.duration(),
 						PotionListener.createFlags(
 								customPotion.isAmbient(),
@@ -126,27 +131,18 @@ public class Arrow extends AbstractArrow {
 	
 	@Override
 	protected ItemStack getPickupItem() {
-		if (potion.getPotionType() == PotionType.EMPTY && potion.getCustomPotionEffects().isEmpty()) {
+		if (potion.potion() == PotionType.MUNDANE && potion.customEffects().isEmpty()) {
 			return DEFAULT_ARROW;
 		}
 		
-		return ItemStack.builder(Material.TIPPED_ARROW).meta(PotionMeta.class, meta -> {
-			if (potion.getPotionType() != PotionType.EMPTY) {
-				meta.potionType(potion.getPotionType());
-			}
-			if (!potion.getCustomPotionEffects().isEmpty()) {
-				meta.effects(potion.getCustomPotionEffects());
-			}
-			if (fixedColor) {
-				meta.color(new Color(getColor()));
-			}
-		}).build();
+		return ItemStack.of(Material.TIPPED_ARROW).with(ItemComponent.POTION_CONTENTS, new PotionContents(
+				potion.potion(), fixedColor ? new Color(getColor()) : null, potion.customEffects()));
 	}
 	
 	public void addPotion(net.minestom.server.potion.CustomPotionEffect effect) {
-		potion.getCustomPotionEffects().add(effect);
+		potion.customEffects().add(effect);
 		setColor(PotionListener.getPotionColor(
-				PotionListener.getAllPotions(potion.getPotionType(), potion.getCustomPotionEffects(), legacy)));
+				PotionListener.getAllPotions(potion.potion(), potion.customEffects(), legacy)));
 	}
 	
 	private void setColor(int color) {

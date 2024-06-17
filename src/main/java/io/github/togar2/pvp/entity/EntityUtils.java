@@ -16,7 +16,7 @@ import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
 import net.minestom.server.entity.metadata.projectile.AbstractArrowMeta;
 import net.minestom.server.event.EventDispatcher;
-import net.minestom.server.event.entity.EntityFireEvent;
+import net.minestom.server.event.entity.EntitySetFireEvent;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
@@ -26,7 +26,6 @@ import net.minestom.server.utils.inventory.PlayerInventoryUtils;
 import net.minestom.server.utils.time.TimeUnit;
 
 import java.lang.reflect.Field;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -35,17 +34,17 @@ import java.util.function.Predicate;
 public class EntityUtils {
 	public static final Tag<Long> FIRE_EXTINGUISH_TIME = Tag.Long("fireExtinguishTime");
 	
-	public static void setFireForDuration(Entity entity, Duration duration) {
+	public static void setFireForTicks(Entity entity, int ticks) {
 		if (entity instanceof LivingEntity) {
-			((LivingEntity) entity).setFireForDuration(duration);
+			((LivingEntity) entity).setFireTicks(ticks);
 			return;
 		}
 		
-		EntityFireEvent entityFireEvent = new EntityFireEvent(entity, duration);
+		EntitySetFireEvent entityFireEvent = new EntitySetFireEvent(entity, ticks);
 		
 		// Do not start fire event if the fire needs to be removed (< 0 duration)
-		if (duration.toMillis() > 0) {
-			EventDispatcher.callCancellable(entityFireEvent, () -> entity.setOnFire(true));
+		if (ticks > 0) {
+			EventDispatcher.callCancellable(entityFireEvent, () -> entity.getEntityMeta().setOnFire(true));
 		}
 		// FIRE_EXTINGUISH_TIME is updated by event listener
 	}
@@ -58,11 +57,10 @@ public class EntityUtils {
 		if (living) {
 			ticks = ProtectionEnchantment.transformFireDuration(livingEntity, ticks);
 		}
-		int millis = ticks * MinecraftServer.TICK_MS;
 		
 		long fireExtinguishTime = entity.hasTag(FIRE_EXTINGUISH_TIME) ? entity.getTag(FIRE_EXTINGUISH_TIME) : 0;
-		if (System.currentTimeMillis() + millis > fireExtinguishTime) {
-			setFireForDuration(entity, Duration.ofMillis(millis));
+		if (entity.getAliveTicks() + ticks > fireExtinguishTime) {
+			setFireForTicks(entity, ticks);
 		}
 	}
 	
@@ -156,7 +154,7 @@ public class EntityUtils {
 			if (allSupportedPredicate.test(stack)) return Pair.of(stack, i);
 		}
 		
-		return player.isCreative() ? Pair.of(Arrow.DEFAULT_ARROW, -1) : Pair.of(ItemStack.AIR, -1);
+		return player.getGameMode() == GameMode.CREATIVE ? Pair.of(Arrow.DEFAULT_ARROW, -1) : Pair.of(ItemStack.AIR, -1);
 	}
 	
 	private static Pair<ItemStack, Integer> getHeldItem(Player player, Predicate<ItemStack> predicate) {
@@ -176,7 +174,7 @@ public class EntityUtils {
 		boolean success = false;
 		int lowestY = to.blockY();
 		if (lowestY == 0) lowestY++;
-		while (lowestY > instance.getDimensionType().getMinY()) {
+		while (lowestY > MinecraftServer.getDimensionTypeRegistry().get(instance.getDimensionType()).minY()) {
 			Block block = instance.getBlock(to.blockX(), lowestY - 1, to.blockZ());
 			if (!block.isAir() && !block.isLiquid()) {
 				Block above = instance.getBlock(to.blockX(), lowestY, to.blockZ());
@@ -236,5 +234,14 @@ public class EntityUtils {
 		} catch (NoSuchFieldException | IllegalAccessException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static Entity findEntityById(int id) {
+		for (Instance instance : MinecraftServer.getInstanceManager().getInstances()) {
+			Entity entity = instance.getEntityById(id);
+			if (entity != null) return entity;
+		}
+		
+		return null;
 	}
 }

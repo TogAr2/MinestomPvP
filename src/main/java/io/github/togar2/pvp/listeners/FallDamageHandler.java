@@ -12,7 +12,6 @@ import net.minestom.server.gamedata.tags.Tag;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
-import net.minestom.server.particle.data.BlockParticleData;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.TimedPotion;
 import net.minestom.server.sound.SoundEvent;
@@ -48,7 +47,7 @@ public class FallDamageHandler {
 				int particleCount = (int) (150 * particleMultiplier);
 				
 				entity.sendPacketToViewersAndSelf(new ParticlePacket(
-						Particle.BLOCK.withData(new BlockParticleData(block)),
+						Particle.BLOCK.withBlock(block),
 						false,
 						newPosition.x(), newPosition.y(), newPosition.z(),
 						0, 0, 0,

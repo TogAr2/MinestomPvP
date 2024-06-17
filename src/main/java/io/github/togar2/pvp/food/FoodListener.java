@@ -8,6 +8,7 @@ import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
@@ -18,6 +19,7 @@ import net.minestom.server.event.player.PlayerPreEatEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.trait.PlayerInstanceEvent;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.sound.SoundEvent;
@@ -46,14 +48,14 @@ public class FoodListener {
 			FoodComponent foodComponent = FoodComponents.fromMaterial(event.getItemStack().material());
 			
 			//If no food, or if the players hunger is full and the food is not always edible, cancel
-			if (foodComponent == null || (!event.getPlayer().isCreative()
+			if (foodComponent == null || (event.getPlayer().getGameMode() != GameMode.CREATIVE
 					&& !foodComponent.isAlwaysEdible() && event.getPlayer().getFood() == 20)) {
 				event.setCancelled(true);
 				return;
 			}
 			
 			event.setEatingTime((long) getUseTime(foodComponent) * MinecraftServer.TICK_MS);
-		}).filter(event -> event.getItemStack().material().isFood()).build());
+		}).filter(event -> event.getItemStack().has(ItemComponent.FOOD)).build());
 		
 		node.addListener(EventListener.builder(ItemUpdateStateEvent.class).handler(event -> {
 			if (!event.getPlayer().isEating()) return; // Temporary hack, waiting on Minestom PR #2128
@@ -87,7 +89,7 @@ public class FoodListener {
 			
 			if (component.getBehaviour() != null) component.getBehaviour().onEat(player, stack);
 			
-			if (!player.isCreative()) {
+			if (player.getGameMode() != GameMode.CREATIVE) {
 				ItemStack leftOver = component.getBehaviour() != null ? component.getBehaviour().getLeftOver() : null;
 				if (leftOver != null) {
 					if (stack.amount() == 1) {
@@ -100,7 +102,7 @@ public class FoodListener {
 					event.getPlayer().setItemInHand(event.getHand(), stack.withAmount(stack.amount() - 1));
 				}
 			}
-		}).filter(event -> event.getItemStack().material().isFood()).build()); //May also be a potion
+		}).filter(event -> event.getItemStack().has(ItemComponent.FOOD)).build()); //May also be a potion
 		
 		if (config.isFoodSoundsEnabled()) node.addListener(PlayerTickEvent.class, event -> {
 			Player player = event.getPlayer();
@@ -155,7 +157,7 @@ public class FoodListener {
 	}
 	
 	public static void eatSounds(Player player) {
-		ItemStack stack = player.getItemInHand(Objects.requireNonNull(player.getEatingHand()));
+		ItemStack stack = player.getItemInHand(Objects.requireNonNull(player.getItemUseHand()));
 		
 		FoodComponent component = FoodComponents.fromMaterial(stack.material());
 		if (component == null) return;
