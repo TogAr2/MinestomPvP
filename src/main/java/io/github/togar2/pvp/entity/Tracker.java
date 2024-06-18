@@ -37,10 +37,7 @@ public class Tracker {
 	
 	public static boolean hasCooldown(Player player, Material material) {
 		Map<Material, Long> cooldownMap = cooldownEnd.get(player.getUuid());
-		
-		if (cooldownMap == null) {
-			System.out.println("null for uuid " + player.getUuid());
-		}
+
 		return cooldownMap.containsKey(material) && cooldownMap.get(material) > System.currentTimeMillis();
 	}
 	
@@ -87,7 +84,6 @@ public class Tracker {
 			event.getPlayer().setTag(SwordBlockHandler.BLOCKING_SWORD, false);
 			event.getPlayer().setTag(HungerManager.EXHAUSTION, 0F);
 			event.getPlayer().setTag(HungerManager.STARVATION_TICKS, 0);
-			System.out.println("register for uuid " + uuid);
 			Tracker.cooldownEnd.put(uuid, new HashMap<>());
 			Tracker.combatManager.put(uuid, new CombatManager(event.getPlayer()));
 		});
