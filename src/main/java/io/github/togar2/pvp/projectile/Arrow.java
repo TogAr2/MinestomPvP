@@ -1,7 +1,6 @@
 package io.github.togar2.pvp.projectile;
 
 import io.github.togar2.pvp.feature.effect.EffectFeature;
-import net.minestom.server.color.Color;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
@@ -10,12 +9,15 @@ import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.item.component.PotionContents;
-import net.minestom.server.potion.PotionType;
+import net.minestom.server.potion.CustomPotionEffect;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
 public class Arrow extends AbstractArrow {
 	public static final ItemStack DEFAULT_ARROW = ItemStack.of(Material.ARROW);
@@ -29,41 +31,10 @@ public class Arrow extends AbstractArrow {
 	private final EffectFeature effectFeature;
 	
 	private ItemStack itemStack = DEFAULT_ARROW;
-	private boolean fixedColor;
 	
 	public Arrow(@Nullable Entity shooter, EffectFeature effectFeature) {
 		super(shooter, EntityType.ARROW);
 		this.effectFeature = effectFeature;
-	}
-	
-	public void inheritEffects(ItemStack stack) {
-		if (stack.material() == Material.TIPPED_ARROW) {
-			PotionMeta potionMeta = new PotionMeta(stack.meta());
-			PotionType potionType = potionMeta.getPotionType();
-			List<net.minestom.server.potion.CustomPotionEffect> customEffects = potionMeta.getCustomPotionEffects();
-			Color color = potionMeta.getColor();
-			
-			if (color == null) {
-				fixedColor = false;
-				if (potionType == PotionType.EMPTY && customEffects.isEmpty()) {
-					setColor(-1);
-				} else {
-					setColor(effectFeature.getPotionColor(potion));
-				}
-			} else {
-				fixedColor = true;
-				setColor(color.asRGB());
-			}
-			
-			PotionMeta.Builder builder = new PotionMeta.Builder().effects(customEffects);
-			builder.potionType(potionType);
-			potion = new PotionMeta(builder);
-		} else if (stack.material() == Material.ARROW) {
-			fixedColor = false;
-			setColor(-1);
-			
-			potion = new PotionMeta(new PotionMeta.Builder().potionType(PotionType.EMPTY));
-		}
 	}
 	
 	@Override
@@ -78,32 +49,13 @@ public class Arrow extends AbstractArrow {
 	}
 	
 	@Override
-	protected void onHurt(LivingEntity entity) {
-		effectFeature.addArrowEffects(entity, this);
+	protected ItemStack getPickupItem() {
+		return itemStack;
 	}
 	
 	@Override
-	protected ItemStack getPickupItem() {
-		if (potion.getPotionType() == PotionType.EMPTY && potion.getCustomPotionEffects().isEmpty()) {
-			return DEFAULT_ARROW;
-		}
-		
-		return ItemStack.builder(Material.TIPPED_ARROW).meta(PotionMeta.class, meta -> {
-			if (potion.getPotionType() != PotionType.EMPTY) {
-				meta.potionType(potion.getPotionType());
-			}
-			if (!potion.getCustomPotionEffects().isEmpty()) {
-				meta.effects(potion.getCustomPotionEffects());
-			}
-			if (fixedColor) {
-				meta.color(new Color(getColor()));
-			}
-		}).build();
-	}
-	
-	public void addPotion(net.minestom.server.potion.CustomPotionEffect effect) {
-		potion.getCustomPotionEffects().add(effect);
-		setColor(effectFeature.getPotionColor(potion));
+	protected void onHurt(LivingEntity entity) {
+		effectFeature.addArrowEffects(entity, this);
 	}
 	
 	private void updateColor() {
@@ -112,8 +64,8 @@ public class Arrow extends AbstractArrow {
 			setColor(-1);
 			return;
 		}
-		//todo color from potion contents
 		
+		setColor(effectFeature.getPotionColor(potionContents));
 	}
 	
 	private void setColor(int color) {
@@ -124,7 +76,20 @@ public class Arrow extends AbstractArrow {
 		return ((ArrowMeta) getEntityMeta()).getColor();
 	}
 	
-	public PotionMeta getPotion() {
-		return potion;
+	public @NotNull PotionContents getPotion() {
+		return itemStack.get(ItemComponent.POTION_CONTENTS, PotionContents.EMPTY);
+	}
+	
+	public void setPotion(@NotNull PotionContents potion) {
+		this.itemStack = ItemStack.of(Material.TIPPED_ARROW).with(ItemComponent.POTION_CONTENTS, potion);
+		updateColor();
+	}
+	
+	public void addArrowEffect(CustomPotionEffect effect) {
+		this.itemStack = itemStack.with(ItemComponent.POTION_CONTENTS, (UnaryOperator<PotionContents>) potionContents -> {
+			List<CustomPotionEffect> list = new ArrayList<>(potionContents.customEffects());
+			list.add(effect);
+			return new PotionContents(potionContents.potion(), potionContents.customColor(), list);
+		});
 	}
 }

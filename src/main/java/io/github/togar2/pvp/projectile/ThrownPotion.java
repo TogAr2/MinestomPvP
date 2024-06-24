@@ -1,16 +1,16 @@
 package io.github.togar2.pvp.projectile;
 
 import io.github.togar2.pvp.feature.effect.EffectFeature;
-import io.github.togar2.pvp.feature.potion.PotionFeature;
 import io.github.togar2.pvp.utils.EffectManager;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.effects.Effects;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.metadata.item.ThrownPotionMeta;
+import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import net.minestom.server.item.metadata.PotionMeta;
+import net.minestom.server.item.component.PotionContents;
 import net.minestom.server.potion.Potion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,12 +21,10 @@ import java.util.stream.Collectors;
 
 public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingProjectile {
 	private final EffectFeature effectFeature;
-	private final PotionFeature potionFeature;
 	
-	public ThrownPotion(@Nullable Entity shooter, EffectFeature effectFeature, PotionFeature potionFeature) {
+	public ThrownPotion(@Nullable Entity shooter, EffectFeature effectFeature) {
 		super(shooter, EntityType.POTION);
 		this.effectFeature = effectFeature;
-		this.potionFeature = potionFeature;
 		
 		// Why does Minestom have the wrong value 0.03 in its registries?
 		setAerodynamics(getAerodynamics().withGravity(0.05));
@@ -47,8 +45,8 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 	public void splash(@Nullable Entity entity) {
 		ItemStack item = getItem();
 		
-		PotionMeta meta = item.meta(PotionMeta.class);
-		List<Potion> potions = potionFeature.getAllPotions(meta);
+		PotionContents potionContents = item.get(ItemComponent.POTION_CONTENTS);
+		List<Potion> potions = effectFeature.getAllPotions(potionContents);
 		
 		if (!potions.isEmpty()) {
 			if (item.material() == Material.LINGERING_POTION) {
@@ -59,10 +57,19 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 		}
 		
 		Pos position = getPosition();
-		Effects effect = effectFeature.hasInstantEffect(potions) ? Effects.INSTANT_SPLASH : Effects.SPLASH_POTION;
+		
+		boolean instantEffect = false;
+		for (Potion potion : potions) {
+			if (potion.effect().registry().isInstantaneous()) {
+				instantEffect = true;
+				break;
+			}
+		}
+		
+		Effects effect = instantEffect ? Effects.INSTANT_SPLASH : Effects.SPLASH_POTION;
 		EffectManager.sendNearby(
 				Objects.requireNonNull(getInstance()), effect, position.blockX(),
-				position.blockY(), position.blockZ(), effectFeature.getPotionColor(meta),
+				position.blockY(), position.blockZ(), effectFeature.getPotionColor(potionContents),
 				64.0, false
 		);
 	}

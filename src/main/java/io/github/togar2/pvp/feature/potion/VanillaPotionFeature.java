@@ -5,18 +5,17 @@ import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.effect.EffectFeature;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffect;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
-import io.github.togar2.pvp.potion.item.CustomPotionType;
-import io.github.togar2.pvp.potion.item.CustomPotionTypes;
 import io.github.togar2.pvp.projectile.ThrownPotion;
 import io.github.togar2.pvp.utils.CombatVersion;
-import io.github.togar2.pvp.utils.PotionFlags;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
+import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.item.ItemUpdateStateEvent;
@@ -24,16 +23,12 @@ import net.minestom.server.event.player.PlayerPreEatEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
+import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import net.minestom.server.item.metadata.PotionMeta;
 import net.minestom.server.potion.Potion;
-import net.minestom.server.potion.PotionEffect;
-import net.minestom.server.potion.PotionType;
 import net.minestom.server.sound.SoundEvent;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
@@ -41,15 +36,17 @@ import java.util.concurrent.ThreadLocalRandom;
 public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaPotionFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.POTION, VanillaPotionFeature::new,
-			FeatureType.VERSION
+			FeatureType.EFFECT, FeatureType.VERSION
 	);
 	
 	private static final int USE_TICKS = 32;
 	private static final ItemStack GLASS_BOTTLE = ItemStack.of(Material.GLASS_BOTTLE);
 	
+	private final EffectFeature effectFeature;
 	private final CombatVersion version;
 	
 	public VanillaPotionFeature(FeatureConfiguration configuration) {
+		this.effectFeature = configuration.get(FeatureType.EFFECT);
 		this.version = configuration.get(FeatureType.VERSION);
 	}
 	
@@ -70,7 +67,7 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 			
 			triggerDrinkingSound(player);
 			
-			List<Potion> potions = getAllPotions(stack.meta(PotionMeta.class));
+			List<Potion> potions = effectFeature.getAllPotions(stack.get(ItemComponent.POTION_CONTENTS));
 			
 			// Apply the potions
 			for (Potion potion : potions) {
@@ -83,7 +80,7 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 				}
 			}
 			
-			if (!player.isCreative()) {
+			if (player.getGameMode() != GameMode.CREATIVE) {
 				if (stack.amount() == 1) {
 					player.setItemInHand(event.getHand(), GLASS_BOTTLE);
 				} else {
@@ -99,8 +96,6 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 			
 			tickDrinkingSounds(player);
 		});
-		
-		
 		
 		node.addListener(PlayerUseItemEvent.class, event -> {
 			if (event.getItemStack().material() != Material.SPLASH_POTION) return;
@@ -128,7 +123,7 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 	}
 	
 	protected void throwPotion(Player player, ItemStack stack, Player.Hand hand) {
-		ThrownPotion thrownPotion = new ThrownPotion(player, this);
+		ThrownPotion thrownPotion = new ThrownPotion(player, effectFeature);
 		thrownPotion.setItem(stack);
 		
 		Pos position = player.getPosition().add(0, player.getEyeHeight(), 0);
@@ -140,34 +135,13 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 		thrownPotion.setVelocity(thrownPotion.getVelocity().add(playerVel.x(),
 				player.isOnGround() ? 0.0 : playerVel.y(), playerVel.z()));
 		
-		if (!player.isCreative()) {
+		if (player.getGameMode() != GameMode.CREATIVE) {
 			player.setItemInHand(hand, stack.withAmount(stack.amount() - 1));
 		}
 	}
 	
-	@Override
-	public List<Potion> getAllPotions(PotionType potionType,
-	                                  Collection<net.minestom.server.potion.CustomPotionEffect> customEffects) {
-		//PotionType effects plus custom effects
-		List<Potion> potions = new ArrayList<>();
-		
-		CustomPotionType customPotionType = CustomPotionTypes.get(potionType);
-		if (customPotionType != null) potions.addAll(customPotionType.getEffects(version));
-		
-		potions.addAll(customEffects.stream().map((customPotion) ->
-				new Potion(Objects.requireNonNull(PotionEffect.fromId(customPotion.id())),
-						customPotion.amplifier(), customPotion.duration(),
-						PotionFlags.create(
-								customPotion.isAmbient(),
-								customPotion.showParticles(),
-								customPotion.showIcon()
-						))).toList());
-		
-		return potions;
-	}
-	
 	protected void tickDrinkingSounds(Player player) {
-		ItemStack stack = player.getItemInHand(Objects.requireNonNull(player.getEatingHand()));
+		ItemStack stack = player.getItemInHand(Objects.requireNonNull(player.getItemUseHand()));
 		if (stack.material() != Material.POTION) return;
 		
 		long usedDuration = System.currentTimeMillis() - player.getTag(Tracker.ITEM_USE_START_TIME);

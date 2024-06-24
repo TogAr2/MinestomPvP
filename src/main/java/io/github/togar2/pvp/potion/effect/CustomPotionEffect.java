@@ -2,6 +2,7 @@ package io.github.togar2.pvp.potion.effect;
 
 import io.github.togar2.pvp.entity.EntityGroup;
 import io.github.togar2.pvp.utils.CombatVersion;
+import net.minestom.server.color.Color;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
@@ -11,28 +12,42 @@ import net.minestom.server.entity.attribute.AttributeModifier;
 import net.minestom.server.entity.attribute.AttributeOperation;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
+import net.minestom.server.particle.Particle;
+import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.utils.NamespaceID;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 public class CustomPotionEffect {
 	private final Map<Attribute, AttributeModifier> attributeModifiers = new HashMap<>();
 	private Map<Attribute, AttributeModifier> legacyAttributeModifiers;
 	private final PotionEffect potionEffect;
+	private final Function<Potion, Particle> particleSupplier;
 	
 	public CustomPotionEffect(PotionEffect potionEffect) {
 		this.potionEffect = potionEffect;
+		this.particleSupplier = potion -> {
+			int alpha = potion.isAmbient() ? 38 : 255;
+			//TODO why does Minestom not support an alpha value??
+			return Particle.ENTITY_EFFECT.withColor(new Color(potion.effect().registry().color()));
+		};
+	}
+	
+	public CustomPotionEffect(PotionEffect potionEffect, Function<Potion, Particle> particleSupplier) {
+		this.potionEffect = potionEffect;
+		this.particleSupplier = particleSupplier;
 	}
 	
 	public PotionEffect getPotionEffect() {
 		return potionEffect;
 	}
 	
-	public int getColor() {
-		return potionEffect.registry().color();
+	public Particle getParticle(Potion potion) {
+		return particleSupplier.apply(potion);
 	}
 	
 	public CustomPotionEffect addAttributeModifier(Attribute attribute, NamespaceID id,

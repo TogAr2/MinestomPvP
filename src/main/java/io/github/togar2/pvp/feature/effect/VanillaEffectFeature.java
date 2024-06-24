@@ -5,7 +5,6 @@ import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
-import io.github.togar2.pvp.feature.potion.PotionFeature;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffect;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
 import io.github.togar2.pvp.potion.item.CustomPotionType;
@@ -13,6 +12,7 @@ import io.github.togar2.pvp.potion.item.CustomPotionTypes;
 import io.github.togar2.pvp.projectile.Arrow;
 import io.github.togar2.pvp.utils.CombatVersion;
 import io.github.togar2.pvp.utils.PotionFlags;
+import net.kyori.adventure.util.RGBLike;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.GameMode;
@@ -27,7 +27,7 @@ import net.minestom.server.event.entity.EntityPotionRemoveEvent;
 import net.minestom.server.event.entity.EntityTickEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.item.component.PotionContents;
-import net.minestom.server.item.metadata.PotionMeta;
+import net.minestom.server.particle.Particle;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.PotionType;
@@ -36,27 +36,21 @@ import net.minestom.server.tag.Tag;
 import net.minestom.server.utils.time.TimeUnit;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaEffectFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.EFFECT, VanillaEffectFeature::new,
-			FeatureType.POTION, FeatureType.VERSION
+			FeatureType.VERSION
 	);
 	
 	public static final Tag<Map<PotionEffect, Integer>> DURATION_LEFT = Tag.Transient("effectDurationLeft");
 	public static final int DEFAULT_POTION_COLOR = 0xff385dc6;
 	
-	private final PotionFeature potionFeature;
 	private final CombatVersion version;
 	
 	public VanillaEffectFeature(FeatureConfiguration configuration) {
-		this.potionFeature = configuration.get(FeatureType.POTION);
 		this.version = configuration.get(FeatureType.VERSION);
 	}
 	
@@ -125,55 +119,91 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 		return potionMap;
 	}
 	
-	protected void updatePotionVisibility(LivingEntity entity) {
+	@Override
+	public int getPotionColor(PotionContents contents) {
+		if (contents.customColor() != null) {
+			RGBLike rgbLike = contents.customColor();
+			return PotionColorUtils.rgba(255, rgbLike.red(), rgbLike.green(), rgbLike.blue());
+		} else if (contents.equals(PotionContents.EMPTY)) {
+			return DEFAULT_POTION_COLOR;
+		} else {
+			Collection<Potion> effects = getAllPotions(contents);
+			int color = PotionColorUtils.getPotionColor(effects);
+			return color == -1 ? DEFAULT_POTION_COLOR : color;
+		}
+	}
+	
+	@Override
+	public List<Potion> getAllPotions(PotionType potionType,
+	                                  Collection<net.minestom.server.potion.CustomPotionEffect> customEffects) {
+		// PotionType effects plus custom effects
+		List<Potion> potions = new ArrayList<>();
+		
+		CustomPotionType customPotionType = CustomPotionTypes.get(potionType);
+		if (customPotionType != null) potions.addAll(customPotionType.getEffects(version));
+		
+		potions.addAll(customEffects.stream().map((customPotion) ->
+				new Potion(Objects.requireNonNull(customPotion.id()),
+						customPotion.amplifier(), customPotion.duration(),
+						PotionFlags.create(
+								customPotion.isAmbient(),
+								customPotion.showParticles(),
+								customPotion.showIcon()
+						))).toList());
+		
+		return potions;
+	}
+	
+	@Override
+	public void updatePotionVisibility(LivingEntity entity) {
 		boolean ambient;
-		int color;
+		List<Particle> particles;
 		boolean invisible;
 		
 		if (entity instanceof Player player && player.getGameMode() == GameMode.SPECTATOR) {
 			ambient = false;
-			color = 0;
+			particles = List.of();
 			invisible = true;
 		} else {
 			Collection<TimedPotion> effects = entity.getActiveEffects();
 			if (effects.isEmpty()) {
 				ambient = false;
-				color = 0;
+				particles = List.of();
 				invisible = false;
 			} else {
-				ambient = containsOnlyAmbientEffects(effects);
-				color = getPotionColor(effects.stream().map(TimedPotion::potion).collect(Collectors.toList()));
+				ambient = true;
+				particles = new ArrayList<>();
+				
+				for (TimedPotion potion : effects) {
+					if (!potion.potion().isAmbient()) {
+						ambient = false;
+					}
+					
+					if (potion.potion().hasParticles()) {
+						CustomPotionEffect effect = CustomPotionEffects.get(potion.potion().effect());
+						particles.add(effect.getParticle(potion.potion()));
+					}
+				}
+				
 				invisible = entity.hasEffect(PotionEffect.INVISIBILITY);
 			}
 		}
 		
-		PotionVisibilityEvent potionVisibilityEvent = new PotionVisibilityEvent(entity, ambient, color, invisible);
+		PotionVisibilityEvent potionVisibilityEvent = new PotionVisibilityEvent(entity, ambient, particles, invisible);
 		EventDispatcher.callCancellable(potionVisibilityEvent, () -> {
 			LivingEntityMeta meta = (LivingEntityMeta) entity.getEntityMeta();
 			
 			meta.setPotionEffectAmbient(potionVisibilityEvent.isAmbient());
-			meta.setPotionEffectColor(potionVisibilityEvent.getColor());
+			meta.setEffectParticles(potionVisibilityEvent.getParticles());
 			meta.setInvisible(potionVisibilityEvent.isInvisible());
 		});
 	}
 	
-	private boolean containsOnlyAmbientEffects(Collection<TimedPotion> effects) {
-		if (effects.isEmpty()) return true;
-		
-		for (TimedPotion potion : effects) {
-			if (!potion.potion().isAmbient()) {
-				return false;
-			}
-		}
-		
-		return true;
-	}
-	
 	@Override
 	public void addArrowEffects(LivingEntity entity, Arrow arrow) {
-		PotionMeta potionMeta = arrow.getPotion();
+		PotionContents potionContents = arrow.getPotion();
 		
-		CustomPotionType customPotionType = CustomPotionTypes.get(potionMeta.getPotionType());
+		CustomPotionType customPotionType = CustomPotionTypes.get(potionContents.potion());
 		if (customPotionType != null) {
 			for (Potion potion : customPotionType.getEffects(version)) {
 				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.effect());
@@ -187,10 +217,10 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 			}
 		}
 		
-		if (potionMeta.getCustomPotionEffects().isEmpty()) return;
+		if (potionContents.customEffects().isEmpty()) return;
 		
-		potionMeta.getCustomPotionEffects().stream().map(customPotion ->
-						new Potion(Objects.requireNonNull(PotionEffect.fromId(customPotion.id())),
+		potionContents.customEffects().stream().map(customPotion ->
+						new Potion(Objects.requireNonNull(customPotion.id()),
 								customPotion.amplifier(), customPotion.duration(),
 								PotionFlags.create(
 										customPotion.isAmbient(),
@@ -227,39 +257,5 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 				}
 			}
 		}
-	}
-	
-	@Override
-	public boolean hasInstantEffect(Collection<Potion> effects) {
-		if (effects.isEmpty()) return false;
-		
-		for (Potion potion : effects) {
-			if (CustomPotionEffects.get(potion.effect()).isInstant()) {
-				return true;
-			}
-		}
-		
-		return false;
-	}
-	
-	@Override
-	public int getPotionColor(PotionContents contents) {
-		if (contents.customColor() != null) {
-			return contents.customColor();
-		}
-		
-		int r = 0, g = 0, b = 0;
-		int total = 0;
-		
-		if (contents.getColor() != null) {
-			return contents.getColor().asRGB();
-		} else {
-			return contents.getPotionType() == PotionType.EMPTY ? 16253176 : getPotionColor(potionFeature.getAllPotions(contents));
-		}
-	}
-	
-	@Override
-	public int getPotionColor(Collection<Potion> effects) {
-		return PotionColorUtils.getPotionColor(effects);
 	}
 }

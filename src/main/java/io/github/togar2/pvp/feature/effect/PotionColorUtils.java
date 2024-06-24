@@ -1,41 +1,33 @@
 package io.github.togar2.pvp.feature.effect;
 
-import io.github.togar2.pvp.potion.effect.CustomPotionEffect;
-import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
 import net.minestom.server.potion.Potion;
 
 import java.util.Collection;
 
 class PotionColorUtils {
 	public static int getPotionColor(Collection<Potion> effects) {
-		if (effects.isEmpty()) {
-			return 3694022;
-		}
-		
-		float r = 0.0f;
-		float g = 0.0f;
-		float b = 0.0f;
+		int r = 0, g = 0, b = 0;
 		int totalAmplifier = 0;
 		
 		for (Potion potion : effects) {
 			if (potion.hasParticles()) {
-				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.effect());
-				int color = customPotionEffect.getColor();
+				int color = potion.effect().registry().color();
 				int amplifier = potion.amplifier() + 1;
-				r += (float) (amplifier * (color >> 16 & 255)) / 255.0f;
-				g += (float) (amplifier * (color >> 8 & 255)) / 255.0f;
-				b += (float) (amplifier * (color & 255)) / 255.0f;
+				r += amplifier * (color >> 16 & 0xFF);
+				g += amplifier * (color >> 8 & 0xFF);
+				b += amplifier * (color & 0xFF);
 				totalAmplifier += amplifier;
 			}
 		}
 		
 		if (totalAmplifier == 0) {
-			return 0;
+			return -1;
 		} else {
-			r = r / (float) totalAmplifier * 255.0f;
-			g = g / (float) totalAmplifier * 255.0f;
-			b = b / (float) totalAmplifier * 255.0f;
-			return (int) r << 16 | (int) g << 8 | (int) b;
+			return rgba(255, r / totalAmplifier, g / totalAmplifier, b / totalAmplifier);
 		}
+	}
+	
+	public static int rgba(int a, int r, int g, int b) {
+		return (a << 24) | (r << 16) | (g << 8) | b;
 	}
 }
