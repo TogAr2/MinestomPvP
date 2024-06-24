@@ -6,14 +6,17 @@ import io.github.togar2.pvp.enums.ArmorMaterial;
 import io.github.togar2.pvp.events.EquipmentDamageEvent;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.EventDispatcher;
-import net.minestom.server.item.Enchantment;
+import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
+import net.minestom.server.item.enchant.Enchantment;
 
 import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 
 public class VanillaItemDamageFeature implements ItemDamageFeature {
 	public static final DefinedFeature<VanillaItemDamageFeature> DEFINED = new DefinedFeature<>(
@@ -21,38 +24,37 @@ public class VanillaItemDamageFeature implements ItemDamageFeature {
 	);
 	
 	protected ItemStack damage(ItemStack stack, int amount) {
-		if (amount == 0 || stack.material().registry().maxDamage() <= 0)
+		if (amount == 0 || stack.get(ItemComponent.MAX_DAMAGE, 0) <= 0)
 			return stack;
 		
-		return stack.withMeta(meta -> {
-			int unbreaking = EnchantmentUtils.getLevel(Enchantment.UNBREAKING, stack);
-			int preventAmount = 0;
-			int newAmount = amount;
-			
-			if (unbreaking > 0) {
-				for (int i = 0; i < newAmount; i++) {
-					if (EnchantmentUtils.shouldNotBreak(stack, unbreaking)) {
-						preventAmount++;
-					}
+		int unbreaking = EnchantmentUtils.getLevel(Enchantment.UNBREAKING, stack);
+		int preventAmount = 0;
+		int newAmount = amount;
+		
+		if (unbreaking > 0) {
+			for (int i = 0; i < newAmount; i++) {
+				if (EnchantmentUtils.shouldNotBreak(stack, unbreaking)) {
+					preventAmount++;
 				}
 			}
-			
-			newAmount -= preventAmount;
-			if (newAmount <= 0) return;
-			
-			meta.damage(stack.meta().getDamage() + newAmount);
-		});
+		}
+		
+		newAmount -= preventAmount;
+		if (newAmount <= 0) return stack;
+		
+		int finalNewAmount = newAmount;
+		return stack.with(ItemComponent.DAMAGE, (UnaryOperator<Integer>) d -> d + finalNewAmount);
 	}
 	
-	protected  <T extends LivingEntity> ItemStack damage(ItemStack stack, int amount,
-	                                                        T entity, Consumer<T> breakCallback) {
-		if (amount == 0 || stack.material().registry().maxDamage() <= 0)
+	protected <T extends LivingEntity> ItemStack damage(ItemStack stack, int amount,
+	                                                    T entity, Consumer<T> breakCallback) {
+		if (amount == 0 || stack.get(ItemComponent.MAX_DAMAGE, 0) <= 0)
 			return stack;
 		
 		ItemStack newStack = damage(stack, amount);
-		if (newStack.meta().getDamage() >= stack.material().registry().maxDamage()) {
+		if (newStack.get(ItemComponent.DAMAGE, 0) >= stack.get(ItemComponent.MAX_DAMAGE, 0)) {
 			breakCallback.accept(entity);
-			newStack = newStack.withAmount(i -> i - 1).withMeta(meta -> meta.damage(0));
+			newStack = newStack.withAmount(i -> i - 1).with(ItemComponent.DAMAGE, 0);
 		}
 		
 		return newStack;
@@ -77,7 +79,7 @@ public class VanillaItemDamageFeature implements ItemDamageFeature {
 		
 		for (EquipmentSlot slot : slots) {
 			ItemStack stack = entity.getEquipment(slot);
-			DamageTypeInfo info = DamageTypeInfo.of(damageType);
+			DamageTypeInfo info = DamageTypeInfo.of(MinecraftServer.getDamageTypeRegistry().getKey(damageType));
 			if (!(info.fire() && stack.material().namespace().value().toLowerCase().contains("netherite"))
 					&& ArmorMaterial.fromMaterial(stack.material()) != null) {
 				damageEquipment(entity, slot, (int) damage);

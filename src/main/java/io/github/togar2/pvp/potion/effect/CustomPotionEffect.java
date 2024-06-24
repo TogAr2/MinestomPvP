@@ -2,33 +2,29 @@ package io.github.togar2.pvp.potion.effect;
 
 import io.github.togar2.pvp.entity.EntityGroup;
 import io.github.togar2.pvp.utils.CombatVersion;
-import net.minestom.server.attribute.Attribute;
-import net.minestom.server.attribute.AttributeInstance;
-import net.minestom.server.attribute.AttributeModifier;
-import net.minestom.server.attribute.AttributeOperation;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.attribute.Attribute;
+import net.minestom.server.entity.attribute.AttributeInstance;
+import net.minestom.server.entity.attribute.AttributeModifier;
+import net.minestom.server.entity.attribute.AttributeOperation;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.potion.PotionEffect;
+import net.minestom.server.utils.NamespaceID;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class CustomPotionEffect {
-	public static final int PERMANENT = 32767;
-	
 	private final Map<Attribute, AttributeModifier> attributeModifiers = new HashMap<>();
 	private Map<Attribute, AttributeModifier> legacyAttributeModifiers;
 	private final PotionEffect potionEffect;
-	private final int color;
 	
-	public CustomPotionEffect(PotionEffect potionEffect, int color) {
+	public CustomPotionEffect(PotionEffect potionEffect) {
 		this.potionEffect = potionEffect;
-		this.color = color;
 	}
 	
 	public PotionEffect getPotionEffect() {
@@ -36,24 +32,26 @@ public class CustomPotionEffect {
 	}
 	
 	public int getColor() {
-		return color;
+		return potionEffect.registry().color();
 	}
 	
-	public CustomPotionEffect addAttributeModifier(Attribute attribute, String uuid, float amount, AttributeOperation operation) {
-		attributeModifiers.put(attribute, new AttributeModifier(UUID.fromString(uuid), potionEffect.name(), amount, operation));
+	public CustomPotionEffect addAttributeModifier(Attribute attribute, NamespaceID id,
+	                                               float amount, AttributeOperation operation) {
+		attributeModifiers.put(attribute, new AttributeModifier(id, amount, operation));
 		return this;
 	}
 	
-	public CustomPotionEffect addLegacyAttributeModifier(Attribute attribute, String uuid, float amount, AttributeOperation operation) {
+	public CustomPotionEffect addLegacyAttributeModifier(Attribute attribute, NamespaceID id,
+	                                                     float amount, AttributeOperation operation) {
 		if (legacyAttributeModifiers == null)
 			legacyAttributeModifiers = new HashMap<>();
-		legacyAttributeModifiers.put(attribute, new AttributeModifier(UUID.fromString(uuid), potionEffect.name(), amount, operation));
+		legacyAttributeModifiers.put(attribute, new AttributeModifier(id, amount, operation));
 		return this;
 	}
 	
 	public void applyUpdateEffect(LivingEntity entity, byte amplifier, CombatVersion version) {
 		if (potionEffect == PotionEffect.REGENERATION) {
-			if (entity.getHealth() < entity.getMaxHealth()) {
+			if (entity.getHealth() < entity.getAttributeValue(Attribute.GENERIC_MAX_HEALTH)) {
 				entity.setHealth(entity.getHealth() + 1);
 			}
 			return;
@@ -88,7 +86,8 @@ public class CustomPotionEffect {
 		}
 	}
 	
-	public void applyInstantEffect(@Nullable Entity source, @Nullable Entity attacker, LivingEntity target, byte amplifier, double proximity, CombatVersion version) {
+	public void applyInstantEffect(@Nullable Entity source, @Nullable Entity attacker, LivingEntity target,
+	                               byte amplifier, double proximity, CombatVersion version) {
 		EntityGroup targetGroup = EntityGroup.ofEntity(target);
 		
 		if (potionEffect != PotionEffect.INSTANT_DAMAGE && potionEffect != PotionEffect.INSTANT_HEALTH) {
@@ -115,6 +114,8 @@ public class CustomPotionEffect {
 	}
 	
 	public boolean canApplyUpdateEffect(int duration, byte amplifier) {
+		if (isInstant()) return duration >= 1;
+		
 		int applyInterval;
 		if (potionEffect == PotionEffect.REGENERATION) {
 			applyInterval = 50 >> amplifier;
@@ -134,7 +135,7 @@ public class CustomPotionEffect {
 	}
 	
 	public boolean isInstant() {
-		return false;
+		return potionEffect.registry().isInstantaneous();
 	}
 	
 	public void onApplied(LivingEntity entity, byte amplifier, CombatVersion version) {
@@ -148,7 +149,7 @@ public class CustomPotionEffect {
 		modifiers.forEach((attribute, modifier) -> {
 			AttributeInstance instance = entity.getAttribute(attribute);
 			instance.removeModifier(modifier);
-			instance.addModifier(new AttributeModifier(modifier.getId(), potionEffect.name() + " " + amplifier, adjustModifierAmount(amplifier, modifier), modifier.getOperation()));
+			instance.addModifier(new AttributeModifier(modifier.id(), adjustModifierAmount(amplifier, modifier), modifier.operation()));
 		});
 	}
 	
@@ -165,6 +166,6 @@ public class CustomPotionEffect {
 	}
 	
 	private double adjustModifierAmount(byte amplifier, AttributeModifier modifier) {
-		return modifier.getAmount() * (amplifier + 1);
+		return modifier.amount() * (amplifier + 1);
 	}
 }

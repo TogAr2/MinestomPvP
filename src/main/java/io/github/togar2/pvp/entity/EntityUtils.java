@@ -1,6 +1,5 @@
 package io.github.togar2.pvp.entity;
 
-import io.github.togar2.pvp.damage.DamageTypeInfo;
 import io.github.togar2.pvp.enchantment.enchantments.ProtectionEnchantment;
 import io.github.togar2.pvp.projectile.Arrow;
 import it.unimi.dsi.fastutil.Pair;
@@ -9,91 +8,28 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.damage.Damage;
-import net.minestom.server.entity.metadata.LivingEntityMeta;
-import net.minestom.server.entity.metadata.projectile.AbstractArrowMeta;
-import net.minestom.server.event.EventDispatcher;
-import net.minestom.server.event.entity.EntityFireEvent;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
-import net.minestom.server.item.Material;
-import net.minestom.server.tag.Tag;
 import net.minestom.server.utils.inventory.PlayerInventoryUtils;
 import net.minestom.server.utils.time.TimeUnit;
 
 import java.lang.reflect.Field;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
 public class EntityUtils {
-	public static final Tag<Long> FIRE_EXTINGUISH_TIME = Tag.Long("fireExtinguishTime");
-	
-	public static void setFireForDuration(Entity entity, Duration duration) {
-		if (entity instanceof LivingEntity) {
-			((LivingEntity) entity).setFireForDuration(duration);
-			return;
-		}
-		
-		EntityFireEvent entityFireEvent = new EntityFireEvent(entity, duration);
-		
-		// Do not start fire event if the fire needs to be removed (< 0 duration)
-		if (duration.toMillis() > 0) {
-			EventDispatcher.callCancellable(entityFireEvent, () -> entity.setOnFire(true));
-		}
-		// FIRE_EXTINGUISH_TIME is updated by event listener
-	}
-	
-	public static void setOnFireForSeconds(Entity entity, int seconds) {
-		boolean living = entity instanceof LivingEntity;
-		LivingEntity livingEntity = living ? (LivingEntity) entity : null;
-		
+	public static void setOnFireForSeconds(LivingEntity entity, int seconds) {
 		int ticks = seconds * ServerFlag.SERVER_TICKS_PER_SECOND;
-		if (living) {
-			ticks = ProtectionEnchantment.transformFireDuration(livingEntity, ticks);
-		}
-		int millis = ticks * MinecraftServer.TICK_MS;
+		//todo move to enchantment feature
+		ticks = ProtectionEnchantment.transformFireDuration(entity, ticks);
 		
-		long fireExtinguishTime = entity.hasTag(FIRE_EXTINGUISH_TIME) ? entity.getTag(FIRE_EXTINGUISH_TIME) : 0;
-		if (System.currentTimeMillis() + millis > fireExtinguishTime) {
-			setFireForDuration(entity, Duration.ofMillis(millis));
-		}
-	}
-	
-	public static boolean blockedByShield(LivingEntity entity, Damage damage, DamageTypeInfo typeInfo, boolean legacy) {
-		Entity source = damage.getSource();
-		boolean piercing = false;
-		if (source != null && source.getEntityMeta() instanceof AbstractArrowMeta) {
-			if (((AbstractArrowMeta) source.getEntityMeta()).getPiercingLevel() > 0) {
-				piercing = true;
-			}
-		}
-		
-		// If damage doesn't bypass armor, no piercing, and a shield is active
-		if (!typeInfo.bypassesArmor() && !piercing
-				&& entity.getEntityMeta() instanceof LivingEntityMeta meta
-				&& meta.isHandActive() && entity.getItemInHand(meta.getActiveHand()).material() == Material.SHIELD) {
-			if (legacy) return true;
-			
-			if (source != null) {
-				Pos attackerPos = source.getPosition();
-				Pos entityPos = entity.getPosition();
-				
-				Vec attackerPosVector = attackerPos.asVec();
-				Vec entityRotation = entityPos.direction();
-				Vec attackerDirection = entityPos.asVec().sub(attackerPosVector).normalize();
-				attackerDirection = attackerDirection.withY(0);
-				
-				return attackerDirection.dot(entityRotation) < 0.0;
-			}
-		}
-		
-		return false;
+		if (ticks > entity.getFireTicks())
+			entity.setFireTicks(ticks);
 	}
 	
 	public static Iterable<ItemStack> getArmorItems(LivingEntity entity) {
@@ -146,7 +82,7 @@ public class EntityUtils {
 			if (allSupportedPredicate.test(stack)) return Pair.of(stack, i);
 		}
 		
-		return player.isCreative() ? Pair.of(Arrow.DEFAULT_ARROW, -1) : Pair.of(ItemStack.AIR, -1);
+		return player.getGameMode() == GameMode.CREATIVE ? Pair.of(Arrow.DEFAULT_ARROW, -1) : Pair.of(ItemStack.AIR, -1);
 	}
 	
 	private static Pair<ItemStack, Integer> getHeldItem(Player player, Predicate<ItemStack> predicate) {
@@ -166,7 +102,7 @@ public class EntityUtils {
 		boolean success = false;
 		int lowestY = to.blockY();
 		if (lowestY == 0) lowestY++;
-		while (lowestY > instance.getDimensionType().getMinY()) {
+		while (lowestY > MinecraftServer.getDimensionTypeRegistry().get(instance.getDimensionType()).minY()) {
 			Block block = instance.getBlock(to.blockX(), lowestY - 1, to.blockZ());
 			if (!block.isAir() && !block.isLiquid()) {
 				Block above = instance.getBlock(to.blockX(), lowestY, to.blockZ());
@@ -204,19 +140,7 @@ public class EntityUtils {
 			return Component.text(name).hoverEvent(hoverEvent);
 		}
 	}
-
-	public static Pos getPreviousPosition(Entity entity) {
-		// Use reflection to get previousPosition field
-		try {
-			Field field = Entity.class.getDeclaredField("previousPosition");
-			field.setAccessible(true);
-			return (Pos) field.get(entity);
-		} catch (NoSuchFieldException | IllegalAccessException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
+	
 	public static void setLastDamage(LivingEntity livingEntity, Damage lastDamage) {
 		// Use reflection to set lastDamage field
 		try {

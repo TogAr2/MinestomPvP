@@ -2,7 +2,7 @@ package io.github.togar2.pvp.feature.food;
 
 import io.github.togar2.pvp.feature.CombatFeature;
 import net.minestom.server.entity.Player;
-import net.minestom.server.item.Material;
+import net.minestom.server.item.ItemStack;
 
 public interface FoodFeature extends CombatFeature {
 	FoodFeature NO_OP = new FoodFeature() {
@@ -10,10 +10,10 @@ public interface FoodFeature extends CombatFeature {
 		public void addFood(Player player, int food, float exhaustion) {}
 		
 		@Override
-		public void eat(Player player, Material material) {}
+		public void eat(Player player, ItemStack stack) {}
 	};
 	
 	void addFood(Player player, int food, float exhaustion);
 	
-	void eat(Player player, Material material);
+	void eat(Player player, ItemStack stack);
 }

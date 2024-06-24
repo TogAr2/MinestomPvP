@@ -22,7 +22,6 @@ import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
-import net.minestom.server.particle.data.BlockParticleData;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.TimedPotion;
 import net.minestom.server.sound.SoundEvent;
@@ -34,7 +33,7 @@ public class VanillaFallFeature implements FallFeature, CombatFeature, Registrab
 			VanillaFallFeature::initPlayer
 	);
 	
-	public static final Tag<Block> LAST_CLIMBED_BLOCK = Tag.Short("lastClimbedBlock").map(Block::fromStateId, Block::stateId);
+	public static final Tag<Block> LAST_CLIMBED_BLOCK = Tag.Integer("lastClimbedBlock").map(Block::fromStateId, Block::stateId);
 	public static final Tag<Double> FALL_DISTANCE = Tag.Double("fallDistance");
 	
 	public static void initPlayer(Player player, boolean firstInit) {
@@ -105,7 +104,7 @@ public class VanillaFallFeature implements FallFeature, CombatFeature, Registrab
 				int particleCount = (int) (150 * particleMultiplier);
 				
 				entity.sendPacketToViewersAndSelf(new ParticlePacket(
-						Particle.BLOCK.withData(new BlockParticleData(block)),
+						Particle.BLOCK.withBlock(block),
 						false,
 						newPos.x(), newPos.y(), newPos.z(),
 						0, 0, 0,

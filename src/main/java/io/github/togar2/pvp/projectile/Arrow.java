@@ -1,22 +1,15 @@
 package io.github.togar2.pvp.projectile;
 
-import io.github.togar2.pvp.potion.PotionListener;
-import io.github.togar2.pvp.potion.effect.CustomPotionEffect;
-import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
-import io.github.togar2.pvp.potion.item.CustomPotionType;
-import io.github.togar2.pvp.potion.item.CustomPotionTypes;
-import io.github.togar2.pvp.utils.CombatVersion;
-import io.github.togar2.pvp.utils.PotionUtils;
+import io.github.togar2.pvp.feature.effect.EffectFeature;
 import net.minestom.server.color.Color;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.metadata.projectile.ArrowMeta;
+import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import net.minestom.server.item.metadata.PotionMeta;
-import net.minestom.server.potion.Potion;
-import net.minestom.server.potion.PotionEffect;
+import net.minestom.server.item.component.PotionContents;
 import net.minestom.server.potion.PotionType;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,14 +26,14 @@ public class Arrow extends AbstractArrow {
 	public static final Predicate<ItemStack> ARROW_OR_FIREWORK_PREDICATE = ARROW_PREDICATE.or(stack ->
 			stack.material() == Material.FIREWORK_ROCKET);
 	
-	private final boolean legacy;
-	private PotionMeta potion;
+	private final EffectFeature effectFeature;
+	
+	private ItemStack itemStack = DEFAULT_ARROW;
 	private boolean fixedColor;
 	
-	public Arrow(@Nullable Entity shooter, boolean legacy) {
+	public Arrow(@Nullable Entity shooter, EffectFeature effectFeature) {
 		super(shooter, EntityType.ARROW);
-		this.legacy = legacy;
-		this.potion = new PotionMeta(new PotionMeta.Builder().potionType(PotionType.EMPTY));
+		this.effectFeature = effectFeature;
 	}
 	
 	public void inheritEffects(ItemStack stack) {
@@ -55,8 +48,7 @@ public class Arrow extends AbstractArrow {
 				if (potionType == PotionType.EMPTY && customEffects.isEmpty()) {
 					setColor(-1);
 				} else {
-					setColor(PotionUtils.getPotionColor(
-							PotionListener.getAllPotions(potionType, customEffects, legacy)));
+					setColor(effectFeature.getPotionColor(potion));
 				}
 			} else {
 				fixedColor = true;
@@ -78,52 +70,16 @@ public class Arrow extends AbstractArrow {
 	public void update(long time) {
 		super.update(time);
 		
-		if (onGround && stuckTime >= 600 && !potion.getCustomPotionEffects().isEmpty()) {
+		if (onGround && stuckTime >= 600 && (!itemStack.has(ItemComponent.POTION_CONTENTS)
+				|| !Objects.equals(itemStack.get(ItemComponent.POTION_CONTENTS), PotionContents.EMPTY))) {
 			triggerStatus((byte) 0);
-			
-			fixedColor = false;
-			setColor(-1);
-			
-			potion = new PotionMeta(new PotionMeta.Builder().potionType(PotionType.EMPTY));
+			itemStack = DEFAULT_ARROW;
 		}
 	}
 	
 	@Override
 	protected void onHurt(LivingEntity entity) {
-		CustomPotionType customPotionType = CustomPotionTypes.get(potion.getPotionType());
-		if (customPotionType != null) {
-			for (Potion potion : legacy ? customPotionType.getLegacyEffects() : customPotionType.getEffects()) {
-				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.effect());
-				if (customPotionEffect.isInstant()) {
-					customPotionEffect.applyInstantEffect(this, null,
-							entity, potion.amplifier(), 1.0D, CombatVersion.fromLegacy(legacy));
-				} else {
-					int duration = Math.max(potion.duration() / 8, 1);
-					entity.addEffect(new Potion(potion.effect(), potion.amplifier(), duration, potion.flags()));
-				}
-			}
-		}
-		
-		if (potion.getCustomPotionEffects().isEmpty()) return;
-		
-		potion.getCustomPotionEffects().stream().map(customPotion ->
-				new Potion(Objects.requireNonNull(PotionEffect.fromId(customPotion.id())),
-						customPotion.amplifier(), customPotion.duration(),
-						PotionUtils.createFlags(
-								customPotion.isAmbient(),
-								customPotion.showParticles(),
-								customPotion.showIcon()
-						)))
-				.forEach(potion -> {
-					CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.effect());
-					if (customPotionEffect.isInstant()) {
-						customPotionEffect.applyInstantEffect(this, null,
-								entity, potion.amplifier(), 1.0D, CombatVersion.fromLegacy(legacy));
-					} else {
-						entity.addEffect(new Potion(potion.effect(), potion.amplifier(),
-								potion.duration(), potion.flags()));
-					}
-				});
+		effectFeature.addArrowEffects(entity, this);
 	}
 	
 	@Override
@@ -146,10 +102,18 @@ public class Arrow extends AbstractArrow {
 	}
 	
 	public void addPotion(net.minestom.server.potion.CustomPotionEffect effect) {
-		//TODO replace all potion color things with PotionFeature
 		potion.getCustomPotionEffects().add(effect);
-		setColor(PotionUtils.getPotionColor(
-				PotionListener.getAllPotions(potion.getPotionType(), potion.getCustomPotionEffects(), legacy)));
+		setColor(effectFeature.getPotionColor(potion));
+	}
+	
+	private void updateColor() {
+		PotionContents potionContents = itemStack.get(ItemComponent.POTION_CONTENTS);
+		if (potionContents == null || potionContents.equals(PotionContents.EMPTY)) {
+			setColor(-1);
+			return;
+		}
+		//todo color from potion contents
+		
 	}
 	
 	private void setColor(int color) {
@@ -158,5 +122,9 @@ public class Arrow extends AbstractArrow {
 	
 	private int getColor() {
 		return ((ArrowMeta) getEntityMeta()).getColor();
+	}
+	
+	public PotionMeta getPotion() {
+		return potion;
 	}
 }

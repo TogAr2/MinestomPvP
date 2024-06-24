@@ -1,10 +1,9 @@
 package io.github.togar2.pvp.potion.item;
 
-import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
+import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionType;
 
-import java.util.Collection;
 import java.util.List;
 
 public class CustomPotionType {
@@ -26,29 +25,8 @@ public class CustomPotionType {
 		return potionType;
 	}
 	
-	public List<Potion> getEffects() {
-		return effects;
-	}
-	
-	public List<Potion> getLegacyEffects() {
-		if (legacyEffects != null)
-			return legacyEffects;
-		return effects;
-	}
-	
-	public boolean hasInstantEffect() {
-		return hasInstantEffect(effects);
-	}
-	
-	public static boolean hasInstantEffect(Collection<Potion> effects) {
-		if (effects.isEmpty()) return false;
-		
-		for (Potion potion : effects) {
-			if (CustomPotionEffects.get(potion.effect()).isInstant()) {
-				return true;
-			}
-		}
-		
-		return false;
+	public List<Potion> getEffects(CombatVersion version) {
+		if (legacyEffects == null) return effects;
+		return version.legacy() ? legacyEffects : effects;
 	}
 }

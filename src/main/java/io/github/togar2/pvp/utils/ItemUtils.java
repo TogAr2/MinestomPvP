@@ -1,8 +1,6 @@
 package io.github.togar2.pvp.utils;
 
-import io.github.togar2.pvp.damage.DamageTypeInfo;
 import io.github.togar2.pvp.enchantment.EnchantmentUtils;
-import io.github.togar2.pvp.enums.ArmorMaterial;
 import io.github.togar2.pvp.events.EquipmentDamageEvent;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
@@ -57,25 +55,6 @@ public class ItemUtils {
 		EventDispatcher.callCancellable(equipmentDamageEvent, () ->
 				entity.setEquipment(slot, damage(entity.getEquipment(slot), amount, entity,
 						e -> triggerEquipmentBreak(e, slot))));
-	}
-	
-	public static void damageArmor(LivingEntity entity, DamageTypeInfo typeInfo,
-	                               float damage, EquipmentSlot... slots) {
-		if (damage <= 0) return;
-		
-		damage /= 4;
-		if (damage < 1) {
-			damage = 1;
-		}
-		
-		for (EquipmentSlot slot : slots) {
-			ItemStack stack = entity.getEquipment(slot);
-			if ((!typeInfo.fire()
-					|| !stack.material().namespace().value().toLowerCase().contains("netherite"))
-					&& ArmorMaterial.fromMaterial(stack.material()) != null) {
-				damageEquipment(entity, slot, (int) damage);
-			}
-		}
 	}
 	
 	public static void triggerEquipmentBreak(LivingEntity entity, EquipmentSlot slot) {

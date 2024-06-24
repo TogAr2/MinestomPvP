@@ -8,8 +8,8 @@ import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.utils.CombatVersion;
-import net.minestom.server.attribute.Attribute;
 import net.minestom.server.entity.LivingEntity;
+import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.TimedPotion;
@@ -37,14 +37,14 @@ public class VanillaArmorFeature implements ArmorFeature, CombatFeature {
 	protected float getDamageWithArmor(LivingEntity entity, DamageTypeInfo typeInfo, float amount) {
 		if (typeInfo.bypassesArmor()) return amount;
 		
-		float armorValue = entity.getAttributeValue(Attribute.ARMOR);
+		double armorValue = entity.getAttributeValue(Attribute.GENERIC_ARMOR);
 		if (version.legacy()) {
 			int armorMultiplier = 25 - (int) armorValue;
 			return (amount * (float) armorMultiplier) / 25;
 		} else {
 			return getDamageLeft(
 					amount, (float) Math.floor(armorValue),
-					entity.getAttributeValue(Attribute.ARMOR_TOUGHNESS)
+					(float) entity.getAttributeValue(Attribute.GENERIC_ARMOR_TOUGHNESS)
 			);
 		}
 	}

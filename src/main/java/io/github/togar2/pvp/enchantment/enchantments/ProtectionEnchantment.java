@@ -6,18 +6,19 @@ import io.github.togar2.pvp.enchantment.CustomEnchantments;
 import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
-import net.minestom.server.item.Enchantment;
+import net.minestom.server.item.enchant.Enchantment;
+import net.minestom.server.registry.DynamicRegistry;
 
 public class ProtectionEnchantment extends CustomEnchantment {
 	private final Type type;
 	
-	public ProtectionEnchantment(Enchantment enchantment, Type type, EquipmentSlot... slotTypes) {
+	public ProtectionEnchantment(DynamicRegistry.Key<Enchantment> enchantment, Type type, EquipmentSlot... slotTypes) {
 		super(enchantment, slotTypes);
 		this.type = type;
 	}
 	
 	@Override
-	public int getProtectionAmount(short level, DamageTypeInfo damageTypeInfo) {
+	public int getProtectionAmount(int level, DamageTypeInfo damageTypeInfo) {
 		if (damageTypeInfo.outOfWorld()) {
 			return 0;
 		} else if (type == Type.ALL) {
@@ -34,9 +35,9 @@ public class ProtectionEnchantment extends CustomEnchantment {
 	}
 	
 	public static int transformFireDuration(LivingEntity entity, int duration) {
-		short level = EnchantmentUtils.getEquipmentLevel(CustomEnchantments.get(Enchantment.FIRE_PROTECTION), entity);
+		int level = EnchantmentUtils.getEquipmentLevel(CustomEnchantments.get(Enchantment.FIRE_PROTECTION), entity);
 		if (level > 0) {
-			duration -= Math.floor((float) duration * (float) level * 0.15F);
+			duration -= (int) Math.floor((float) duration * (float) level * 0.15F);
 		}
 		
 		return duration;

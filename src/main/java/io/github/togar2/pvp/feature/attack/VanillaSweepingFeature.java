@@ -7,13 +7,13 @@ import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.knockback.KnockbackFeature;
-import net.minestom.server.attribute.Attribute;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
@@ -36,7 +36,7 @@ public class VanillaSweepingFeature implements SweepingFeature {
 		if (!values.strong() || values.critical() || values.sprint() || !attacker.isOnGround()) return false;
 		
 		double lastMoveDistance = attacker.getPreviousPosition().distance(attacker.getPosition()) * 0.6;
-		if (lastMoveDistance >= attacker.getAttributeValue(Attribute.MOVEMENT_SPEED)) return false;
+		if (lastMoveDistance >= attacker.getAttributeValue(Attribute.GENERIC_MOVEMENT_SPEED)) return false;
 		
 		Tool tool = Tool.fromMaterial(attacker.getItemInMainHand().material());
 		return tool != null && tool.isSword();

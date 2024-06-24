@@ -1,17 +1,12 @@
 package io.github.togar2.pvp.projectile;
 
-import io.github.togar2.pvp.potion.PotionListener;
-import io.github.togar2.pvp.potion.effect.CustomPotionEffect;
-import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
-import io.github.togar2.pvp.potion.item.CustomPotionType;
-import io.github.togar2.pvp.utils.CombatVersion;
+import io.github.togar2.pvp.feature.effect.EffectFeature;
+import io.github.togar2.pvp.feature.potion.PotionFeature;
 import io.github.togar2.pvp.utils.EffectManager;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.effects.Effects;
-import net.minestom.server.entity.Entity;
-import net.minestom.server.entity.EntityType;
-import net.minestom.server.entity.LivingEntity;
+import net.minestom.server.entity.*;
 import net.minestom.server.entity.metadata.item.ThrownPotionMeta;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
@@ -25,11 +20,13 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingProjectile {
-	private final boolean legacy;
+	private final EffectFeature effectFeature;
+	private final PotionFeature potionFeature;
 	
-	public ThrownPotion(@Nullable Entity shooter, boolean legacy) {
+	public ThrownPotion(@Nullable Entity shooter, EffectFeature effectFeature, PotionFeature potionFeature) {
 		super(shooter, EntityType.POTION);
-		this.legacy = legacy;
+		this.effectFeature = effectFeature;
+		this.potionFeature = potionFeature;
 		
 		// Why does Minestom have the wrong value 0.03 in its registries?
 		setAerodynamics(getAerodynamics().withGravity(0.05));
@@ -51,7 +48,7 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 		ItemStack item = getItem();
 		
 		PotionMeta meta = item.meta(PotionMeta.class);
-		List<Potion> potions = PotionListener.getAllPotions(meta, legacy);
+		List<Potion> potions = potionFeature.getAllPotions(meta);
 		
 		if (!potions.isEmpty()) {
 			if (item.material() == Material.LINGERING_POTION) {
@@ -62,11 +59,11 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 		}
 		
 		Pos position = getPosition();
-		Effects effect = CustomPotionType.hasInstantEffect(potions) ? Effects.INSTANT_SPLASH : Effects.SPLASH_POTION;
+		Effects effect = effectFeature.hasInstantEffect(potions) ? Effects.INSTANT_SPLASH : Effects.SPLASH_POTION;
 		EffectManager.sendNearby(
 				Objects.requireNonNull(getInstance()), effect, position.blockX(),
-				position.blockY(), position.blockZ(), PotionListener.getColor(item, legacy),
-				64.0D, false
+				position.blockY(), position.blockZ(), effectFeature.getPotionColor(meta),
+				64.0, false
 		);
 	}
 	
@@ -74,7 +71,8 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 		BoundingBox boundingBox = getBoundingBox().expand(8.0, 4.0, 8.0);
 		List<LivingEntity> entities = Objects.requireNonNull(getInstance()).getEntities().stream()
 				.filter(entity -> boundingBox.intersectEntity(getPosition().add(0, -2, 0), entity))
-				.filter(entity -> entity instanceof LivingEntity)
+				.filter(entity -> entity instanceof LivingEntity
+						&& !(entity instanceof Player player && player.getGameMode() == GameMode.SPECTATOR))
 				.map(entity -> (LivingEntity) entity).collect(Collectors.toList());
 		
 		if (hitEntity instanceof LivingEntity && !entities.contains(hitEntity))
@@ -88,22 +86,7 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 			if (distanceSquared >= 16.0) continue;
 			
 			double proximity = entity == hitEntity ? 1.0 : (1.0 - Math.sqrt(distanceSquared) / 4.0);
-			
-			for (Potion potion : potions) {
-				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.effect());
-				if (customPotionEffect.isInstant()) {
-					customPotionEffect.applyInstantEffect(this, getShooter(),
-							entity,potion.amplifier(), proximity, CombatVersion.fromLegacy(legacy));
-				} else {
-					int duration = potion.duration();
-					if (legacy) duration = (int) Math.floor(duration * 0.75);
-					duration = (int) (proximity * (double) duration + 0.5);
-					
-					if (duration > 20) {
-						entity.addEffect(new Potion(potion.effect(), potion.amplifier(), duration, potion.flags()));
-					}
-				}
-			}
+			effectFeature.addSplashPotionEffects(entity, potions, proximity, this, getShooter());
 		}
 	}
 	

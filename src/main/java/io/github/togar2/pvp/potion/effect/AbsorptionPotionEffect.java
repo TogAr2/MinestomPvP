@@ -6,8 +6,8 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.potion.PotionEffect;
 
 public class AbsorptionPotionEffect extends CustomPotionEffect {
-	public AbsorptionPotionEffect(int color) {
-		super(PotionEffect.ABSORPTION, color);
+	public AbsorptionPotionEffect() {
+		super(PotionEffect.ABSORPTION);
 	}
 	
 	@Override

@@ -11,7 +11,7 @@ import io.github.togar2.pvp.potion.item.CustomPotionType;
 import io.github.togar2.pvp.potion.item.CustomPotionTypes;
 import io.github.togar2.pvp.projectile.ThrownPotion;
 import io.github.togar2.pvp.utils.CombatVersion;
-import io.github.togar2.pvp.utils.PotionUtils;
+import io.github.togar2.pvp.utils.PotionFlags;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
@@ -128,7 +128,7 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 	}
 	
 	protected void throwPotion(Player player, ItemStack stack, Player.Hand hand) {
-		ThrownPotion thrownPotion = new ThrownPotion(player, version.legacy());
+		ThrownPotion thrownPotion = new ThrownPotion(player, this);
 		thrownPotion.setItem(stack);
 		
 		Pos position = player.getPosition().add(0, player.getEyeHeight(), 0);
@@ -145,24 +145,19 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 		}
 	}
 	
-	protected List<Potion> getAllPotions(PotionMeta meta) {
-		return getAllPotions(meta.getPotionType(), meta.getCustomPotionEffects());
-	}
-	
-	protected List<Potion> getAllPotions(PotionType potionType,
-	                                     Collection<net.minestom.server.potion.CustomPotionEffect> customEffects) {
+	@Override
+	public List<Potion> getAllPotions(PotionType potionType,
+	                                  Collection<net.minestom.server.potion.CustomPotionEffect> customEffects) {
 		//PotionType effects plus custom effects
 		List<Potion> potions = new ArrayList<>();
 		
 		CustomPotionType customPotionType = CustomPotionTypes.get(potionType);
-		if (customPotionType != null) {
-			potions.addAll(version.legacy() ? customPotionType.getLegacyEffects() : customPotionType.getEffects());
-		}
+		if (customPotionType != null) potions.addAll(customPotionType.getEffects(version));
 		
 		potions.addAll(customEffects.stream().map((customPotion) ->
 				new Potion(Objects.requireNonNull(PotionEffect.fromId(customPotion.id())),
 						customPotion.amplifier(), customPotion.duration(),
-						PotionUtils.createFlags(
+						PotionFlags.create(
 								customPotion.isAmbient(),
 								customPotion.showParticles(),
 								customPotion.showIcon()

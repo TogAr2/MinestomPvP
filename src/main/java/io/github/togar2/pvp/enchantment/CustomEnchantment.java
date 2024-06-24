@@ -6,22 +6,23 @@ import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
-import net.minestom.server.item.Enchantment;
 import net.minestom.server.item.ItemStack;
+import net.minestom.server.item.enchant.Enchantment;
+import net.minestom.server.registry.DynamicRegistry;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class CustomEnchantment {
-	private final Enchantment enchantment;
+	private final DynamicRegistry.Key<Enchantment> enchantment;
 	private final EquipmentSlot[] slotTypes;
 	
-	public CustomEnchantment(Enchantment enchantment, EquipmentSlot... slotTypes) {
+	public CustomEnchantment(DynamicRegistry.Key<Enchantment> enchantment, EquipmentSlot... slotTypes) {
 		this.enchantment = enchantment;
 		this.slotTypes = slotTypes;
 	}
 	
-	public Enchantment getEnchantment() {
+	public DynamicRegistry.Key<Enchantment> getEnchantment() {
 		return enchantment;
 	}
 	
@@ -38,11 +39,11 @@ public class CustomEnchantment {
 		return map;
 	}
 	
-	public int getProtectionAmount(short level, DamageTypeInfo typeInfo) {
+	public int getProtectionAmount(int level, DamageTypeInfo typeInfo) {
 		return 0;
 	}
 	
-	public float getAttackDamage(short level, EntityGroup group, CombatVersion version) {
+	public float getAttackDamage(int level, EntityGroup group, CombatVersion version) {
 		return 0.0F;
 	}
 	

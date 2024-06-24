@@ -1,4 +1,4 @@
-package io.github.togar2.pvp.utils;
+package io.github.togar2.pvp.feature.effect;
 
 import io.github.togar2.pvp.potion.effect.CustomPotionEffect;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
@@ -6,7 +6,7 @@ import net.minestom.server.potion.Potion;
 
 import java.util.Collection;
 
-public class PotionUtils {
+class PotionColorUtils {
 	public static int getPotionColor(Collection<Potion> effects) {
 		if (effects.isEmpty()) {
 			return 3694022;
@@ -37,24 +37,5 @@ public class PotionUtils {
 			b = b / (float) totalAmplifier * 255.0f;
 			return (int) r << 16 | (int) g << 8 | (int) b;
 		}
-	}
-	
-	public static byte createFlags(boolean ambient, boolean particles, boolean icon) {
-		byte flags = 0;
-		if (ambient) {
-			flags = (byte) (flags | 0x01);
-		}
-		if (particles) {
-			flags = (byte) (flags | 0x02);
-		}
-		if (icon) {
-			flags = (byte) (flags | 0x04);
-		}
-		return flags;
-	}
-	
-	private static final byte DEFAULT_FLAGS = createFlags(false, true, true);
-	public static byte defaultFlags() {
-		return DEFAULT_FLAGS;
 	}
 }

@@ -5,10 +5,14 @@ import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.potion.PotionFeature;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffect;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
+import io.github.togar2.pvp.potion.item.CustomPotionType;
+import io.github.togar2.pvp.potion.item.CustomPotionTypes;
+import io.github.togar2.pvp.projectile.Arrow;
 import io.github.togar2.pvp.utils.CombatVersion;
-import io.github.togar2.pvp.utils.PotionUtils;
+import io.github.togar2.pvp.utils.PotionFlags;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.GameMode;
@@ -22,27 +26,37 @@ import net.minestom.server.event.entity.EntityPotionAddEvent;
 import net.minestom.server.event.entity.EntityPotionRemoveEvent;
 import net.minestom.server.event.entity.EntityTickEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
+import net.minestom.server.item.component.PotionContents;
+import net.minestom.server.item.metadata.PotionMeta;
+import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
+import net.minestom.server.potion.PotionType;
 import net.minestom.server.potion.TimedPotion;
 import net.minestom.server.tag.Tag;
 import net.minestom.server.utils.time.TimeUnit;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaEffectFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.EFFECT, VanillaEffectFeature::new,
-			FeatureType.VERSION
+			FeatureType.POTION, FeatureType.VERSION
 	);
 	
 	public static final Tag<Map<PotionEffect, Integer>> DURATION_LEFT = Tag.Transient("effectDurationLeft");
+	public static final int DEFAULT_POTION_COLOR = 0xff385dc6;
 	
+	private final PotionFeature potionFeature;
 	private final CombatVersion version;
 	
 	public VanillaEffectFeature(FeatureConfiguration configuration) {
+		this.potionFeature = configuration.get(FeatureType.POTION);
 		this.version = configuration.get(FeatureType.VERSION);
 	}
 	
@@ -111,7 +125,7 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 		return potionMap;
 	}
 	
-	protected static void updatePotionVisibility(LivingEntity entity) {
+	protected void updatePotionVisibility(LivingEntity entity) {
 		boolean ambient;
 		int color;
 		boolean invisible;
@@ -128,7 +142,7 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 				invisible = false;
 			} else {
 				ambient = containsOnlyAmbientEffects(effects);
-				color = PotionUtils.getPotionColor(effects.stream().map(TimedPotion::potion).collect(Collectors.toList()));
+				color = getPotionColor(effects.stream().map(TimedPotion::potion).collect(Collectors.toList()));
 				invisible = entity.hasEffect(PotionEffect.INVISIBILITY);
 			}
 		}
@@ -143,7 +157,7 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 		});
 	}
 	
-	private static boolean containsOnlyAmbientEffects(Collection<TimedPotion> effects) {
+	private boolean containsOnlyAmbientEffects(Collection<TimedPotion> effects) {
 		if (effects.isEmpty()) return true;
 		
 		for (TimedPotion potion : effects) {
@@ -153,5 +167,99 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 		}
 		
 		return true;
+	}
+	
+	@Override
+	public void addArrowEffects(LivingEntity entity, Arrow arrow) {
+		PotionMeta potionMeta = arrow.getPotion();
+		
+		CustomPotionType customPotionType = CustomPotionTypes.get(potionMeta.getPotionType());
+		if (customPotionType != null) {
+			for (Potion potion : customPotionType.getEffects(version)) {
+				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.effect());
+				if (customPotionEffect.isInstant()) {
+					customPotionEffect.applyInstantEffect(arrow, null,
+							entity, potion.amplifier(), 1.0D, version);
+				} else {
+					int duration = Math.max(potion.duration() / 8, 1);
+					entity.addEffect(new Potion(potion.effect(), potion.amplifier(), duration, potion.flags()));
+				}
+			}
+		}
+		
+		if (potionMeta.getCustomPotionEffects().isEmpty()) return;
+		
+		potionMeta.getCustomPotionEffects().stream().map(customPotion ->
+						new Potion(Objects.requireNonNull(PotionEffect.fromId(customPotion.id())),
+								customPotion.amplifier(), customPotion.duration(),
+								PotionFlags.create(
+										customPotion.isAmbient(),
+										customPotion.showParticles(),
+										customPotion.showIcon()
+								)))
+				.forEach(potion -> {
+					CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.effect());
+					if (customPotionEffect.isInstant()) {
+						customPotionEffect.applyInstantEffect(arrow, null,
+								entity, potion.amplifier(), 1.0D, version);
+					} else {
+						entity.addEffect(new Potion(potion.effect(), potion.amplifier(),
+								potion.duration(), potion.flags()));
+					}
+				});
+	}
+	
+	@Override
+	public void addSplashPotionEffects(LivingEntity entity, List<Potion> potions, double proximity,
+	                                   @Nullable Entity source, @Nullable Entity attacker) {
+		for (Potion potion : potions) {
+			CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.effect());
+			if (customPotionEffect.isInstant()) {
+				customPotionEffect.applyInstantEffect(source, attacker,
+						entity, potion.amplifier(), proximity, version);
+			} else {
+				int duration = potion.duration();
+				if (version.legacy()) duration = (int) Math.floor(duration * 0.75);
+				duration = (int) (proximity * (double) duration + 0.5);
+				
+				if (duration > 20) {
+					entity.addEffect(new Potion(potion.effect(), potion.amplifier(), duration, potion.flags()));
+				}
+			}
+		}
+	}
+	
+	@Override
+	public boolean hasInstantEffect(Collection<Potion> effects) {
+		if (effects.isEmpty()) return false;
+		
+		for (Potion potion : effects) {
+			if (CustomPotionEffects.get(potion.effect()).isInstant()) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public int getPotionColor(PotionContents contents) {
+		if (contents.customColor() != null) {
+			return contents.customColor();
+		}
+		
+		int r = 0, g = 0, b = 0;
+		int total = 0;
+		
+		if (contents.getColor() != null) {
+			return contents.getColor().asRGB();
+		} else {
+			return contents.getPotionType() == PotionType.EMPTY ? 16253176 : getPotionColor(potionFeature.getAllPotions(contents));
+		}
+	}
+	
+	@Override
+	public int getPotionColor(Collection<Potion> effects) {
+		return PotionColorUtils.getPotionColor(effects);
 	}
 }

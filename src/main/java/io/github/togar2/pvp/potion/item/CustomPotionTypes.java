@@ -1,6 +1,5 @@
 package io.github.togar2.pvp.potion.item;
 
-import io.github.togar2.pvp.potion.PotionListener;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.PotionType;

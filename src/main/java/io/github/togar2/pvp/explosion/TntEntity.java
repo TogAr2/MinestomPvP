@@ -1,6 +1,7 @@
 package io.github.togar2.pvp.explosion;
 
 import io.github.togar2.pvp.entity.EntityUtils;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
@@ -8,7 +9,6 @@ import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.metadata.other.PrimedTntMeta;
 import org.jetbrains.annotations.Nullable;
-import org.jglrxavpok.hephaistos.nbt.NBT;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -45,7 +45,9 @@ public class TntEntity extends Entity {
 					(float) position.z(),
 					4.0f,
 					causingEntity == null ? null
-							: NBT.Compound(NBT -> NBT.setString("causingEntity", causingEntity.getUuid().toString()))
+							: CompoundBinaryTag.builder()
+							.putString("causingEntity", causingEntity.getUuid().toString())
+							.build()
 			);
 		}
 	}

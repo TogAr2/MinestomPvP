@@ -9,9 +9,7 @@ import net.minestom.server.collision.PhysicsResult;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
-import net.minestom.server.entity.Entity;
-import net.minestom.server.entity.EntityType;
-import net.minestom.server.entity.LivingEntity;
+import net.minestom.server.entity.*;
 import net.minestom.server.entity.metadata.projectile.ProjectileMeta;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.entity.projectile.ProjectileCollideWithBlockEvent;
@@ -192,7 +190,7 @@ public class CustomEntityProjectile extends Entity {
 	}
 	
 	protected boolean canHit(Entity entity) {
-		return entity instanceof LivingEntity;
+		return entity instanceof LivingEntity && !(entity instanceof Player player && player.getGameMode() == GameMode.SPECTATOR);
 	}
 	
 	@Override

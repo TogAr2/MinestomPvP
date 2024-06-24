@@ -5,8 +5,8 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.potion.PotionEffect;
 
 public class GlowingPotionEffect extends CustomPotionEffect {
-	public GlowingPotionEffect(int color) {
-		super(PotionEffect.GLOWING, color);
+	public GlowingPotionEffect() {
+		super(PotionEffect.GLOWING);
 	}
 	
 	@Override

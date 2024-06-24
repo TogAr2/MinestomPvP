@@ -16,8 +16,8 @@ java {
 }
 
 dependencies {
-    compileOnly 'net.minestom:minestom-snapshots:2a7df1ab55'
-    testImplementation 'net.minestom:minestom-snapshots:2a7df1ab55'
+    compileOnly 'net.minestom:minestom-snapshots:f1d5940855'
+    testImplementation 'net.minestom:minestom-snapshots:f1d5940855'
     //testImplementation 'com.github.TogAr2:MinestomFluids:b237b13a4b'
 }
 

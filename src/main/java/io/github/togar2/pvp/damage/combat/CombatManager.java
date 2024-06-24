@@ -13,6 +13,7 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.network.packet.server.play.EndCombatEventPacket;
 import net.minestom.server.network.packet.server.play.EnterCombatEventPacket;
@@ -122,15 +123,15 @@ public class CombatManager {
 		
 		if (firstAttacker != null && firstAttacker != lastAttacker) {
 			ItemStack weapon = firstAttacker instanceof LivingEntity ? ((LivingEntity) firstAttacker).getItemInMainHand() : ItemStack.AIR;
-			if (!weapon.isAir() && weapon.getDisplayName() != null) {
-				return Component.translatable("death.fell.assist.item", getEntityName(), EntityUtils.getName(firstAttacker), weapon.getDisplayName());
+			if (!weapon.isAir() && weapon.has(ItemComponent.CUSTOM_NAME)) {
+				return Component.translatable("death.fell.assist.item", getEntityName(), EntityUtils.getName(firstAttacker), weapon.get(ItemComponent.CUSTOM_NAME));
 			} else {
 				return Component.translatable("death.fell.assist", getEntityName(), EntityUtils.getName(firstAttacker));
 			}
 		} else if (lastAttacker != null) {
 			ItemStack weapon = lastAttacker instanceof LivingEntity ? ((LivingEntity) lastAttacker).getItemInMainHand() : ItemStack.AIR;
-			if (!weapon.isAir() && weapon.getDisplayName() != null) {
-				return Component.translatable("death.fell.finish.item", getEntityName(), EntityUtils.getName(lastAttacker), weapon.getDisplayName());
+			if (!weapon.isAir() && weapon.has(ItemComponent.CUSTOM_NAME)) {
+				return Component.translatable("death.fell.finish.item", getEntityName(), EntityUtils.getName(lastAttacker), weapon.get(ItemComponent.CUSTOM_NAME));
 			} else {
 				return Component.translatable("death.fell.finish", getEntityName(), EntityUtils.getName(lastAttacker));
 			}
@@ -144,7 +145,9 @@ public class CombatManager {
 			return Component.translatable("death.attack.badRespawnPoint.message", player.getName(), BAD_RESPAWN_POINT_MESSAGE);
 		}
 		
-		String id = "death.attack." + damage.getType().messageId();
+		DamageType damageType = MinecraftServer.getDamageTypeRegistry().get(damage.getType());
+		if (damageType == null) return Component.empty();
+		String id = "death.attack." + damageType.messageId();
 		
 		Entity source = damage.getSource();
 		Entity attacker = damage.getAttacker();
@@ -152,8 +155,8 @@ public class CombatManager {
 		if (source != null) {
 			Component ownerName = attacker == null ? EntityUtils.getName(source) : EntityUtils.getName(attacker);
 			ItemStack weapon = source instanceof LivingEntity living ? living.getItemInMainHand() : ItemStack.AIR;
-			if (!weapon.isAir() && weapon.getDisplayName() != null) {
-				return Component.translatable(id + ".item", EntityUtils.getName(player), ownerName, weapon.getDisplayName());
+			if (!weapon.isAir() && weapon.has(ItemComponent.CUSTOM_NAME)) {
+				return Component.translatable(id + ".item", EntityUtils.getName(player), ownerName, weapon.get(ItemComponent.CUSTOM_NAME));
 			} else {
 				return Component.translatable(id, EntityUtils.getName(player), ownerName);
 			}
@@ -173,7 +176,7 @@ public class CombatManager {
 		if (killer != null) return killer;
 		
 		if (lastDamagedBy != -1) {
-			Entity entity = Entity.getEntity(lastDamagedBy);
+			Entity entity = player.getInstance().getEntityById(lastDamagedBy);
 			if (entity instanceof LivingEntity living) return living;
 		}
 		
@@ -249,7 +252,7 @@ public class CombatManager {
 			recheckStatus();
 		
 		if (lastDamagedBy != -1) {
-			Entity lastDamager = Entity.getEntity(lastDamagedBy);
+			Entity lastDamager = player.getInstance().getEntityById(lastDamagedBy);
 			if (lastDamager instanceof LivingEntity living && living.isDead()) {
 				lastDamagedBy = -1;
 			} else if (System.currentTimeMillis() - lastDamageTime > 5000) {

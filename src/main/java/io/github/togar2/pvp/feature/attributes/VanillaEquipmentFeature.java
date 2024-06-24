@@ -7,20 +7,20 @@ import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.utils.CombatVersion;
-import net.minestom.server.attribute.Attribute;
-import net.minestom.server.attribute.AttributeInstance;
-import net.minestom.server.attribute.AttributeModifier;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
+import net.minestom.server.entity.attribute.Attribute;
+import net.minestom.server.entity.attribute.AttributeInstance;
+import net.minestom.server.entity.attribute.AttributeModifier;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.item.EntityEquipEvent;
 import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.item.ItemStack;
+import net.minestom.server.utils.NamespaceID;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public class VanillaEquipmentFeature implements DataFeature<Attribute>, RegistrableFeature {
 	public static final DefinedFeature<VanillaEquipmentFeature> DEFINED = new DefinedFeature<>(
@@ -57,7 +57,7 @@ public class VanillaEquipmentFeature implements DataFeature<Attribute>, Registra
 	}
 	
 	@Override
-	public float getValue(LivingEntity entity, Attribute attribute) {
+	public double getValue(LivingEntity entity, Attribute attribute) {
 		return entity.getAttributeValue(attribute);
 	}
 	
@@ -83,11 +83,11 @@ public class VanillaEquipmentFeature implements DataFeature<Attribute>, Registra
 		addAttributeModifiers(entity, Tool.getAttributes(tool, slot, newItem, version));
 	}
 	
-	private void removeAttributeModifiers(LivingEntity entity, Map<Attribute, List<UUID>> modifiers) {
-		for (Map.Entry<Attribute, List<UUID>> entry : modifiers.entrySet()) {
+	private void removeAttributeModifiers(LivingEntity entity, Map<Attribute, List<NamespaceID>> modifiers) {
+		for (Map.Entry<Attribute, List<NamespaceID>> entry : modifiers.entrySet()) {
 			AttributeInstance attribute = entity.getAttribute(entry.getKey());
-			for (UUID uuid : entry.getValue()) {
-				attribute.removeModifier(uuid);
+			for (NamespaceID id : entry.getValue()) {
+				attribute.removeModifier(id);
 			}
 		}
 	}

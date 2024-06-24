@@ -87,6 +87,9 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 		Damage damage = event.getDamage();
 		Entity attacker = damage.getAttacker();
 		
+		DamageType damageType = MinecraftServer.getDamageTypeRegistry().get(damage.getType());
+		assert damageType != null;
+		
 		DamageTypeInfo typeInfo = DamageTypeInfo.of(damage.getType());
 		if (event.getEntity() instanceof Player player && typeInfo.shouldScaleWithDifficulty(damage))
 			damage.setAmount(scaleWithDifficulty(player, damage.getAmount()));
@@ -112,7 +115,7 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 		}
 		
 		if (typeInfo.damagesHelmet() && !entity.getEquipment(EquipmentSlot.HELMET).isAir()) {
-			itemDamageFeature.damageArmor(entity, damage.getType(), amount, EquipmentSlot.HELMET);
+			itemDamageFeature.damageArmor(entity, damageType, amount, EquipmentSlot.HELMET);
 			amount *= 0.75F;
 		}
 		
@@ -134,7 +137,7 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 		}
 		
 		// Process armor and effects
-		amount = armorFeature.getDamageWithProtection(entity, damage.getType(), amount);
+		amount = armorFeature.getDamageWithProtection(entity, damageType, amount);
 		
 		damage.setAmount(amount);
 		FinalDamageEvent finalDamageEvent = new FinalDamageEvent(entity, damage, 10);
@@ -154,7 +157,7 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 		
 		// Exhaustion from damage
 		if (amountBeforeProcessing != 0 && entity instanceof Player player)
-			exhaustionFeature.addDamageExhaustion(player, damage.getType());
+			exhaustionFeature.addDamageExhaustion(player, damageType);
 		
 		if (register) entity.setTag(LAST_DAMAGE_AMOUNT, amountBeforeProcessing);
 		
@@ -164,7 +167,7 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 			// Send damage animation
 			entity.sendPacketToViewersAndSelf(new DamageEventPacket(
 					entity.getEntityId(),
-					damage.getType().id(),
+					MinecraftServer.getDamageTypeRegistry().getId(damage.getType()),
 					damage.getAttacker() == null ? 0 : damage.getAttacker().getEntityId() + 1,
 					damage.getSource() == null ? 0 : damage.getSource().getEntityId() + 1,
 					null
@@ -190,7 +193,7 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 		float totalHealth = entity.getHealth() +
 				(entity instanceof Player player ? player.getAdditionalHearts() : 0);
 		if (totalHealth - amount <= 0) {
-			boolean totem = totemFeature.tryProtect(entity, damage.getType());
+			boolean totem = totemFeature.tryProtect(entity, damageType);
 			
 			if (totem) {
 				event.setCancelled(true);
@@ -204,32 +207,29 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 		} else if (hurtSoundAndAnimation) {
 			// Workaround to have different types make a different sound,
 			// but only if the sound has not been changed by damage#getSound
-			//TODO improve
 			if (entity instanceof Player && sound == SoundEvent.ENTITY_PLAYER_HURT) {
-				if (typeInfo.fire()) {
-					sound = SoundEvent.ENTITY_PLAYER_HURT_ON_FIRE;
-				} else if (typeInfo.thorns()) {
-					sound = SoundEvent.ENCHANT_THORNS_HIT;
-				} else if (damage.getType() == DamageType.DROWN) {
-					sound = SoundEvent.ENTITY_PLAYER_HURT_DROWN;
-				} else if (damage.getType() == DamageType.SWEET_BERRY_BUSH) {
-					sound = SoundEvent.ENTITY_PLAYER_HURT_SWEET_BERRY_BUSH;
-				} else if (damage.getType() == DamageType.FREEZE) {
-					sound = SoundEvent.ENTITY_PLAYER_HURT_FREEZE;
-				}
+				String effects = Objects.requireNonNull(damageType.registry()).effects();
+				if (effects != null) sound = switch (effects) {
+					case "thorns" -> SoundEvent.ENCHANT_THORNS_HIT;
+					case "drowning" -> SoundEvent.ENTITY_PLAYER_HURT_DROWN;
+					case "burning" -> SoundEvent.ENTITY_PLAYER_HURT_ON_FIRE;
+					case "poking" -> SoundEvent.ENTITY_PLAYER_HURT_SWEET_BERRY_BUSH;
+					case "freezing" -> SoundEvent.ENTITY_PLAYER_HURT_FREEZE;
+					default -> sound;
+				};
 			}
 		}
 		
 		// Play sound (copied from Minestom, because of complications with cancelling)
 		if (sound != null) entity.sendPacketToViewersAndSelf(new SoundEffectPacket(
-				sound, null, entity instanceof Player ? Sound.Source.PLAYER : Sound.Source.HOSTILE,
+				sound, entity instanceof Player ? Sound.Source.PLAYER : Sound.Source.HOSTILE,
 				entity.getPosition(),
 				//TODO seed randomizing?
 				1.0f, 1.0f, 0
 		));
 		
 		if (death && !event.isCancelled()) {
-			EntityPreDeathEvent entityPreDeathEvent = new EntityPreDeathEvent(entity, damage.getType());
+			EntityPreDeathEvent entityPreDeathEvent = new EntityPreDeathEvent(entity, damageType);
 			EventDispatcher.call(entityPreDeathEvent);
 			if (entityPreDeathEvent.isCancelled()) event.setCancelled(true);
 			if (entityPreDeathEvent.isCancelDeath()) amount = 0;

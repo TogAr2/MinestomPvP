@@ -5,7 +5,7 @@ import io.github.togar2.pvp.entity.CustomPlayer;
 import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.feature.CombatFeatures;
 import io.github.togar2.pvp.feature.config.CombatFeatureRegistry;
-import io.github.togar2.pvp.food.FoodComponents;
+import io.github.togar2.pvp.food.FoodBehaviours;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
 import io.github.togar2.pvp.potion.item.CustomPotionTypes;
 import io.github.togar2.pvp.utils.PvPUseItemListener;
@@ -49,7 +49,7 @@ public class PvpExtension {
 	 * Initialize the PvP extension.
 	 */
 	public static void init() {
-		FoodComponents.registerAll();
+		FoodBehaviours.registerAll();
 		CustomEnchantments.registerAll();
 		CustomPotionEffects.registerAll();
 		CustomPotionTypes.registerAll();

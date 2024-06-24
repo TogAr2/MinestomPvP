@@ -18,9 +18,9 @@ import io.github.togar2.pvp.utils.CombatVersion;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;
-import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.*;
+import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.EventDispatcher;
@@ -160,7 +160,7 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 					(tool.isSword() || tool == Tool.TRIDENT) ? 1 : 2);
 		
 		if (attack.fireAspect() > 0)
-			EntityUtils.setOnFireForSeconds(target, attack.fireAspect() * 4);
+			EntityUtils.setOnFireForSeconds(living, attack.fireAspect() * 4);
 		
 		// Damage indicator particles
 		float damageDone = originalHealth - living.getHealth();
@@ -183,7 +183,7 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 	
 	protected @Nullable AttackValues.Final prepareAttack(LivingEntity attacker, Entity target) {
 		//TODO enchantment feature
-		float damage = attacker.getAttributeValue(Attribute.ATTACK_DAMAGE);
+		float damage = (float) attacker.getAttributeValue(Attribute.GENERIC_ATTACK_DAMAGE);
 		float magicalDamage = EnchantmentUtils.getAttackDamage(
 				attacker.getItemInMainHand(),
 				target instanceof LivingEntity living ? EntityGroup.ofEntity(living) : EntityGroup.DEFAULT,
@@ -197,8 +197,8 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 		}
 		
 		// Apply cooldownProgress to damage
-		damage *= 0.2 + cooldownProgress * cooldownProgress * 0.8;
-		magicalDamage *= cooldownProgress;
+		damage *= (float) (0.2 + cooldownProgress * cooldownProgress * 0.8);
+		magicalDamage *= (float) cooldownProgress;
 		
 		// Calculate attacks
 		boolean strongAttack = cooldownProgress > 0.9;

@@ -26,7 +26,7 @@ import io.github.togar2.pvp.feature.totem.TotemFeature;
 import io.github.togar2.pvp.feature.tracking.DeathMessageFeature;
 import io.github.togar2.pvp.feature.tracking.TrackingFeature;
 import io.github.togar2.pvp.utils.CombatVersion;
-import net.minestom.server.attribute.Attribute;
+import net.minestom.server.entity.attribute.Attribute;
 
 public record FeatureType<F extends CombatFeature>(String name, F defaultFeature) {
 	public static final FeatureType<CombatVersion> VERSION = of("VERSION", CombatVersion.MODERN);

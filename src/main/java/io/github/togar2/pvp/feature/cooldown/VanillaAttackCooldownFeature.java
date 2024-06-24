@@ -4,8 +4,8 @@ import io.github.togar2.pvp.feature.CombatFeature;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
-import net.minestom.server.attribute.Attribute;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
@@ -52,6 +52,6 @@ public class VanillaAttackCooldownFeature implements AttackCooldownFeature, Comb
 	}
 	
 	protected double getAttackCooldownProgressPerTick(Player player) {
-		return (1 / player.getAttributeValue(Attribute.ATTACK_SPEED)) * 20;
+		return (1 / player.getAttributeValue(Attribute.GENERIC_ATTACK_SPEED)) * 20;
 	}
 }

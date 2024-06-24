@@ -1,6 +1,5 @@
 package io.github.togar2.pvp.projectile;
 
-import io.github.togar2.pvp.potion.PotionListener;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
