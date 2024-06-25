@@ -28,14 +28,14 @@ import java.util.Optional;
 
 public class PvpTest {
 	public static void main(String[] args) {
-		DimensionType fullbright = DimensionType.builder().ambientLight(1.0f).build();
-		DynamicRegistry.Key<DimensionType> fullbrightKey =
-				MinecraftServer.getDimensionTypeRegistry().register(NamespaceID.from("idk"), fullbright);
-		
 		MinecraftServer server = MinecraftServer.init();
 		PvpExtension.init();
 		//MinestomFluids.init();
 		//VelocityProxy.enable("tj7MulOtnIDe");
+		
+		DimensionType fullbright = DimensionType.builder().ambientLight(1.0f).build();
+		DynamicRegistry.Key<DimensionType> fullbrightKey =
+				MinecraftServer.getDimensionTypeRegistry().register(NamespaceID.from("idk"), fullbright);
 		
 		Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(fullbrightKey);
 		instance.setGenerator(new DemoGenerator());

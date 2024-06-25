@@ -9,10 +9,10 @@ import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.item.enchant.Enchantment;
 import net.minestom.server.registry.DynamicRegistry;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class CustomEnchantments {
 	private static final Map<DynamicRegistry.Key<Enchantment>, CustomEnchantment> ENCHANTMENTS = new HashMap<>();
@@ -28,7 +28,7 @@ public class CustomEnchantments {
 	}
 	
 	public static FeatureType<?>[] getAllFeatureDependencies() {
-		List<FeatureType<?>> features = new ArrayList<>();
+		Set<FeatureType<?>> features = new HashSet<>();
 		
 		for (CustomEnchantment enchantment : ENCHANTMENTS.values()) {
 			features.addAll(enchantment.getDependencies());

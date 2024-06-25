@@ -8,6 +8,7 @@ import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.provider.DifficultyProvider;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventNode;
@@ -53,7 +54,7 @@ public class VanillaRegenerationFeature implements RegenerationFeature, Registra
 		int starvationTicks = player.getTag(STARVATION_TICKS);
 		
 		if (version.modern() && player.getFoodSaturation() > 0 && health > 0
-				&& health < player.getMaxHealth() && food >= 20) {
+				&& health < player.getAttributeValue(Attribute.GENERIC_MAX_HEALTH) && food >= 20) {
 			starvationTicks++;
 			if (starvationTicks >= 10) {
 				float amount = Math.min(player.getFoodSaturation(), 6);
@@ -61,7 +62,7 @@ public class VanillaRegenerationFeature implements RegenerationFeature, Registra
 				starvationTicks = 0;
 			}
 		} else if (food >= 18 && health > 0
-				&& health < player.getMaxHealth()) {
+				&& health < player.getAttributeValue(Attribute.GENERIC_MAX_HEALTH)) {
 			starvationTicks++;
 			if (starvationTicks >= 80) {
 				regenerate(player, 1, version.legacy() ? 3 : 6);

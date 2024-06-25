@@ -93,18 +93,16 @@ public class CombatConfiguration {
 	}
 	
 	public CombatFeatureSet build() {
-		List<CombatFeature> result = new ArrayList<>(features.size());
+		CombatFeatureSet result = new CombatFeatureSet();
 		
 		List<ConstructableFeature> buildOrder = getBuildOrder();
 		
-		FeatureConfiguration configuration = new FeatureConfiguration();
 		for (ConstructableFeature feature : buildOrder) {
-			CombatFeature currentResult = feature.construct(configuration);
-			result.add(currentResult);
-			configuration.add(feature.type, currentResult);
+			CombatFeature currentResult = feature.construct(result);
+			result.add(feature.type, currentResult);
 		}
 		
-		return new CombatFeatureSet(result.toArray(CombatFeature[]::new));
+		return result;
 	}
 	
 	/**
