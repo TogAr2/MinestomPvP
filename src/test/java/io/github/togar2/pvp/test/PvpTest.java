@@ -9,6 +9,7 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.*;
+import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.entity.damage.EntityDamage;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.*;
@@ -18,6 +19,7 @@ import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.common.KeepAlivePacket;
 import net.minestom.server.network.packet.server.play.*;
+import net.minestom.server.registry.DynamicRegistry;
 import net.minestom.server.utils.NamespaceID;
 import net.minestom.server.utils.time.TimeUnit;
 import net.minestom.server.world.DimensionType;
@@ -26,15 +28,16 @@ import java.util.Optional;
 
 public class PvpTest {
 	public static void main(String[] args) {
+		DimensionType fullbright = DimensionType.builder().ambientLight(1.0f).build();
+		DynamicRegistry.Key<DimensionType> fullbrightKey =
+				MinecraftServer.getDimensionTypeRegistry().register(NamespaceID.from("idk"), fullbright);
+		
 		MinecraftServer server = MinecraftServer.init();
 		PvpExtension.init();
 		//MinestomFluids.init();
 		//VelocityProxy.enable("tj7MulOtnIDe");
 		
-		DimensionType fullbright = DimensionType.builder(NamespaceID.from("idk")).ambientLight(1.0f).build();
-		MinecraftServer.getDimensionTypeManager().addDimension(fullbright);
-		
-		Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(fullbright);
+		Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(fullbrightKey);
 		instance.setGenerator(new DemoGenerator());
 		instance.enableAutoChunkLoad(true);
 		
@@ -45,19 +48,19 @@ public class PvpTest {
 			
 			EntityCreature entity = new EntityCreature(EntityType.ZOMBIE);
 			entity.setInstance(instance, spawn);
-			entity.getAttribute(Attribute.MAX_HEALTH).setBaseValue(500);
+			entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(500);
 			entity.heal();
-
+			
 			MinecraftServer.getSchedulerManager().buildTask(() -> {
 				Optional<Player> player = MinecraftServer.getConnectionManager()
 						.getOnlinePlayers().stream()
 						.filter(p -> p.getDistanceSquared(entity) < 6)
 						.findAny();
-
+				
 				if (player.isPresent()) {
 					if (!player.get().damage(new EntityDamage(entity, 1.0f)))
 						return;
-
+					
 //					LegacyKnockbackEvent legacyKnockbackEvent = new LegacyKnockbackEvent(player.get(), entity, true);
 //					EventDispatcher.callCancellable(legacyKnockbackEvent, () -> {
 //						LegacyKnockbackSettings settings = legacyKnockbackEvent.getSettings();
@@ -77,7 +80,7 @@ public class PvpTest {
 //					if (player.get() instanceof CustomPlayer customPlayer)
 //						customPlayer.sendImmediateVelocityUpdate();
 				}
-
+				
 				event.getPlayer().setFood(20);
 			}).repeat(20, TimeUnit.SERVER_TICK).schedule();
 		});
