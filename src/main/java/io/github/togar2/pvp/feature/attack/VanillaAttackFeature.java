@@ -18,6 +18,7 @@ import io.github.togar2.pvp.utils.CombatVersion;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;
+import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.attribute.Attribute;
@@ -163,7 +164,7 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 					(tool.isSword() || tool == Tool.TRIDENT) ? 1 : 2);
 		
 		if (attack.fireAspect() > 0)
-			EntityUtils.setOnFireForSeconds(living, attack.fireAspect() * 4);
+			living.setFireTicks(attack.fireAspect() * 4 * ServerFlag.SERVER_TICKS_PER_SECOND);
 		
 		// Damage indicator particles
 		float damageDone = originalHealth - living.getHealth();

@@ -13,6 +13,7 @@ import io.github.togar2.pvp.feature.cooldown.VanillaAttackCooldownFeature;
 import io.github.togar2.pvp.feature.cooldown.VanillaItemCooldownFeature;
 import io.github.togar2.pvp.feature.damage.VanillaDamageFeature;
 import io.github.togar2.pvp.feature.effect.VanillaEffectFeature;
+import io.github.togar2.pvp.feature.enchantment.VanillaEnchantmentFeature;
 import io.github.togar2.pvp.feature.explosion.VanillaExplosionFeature;
 import io.github.togar2.pvp.feature.fall.VanillaFallFeature;
 import io.github.togar2.pvp.feature.food.VanillaExhaustionFeature;
@@ -41,6 +42,7 @@ public class CombatFeatures {
 	public static final DefinedFeature<VanillaItemCooldownFeature> VANILLA_ITEM_COOLDOWN = VanillaItemCooldownFeature.DEFINED;
 	public static final DefinedFeature<VanillaDamageFeature> VANILLA_DAMAGE = VanillaDamageFeature.DEFINED;
 	public static final DefinedFeature<VanillaEffectFeature> VANILLA_EFFECT = VanillaEffectFeature.DEFINED;
+	public static final DefinedFeature<VanillaEnchantmentFeature> VANILLA_ENCHANTMENT = VanillaEnchantmentFeature.DEFINED;
 	public static final DefinedFeature<VanillaExplosionFeature> VANILLA_EXPLOSION = VanillaExplosionFeature.DEFINED;
 	public static final DefinedFeature<VanillaFallFeature> VANILLA_FALL = VanillaFallFeature.DEFINED;
 	public static final DefinedFeature<VanillaExhaustionFeature> VANILLA_EXHAUSTION = VanillaExhaustionFeature.DEFINED;
@@ -63,16 +65,16 @@ public class CombatFeatures {
 	private static final List<DefinedFeature<?>> VANILLA = List.of(
 			VANILLA_ARMOR, VANILLA_ATTACK, VANILLA_CRITICAL, VANILLA_SWEEPING,
 			VANILLA_EQUIPMENT, VANILLA_BLOCK, VANILLA_ATTACK_COOLDOWN, VANILLA_ITEM_COOLDOWN,
-			VANILLA_DAMAGE, VANILLA_EFFECT, VANILLA_EXPLOSION, VANILLA_FALL,
-			VANILLA_EXHAUSTION, VANILLA_FOOD, VANILLA_REGENERATION, VANILLA_ITEM_DAMAGE,
-			VANILLA_KNOCKBACK, VANILLA_POTION, VANILLA_BOW, VANILLA_CROSSBOW,
-			VANILLA_FISHING_ROD, VANILLA_ITEM_PROJECTILE, VANILLA_TRIDENT, VANILLA_SPECTATE,
-			VANILLA_TOTEM, VANILLA_DEATH_MESSAGE
+			VANILLA_DAMAGE, VANILLA_EFFECT, VANILLA_ENCHANTMENT, VANILLA_EXPLOSION,
+			VANILLA_FALL, VANILLA_EXHAUSTION, VANILLA_FOOD, VANILLA_REGENERATION,
+			VANILLA_ITEM_DAMAGE, VANILLA_KNOCKBACK, VANILLA_POTION, VANILLA_BOW,
+			VANILLA_CROSSBOW, VANILLA_FISHING_ROD, VANILLA_ITEM_PROJECTILE, VANILLA_TRIDENT,
+			VANILLA_SPECTATE, VANILLA_TOTEM, VANILLA_DEATH_MESSAGE
 	);
 	
-	public static final RegistrableFeature MODERN_VANILLA = getVanilla(CombatVersion.MODERN, DifficultyProvider.DEFAULT).build();
+	public static final CombatFeatureSet MODERN_VANILLA = getVanilla(CombatVersion.MODERN, DifficultyProvider.DEFAULT).build();
 	
-	public static final RegistrableFeature LEGACY_VANILLA = getVanilla(CombatVersion.LEGACY, DifficultyProvider.DEFAULT)
+	public static final CombatFeatureSet LEGACY_VANILLA = getVanilla(CombatVersion.LEGACY, DifficultyProvider.DEFAULT)
 			.add(LEGACY_VANILLA_BLOCK)
 			.build();
 	

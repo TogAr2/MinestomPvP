@@ -28,17 +28,19 @@ import org.jetbrains.annotations.Nullable;
 public class VanillaExplosionFeature implements ExplosionFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaExplosionFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.EXPLOSION, VanillaExplosionFeature::new,
-			FeatureType.ITEM_DAMAGE
+			FeatureType.ITEM_DAMAGE, FeatureType.ENCHANTMENT
 	);
 	
 	private final ItemDamageFeature itemDamageFeature;
 	
+	private final VanillaExplosionSupplier explosionSupplier;
+	
 	public VanillaExplosionFeature(FeatureConfiguration configuration) {
 		this.itemDamageFeature = configuration.get(FeatureType.ITEM_DAMAGE);
+		this.explosionSupplier = new VanillaExplosionSupplier(this, configuration.get(FeatureType.ENCHANTMENT));
 	}
 	
-	private final VanillaExplosionSupplier explosionSupplier = new VanillaExplosionSupplier(this);
-	
+	@Override
 	public VanillaExplosionSupplier getExplosionSupplier() {
 		return explosionSupplier;
 	}

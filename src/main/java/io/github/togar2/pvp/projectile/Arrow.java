@@ -1,6 +1,7 @@
 package io.github.togar2.pvp.projectile;
 
 import io.github.togar2.pvp.feature.effect.EffectFeature;
+import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
@@ -32,8 +33,8 @@ public class Arrow extends AbstractArrow {
 	
 	private ItemStack itemStack = DEFAULT_ARROW;
 	
-	public Arrow(@Nullable Entity shooter, EffectFeature effectFeature) {
-		super(shooter, EntityType.ARROW);
+	public Arrow(@Nullable Entity shooter, EffectFeature effectFeature, EnchantmentFeature enchantmentFeature) {
+		super(shooter, EntityType.ARROW, enchantmentFeature);
 		this.effectFeature = effectFeature;
 	}
 	

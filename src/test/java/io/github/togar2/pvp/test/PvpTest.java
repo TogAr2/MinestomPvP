@@ -2,11 +2,10 @@ package io.github.togar2.pvp.test;
 
 import io.github.togar2.pvp.PvpExtension;
 import io.github.togar2.pvp.feature.CombatFeatures;
-import io.github.togar2.pvp.feature.explosion.VanillaExplosionFeature;
+import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.test.commands.Commands;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.attribute.Attribute;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.*;
@@ -127,7 +126,7 @@ public class PvpTest {
 //		MinecraftServer.getGlobalEventHandler().addListener(LegacyKnockbackEvent.class,
 //				event -> event.setSettings(settings));
 		
-		instance.setExplosionSupplier(VanillaExplosionFeature.INSTANCE.getExplosionSupplier());
+		instance.setExplosionSupplier(CombatFeatures.MODERN_VANILLA.get(FeatureType.EXPLOSION).getExplosionSupplier());
 		
 		GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
 		eventHandler.addChild(CombatFeatures.MODERN_VANILLA.createNode());

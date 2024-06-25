@@ -36,7 +36,12 @@ public interface EnchantmentFeature extends CombatFeature {
 		
 		@Override
 		public double getExplosionKnockback(LivingEntity entity, double strength) {
-			return 0;
+			return strength;
+		}
+		
+		@Override
+		public int getFireDuration(LivingEntity entity, int duration) {
+			return duration;
 		}
 		
 		@Override
@@ -75,6 +80,8 @@ public interface EnchantmentFeature extends CombatFeature {
 	float getAttackDamage(ItemStack stack, EntityGroup group);
 	
 	double getExplosionKnockback(LivingEntity entity, double strength);
+	
+	int getFireDuration(LivingEntity entity, int duration);
 	
 	int getKnockback(LivingEntity entity);
 	

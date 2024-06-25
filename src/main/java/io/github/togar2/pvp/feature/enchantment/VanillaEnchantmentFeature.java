@@ -5,11 +5,17 @@ import io.github.togar2.pvp.enchantment.CustomEnchantments;
 import io.github.togar2.pvp.entity.EntityGroup;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.enums.ArmorMaterial;
+import io.github.togar2.pvp.feature.FeatureType;
+import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.damage.DamageType;
+import net.minestom.server.event.EventNode;
+import net.minestom.server.event.entity.EntitySetFireEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.component.EnchantmentList;
@@ -22,11 +28,24 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 
-public class VanillaEnchantmentFeature implements EnchantmentFeature {
+public class VanillaEnchantmentFeature implements EnchantmentFeature, RegistrableFeature {
+	public static final DefinedFeature<VanillaEnchantmentFeature> DEFINED = new DefinedFeature<>(
+			FeatureType.ENCHANTMENT, VanillaEnchantmentFeature::new,
+			CustomEnchantments.getAllFeatureDependencies()
+	);
+	
 	private final FeatureConfiguration configuration;
 	
 	public VanillaEnchantmentFeature(FeatureConfiguration configuration) {
 		this.configuration = configuration;
+	}
+	
+	@Override
+	public void init(EventNode<EntityInstanceEvent> node) {
+		node.addListener(EntitySetFireEvent.class, event -> {
+			if (event.getEntity() instanceof LivingEntity living)
+				event.setFireTicks(getFireDuration(living, event.getFireTicks()));
+		});
 	}
 	
 	public static void forEachEnchantment(Iterable<ItemStack> stacks, BiConsumer<CustomEnchantment, Integer> consumer) {
@@ -98,6 +117,13 @@ public class VanillaEnchantmentFeature implements EnchantmentFeature {
 		int level = getEquipmentLevel(entity, Enchantment.BLAST_PROTECTION);
 		if (level > 0) strength -= Math.floor((strength * (double) (level * 0.15f)));
 		return strength;
+	}
+	
+	@Override
+	public int getFireDuration(LivingEntity entity, int duration) {
+		int level = getEquipmentLevel(entity, Enchantment.FIRE_PROTECTION);
+		if (level > 0) duration -= (int) Math.floor((float) duration * (float) level * 0.15F);
+		return duration;
 	}
 	
 	@Override

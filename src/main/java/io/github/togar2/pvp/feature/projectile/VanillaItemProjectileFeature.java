@@ -10,6 +10,7 @@ import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
+import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.player.PlayerUseItemEvent;
@@ -82,7 +83,7 @@ public class VanillaItemProjectileFeature implements ItemProjectileFeature, Regi
 			projectile.setVelocity(projectile.getVelocity().add(playerVel.x(),
 					player.isOnGround() ? 0.0D : playerVel.y(), playerVel.z()));
 			
-			if (!player.isCreative()) {
+			if (player.getGameMode() != GameMode.CREATIVE) {
 				player.setItemInHand(event.getHand(), stack.withAmount(stack.amount() - 1));
 			}
 		});

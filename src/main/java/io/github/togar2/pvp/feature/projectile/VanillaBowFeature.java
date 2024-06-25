@@ -7,6 +7,7 @@ import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.effect.EffectFeature;
+import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.projectile.AbstractArrow;
 import io.github.togar2.pvp.projectile.Arrow;
@@ -14,6 +15,7 @@ import io.github.togar2.pvp.projectile.SpectralArrow;
 import io.github.togar2.pvp.utils.ViewUtil;
 import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.sound.Sound;
+import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
@@ -38,15 +40,17 @@ import java.util.concurrent.ThreadLocalRandom;
 public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaBowFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.BOW, VanillaBowFeature::new,
-			FeatureType.ITEM_DAMAGE, FeatureType.EFFECT
+			FeatureType.ITEM_DAMAGE, FeatureType.EFFECT, FeatureType.ENCHANTMENT
 	);
 	
 	private final ItemDamageFeature itemDamageFeature;
 	private final EffectFeature effectFeature;
+	private final EnchantmentFeature enchantmentFeature;
 	
 	public VanillaBowFeature(FeatureConfiguration configuration) {
 		this.itemDamageFeature = configuration.get(FeatureType.ITEM_DAMAGE);
 		this.effectFeature = configuration.get(FeatureType.EFFECT);
+		this.enchantmentFeature = configuration.get(FeatureType.ENCHANTMENT);
 	}
 	
 	@Override
@@ -98,7 +102,7 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 			if (punchEnchantment > 0) arrow.setKnockback(punchEnchantment);
 			
 			if (enchantmentList.level(Enchantment.FLAME) > 0)
-				arrow.setFireTicksLeft(100 * 20); // 100 seconds
+				arrow.setFireTicksLeft(100 * ServerFlag.SERVER_TICKS_PER_SECOND); // 100 seconds
 			
 			itemDamageFeature.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
 					EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, 1);
@@ -143,9 +147,9 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 	
 	protected AbstractArrow createArrow(ItemStack stack, @Nullable Entity shooter) {
 		if (stack.material() == Material.SPECTRAL_ARROW) {
-			return new SpectralArrow(shooter);
+			return new SpectralArrow(shooter, enchantmentFeature);
 		} else {
-			Arrow arrow = new Arrow(shooter, effectFeature);
+			Arrow arrow = new Arrow(shooter, effectFeature, enchantmentFeature);
 			arrow.setItemStack(stack);
 			return arrow;
 		}

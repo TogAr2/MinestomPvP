@@ -4,11 +4,14 @@ import io.github.togar2.pvp.enchantment.enchantments.DamageEnchantment;
 import io.github.togar2.pvp.enchantment.enchantments.ImpalingEnchantment;
 import io.github.togar2.pvp.enchantment.enchantments.ProtectionEnchantment;
 import io.github.togar2.pvp.enchantment.enchantments.ThornsEnchantment;
+import io.github.togar2.pvp.feature.FeatureType;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.item.enchant.Enchantment;
 import net.minestom.server.registry.DynamicRegistry;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CustomEnchantments {
@@ -24,11 +27,27 @@ public class CustomEnchantments {
 		}
 	}
 	
+	public static FeatureType<?>[] getAllFeatureDependencies() {
+		List<FeatureType<?>> features = new ArrayList<>();
+		
+		for (CustomEnchantment enchantment : ENCHANTMENTS.values()) {
+			features.addAll(enchantment.getDependencies());
+		}
+		
+		return features.toArray(FeatureType[]::new);
+	}
+	
+	private static boolean registered = false;
+	
+	static {
+		registerAll();
+	}
+	
 	public static void registerAll() {
-		EquipmentSlot[] ALL_ARMOR_SLOTS = new EquipmentSlot[] {
-				EquipmentSlot.HELMET, EquipmentSlot.CHESTPLATE,
-				EquipmentSlot.LEGGINGS, EquipmentSlot.BOOTS
-		};
+		if (registered) return;
+		registered = true;
+		
+		EquipmentSlot[] ALL_ARMOR_SLOTS = EquipmentSlot.armors().toArray(EquipmentSlot[]::new);
 		
 		register(
 				new ProtectionEnchantment(Enchantment.PROTECTION, ProtectionEnchantment.Type.ALL, ALL_ARMOR_SLOTS),

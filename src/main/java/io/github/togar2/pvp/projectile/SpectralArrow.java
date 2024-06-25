@@ -1,5 +1,6 @@
 package io.github.togar2.pvp.projectile;
 
+import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import io.github.togar2.pvp.utils.PotionFlags;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
@@ -14,8 +15,8 @@ public class SpectralArrow extends AbstractArrow {
 	private static final ItemStack PICKUP_ITEM = ItemStack.of(Material.SPECTRAL_ARROW);
 	private int duration = 200;
 	
-	public SpectralArrow(@Nullable Entity shooter) {
-		super(shooter, EntityType.SPECTRAL_ARROW);
+	public SpectralArrow(@Nullable Entity shooter, EnchantmentFeature enchantmentFeature) {
+		super(shooter, EntityType.SPECTRAL_ARROW, enchantmentFeature);
 	}
 	
 	public int getDuration() {

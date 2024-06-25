@@ -21,7 +21,7 @@ public class VanillaSpectateFeature implements SpectateFeature, CombatFeature, R
 			FeatureType.SPECTATE, configuration -> new VanillaSpectateFeature()
 	);
 	
-	public static final Tag<Integer> SPECTATING = Tag.Integer("spectating");
+	public static final Tag<Entity> SPECTATING = Tag.Transient("spectating");
 	
 	@Override
 	public int getPriority() {
@@ -41,9 +41,7 @@ public class VanillaSpectateFeature implements SpectateFeature, CombatFeature, R
 	}
 	
 	protected void spectateTick(Player player) {
-		Integer spectatingId = player.getTag(SPECTATING);
-		if (spectatingId == null) return;
-		Entity spectating = Entity.getEntity(spectatingId);
+		Entity spectating = player.getTag(SPECTATING);
 		if (spectating == null || spectating == player) return;
 		
 		// This is to make sure other players don't see the player standing still while spectating
@@ -62,7 +60,7 @@ public class VanillaSpectateFeature implements SpectateFeature, CombatFeature, R
 		PlayerSpectateEvent playerSpectateEvent = new PlayerSpectateEvent(player, target);
 		EventDispatcher.callCancellable(playerSpectateEvent, () -> {
 			player.spectate(target);
-			player.setTag(SPECTATING, target.getEntityId());
+			player.setTag(SPECTATING, target);
 		});
 	}
 	

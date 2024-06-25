@@ -6,7 +6,6 @@ import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.EquipmentSlot;
-import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.item.enchant.Enchantment;
 import net.minestom.server.registry.DynamicRegistry;
@@ -36,15 +35,6 @@ public class ProtectionEnchantment extends CustomEnchantment {
 		} else {
 			return type == Type.PROJECTILE && damageTypeInfo.projectile() ? level * 2 : 0;
 		}
-	}
-	
-	public static int transformFireDuration(LivingEntity entity, int duration, EnchantmentFeature feature) {
-		int level = feature.getEquipmentLevel(entity, Enchantment.FIRE_PROTECTION);
-		if (level > 0) {
-			duration -= (int) Math.floor((float) duration * (float) level * 0.15F);
-		}
-		
-		return duration;
 	}
 	
 	public enum Type {

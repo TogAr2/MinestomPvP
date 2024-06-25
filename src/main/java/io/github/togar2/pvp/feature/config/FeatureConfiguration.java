@@ -5,6 +5,7 @@ import io.github.togar2.pvp.feature.FeatureType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -32,6 +33,10 @@ public class FeatureConfiguration {
 	@SuppressWarnings("unchecked")
 	<T extends CombatFeature> @Nullable T getRaw(FeatureType<T> type) {
 		return (T) combatFeatures.get(type);
+	}
+	
+	public Collection<CombatFeature> listFeatures() {
+		return combatFeatures.values();
 	}
 	
 	public Set<FeatureType<?>> listTypes() {

@@ -24,12 +24,9 @@ public class ThrownTrident extends AbstractArrow {
 	private boolean damageDone;
 	private boolean hasStartedReturning;
 	
-	private final EnchantmentFeature enchantmentFeature;
-	
 	public ThrownTrident(@Nullable Entity shooter, ItemStack tridentItem, EnchantmentFeature enchantmentFeature) {
-		super(shooter, EntityType.TRIDENT);
+		super(shooter, EntityType.TRIDENT, enchantmentFeature);
 		this.tridentItem = tridentItem;
-		this.enchantmentFeature = enchantmentFeature;
 		
 		ThrownTridentMeta meta = ((ThrownTridentMeta) getEntityMeta());
 		meta.setLoyaltyLevel(tridentItem.get(ItemComponent.ENCHANTMENTS).level(Enchantment.LOYALTY));

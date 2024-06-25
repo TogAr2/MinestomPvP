@@ -1,12 +1,10 @@
 package io.github.togar2.pvp.entity;
 
-import io.github.togar2.pvp.enchantment.enchantments.ProtectionEnchantment;
 import io.github.togar2.pvp.projectile.Arrow;
 import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.damage.Damage;
@@ -23,15 +21,6 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 public class EntityUtils {
-	public static void setOnFireForSeconds(LivingEntity entity, int seconds) {
-		int ticks = seconds * ServerFlag.SERVER_TICKS_PER_SECOND;
-		//todo move to enchantment feature
-		ticks = ProtectionEnchantment.transformFireDuration(entity, ticks);
-		
-		if (ticks > entity.getFireTicks())
-			entity.setFireTicks(ticks);
-	}
-	
 	public static Iterable<ItemStack> getArmorItems(LivingEntity entity) {
 		List<ItemStack> list = new ArrayList<>();
 		for (EquipmentSlot slot : EquipmentSlot.armors()) {

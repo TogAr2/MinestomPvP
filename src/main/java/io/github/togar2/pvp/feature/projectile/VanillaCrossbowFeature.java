@@ -7,6 +7,7 @@ import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.effect.EffectFeature;
+import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.projectile.AbstractArrow;
 import io.github.togar2.pvp.projectile.Arrow;
@@ -41,7 +42,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaCrossbowFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.CROSSBOW, VanillaCrossbowFeature::new,
-			FeatureType.ITEM_DAMAGE, FeatureType.EFFECT
+			FeatureType.ITEM_DAMAGE, FeatureType.EFFECT, FeatureType.ENCHANTMENT
 	);
 	
 	private static final Tag<Boolean> START_SOUND_PLAYED = Tag.Transient("StartSoundPlayed");
@@ -49,10 +50,12 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 	
 	private final ItemDamageFeature itemDamageFeature;
 	private final EffectFeature effectFeature;
+	private final EnchantmentFeature enchantmentFeature;
 	
 	public VanillaCrossbowFeature(FeatureConfiguration configuration) {
 		this.itemDamageFeature = configuration.get(FeatureType.ITEM_DAMAGE);
 		this.effectFeature = configuration.get(FeatureType.EFFECT);
+		this.enchantmentFeature = configuration.get(FeatureType.ENCHANTMENT);
 	}
 	
 	@Override
@@ -153,9 +156,9 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 	
 	protected AbstractArrow createArrow(ItemStack stack, @Nullable Entity shooter) {
 		if (stack.material() == Material.SPECTRAL_ARROW) {
-			return new SpectralArrow(shooter);
+			return new SpectralArrow(shooter, enchantmentFeature);
 		} else {
-			Arrow arrow = new Arrow(shooter, effectFeature);
+			Arrow arrow = new Arrow(shooter, effectFeature, enchantmentFeature);
 			arrow.setItemStack(stack);
 			return arrow;
 		}

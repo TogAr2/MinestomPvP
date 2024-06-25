@@ -41,7 +41,7 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 	private final Set<Integer> piercingIgnore = new HashSet<>();
 	private int fireTicksLeft = 0;
 	
-	private final EnchantmentFeature enchantmentFeature;
+	protected final EnchantmentFeature enchantmentFeature;
 	
 	public AbstractArrow(@Nullable Entity shooter, @NotNull EntityType entityType,
 	                     EnchantmentFeature enchantmentFeature) {
@@ -172,7 +172,7 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 			if (entity.getEntityType() == EntityType.ENDERMAN) return false;
 			
 			if (isOnFire()) {
-				EntityUtils.setOnFireForSeconds(living, 5);
+				living.setFireTicks(5 * ServerFlag.SERVER_TICKS_PER_SECOND);
 			}
 			
 			if (getPiercingLevel() <= 0) {

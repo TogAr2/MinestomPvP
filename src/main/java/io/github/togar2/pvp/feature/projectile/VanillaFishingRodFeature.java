@@ -13,6 +13,7 @@ import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.EquipmentSlot;
+import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventNode;
@@ -53,7 +54,7 @@ public class VanillaFishingRodFeature implements FishingRodFeature, RegistrableF
 			
 			if (player.hasTag(FISHING_BOBBER)) {
 				int durability = player.getTag(FISHING_BOBBER).retrieve();
-				if (!player.isCreative())
+				if (player.getGameMode() != GameMode.CREATIVE)
 					itemDamageFeature.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
 							EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, durability);
 				
