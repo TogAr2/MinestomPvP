@@ -67,8 +67,6 @@ public class VanillaFoodFeature implements FoodFeature, CombatFeature, Registrab
 					&& !event.getItemStack().has(ItemComponent.FOOD))
 				return;
 			
-			if (!event.getPlayer().isEating()) return; // Temporary hack, waiting on Minestom PR #2128
-			
 			onFinishEating(event.getPlayer(), event.getItemStack(), event.getHand());
 		});
 		

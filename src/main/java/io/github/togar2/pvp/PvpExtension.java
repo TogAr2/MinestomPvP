@@ -8,14 +8,12 @@ import io.github.togar2.pvp.feature.config.CombatFeatureRegistry;
 import io.github.togar2.pvp.food.FoodBehaviours;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
 import io.github.togar2.pvp.potion.item.CustomPotionTypes;
-import io.github.togar2.pvp.utils.PvPUseItemListener;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.entity.attribute.AttributeInstance;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityInstanceEvent;
-import net.minestom.server.network.packet.client.play.ClientUseItemPacket;
 
 public class PvpExtension {
 	public static EventNode<EntityInstanceEvent> events() {
@@ -57,6 +55,5 @@ public class PvpExtension {
 		CombatFeatureRegistry.init();
 		Tracker.register(MinecraftServer.getGlobalEventHandler());
 		MinecraftServer.getConnectionManager().setPlayerProvider(CustomPlayer::new);
-		MinecraftServer.getPacketListenerManager().setPlayListener(ClientUseItemPacket.class, PvPUseItemListener::useItemListener);
 	}
 }
