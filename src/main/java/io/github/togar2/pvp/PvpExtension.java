@@ -10,9 +10,9 @@ import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
 import io.github.togar2.pvp.potion.item.CustomPotionTypes;
 import io.github.togar2.pvp.utils.PvPUseItemListener;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.attribute.Attribute;
-import net.minestom.server.attribute.AttributeInstance;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.attribute.Attribute;
+import net.minestom.server.entity.attribute.AttributeInstance;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.network.packet.client.play.ClientUseItemPacket;
@@ -34,14 +34,14 @@ public class PvpExtension {
 	 * @param legacyAttack {@code true} if legacy attack should be enabled
 	 */
 	public static void setLegacyAttack(Player player, boolean legacyAttack) {
-		AttributeInstance speed = player.getAttribute(Attribute.ATTACK_SPEED);
-		AttributeInstance damage = player.getAttribute(Attribute.ATTACK_DAMAGE);
+		AttributeInstance speed = player.getAttribute(Attribute.GENERIC_ATTACK_SPEED);
+		AttributeInstance damage = player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
 		if (legacyAttack) {
 			speed.setBaseValue(100);
 			damage.setBaseValue(1.0F);
 		} else {
-			speed.setBaseValue(speed.getAttribute().defaultValue());
-			damage.setBaseValue(damage.getAttribute().defaultValue());
+			speed.setBaseValue(speed.attribute().defaultValue());
+			damage.setBaseValue(damage.attribute().defaultValue());
 		}
 	}
 	

@@ -1,5 +1,6 @@
 package io.github.togar2.pvp.projectile;
 
+import io.github.togar2.pvp.utils.PotionFlags;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
@@ -32,6 +33,6 @@ public class SpectralArrow extends AbstractArrow {
 	
 	@Override
 	protected void onHurt(LivingEntity entity) {
-		entity.addEffect(new Potion(PotionEffect.GLOWING, (byte) 0, duration, PotionListener.defaultFlags()));
+		entity.addEffect(new Potion(PotionEffect.GLOWING, (byte) 0, duration, PotionFlags.defaultFlags()));
 	}
 }

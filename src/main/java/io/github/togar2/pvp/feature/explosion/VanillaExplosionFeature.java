@@ -5,7 +5,8 @@ import io.github.togar2.pvp.explosion.TntEntity;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
-import io.github.togar2.pvp.utils.ItemUtils;
+import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.sound.Sound;
@@ -25,10 +26,16 @@ import net.minestom.server.sound.SoundEvent;
 import org.jetbrains.annotations.Nullable;
 
 public class VanillaExplosionFeature implements ExplosionFeature, RegistrableFeature {
-	public static final VanillaExplosionFeature INSTANCE = new VanillaExplosionFeature();
 	public static final DefinedFeature<VanillaExplosionFeature> DEFINED = new DefinedFeature<>(
-			FeatureType.EXPLOSION, configuration -> INSTANCE
+			FeatureType.EXPLOSION, VanillaExplosionFeature::new,
+			FeatureType.ITEM_DAMAGE
 	);
+	
+	private final ItemDamageFeature itemDamageFeature;
+	
+	public VanillaExplosionFeature(FeatureConfiguration configuration) {
+		this.itemDamageFeature = configuration.get(FeatureType.ITEM_DAMAGE);
+	}
 	
 	private final VanillaExplosionSupplier explosionSupplier = new VanillaExplosionSupplier(this);
 	
@@ -53,7 +60,7 @@ public class VanillaExplosionFeature implements ExplosionFeature, RegistrableFea
 			
 			if (player.getGameMode() != GameMode.CREATIVE) {
 				if (stack.material() == Material.FLINT_AND_STEEL) {
-					ItemUtils.damageEquipment(player, event.getHand() == Player.Hand.MAIN
+					itemDamageFeature.damageEquipment(player, event.getHand() == Player.Hand.MAIN
 							? EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, 1);
 				} else {
 					player.setItemInHand(event.getHand(), stack.consume(1));

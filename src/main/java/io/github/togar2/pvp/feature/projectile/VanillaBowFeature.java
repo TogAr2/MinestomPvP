@@ -7,11 +7,11 @@ import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.effect.EffectFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.projectile.AbstractArrow;
 import io.github.togar2.pvp.projectile.Arrow;
 import io.github.togar2.pvp.projectile.SpectralArrow;
-import io.github.togar2.pvp.utils.CombatVersion;
 import io.github.togar2.pvp.utils.ViewUtil;
 import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.sound.Sound;
@@ -19,14 +19,15 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
+import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.item.ItemUpdateStateEvent;
 import net.minestom.server.event.player.PlayerItemAnimationEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
-import net.minestom.server.item.Enchantment;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import net.minestom.server.item.enchant.Enchantment;
 import net.minestom.server.sound.SoundEvent;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,22 +37,22 @@ import java.util.concurrent.ThreadLocalRandom;
 public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaBowFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.BOW, VanillaBowFeature::new,
-			FeatureType.ITEM_DAMAGE, FeatureType.VERSION
+			FeatureType.ITEM_DAMAGE, FeatureType.EFFECT
 	);
 	
 	private final ItemDamageFeature itemDamageFeature;
-	private final CombatVersion version;
+	private final EffectFeature effectFeature;
 	
 	public VanillaBowFeature(FeatureConfiguration configuration) {
 		this.itemDamageFeature = configuration.get(FeatureType.ITEM_DAMAGE);
-		this.version = configuration.get(FeatureType.VERSION);
+		this.effectFeature = configuration.get(FeatureType.EFFECT);
 	}
 	
 	@Override
 	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(PlayerItemAnimationEvent.class, event -> {
 			if (event.getItemAnimationType() == PlayerItemAnimationEvent.ItemAnimationType.BOW) {
-				if (!event.getPlayer().isCreative()
+				if (event.getPlayer().getGameMode() != GameMode.CREATIVE
 						&& EntityUtils.getProjectile(event.getPlayer(), Arrow.ARROW_PREDICATE).first().isAir()) {
 					event.setCancelled(true);
 				}
@@ -63,7 +64,8 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 			ItemStack stack = event.getItemStack();
 			if (stack.material() != Material.BOW) return;
 			
-			boolean infinite = player.isCreative() || EnchantmentUtils.getLevel(Enchantment.INFINITY, stack) > 0;
+			boolean infinite = player.getGameMode() == GameMode.CREATIVE
+					|| EnchantmentUtils.getLevel(Enchantment.INFINITY, stack) > 0;
 			
 			Pair<ItemStack, Integer> projectilePair = EntityUtils.getProjectile(player, Arrow.ARROW_PREDICATE);
 			ItemStack projectile = projectilePair.first();
@@ -92,13 +94,13 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 			if (punchEnchantment > 0) arrow.setKnockback(punchEnchantment);
 			
 			if (EnchantmentUtils.getLevel(Enchantment.FLAME, stack) > 0)
-				EntityUtils.setOnFireForSeconds(arrow, 100);
+				arrow.setFireTicksLeft(100 * 20); // 100 seconds
 			
 			itemDamageFeature.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
 					EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, 1);
 			
 			boolean reallyInfinite = infinite && projectile.material() == Material.ARROW;
-			if (reallyInfinite || player.isCreative()
+			if (reallyInfinite || player.getGameMode() == GameMode.CREATIVE
 					&& (projectile.material() == Material.SPECTRAL_ARROW
 					|| projectile.material() == Material.TIPPED_ARROW)) {
 				arrow.setPickupMode(AbstractArrow.PickupMode.CREATIVE_ONLY);
@@ -118,7 +120,7 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 					1.0f, 1.0f / (random.nextFloat() * 0.4f + 1.2f) + (float) power * 0.5f
 			), player);
 			
-			if (!reallyInfinite && !player.isCreative() && projectileSlot >= 0) {
+			if (!reallyInfinite && player.getGameMode() != GameMode.CREATIVE && projectileSlot >= 0) {
 				player.getInventory().setItemStack(projectileSlot,
 						projectile.withAmount(projectile.amount() - 1));
 			}
@@ -139,8 +141,8 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 		if (stack.material() == Material.SPECTRAL_ARROW) {
 			return new SpectralArrow(shooter);
 		} else {
-			Arrow arrow = new Arrow(shooter, version.legacy());
-			arrow.inheritEffects(stack);
+			Arrow arrow = new Arrow(shooter, effectFeature);
+			arrow.setItemStack(stack);
 			return arrow;
 		}
 	}

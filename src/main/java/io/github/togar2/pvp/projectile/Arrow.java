@@ -53,6 +53,11 @@ public class Arrow extends AbstractArrow {
 		return itemStack;
 	}
 	
+	public void setItemStack(ItemStack itemStack) {
+		this.itemStack = itemStack;
+		updateColor();
+	}
+	
 	@Override
 	protected void onHurt(LivingEntity entity) {
 		effectFeature.addArrowEffects(entity, this);
@@ -91,5 +96,6 @@ public class Arrow extends AbstractArrow {
 			list.add(effect);
 			return new PotionContents(potionContents.potion(), potionContents.customColor(), list);
 		});
+		updateColor();
 	}
 }

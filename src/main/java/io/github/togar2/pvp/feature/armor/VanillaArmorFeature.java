@@ -8,6 +8,7 @@ import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.utils.CombatVersion;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.entity.damage.DamageType;
@@ -29,7 +30,7 @@ public class VanillaArmorFeature implements ArmorFeature, CombatFeature {
 	
 	@Override
 	public float getDamageWithProtection(LivingEntity entity, DamageType type, float amount) {
-		DamageTypeInfo info = DamageTypeInfo.of(type);
+		DamageTypeInfo info = DamageTypeInfo.of(MinecraftServer.getDamageTypeRegistry().getKey(type));
 		amount = getDamageWithArmor(entity, info, amount);
 		return getDamageWithEnchantments(entity, info, amount);
 	}

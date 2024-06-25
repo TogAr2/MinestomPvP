@@ -3,6 +3,7 @@ package io.github.togar2.pvp.enchantment.enchantments;
 import io.github.togar2.pvp.enchantment.CustomEnchantment;
 import io.github.togar2.pvp.entity.EntityGroup;
 import io.github.togar2.pvp.utils.CombatVersion;
+import io.github.togar2.pvp.utils.PotionFlags;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
@@ -38,7 +39,7 @@ public class DamageEnchantment extends CustomEnchantment {
 		if (target instanceof LivingEntity livingEntity) {
 			if (type == Type.ARTHROPODS && EntityGroup.ofEntity(livingEntity) == EntityGroup.ARTHROPOD) {
 				int i = 20 + ThreadLocalRandom.current().nextInt(10 * level);
-				livingEntity.addEffect(new Potion(PotionEffect.SLOWNESS, (byte) 3, i, PotionListener.defaultFlags()));
+				livingEntity.addEffect(new Potion(PotionEffect.SLOWNESS, (byte) 3, i, PotionFlags.defaultFlags()));
 			}
 		}
 	}

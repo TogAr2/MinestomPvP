@@ -2,7 +2,6 @@ package io.github.togar2.pvp.enchantment.enchantments;
 
 import io.github.togar2.pvp.enchantment.CustomEnchantment;
 import io.github.togar2.pvp.enchantment.EnchantmentUtils;
-import io.github.togar2.pvp.utils.ItemUtils;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.damage.Damage;
@@ -30,7 +29,7 @@ public class ThornsEnchantment extends CustomEnchantment {
 		}
 		
 		if (entry != null) {
-			ItemUtils.damageEquipment(user, entry.getKey(), 2);
+			//TODO feature ItemUtils.damageEquipment(user, entry.getKey(), 2);
 		}
 	}
 	

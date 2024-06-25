@@ -9,11 +9,11 @@ import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.legacy.LegacyKnockbackSettings;
 import io.github.togar2.pvp.utils.CombatVersion;
-import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.network.packet.server.play.HitAnimationPacket;
@@ -89,7 +89,7 @@ public class VanillaKnockbackFeature implements KnockbackFeature, CombatFeature 
 		
 		LegacyKnockbackSettings settings = legacyKnockbackEvent.getSettings();
 		
-		float kbResistance = target.getAttributeValue(Attribute.KNOCKBACK_RESISTANCE);
+		double kbResistance = target.getAttributeValue(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
 		double horizontal = settings.horizontal() * (1 - kbResistance) * knockback;
 		double vertical = settings.vertical() * (1 - kbResistance) * knockback;
 		Vec horizontalModifier = new Vec(dx, dz).normalize().mul(horizontal);

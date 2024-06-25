@@ -8,10 +8,7 @@ import net.kyori.adventure.sound.Sound;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
-import net.minestom.server.entity.Entity;
-import net.minestom.server.entity.EntityType;
-import net.minestom.server.entity.LivingEntity;
-import net.minestom.server.entity.Player;
+import net.minestom.server.entity.*;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.entity.metadata.projectile.AbstractArrowMeta;
@@ -42,12 +39,13 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 	private SoundEvent soundEvent = getDefaultSound();
 	
 	private final Set<Integer> piercingIgnore = new HashSet<>();
+	private int fireTicksLeft = 0;
 	
 	public AbstractArrow(@Nullable Entity shooter, @NotNull EntityType entityType) {
 		super(shooter, entityType);
 		
 		if (shooter instanceof Player) {
-			pickupMode = ((Player) shooter).isCreative() ? PickupMode.CREATIVE_ONLY : PickupMode.ALLOWED;
+			pickupMode = ((Player) shooter).getGameMode() == GameMode.CREATIVE ? PickupMode.CREATIVE_ONLY : PickupMode.ALLOWED;
 		}
 	}
 	
@@ -62,7 +60,18 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 		if (pickupDelay > 0) {
 			pickupDelay--;
 		}
-
+		
+		if (fireTicksLeft > 0) {
+			if (entityMeta.isOnFire()) {
+				fireTicksLeft--;
+				if (fireTicksLeft == 0) {
+					entityMeta.setOnFire(false);
+				}
+			} else {
+				fireTicksLeft = 0;
+			}
+		}
+		
         // Pickup
         if (canBePickedUp(null)) {
             instance.getEntityTracker().nearbyEntities(position, 5, EntityTracker.Target.PLAYERS,
@@ -94,6 +103,11 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 		//TODO water (also for other projectiles?)
 		
 		tickRemoval();
+	}
+	
+	public void setFireTicksLeft(int fireTicksLeft) {
+		this.fireTicksLeft = fireTicksLeft;
+		if (fireTicksLeft > 0) entityMeta.setOnFire(true);
 	}
 	
 	protected void tickRemoval() {
@@ -154,7 +168,7 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 			if (entity.getEntityType() == EntityType.ENDERMAN) return false;
 			
 			if (isOnFire()) {
-				EntityUtils.setOnFireForSeconds(entity, 5);
+				EntityUtils.setOnFireForSeconds(living, 5);
 			}
 			
 			if (getPiercingLevel() <= 0) {
@@ -238,13 +252,13 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 		
 		return switch (pickupMode) {
 			case ALLOWED -> true;
-			case CREATIVE_ONLY -> player == null || player.isCreative();
+			case CREATIVE_ONLY -> player == null || player.getGameMode() == GameMode.CREATIVE;
 			default -> false;
 		};
 	}
 	
 	public boolean pickup(Player player) {
-		return player.isCreative() || player.getInventory().addItemStack(getPickupItem());
+		return player.getGameMode() == GameMode.CREATIVE || player.getInventory().addItemStack(getPickupItem());
 	}
 	
 	protected abstract ItemStack getPickupItem();
