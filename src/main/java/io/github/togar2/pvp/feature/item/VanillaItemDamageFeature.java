@@ -1,11 +1,12 @@
 package io.github.togar2.pvp.feature.item;
 
 import io.github.togar2.pvp.damage.DamageTypeInfo;
-import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.enums.ArmorMaterial;
 import io.github.togar2.pvp.events.EquipmentDamageEvent;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
+import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
@@ -13,29 +14,32 @@ import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
-import net.minestom.server.item.enchant.Enchantment;
 
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
 public class VanillaItemDamageFeature implements ItemDamageFeature {
 	public static final DefinedFeature<VanillaItemDamageFeature> DEFINED = new DefinedFeature<>(
-			FeatureType.ITEM_DAMAGE, configuration -> new VanillaItemDamageFeature()
+			FeatureType.ITEM_DAMAGE, VanillaItemDamageFeature::new,
+			FeatureType.ENCHANTMENT
 	);
+	
+	private final EnchantmentFeature enchantmentFeature;
+	
+	public VanillaItemDamageFeature(FeatureConfiguration configuration) {
+		this.enchantmentFeature = configuration.get(FeatureType.ENCHANTMENT);
+	}
 	
 	protected ItemStack damage(ItemStack stack, int amount) {
 		if (amount == 0 || stack.get(ItemComponent.MAX_DAMAGE, 0) <= 0)
 			return stack;
 		
-		int unbreaking = EnchantmentUtils.getLevel(Enchantment.UNBREAKING, stack);
 		int preventAmount = 0;
 		int newAmount = amount;
 		
-		if (unbreaking > 0) {
-			for (int i = 0; i < newAmount; i++) {
-				if (EnchantmentUtils.shouldNotBreak(stack, unbreaking)) {
-					preventAmount++;
-				}
+		for (int i = 0; i < newAmount; i++) {
+			if (enchantmentFeature.shouldUnbreakingPreventDamage(stack)) {
+				preventAmount++;
 			}
 		}
 		

@@ -1,9 +1,8 @@
 package io.github.togar2.pvp.projectile;
 
-import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.entity.EntityGroup;
 import io.github.togar2.pvp.entity.EntityUtils;
-import io.github.togar2.pvp.utils.CombatVersion;
+import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Vec;
@@ -21,19 +20,19 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 
 public class ThrownTrident extends AbstractArrow {
-	private final boolean legacy;
 	private final ItemStack tridentItem;
 	private boolean damageDone;
 	private boolean hasStartedReturning;
 	
-	public ThrownTrident(@Nullable Entity shooter, boolean legacy, ItemStack tridentItem) {
+	private final EnchantmentFeature enchantmentFeature;
+	
+	public ThrownTrident(@Nullable Entity shooter, ItemStack tridentItem, EnchantmentFeature enchantmentFeature) {
 		super(shooter, EntityType.TRIDENT);
-		this.legacy = legacy;
 		this.tridentItem = tridentItem;
+		this.enchantmentFeature = enchantmentFeature;
 		
 		ThrownTridentMeta meta = ((ThrownTridentMeta) getEntityMeta());
-		meta.setLoyaltyLevel(
-				EnchantmentUtils.getLevel(Enchantment.LOYALTY, tridentItem));
+		meta.setLoyaltyLevel(tridentItem.get(ItemComponent.ENCHANTMENTS).level(Enchantment.LOYALTY));
 		
 		meta.setHasEnchantmentGlint(!Objects.requireNonNull(tridentItem.get(ItemComponent.ENCHANTMENTS))
 				.enchantments().isEmpty());
@@ -84,11 +83,11 @@ public class ThrownTrident extends AbstractArrow {
 		if (!(entity instanceof LivingEntity living)) return false;
 		Entity shooter = getShooter();
 		
-		float damage = 8.0f + EnchantmentUtils.getAttackDamage(tridentItem, EntityGroup.ofEntity(living), CombatVersion.fromLegacy(legacy));
+		float damage = 8.0f + enchantmentFeature.getAttackDamage(tridentItem, EntityGroup.ofEntity(living));
 		Damage damageObj = new Damage(DamageType.TRIDENT, this, shooter == null ? this : shooter, null, damage);
 		if (living.damage(damageObj) && shooter instanceof LivingEntity livingShooter) {
-			EnchantmentUtils.onUserDamaged(living, livingShooter);
-			EnchantmentUtils.onTargetDamaged(livingShooter, living);
+			enchantmentFeature.onUserDamaged(living, livingShooter);
+			enchantmentFeature.onTargetDamaged(livingShooter, living);
 		}
 		damageDone = true;
 		

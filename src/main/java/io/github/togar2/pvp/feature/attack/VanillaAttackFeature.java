@@ -1,6 +1,5 @@
 package io.github.togar2.pvp.feature.attack;
 
-import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.entity.EntityGroup;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.entity.PvpPlayer;
@@ -11,6 +10,7 @@ import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.cooldown.AttackCooldownFeature;
+import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import io.github.togar2.pvp.feature.food.ExhaustionFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.feature.knockback.KnockbackFeature;
@@ -37,7 +37,8 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaAttackFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.ATTACK, VanillaAttackFeature::new,
 			FeatureType.ATTACK_COOLDOWN, FeatureType.EXHAUSTION, FeatureType.ITEM_DAMAGE,
-			FeatureType.CRITICAL, FeatureType.SWEEPING, FeatureType.KNOCKBACK, FeatureType.VERSION
+			FeatureType.ENCHANTMENT, FeatureType.CRITICAL, FeatureType.SWEEPING, FeatureType.KNOCKBACK,
+			FeatureType.VERSION
 	);
 	
 	private static final double MAX_DISTANCE_SQUARED = 36.0;
@@ -45,6 +46,7 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 	private final AttackCooldownFeature cooldownFeature;
 	private final ExhaustionFeature exhaustionFeature;
 	private final ItemDamageFeature itemDamageFeature;
+	private final EnchantmentFeature enchantmentFeature;;
 	
 	private final CriticalFeature criticalFeature;
 	private final SweepingFeature sweepingFeature;
@@ -56,6 +58,7 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 		this.cooldownFeature = configuration.get(FeatureType.ATTACK_COOLDOWN);
 		this.exhaustionFeature = configuration.get(FeatureType.EXHAUSTION);
 		this.itemDamageFeature = configuration.get(FeatureType.ITEM_DAMAGE);
+		this.enchantmentFeature = configuration.get(FeatureType.ENCHANTMENT);
 		this.criticalFeature = configuration.get(FeatureType.CRITICAL);
 		this.sweepingFeature = configuration.get(FeatureType.SWEEPING);
 		this.knockbackFeature = configuration.get(FeatureType.KNOCKBACK);
@@ -151,8 +154,8 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 		));
 		
 		// Thorns
-		EnchantmentUtils.onUserDamaged(living, attacker);
-		EnchantmentUtils.onTargetDamaged(attacker, target);
+		enchantmentFeature.onUserDamaged(living, attacker);
+		enchantmentFeature.onTargetDamaged(attacker, target);
 		
 		// Damage item
 		Tool tool = Tool.fromMaterial(attacker.getItemInMainHand().material());
@@ -184,10 +187,9 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 	protected @Nullable AttackValues.Final prepareAttack(LivingEntity attacker, Entity target) {
 		//TODO enchantment feature
 		float damage = (float) attacker.getAttributeValue(Attribute.GENERIC_ATTACK_DAMAGE);
-		float magicalDamage = EnchantmentUtils.getAttackDamage(
+		float magicalDamage = enchantmentFeature.getAttackDamage(
 				attacker.getItemInMainHand(),
-				target instanceof LivingEntity living ? EntityGroup.ofEntity(living) : EntityGroup.DEFAULT,
-				version
+				target instanceof LivingEntity living ? EntityGroup.ofEntity(living) : EntityGroup.DEFAULT
 		);
 		
 		double cooldownProgress = 1;
@@ -203,8 +205,8 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 		// Calculate attacks
 		boolean strongAttack = cooldownProgress > 0.9;
 		boolean sprintAttack = attacker.isSprinting() && strongAttack;
-		int knockback = EnchantmentUtils.getKnockback(attacker);
-		int fireAspect = EnchantmentUtils.getFireAspect(attacker);
+		int knockback = enchantmentFeature.getKnockback(attacker);
+		int fireAspect = enchantmentFeature.getFireAspect(attacker);
 		
 		// Use features to determine critical and sweeping
 		AttackValues.PreCritical preCritical = new AttackValues.PreCritical(

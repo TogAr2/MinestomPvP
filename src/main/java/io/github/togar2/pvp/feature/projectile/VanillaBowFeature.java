@@ -1,6 +1,5 @@
 package io.github.togar2.pvp.feature.projectile;
 
-import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.feature.FeatureType;
@@ -25,8 +24,10 @@ import net.minestom.server.event.EventNode;
 import net.minestom.server.event.item.ItemUpdateStateEvent;
 import net.minestom.server.event.player.PlayerItemAnimationEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
+import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import net.minestom.server.item.component.EnchantmentList;
 import net.minestom.server.item.enchant.Enchantment;
 import net.minestom.server.sound.SoundEvent;
 import org.jetbrains.annotations.Nullable;
@@ -64,8 +65,11 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 			ItemStack stack = event.getItemStack();
 			if (stack.material() != Material.BOW) return;
 			
+			EnchantmentList enchantmentList = stack.get(ItemComponent.ENCHANTMENTS);
+			assert enchantmentList != null;
+			
 			boolean infinite = player.getGameMode() == GameMode.CREATIVE
-					|| EnchantmentUtils.getLevel(Enchantment.INFINITY, stack) > 0;
+					|| enchantmentList.level(Enchantment.INFINITY) > 0;
 			
 			Pair<ItemStack, Integer> projectilePair = EntityUtils.getProjectile(player, Arrow.ARROW_PREDICATE);
 			ItemStack projectile = projectilePair.first();
@@ -86,14 +90,14 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 			
 			if (power >= 1) arrow.setCritical(true);
 			
-			int powerEnchantment = EnchantmentUtils.getLevel(Enchantment.POWER, stack);
+			int powerEnchantment = enchantmentList.level(Enchantment.POWER);
 			if (powerEnchantment > 0)
 				arrow.setBaseDamage(arrow.getBaseDamage() + (double) powerEnchantment * 0.5 + 0.5);
 			
-			int punchEnchantment = EnchantmentUtils.getLevel(Enchantment.PUNCH, stack);
+			int punchEnchantment = enchantmentList.level(Enchantment.PUNCH);
 			if (punchEnchantment > 0) arrow.setKnockback(punchEnchantment);
 			
-			if (EnchantmentUtils.getLevel(Enchantment.FLAME, stack) > 0)
+			if (enchantmentList.level(Enchantment.FLAME) > 0)
 				arrow.setFireTicksLeft(100 * 20); // 100 seconds
 			
 			itemDamageFeature.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?

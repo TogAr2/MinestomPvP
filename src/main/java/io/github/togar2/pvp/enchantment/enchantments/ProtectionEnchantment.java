@@ -2,10 +2,12 @@ package io.github.togar2.pvp.enchantment.enchantments;
 
 import io.github.togar2.pvp.damage.DamageTypeInfo;
 import io.github.togar2.pvp.enchantment.CustomEnchantment;
-import io.github.togar2.pvp.enchantment.CustomEnchantments;
-import io.github.togar2.pvp.enchantment.EnchantmentUtils;
+import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
+import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.item.enchant.Enchantment;
 import net.minestom.server.registry.DynamicRegistry;
 
@@ -18,7 +20,9 @@ public class ProtectionEnchantment extends CustomEnchantment {
 	}
 	
 	@Override
-	public int getProtectionAmount(int level, DamageTypeInfo damageTypeInfo) {
+	public int getProtectionAmount(int level, DamageType damageType,
+	                               EnchantmentFeature feature, FeatureConfiguration configuration) {
+		DamageTypeInfo damageTypeInfo = DamageTypeInfo.of(MinecraftServer.getDamageTypeRegistry().getKey(damageType));
 		if (damageTypeInfo.outOfWorld()) {
 			return 0;
 		} else if (type == Type.ALL) {
@@ -34,8 +38,8 @@ public class ProtectionEnchantment extends CustomEnchantment {
 		}
 	}
 	
-	public static int transformFireDuration(LivingEntity entity, int duration) {
-		int level = EnchantmentUtils.getEquipmentLevel(CustomEnchantments.get(Enchantment.FIRE_PROTECTION), entity);
+	public static int transformFireDuration(LivingEntity entity, int duration, EnchantmentFeature feature) {
+		int level = feature.getEquipmentLevel(entity, Enchantment.FIRE_PROTECTION);
 		if (level > 0) {
 			duration -= (int) Math.floor((float) duration * (float) level * 0.15F);
 		}

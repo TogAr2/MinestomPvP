@@ -1,8 +1,8 @@
 package io.github.togar2.pvp.projectile;
 
-import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.events.PickupEntityEvent;
+import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import io.github.togar2.pvp.utils.EffectManager;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.ServerFlag;
@@ -41,8 +41,12 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 	private final Set<Integer> piercingIgnore = new HashSet<>();
 	private int fireTicksLeft = 0;
 	
-	public AbstractArrow(@Nullable Entity shooter, @NotNull EntityType entityType) {
+	private final EnchantmentFeature enchantmentFeature;
+	
+	public AbstractArrow(@Nullable Entity shooter, @NotNull EntityType entityType,
+	                     EnchantmentFeature enchantmentFeature) {
 		super(shooter, entityType);
+		this.enchantmentFeature = enchantmentFeature;
 		
 		if (shooter instanceof Player) {
 			pickupMode = ((Player) shooter).getGameMode() == GameMode.CREATIVE ? PickupMode.CREATIVE_ONLY : PickupMode.ALLOWED;
@@ -189,8 +193,8 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 			}
 			
 			if (shooter instanceof LivingEntity livingShooter) {
-				EnchantmentUtils.onUserDamaged(living, livingShooter);
-				EnchantmentUtils.onTargetDamaged(livingShooter, living);
+				enchantmentFeature.onUserDamaged(living, livingShooter);
+				enchantmentFeature.onTargetDamaged(livingShooter, living);
 			}
 			
 			onHurt(living);

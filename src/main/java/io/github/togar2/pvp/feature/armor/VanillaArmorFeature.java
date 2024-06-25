@@ -1,12 +1,11 @@
 package io.github.togar2.pvp.feature.armor;
 
 import io.github.togar2.pvp.damage.DamageTypeInfo;
-import io.github.togar2.pvp.enchantment.EnchantmentUtils;
-import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.feature.CombatFeature;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.LivingEntity;
@@ -19,12 +18,14 @@ import net.minestom.server.utils.MathUtils;
 public class VanillaArmorFeature implements ArmorFeature, CombatFeature {
 	public static final DefinedFeature<VanillaArmorFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.ARMOR, VanillaArmorFeature::new,
-			FeatureType.VERSION
+			FeatureType.ENCHANTMENT, FeatureType.VERSION
 	);
 	
+	private final EnchantmentFeature enchantmentFeature;
 	private final CombatVersion version;
 	
 	public VanillaArmorFeature(FeatureConfiguration configuration) {
+		this.enchantmentFeature = configuration.get(FeatureType.ENCHANTMENT);
 		this.version = configuration.get(FeatureType.VERSION);
 	}
 	
@@ -32,7 +33,7 @@ public class VanillaArmorFeature implements ArmorFeature, CombatFeature {
 	public float getDamageWithProtection(LivingEntity entity, DamageType type, float amount) {
 		DamageTypeInfo info = DamageTypeInfo.of(MinecraftServer.getDamageTypeRegistry().getKey(type));
 		amount = getDamageWithArmor(entity, info, amount);
-		return getDamageWithEnchantments(entity, info, amount);
+		return getDamageWithEnchantments(entity, type, amount);
 	}
 	
 	protected float getDamageWithArmor(LivingEntity entity, DamageTypeInfo typeInfo, float amount) {
@@ -50,8 +51,9 @@ public class VanillaArmorFeature implements ArmorFeature, CombatFeature {
 		}
 	}
 	
-	protected float getDamageWithEnchantments(LivingEntity entity, DamageTypeInfo typeInfo, float amount) {
-		if (typeInfo.unblockable()) return amount;
+	protected float getDamageWithEnchantments(LivingEntity entity, DamageType damageType, float amount) {
+		DamageTypeInfo damageTypeInfo = DamageTypeInfo.of(MinecraftServer.getDamageTypeRegistry().getKey(damageType));
+		if (damageTypeInfo.unblockable()) return amount;
 		
 		int k;
 		TimedPotion effect = entity.getEffect(PotionEffect.RESISTANCE);
@@ -65,7 +67,7 @@ public class VanillaArmorFeature implements ArmorFeature, CombatFeature {
 		if (amount <= 0) {
 			return 0;
 		} else {
-			k = EnchantmentUtils.getProtectionAmount(EntityUtils.getArmorItems(entity), typeInfo);
+			k = enchantmentFeature.getProtectionAmount(entity, damageType);
 			if (version.modern()) {
 				if (k > 0) {
 					amount = getDamageAfterProtectionEnchantment(amount, (float) k);

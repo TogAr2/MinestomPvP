@@ -1,15 +1,14 @@
 package io.github.togar2.pvp.feature.projectile;
 
-import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.entity.PvpPlayer;
 import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.projectile.ThrownTrident;
-import io.github.togar2.pvp.utils.CombatVersion;
 import io.github.togar2.pvp.utils.FluidUtils;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
@@ -27,6 +26,7 @@ import net.minestom.server.event.item.ItemUpdateStateEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.instance.EntityTracker;
+import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.item.enchant.Enchantment;
@@ -39,17 +39,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class VanillaTridentFeature implements TridentFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaTridentFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.TRIDENT, VanillaTridentFeature::new,
-			FeatureType.ITEM_DAMAGE, FeatureType.VERSION
+			FeatureType.ITEM_DAMAGE, FeatureType.ENCHANTMENT
 	);
 	
 	private final ItemDamageFeature itemDamageFeature;
-	private final CombatVersion version;
+	private final EnchantmentFeature enchantmentFeature;
 	
 	public static final Tag<Long> RIPTIDE_START = Tag.Long("riptideStart");
 	
 	public VanillaTridentFeature(FeatureConfiguration configuration) {
 		this.itemDamageFeature = configuration.get(FeatureType.ITEM_DAMAGE);
-		this.version = configuration.get(FeatureType.VERSION);
+		this.enchantmentFeature = configuration.get(FeatureType.ENCHANTMENT);
 	}
 	
 	@Override
@@ -63,7 +63,7 @@ public class VanillaTridentFeature implements TridentFeature, RegistrableFeature
 			int ticks = (int) ((useDuration / 1000.0) * 20);
 			if (ticks < 10) return;
 			
-			int riptide = EnchantmentUtils.getLevel(Enchantment.RIPTIDE, stack);
+			int riptide = stack.get(ItemComponent.ENCHANTMENTS).level(Enchantment.RIPTIDE);
 			if (riptide > 0 && !FluidUtils.isTouchingWater(player)) return;
 			
 			itemDamageFeature.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
@@ -72,7 +72,7 @@ public class VanillaTridentFeature implements TridentFeature, RegistrableFeature
 			if (riptide > 0) {
 				applyRiptide(player, riptide);
 			} else {
-				ThrownTrident trident = new ThrownTrident(player, version.legacy(), stack);
+				ThrownTrident trident = new ThrownTrident(player, stack, enchantmentFeature);
 				
 				Pos position = player.getPosition().add(0, player.getEyeHeight() - 0.1, 0);
 				trident.setInstance(Objects.requireNonNull(player.getInstance()), position);

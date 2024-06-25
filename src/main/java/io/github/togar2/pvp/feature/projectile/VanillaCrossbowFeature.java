@@ -1,6 +1,5 @@
 package io.github.togar2.pvp.feature.projectile;
 
-import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.feature.FeatureType;
@@ -91,7 +90,7 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 			Player.Hand hand = player.getPlayerMeta().getActiveHand();
 			ItemStack stack = player.getItemInHand(hand);
 			
-			int quickCharge = EnchantmentUtils.getLevel(Enchantment.QUICK_CHARGE, stack);
+			int quickCharge = stack.get(ItemComponent.ENCHANTMENTS).level(Enchantment.QUICK_CHARGE);
 			
 			long useDuration = System.currentTimeMillis() - player.getTag(Tracker.ITEM_USE_START_TIME);
 			long useTicks = useDuration / MinecraftServer.TICK_MS;
@@ -130,7 +129,7 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 			ItemStack stack = event.getItemStack();
 			if (stack.material() != Material.CROSSBOW) return;
 			
-			int quickCharge = EnchantmentUtils.getLevel(Enchantment.QUICK_CHARGE, stack);
+			int quickCharge = stack.get(ItemComponent.ENCHANTMENTS).level(Enchantment.QUICK_CHARGE);
 			
 			if (quickCharge < 6) {
 				long useDuration = System.currentTimeMillis() - player.getTag(Tracker.ITEM_USE_START_TIME);
@@ -206,7 +205,7 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 	}
 	
 	protected int getCrossbowChargeDuration(ItemStack stack) {
-		int quickCharge = EnchantmentUtils.getLevel(Enchantment.QUICK_CHARGE, stack);
+		int quickCharge = stack.get(ItemComponent.ENCHANTMENTS).level(Enchantment.QUICK_CHARGE);
 		return quickCharge == 0 ? 25 : 25 - 5 * quickCharge;
 	}
 	
@@ -220,7 +219,7 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 	}
 	
 	protected ItemStack loadCrossbowProjectiles(Player player, ItemStack stack) {
-		boolean multiShot = EnchantmentUtils.getLevel(Enchantment.MULTISHOT, stack) > 0;
+		boolean multiShot = stack.get(ItemComponent.ENCHANTMENTS).level(Enchantment.MULTISHOT) > 0;
 		
 		Pair<ItemStack, Integer> pair = EntityUtils.getProjectile(player,
 				Arrow.ARROW_OR_FIREWORK_PREDICATE, Arrow.ARROW_PREDICATE);
@@ -310,7 +309,7 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 		arrow.setCritical(true); // Player shooter is always critical
 		arrow.setSound(SoundEvent.ITEM_CROSSBOW_HIT);
 		
-		int piercing = EnchantmentUtils.getLevel(Enchantment.PIERCING, crossbowStack);
+		int piercing = crossbowStack.get(ItemComponent.ENCHANTMENTS).level(Enchantment.PIERCING);
 		if (piercing > 0) {
 			arrow.setPiercingLevel((byte) piercing);
 		}

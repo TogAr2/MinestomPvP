@@ -34,7 +34,7 @@ public class EntityUtils {
 	
 	public static Iterable<ItemStack> getArmorItems(LivingEntity entity) {
 		List<ItemStack> list = new ArrayList<>();
-		for (EquipmentSlot slot : EquipmentSlot.values()) {
+		for (EquipmentSlot slot : EquipmentSlot.armors()) {
 			if (slot.isArmor() && !entity.getEquipment(slot).isAir()) {
 				list.add(entity.getEquipment(slot));
 			}

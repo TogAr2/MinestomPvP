@@ -11,6 +11,7 @@ import io.github.togar2.pvp.feature.cooldown.AttackCooldownFeature;
 import io.github.togar2.pvp.feature.cooldown.ItemCooldownFeature;
 import io.github.togar2.pvp.feature.damage.DamageFeature;
 import io.github.togar2.pvp.feature.effect.EffectFeature;
+import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import io.github.togar2.pvp.feature.explosion.ExplosionFeature;
 import io.github.togar2.pvp.feature.fall.FallFeature;
 import io.github.togar2.pvp.feature.food.ExhaustionFeature;
@@ -40,6 +41,7 @@ public record FeatureType<F extends CombatFeature>(String name, F defaultFeature
 	public static final FeatureType<AttackCooldownFeature> ATTACK_COOLDOWN = of("ATTACK_COOLDOWN", AttackCooldownFeature.NO_OP);
 	public static final FeatureType<ItemCooldownFeature> ITEM_COOLDOWN = of("ITEM_COOLDOWN", ItemCooldownFeature.NO_OP);
 	public static final FeatureType<DamageFeature> DAMAGE = of("DAMAGE", DamageFeature.NO_OP);
+	public static final FeatureType<EnchantmentFeature> ENCHANTMENT = of("ENCHANTMENT", EnchantmentFeature.NO_OP);
 	public static final FeatureType<EffectFeature> EFFECT = of("EFFECT", EffectFeature.NO_OP);
 	public static final FeatureType<ExplosionFeature> EXPLOSION = of("EXPLOSION", ExplosionFeature.NO_OP);
 	public static final FeatureType<FallFeature> FALL = of("FALL", FallFeature.NO_OP);

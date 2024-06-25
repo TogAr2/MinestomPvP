@@ -1,8 +1,8 @@
 package io.github.togar2.pvp.feature.explosion;
 
-import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.entity.PvpPlayer;
 import io.github.togar2.pvp.events.ExplosionEvent;
+import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.collision.BoundingBox;
@@ -32,8 +32,11 @@ import java.util.stream.Collectors;
 public final class VanillaExplosionSupplier implements ExplosionSupplier {
 	private final ExplosionFeature feature;
 	
-	VanillaExplosionSupplier(ExplosionFeature feature) {
+	private final EnchantmentFeature enchantmentFeature;
+	
+	VanillaExplosionSupplier(ExplosionFeature feature, EnchantmentFeature enchantmentFeature) {
 		this.feature = feature;
+		this.enchantmentFeature = enchantmentFeature;
 	}
 	
 	@Override
@@ -159,7 +162,7 @@ public final class VanillaExplosionSupplier implements ExplosionSupplier {
 							double knockback = currentStrength;
 							if (entity instanceof LivingEntity living) {
 								if (!living.damage(damageObj)) continue;
-								knockback = EnchantmentUtils.getExplosionKnockback(living, currentStrength);
+								knockback = enchantmentFeature.getExplosionKnockback(living, currentStrength);
 							}
 							
 							Vec knockbackVec = new Vec(

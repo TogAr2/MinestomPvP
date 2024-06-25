@@ -1,11 +1,11 @@
 package io.github.togar2.pvp.feature.attack;
 
-import io.github.togar2.pvp.enchantment.EnchantmentUtils;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.enums.Tool;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import io.github.togar2.pvp.feature.knockback.KnockbackFeature;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Pos;
@@ -22,12 +22,14 @@ import net.minestom.server.particle.Particle;
 public class VanillaSweepingFeature implements SweepingFeature {
 	public static final DefinedFeature<VanillaSweepingFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.SWEEPING, VanillaSweepingFeature::new,
-			FeatureType.KNOCKBACK
+			FeatureType.ENCHANTMENT, FeatureType.KNOCKBACK
 	);
 	
+	private final EnchantmentFeature enchantmentFeature;
 	private final KnockbackFeature knockbackFeature;
 	
 	public VanillaSweepingFeature(FeatureConfiguration configuration) {
+		this.enchantmentFeature = configuration.get(FeatureType.ENCHANTMENT);
 		this.knockbackFeature = configuration.get(FeatureType.KNOCKBACK);
 	}
 	
@@ -45,7 +47,7 @@ public class VanillaSweepingFeature implements SweepingFeature {
 	@Override
 	public float getSweepingDamage(LivingEntity attacker, float damage) {
 		float sweepingMultiplier = 0;
-		int sweepingLevel = EnchantmentUtils.getSweeping(attacker);
+		int sweepingLevel = enchantmentFeature.getSweeping(attacker);
 		if (sweepingLevel > 0) sweepingMultiplier = 1.0f - (1.0f / (float) (sweepingLevel + 1));
 		return 1.0f + sweepingMultiplier * damage;
 	}
