@@ -2,11 +2,14 @@ package io.github.togar2.pvp.explosion;
 
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.minestom.server.ServerFlag;
+import net.minestom.server.collision.BoundingBox;
+import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.metadata.other.PrimedTntMeta;
+import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -37,6 +40,10 @@ public class TntEntity extends Entity {
 		int newFuse = getFuse() - 1;
 		setFuse(newFuse);
 		if (newFuse <= 0) {
+			Instance instance = this.instance;
+			Pos position = this.position;
+			BoundingBox boundingBox = this.boundingBox;
+			
 			remove();
 			if (instance.getExplosionSupplier() != null) instance.explode(
 					(float) position.x(),
