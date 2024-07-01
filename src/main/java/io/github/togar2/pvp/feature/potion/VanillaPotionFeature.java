@@ -18,8 +18,7 @@ import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventNode;
-import net.minestom.server.event.item.ItemUpdateStateEvent;
-import net.minestom.server.event.player.PlayerPreEatEvent;
+import net.minestom.server.event.item.ItemUsageCompleteEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
@@ -59,15 +58,14 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 	
 	@Override
 	public void init(EventNode<EntityInstanceEvent> node) {
-		node.addListener(PlayerPreEatEvent.class, event -> {
+		node.addListener(PlayerUseItemEvent.class, event -> {
 			if (event.getItemStack().material() == Material.POTION) {
-				event.setEatingTime((long) USE_TICKS * MinecraftServer.TICK_MS); // Potion use time is always 32 ticks
+				event.setItemUseTime((long) USE_TICKS * MinecraftServer.TICK_MS); // Potion use time is always 32 ticks
 			}
 		});
 		
-		node.addListener(ItemUpdateStateEvent.class, event -> {
+		node.addListener(ItemUsageCompleteEvent.class, event -> {
 			if (event.getItemStack().material() != Material.POTION) return;
-			if (!event.getPlayer().isEating()) return; // Temporary hack, waiting on Minestom PR #2128
 			
 			Player player = event.getPlayer();
 			ItemStack stack = event.getItemStack();

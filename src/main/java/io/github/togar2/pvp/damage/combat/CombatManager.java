@@ -2,7 +2,7 @@ package io.github.togar2.pvp.damage.combat;
 
 import io.github.togar2.pvp.damage.DamageTypeInfo;
 import io.github.togar2.pvp.entity.EntityUtils;
-import io.github.togar2.pvp.entity.Tracker;
+import io.github.togar2.pvp.feature.fall.FallFeature;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -43,8 +43,8 @@ public class CombatManager {
 		this.player = player;
 	}
 	
-	public @Nullable String getFallLocation() {
-		Block lastClimbedBlock = player.getTag(Tracker.LAST_CLIMBED_BLOCK);
+	public @Nullable String getFallLocation(FallFeature fallFeature) {
+		Block lastClimbedBlock = fallFeature.getLastClimbedBlock(player);
 		if (lastClimbedBlock == null) {
 			//TODO check for water at feet
 			return null;
@@ -77,10 +77,10 @@ public class CombatManager {
 		return "other_climbable";
 	}
 	
-	public void recordDamage(int attackerId, Damage damage) {
+	public void recordDamage(int attackerId, Damage damage, FallFeature fallFeature) {
 		recheckStatus();
 		
-		CombatEntry entry = new CombatEntry(damage, getFallLocation(), player.getTag(Tracker.FALL_DISTANCE));
+		CombatEntry entry = new CombatEntry(damage, getFallLocation(fallFeature), fallFeature.getFallDistance(player));
 		entries.add(entry);
 		
 		lastDamagedBy = attackerId;

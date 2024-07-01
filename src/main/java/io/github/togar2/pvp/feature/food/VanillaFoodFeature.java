@@ -14,7 +14,7 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventNode;
-import net.minestom.server.event.item.ItemUpdateStateEvent;
+import net.minestom.server.event.item.ItemUsageCompleteEvent;
 import net.minestom.server.event.player.PlayerPreEatEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
@@ -62,7 +62,7 @@ public class VanillaFoodFeature implements FoodFeature, CombatFeature, Registrab
 			event.setEatingTime(getUseTime(event.getItemStack().material(), foodComponent));
 		});
 		
-		node.addListener(ItemUpdateStateEvent.class, event -> {
+		node.addListener(ItemUsageCompleteEvent.class, event -> {
 			if (event.getItemStack().material() != Material.MILK_BUCKET
 					&& !event.getItemStack().has(ItemComponent.FOOD))
 				return;
@@ -100,6 +100,7 @@ public class VanillaFoodFeature implements FoodFeature, CombatFeature, Registrab
 			if (random.nextFloat() < effect.probability()) {
 				player.addEffect(new Potion(
 						effect.effect().id(), effect.effect().amplifier(),
+						effect.effect().duration(),
 						PotionFlags.create(
 								effect.effect().isAmbient(),
 								effect.effect().showParticles(),

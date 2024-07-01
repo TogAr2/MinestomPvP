@@ -81,7 +81,7 @@ public class PvpTest {
 //						customPlayer.sendImmediateVelocityUpdate();
 				}
 				
-				event.getPlayer().setFood(20);
+				//event.getPlayer().setFood(20);
 			}).repeat(20, TimeUnit.SERVER_TICK).schedule();
 		});
 		

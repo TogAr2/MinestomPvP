@@ -1,6 +1,6 @@
 package io.github.togar2.pvp.projectile;
 
-import io.github.togar2.pvp.entity.Tracker;
+import io.github.togar2.pvp.feature.fall.FallFeature;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
@@ -20,8 +20,11 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ThrownEnderpearl extends CustomEntityProjectile implements ItemHoldingProjectile {
 	private Pos prevPos = Pos.ZERO;
 	
-	public ThrownEnderpearl(@Nullable Entity shooter) {
+	private final FallFeature fallFeature;
+	
+	public ThrownEnderpearl(@Nullable Entity shooter, FallFeature fallFeature) {
 		super(shooter, EntityType.ENDER_PEARL);
+		this.fallFeature = fallFeature;
 	}
 	
 	private void teleportOwner() {
@@ -53,7 +56,7 @@ public class ThrownEnderpearl extends CustomEntityProjectile implements ItemHold
 				}
 				
 				player.teleport(position);
-				player.setTag(Tracker.FALL_DISTANCE, 0.0);
+				fallFeature.resetFallDistance(player);
 				
 				player.damage(DamageType.FALL, 5.0F);
 			}
