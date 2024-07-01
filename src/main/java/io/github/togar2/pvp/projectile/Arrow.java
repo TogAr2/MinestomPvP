@@ -17,17 +17,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 public class Arrow extends AbstractArrow {
 	public static final ItemStack DEFAULT_ARROW = ItemStack.of(Material.ARROW);
-	public static final Predicate<ItemStack> ARROW_PREDICATE = stack ->
-			stack.material() == Material.ARROW
-			|| stack.material() == Material.SPECTRAL_ARROW
-			|| stack.material() == Material.TIPPED_ARROW;
-	public static final Predicate<ItemStack> ARROW_OR_FIREWORK_PREDICATE = ARROW_PREDICATE.or(stack ->
-			stack.material() == Material.FIREWORK_ROCKET);
 	
 	private final EffectFeature effectFeature;
 	

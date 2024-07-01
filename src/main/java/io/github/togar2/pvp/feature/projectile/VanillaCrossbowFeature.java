@@ -1,6 +1,5 @@
 package io.github.togar2.pvp.feature.projectile;
 
-import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
@@ -13,7 +12,6 @@ import io.github.togar2.pvp.projectile.AbstractArrow;
 import io.github.togar2.pvp.projectile.Arrow;
 import io.github.togar2.pvp.projectile.SpectralArrow;
 import io.github.togar2.pvp.utils.ViewUtil;
-import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
@@ -42,7 +40,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaCrossbowFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.CROSSBOW, VanillaCrossbowFeature::new,
-			FeatureType.ITEM_DAMAGE, FeatureType.EFFECT, FeatureType.ENCHANTMENT
+			FeatureType.ITEM_DAMAGE, FeatureType.EFFECT, FeatureType.ENCHANTMENT, FeatureType.PROJECTILE_ITEM
 	);
 	
 	private static final Tag<Boolean> START_SOUND_PLAYED = Tag.Transient("StartSoundPlayed");
@@ -53,6 +51,7 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 	private ItemDamageFeature itemDamageFeature;
 	private EffectFeature effectFeature;
 	private EnchantmentFeature enchantmentFeature;
+	private ProjectileItemFeature projectileItemFeature;
 	
 	public VanillaCrossbowFeature(FeatureConfiguration configuration) {
 		this.configuration = configuration;
@@ -63,6 +62,7 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 		this.itemDamageFeature = configuration.get(FeatureType.ITEM_DAMAGE);
 		this.effectFeature = configuration.get(FeatureType.EFFECT);
 		this.enchantmentFeature = configuration.get(FeatureType.ENCHANTMENT);
+		this.projectileItemFeature = configuration.get(FeatureType.PROJECTILE_ITEM);
 	}
 	
 	@Override
@@ -79,8 +79,7 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 				stack = performCrossbowShooting(player, event.getHand(), stack, getCrossbowPower(stack), 1.0);
 				player.setItemInHand(event.getHand(), setCrossbowProjectile(stack, null));
 			} else {
-				if (EntityUtils.getProjectile(player,
-						Arrow.ARROW_OR_FIREWORK_PREDICATE, Arrow.ARROW_PREDICATE).first().isAir()) {
+				if (projectileItemFeature.getCrossbowProjectile(player) == null) {
 					event.setCancelled(true);
 				} else {
 					player.setTag(START_SOUND_PLAYED, false);
@@ -231,24 +230,29 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 	protected ItemStack loadCrossbowProjectiles(Player player, ItemStack stack) {
 		boolean multiShot = stack.get(ItemComponent.ENCHANTMENTS).level(Enchantment.MULTISHOT) > 0;
 		
-		Pair<ItemStack, Integer> pair = EntityUtils.getProjectile(player,
-				Arrow.ARROW_OR_FIREWORK_PREDICATE, Arrow.ARROW_PREDICATE);
-		ItemStack projectile = pair.first();
-		int projectileSlot = pair.second();
+		ItemStack projectileItem;
+		int projectileSlot;
 		
-		if (projectile.isAir() && player.getGameMode() == GameMode.CREATIVE) {
-			projectile = Arrow.DEFAULT_ARROW;
+		ProjectileItemFeature.ProjectileItem projectile = projectileItemFeature.getCrossbowProjectile(player);
+		if (projectile == null && player.getGameMode() == GameMode.CREATIVE) {
+			projectileItem = Arrow.DEFAULT_ARROW;
 			projectileSlot = -1;
+		} else if (projectile != null) {
+			projectileItem = projectile.stack();
+			projectileSlot = projectile.slot();
+		} else {
+			// Should not happen
+			return ItemStack.AIR;
 		}
 		
 		if (multiShot) {
-			stack = setCrossbowProjectiles(stack, projectile, projectile, projectile);
+			stack = setCrossbowProjectiles(stack, projectileItem, projectileItem, projectileItem);
 		} else {
-			stack = setCrossbowProjectile(stack, projectile);
+			stack = setCrossbowProjectile(stack, projectileItem);
 		}
 		
 		if (player.getGameMode() != GameMode.CREATIVE && projectileSlot >= 0) {
-			player.getInventory().setItemStack(projectileSlot, projectile.withAmount(projectile.amount() - 1));
+			player.getInventory().setItemStack(projectileSlot, projectileItem.withAmount(projectileItem.amount() - 1));
 		}
 		
 		return stack;

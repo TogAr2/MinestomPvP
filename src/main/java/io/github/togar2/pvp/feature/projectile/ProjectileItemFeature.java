@@ -1,0 +1,26 @@
+package io.github.togar2.pvp.feature.projectile;
+
+import io.github.togar2.pvp.feature.CombatFeature;
+import net.minestom.server.entity.Player;
+import net.minestom.server.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
+
+public interface ProjectileItemFeature extends CombatFeature {
+	ProjectileItemFeature NO_OP = new ProjectileItemFeature() {
+		@Override
+		public @Nullable ProjectileItem getBowProjectile(Player player) {
+			return null;
+		}
+		
+		@Override
+		public @Nullable ProjectileItem getCrossbowProjectile(Player player) {
+			return null;
+		}
+	};
+	
+	@Nullable ProjectileItem getBowProjectile(Player player);
+	
+	@Nullable ProjectileItem getCrossbowProjectile(Player player);
+	
+	record ProjectileItem(int slot, ItemStack stack) {}
+}

@@ -1,18 +1,17 @@
 package io.github.togar2.pvp.entity;
 
-import io.github.togar2.pvp.projectile.Arrow;
-import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.minestom.server.entity.*;
+import net.minestom.server.entity.Entity;
+import net.minestom.server.entity.ItemEntity;
+import net.minestom.server.entity.LivingEntity;
+import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.item.ItemStack;
-import net.minestom.server.utils.inventory.PlayerInventoryUtils;
 import net.minestom.server.utils.time.TimeUnit;
 
 import java.lang.reflect.Field;
 import java.util.Objects;
-import java.util.function.Predicate;
 
 public class EntityUtils {
 	public static void spawnItemAtLocation(Entity entity, ItemStack itemStack, double up) {
@@ -21,35 +20,6 @@ public class EntityUtils {
 		ItemEntity item = new ItemEntity(itemStack);
 		item.setPickupDelay(10, TimeUnit.SERVER_TICK); // Default 0.5 seconds
 		item.setInstance(Objects.requireNonNull(entity.getInstance()), entity.getPosition().add(0, up, 0));
-	}
-	
-	public static Pair<ItemStack, Integer> getProjectile(Player player, Predicate<ItemStack> predicate) {
-		return getProjectile(player, predicate, predicate);
-	}
-	
-	public static Pair<ItemStack, Integer> getProjectile(Player player, Predicate<ItemStack> heldSupportedPredicate,
-	                                                     Predicate<ItemStack> allSupportedPredicate) {
-		Pair<ItemStack, Integer> held = getHeldItem(player, heldSupportedPredicate);
-		if (!held.first().isAir()) return held;
-		
-		ItemStack[] itemStacks = player.getInventory().getItemStacks();
-		for (int i = 0; i < itemStacks.length; i++) {
-			ItemStack stack = itemStacks[i];
-			if (stack == null || stack.isAir()) continue;
-			if (allSupportedPredicate.test(stack)) return Pair.of(stack, i);
-		}
-		
-		return player.getGameMode() == GameMode.CREATIVE ? Pair.of(Arrow.DEFAULT_ARROW, -1) : Pair.of(ItemStack.AIR, -1);
-	}
-	
-	private static Pair<ItemStack, Integer> getHeldItem(Player player, Predicate<ItemStack> predicate) {
-		ItemStack stack = player.getItemInHand(Player.Hand.OFF);
-		if (predicate.test(stack)) return Pair.of(stack, PlayerInventoryUtils.OFFHAND_SLOT);
-		
-		stack = player.getItemInHand(Player.Hand.MAIN);
-		if (predicate.test(stack)) return Pair.of(stack, (int) player.getHeldSlot());
-		
-		return Pair.of(ItemStack.AIR, -1);
 	}
 	
 	public static Component getName(Entity entity) {

@@ -1,6 +1,5 @@
 package io.github.togar2.pvp.feature.projectile;
 
-import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
@@ -13,7 +12,6 @@ import io.github.togar2.pvp.projectile.AbstractArrow;
 import io.github.togar2.pvp.projectile.Arrow;
 import io.github.togar2.pvp.projectile.SpectralArrow;
 import io.github.togar2.pvp.utils.ViewUtil;
-import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Pos;
@@ -40,7 +38,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaBowFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.BOW, VanillaBowFeature::new,
-			FeatureType.ITEM_DAMAGE, FeatureType.EFFECT, FeatureType.ENCHANTMENT
+			FeatureType.ITEM_DAMAGE, FeatureType.EFFECT, FeatureType.ENCHANTMENT, FeatureType.PROJECTILE_ITEM
 	);
 	
 	private final FeatureConfiguration configuration;
@@ -48,6 +46,7 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 	private ItemDamageFeature itemDamageFeature;
 	private EffectFeature effectFeature;
 	private EnchantmentFeature enchantmentFeature;
+	private ProjectileItemFeature projectileItemFeature;
 	
 	public VanillaBowFeature(FeatureConfiguration configuration) {
 		this.configuration = configuration;
@@ -58,6 +57,7 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 		this.itemDamageFeature = configuration.get(FeatureType.ITEM_DAMAGE);
 		this.effectFeature = configuration.get(FeatureType.EFFECT);
 		this.enchantmentFeature = configuration.get(FeatureType.ENCHANTMENT);
+		this.projectileItemFeature = configuration.get(FeatureType.PROJECTILE_ITEM);
 	}
 	
 	@Override
@@ -65,7 +65,7 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 		node.addListener(PlayerItemAnimationEvent.class, event -> {
 			if (event.getItemAnimationType() == PlayerItemAnimationEvent.ItemAnimationType.BOW) {
 				if (event.getPlayer().getGameMode() != GameMode.CREATIVE
-						&& EntityUtils.getProjectile(event.getPlayer(), Arrow.ARROW_PREDICATE).first().isAir()) {
+						&& projectileItemFeature.getBowProjectile(event.getPlayer()) == null) {
 					event.setCancelled(true);
 				}
 			}
@@ -82,14 +82,17 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 			boolean infinite = player.getGameMode() == GameMode.CREATIVE
 					|| enchantmentList.level(Enchantment.INFINITY) > 0;
 			
-			Pair<ItemStack, Integer> projectilePair = EntityUtils.getProjectile(player, Arrow.ARROW_PREDICATE);
-			ItemStack projectile = projectilePair.first();
-			int projectileSlot = projectilePair.second();
+			ItemStack projectileItem;
+			int projectileSlot;
 			
-			if (!infinite && projectile.isAir()) return;
-			if (projectile.isAir()) {
-				projectile = Arrow.DEFAULT_ARROW;
+			ProjectileItemFeature.ProjectileItem projectile = projectileItemFeature.getBowProjectile(player);
+			if (!infinite && projectile == null) return;
+			if (projectile == null) {
+				projectileItem = Arrow.DEFAULT_ARROW;
 				projectileSlot = -1;
+			} else {
+				projectileItem = projectile.stack();
+				projectileSlot = projectile.slot();
 			}
 			
 			long useDuration = System.currentTimeMillis() - player.getTag(Tracker.ITEM_USE_START_TIME);
@@ -97,7 +100,7 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 			if (power < 0.1) return;
 			
 			// Arrow creation
-			AbstractArrow arrow = createArrow(projectile, player);
+			AbstractArrow arrow = createArrow(projectileItem, player);
 			
 			if (power >= 1) arrow.setCritical(true);
 			
@@ -114,10 +117,10 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 			itemDamageFeature.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
 					EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, 1);
 			
-			boolean reallyInfinite = infinite && projectile.material() == Material.ARROW;
+			boolean reallyInfinite = infinite && projectileItem.material() == Material.ARROW;
 			if (reallyInfinite || player.getGameMode() == GameMode.CREATIVE
-					&& (projectile.material() == Material.SPECTRAL_ARROW
-					|| projectile.material() == Material.TIPPED_ARROW)) {
+					&& (projectileItem.material() == Material.SPECTRAL_ARROW
+					|| projectileItem.material() == Material.TIPPED_ARROW)) {
 				arrow.setPickupMode(AbstractArrow.PickupMode.CREATIVE_ONLY);
 			}
 			
@@ -137,7 +140,7 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 			
 			if (!reallyInfinite && player.getGameMode() != GameMode.CREATIVE && projectileSlot >= 0) {
 				player.getInventory().setItemStack(projectileSlot,
-						projectile.withAmount(projectile.amount() - 1));
+						projectileItem.withAmount(projectileItem.amount() - 1));
 			}
 		});
 	}
