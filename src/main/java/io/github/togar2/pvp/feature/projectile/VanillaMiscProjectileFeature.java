@@ -5,6 +5,7 @@ import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.cooldown.ItemCooldownFeature;
+import io.github.togar2.pvp.feature.fall.FallFeature;
 import io.github.togar2.pvp.projectile.*;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
@@ -22,23 +23,25 @@ import net.minestom.server.sound.SoundEvent;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class VanillaItemProjectileFeature implements ItemProjectileFeature, RegistrableFeature {
-	public static final DefinedFeature<VanillaItemProjectileFeature> DEFINED = new DefinedFeature<>(
-			FeatureType.ITEM_PROJECTILE, VanillaItemProjectileFeature::new,
-			FeatureType.ITEM_COOLDOWN
+public class VanillaMiscProjectileFeature implements MiscProjectileFeature, RegistrableFeature {
+	public static final DefinedFeature<VanillaMiscProjectileFeature> DEFINED = new DefinedFeature<>(
+			FeatureType.MISC_PROJECTILE, VanillaMiscProjectileFeature::new,
+			FeatureType.ITEM_COOLDOWN, FeatureType.FALL
 	);
 	
 	private final FeatureConfiguration configuration;
 	
 	private ItemCooldownFeature itemCooldownFeature;
+	private FallFeature fallFeature;
 	
-	public VanillaItemProjectileFeature(FeatureConfiguration configuration) {
+	public VanillaMiscProjectileFeature(FeatureConfiguration configuration) {
 		this.configuration = configuration;
 	}
 	
 	@Override
 	public void initDependencies() {
 		this.itemCooldownFeature = configuration.get(FeatureType.ITEM_COOLDOWN);
+		this.fallFeature = configuration.get(FeatureType.FALL);
 	}
 	
 	@Override
@@ -62,7 +65,7 @@ public class VanillaItemProjectileFeature implements ItemProjectileFeature, Regi
 				projectile = new Snowball(player);
 			} else if (enderpearl) {
 				soundEvent = SoundEvent.ENTITY_ENDER_PEARL_THROW;
-				projectile = new ThrownEnderpearl(player);
+				projectile = new ThrownEnderpearl(player, fallFeature);
 			} else {
 				soundEvent = SoundEvent.ENTITY_EGG_THROW;
 				projectile = new ThrownEgg(player);

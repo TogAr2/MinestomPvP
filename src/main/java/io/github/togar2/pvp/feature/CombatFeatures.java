@@ -55,7 +55,7 @@ public class CombatFeatures {
 	public static final DefinedFeature<VanillaBowFeature> VANILLA_BOW = VanillaBowFeature.DEFINED;
 	public static final DefinedFeature<VanillaCrossbowFeature> VANILLA_CROSSBOW = VanillaCrossbowFeature.DEFINED;
 	public static final DefinedFeature<VanillaFishingRodFeature> VANILLA_FISHING_ROD = VanillaFishingRodFeature.DEFINED;
-	public static final DefinedFeature<VanillaItemProjectileFeature> VANILLA_ITEM_PROJECTILE = VanillaItemProjectileFeature.DEFINED;
+	public static final DefinedFeature<VanillaMiscProjectileFeature> VANILLA_MISC_PROJECTILE = VanillaMiscProjectileFeature.DEFINED;
 	public static final DefinedFeature<VanillaProjectileItemFeature> VANILLA_PROJECTILE_ITEM = VanillaProjectileItemFeature.DEFINED;
 	public static final DefinedFeature<VanillaTridentFeature> VANILLA_TRIDENT = VanillaTridentFeature.DEFINED;
 	public static final DefinedFeature<VanillaSpectateFeature> VANILLA_SPECTATE = VanillaSpectateFeature.DEFINED;
@@ -71,7 +71,7 @@ public class CombatFeatures {
 			VANILLA_DAMAGE, VANILLA_EFFECT, VANILLA_ENCHANTMENT, VANILLA_EXPLOSION,
 			VANILLA_FALL, VANILLA_EXHAUSTION, VANILLA_FOOD, VANILLA_REGENERATION,
 			VANILLA_ITEM_DAMAGE, VANILLA_KNOCKBACK, VANILLA_POTION, VANILLA_BOW,
-			VANILLA_CROSSBOW, VANILLA_FISHING_ROD, VANILLA_ITEM_PROJECTILE, VANILLA_PROJECTILE_ITEM,
+			VANILLA_CROSSBOW, VANILLA_FISHING_ROD, VANILLA_MISC_PROJECTILE, VANILLA_PROJECTILE_ITEM,
 			VANILLA_TRIDENT, VANILLA_SPECTATE, VANILLA_PLAYER_STATE, VANILLA_TOTEM,
 			VANILLA_DEATH_MESSAGE
 	);
