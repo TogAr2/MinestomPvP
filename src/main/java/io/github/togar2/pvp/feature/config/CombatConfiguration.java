@@ -95,12 +95,14 @@ public class CombatConfiguration {
 	public CombatFeatureSet build() {
 		CombatFeatureSet result = new CombatFeatureSet();
 		
-		List<ConstructableFeature> buildOrder = getBuildOrder();
+		//List<ConstructableFeature> buildOrder = getBuildOrder();
 		
-		for (ConstructableFeature feature : buildOrder) {
+		for (ConstructableFeature feature : features) {
 			CombatFeature currentResult = feature.construct(result);
 			result.add(feature.type, currentResult);
 		}
+		
+		result.initDependencies();
 		
 		return result;
 	}
@@ -133,7 +135,8 @@ public class CombatConfiguration {
 	
 	private void visit(List<ConstructableFeature> order, Set<ConstructableFeature> visiting, ConstructableFeature current) {
 		if (order.contains(current)) return; // Feature has already been added
-		if (visiting.contains(current)) throw new RuntimeException("Configuration has a recursive dependency");
+		if (visiting.contains(current))
+			throw new RuntimeException("Configuration has a recursive dependency");
 		
 		if (current instanceof LazyFeatureInit lazy) {
 			visiting.add(current);
@@ -199,7 +202,7 @@ public class CombatConfiguration {
 		
 		@Override
 		CombatFeature construct(FeatureConfiguration configuration) {
-			FeatureConfiguration local = configuration.shallowCopy();
+			FeatureConfiguration local = configuration.overlay();
 			override.forEach((k, v) -> local.add(k, v.construct(configuration)));
 			
 			return constructor.construct(local);

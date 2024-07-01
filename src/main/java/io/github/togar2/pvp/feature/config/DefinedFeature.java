@@ -26,10 +26,6 @@ public class DefinedFeature<F extends CombatFeature> {
 		this.playerInit = playerInit;
 	}
 	
-	public F construct() {
-		return construct(FeatureConfiguration.empty());
-	}
-	
 	public F construct(FeatureConfiguration configuration) {
 		// Registers player init
 		CombatFeatureRegistry.init(this);

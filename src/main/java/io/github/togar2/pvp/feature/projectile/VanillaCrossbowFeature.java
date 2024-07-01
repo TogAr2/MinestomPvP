@@ -48,11 +48,18 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 	private static final Tag<Boolean> START_SOUND_PLAYED = Tag.Transient("StartSoundPlayed");
 	private static final Tag<Boolean> MID_LOAD_SOUND_PLAYED = Tag.Transient("MidLoadSoundPlayed");
 	
-	private final ItemDamageFeature itemDamageFeature;
-	private final EffectFeature effectFeature;
-	private final EnchantmentFeature enchantmentFeature;
+	private final FeatureConfiguration configuration;
+	
+	private ItemDamageFeature itemDamageFeature;
+	private EffectFeature effectFeature;
+	private EnchantmentFeature enchantmentFeature;
 	
 	public VanillaCrossbowFeature(FeatureConfiguration configuration) {
+		this.configuration = configuration;
+	}
+	
+	@Override
+	public void initDependencies() {
 		this.itemDamageFeature = configuration.get(FeatureType.ITEM_DAMAGE);
 		this.effectFeature = configuration.get(FeatureType.EFFECT);
 		this.enchantmentFeature = configuration.get(FeatureType.ENCHANTMENT);

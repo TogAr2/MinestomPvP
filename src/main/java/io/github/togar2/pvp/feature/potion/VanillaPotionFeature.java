@@ -42,10 +42,17 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 	private static final int USE_TICKS = 32;
 	private static final ItemStack GLASS_BOTTLE = ItemStack.of(Material.GLASS_BOTTLE);
 	
-	private final EffectFeature effectFeature;
-	private final CombatVersion version;
+	private final FeatureConfiguration configuration;
+	
+	private EffectFeature effectFeature;
+	private CombatVersion version;
 	
 	public VanillaPotionFeature(FeatureConfiguration configuration) {
+		this.configuration = configuration;
+	}
+	
+	@Override
+	public void initDependencies() {
 		this.effectFeature = configuration.get(FeatureType.EFFECT);
 		this.version = configuration.get(FeatureType.VERSION);
 	}

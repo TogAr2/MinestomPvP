@@ -26,11 +26,18 @@ public class VanillaRegenerationFeature implements RegenerationFeature, Registra
 	
 	public static final Tag<Integer> STARVATION_TICKS = Tag.Integer("starvationTicks");
 	
-	private final ExhaustionFeature exhaustionFeature;
-	private final DifficultyProvider difficultyFeature;
-	private final CombatVersion version;
+	private final FeatureConfiguration configuration;
+	
+	private ExhaustionFeature exhaustionFeature;
+	private DifficultyProvider difficultyFeature;
+	private CombatVersion version;
 	
 	public VanillaRegenerationFeature(FeatureConfiguration configuration) {
+		this.configuration = configuration;
+	}
+	
+	@Override
+	public void initDependencies() {
 		this.exhaustionFeature = configuration.get(FeatureType.EXHAUSTION);
 		this.difficultyFeature = configuration.get(FeatureType.DIFFICULTY);
 		this.version = configuration.get(FeatureType.VERSION);

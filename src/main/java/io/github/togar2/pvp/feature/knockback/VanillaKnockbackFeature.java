@@ -27,10 +27,16 @@ public class VanillaKnockbackFeature implements KnockbackFeature, CombatFeature 
 			FeatureType.VERSION
 	);
 	
-	//TODO this probably shouldn't work like this
-	private final CombatVersion version;
+	private final FeatureConfiguration configuration;
+	
+	private CombatVersion version;
 	
 	public VanillaKnockbackFeature(FeatureConfiguration configuration) {
+		this.configuration = configuration;
+	}
+	
+	@Override
+	public void initDependencies() {
 		this.version = configuration.get(FeatureType.VERSION);
 	}
 	

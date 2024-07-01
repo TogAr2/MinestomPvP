@@ -36,10 +36,17 @@ public class VanillaFishingRodFeature implements FishingRodFeature, RegistrableF
 	
 	public static final Tag<FishingBobber> FISHING_BOBBER = Tag.Transient("fishingBobber");
 	
-	private final ItemDamageFeature itemDamageFeature;
-	private final CombatVersion version;
+	private final FeatureConfiguration configuration;
+	
+	private ItemDamageFeature itemDamageFeature;
+	private CombatVersion version;
 	
 	public VanillaFishingRodFeature(FeatureConfiguration configuration) {
+		this.configuration = configuration;
+	}
+	
+	@Override
+	public void initDependencies() {
 		this.itemDamageFeature = configuration.get(FeatureType.ITEM_DAMAGE);
 		this.version = configuration.get(FeatureType.VERSION);
 	}

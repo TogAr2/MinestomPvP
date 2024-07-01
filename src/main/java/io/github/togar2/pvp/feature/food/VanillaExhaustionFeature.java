@@ -31,10 +31,17 @@ public class VanillaExhaustionFeature implements ExhaustionFeature, RegistrableF
 	
 	public static final Tag<Float> EXHAUSTION = Tag.Float("exhaustion");
 	
-	private final DifficultyProvider difficultyFeature;
-	private final CombatVersion version;
+	private final FeatureConfiguration configuration;
+	
+	private DifficultyProvider difficultyFeature;
+	private CombatVersion version;
 	
 	public VanillaExhaustionFeature(FeatureConfiguration configuration) {
+		this.configuration = configuration;
+	}
+	
+	@Override
+	public void initDependencies() {
 		this.difficultyFeature = configuration.get(FeatureType.DIFFICULTY);
 		this.version = configuration.get(FeatureType.VERSION);
 	}

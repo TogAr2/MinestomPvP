@@ -17,9 +17,16 @@ public class VanillaCriticalFeature implements CriticalFeature, CombatFeature {
 			FeatureType.VERSION
 	);
 	
-	private final CombatVersion version;
+	private final FeatureConfiguration configuration;
+	
+	private CombatVersion version;
 	
 	public VanillaCriticalFeature(FeatureConfiguration configuration) {
+		this.configuration = configuration;
+	}
+	
+	@Override
+	public void initDependencies() {
 		this.version = configuration.get(FeatureType.VERSION);
 	}
 	

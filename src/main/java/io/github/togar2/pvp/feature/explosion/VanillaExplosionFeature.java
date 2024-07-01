@@ -31,11 +31,17 @@ public class VanillaExplosionFeature implements ExplosionFeature, RegistrableFea
 			FeatureType.ITEM_DAMAGE, FeatureType.ENCHANTMENT
 	);
 	
-	private final ItemDamageFeature itemDamageFeature;
+	private final FeatureConfiguration configuration;
 	
-	private final VanillaExplosionSupplier explosionSupplier;
+	private ItemDamageFeature itemDamageFeature;
+	private VanillaExplosionSupplier explosionSupplier;
 	
 	public VanillaExplosionFeature(FeatureConfiguration configuration) {
+		this.configuration = configuration;
+	}
+	
+	@Override
+	public void initDependencies() {
 		this.itemDamageFeature = configuration.get(FeatureType.ITEM_DAMAGE);
 		this.explosionSupplier = new VanillaExplosionSupplier(this, configuration.get(FeatureType.ENCHANTMENT));
 	}

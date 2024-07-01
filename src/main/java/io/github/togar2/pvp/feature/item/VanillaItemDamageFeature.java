@@ -24,9 +24,16 @@ public class VanillaItemDamageFeature implements ItemDamageFeature {
 			FeatureType.ENCHANTMENT
 	);
 	
-	private final EnchantmentFeature enchantmentFeature;
+	private final FeatureConfiguration configuration;
+	
+	private EnchantmentFeature enchantmentFeature;
 	
 	public VanillaItemDamageFeature(FeatureConfiguration configuration) {
+		this.configuration = configuration;
+	}
+	
+	@Override
+	public void initDependencies() {
 		this.enchantmentFeature = configuration.get(FeatureType.ENCHANTMENT);
 	}
 	

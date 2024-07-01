@@ -28,11 +28,18 @@ public class VanillaEquipmentFeature implements DataFeature<Attribute>, Registra
 			FeatureType.VERSION
 	);
 	
+	private final FeatureConfiguration configuration;
+	
 	//TODO this probably shouldn't work this way
 	// We probably want to store all the tools & armor separately per DataFeature
-	private final CombatVersion version;
+	private CombatVersion version;
 	
 	public VanillaEquipmentFeature(FeatureConfiguration configuration) {
+		this.configuration = configuration;
+	}
+	
+	@Override
+	public void initDependencies() {
 		this.version = configuration.get(FeatureType.VERSION);
 	}
 	

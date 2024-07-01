@@ -28,9 +28,16 @@ public class VanillaItemProjectileFeature implements ItemProjectileFeature, Regi
 			FeatureType.ITEM_COOLDOWN
 	);
 	
-	private final ItemCooldownFeature itemCooldownFeature;
+	private final FeatureConfiguration configuration;
+	
+	private ItemCooldownFeature itemCooldownFeature;
 	
 	public VanillaItemProjectileFeature(FeatureConfiguration configuration) {
+		this.configuration = configuration;
+	}
+	
+	@Override
+	public void initDependencies() {
 		this.itemCooldownFeature = configuration.get(FeatureType.ITEM_COOLDOWN);
 	}
 	

@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 
 public class FeatureConfiguration {
-	private final Map<FeatureType<?>, CombatFeature> combatFeatures = new HashMap<>();
+	protected final Map<FeatureType<?>, CombatFeature> combatFeatures = new HashMap<>();
 	
 	public FeatureConfiguration() {}
 	
@@ -27,7 +27,7 @@ public class FeatureConfiguration {
 	
 	@SuppressWarnings("unchecked")
 	public <T extends CombatFeature> @NotNull T get(FeatureType<T> type) {
-		return (T) combatFeatures.computeIfAbsent(type, FeatureType::defaultFeature);
+		return (T) combatFeatures.getOrDefault(type, type.defaultFeature());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -55,6 +55,27 @@ public class FeatureConfiguration {
 		FeatureConfiguration clone = new FeatureConfiguration();
 		clone.combatFeatures.putAll(combatFeatures);
 		return clone;
+	}
+	
+	public FeatureConfiguration overlay() {
+		return new Overlay(this);
+	}
+	
+	private static class Overlay extends FeatureConfiguration {
+		private final FeatureConfiguration backing;
+		
+		public Overlay(FeatureConfiguration backing) {
+			this.backing = backing;
+		}
+		
+		@Override
+		public <T extends CombatFeature> @NotNull T get(FeatureType<T> type) {
+			if (super.combatFeatures.containsKey(type)) {
+				return super.get(type);
+			} else {
+				return backing.get(type);
+			}
+		}
 	}
 	
 	private static final FeatureConfiguration empty = new FeatureConfiguration();

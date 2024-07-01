@@ -48,9 +48,16 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 	public static final Tag<Map<PotionEffect, Integer>> DURATION_LEFT = Tag.Transient("effectDurationLeft");
 	public static final int DEFAULT_POTION_COLOR = 0xff385dc6;
 	
-	private final CombatVersion version;
+	private final FeatureConfiguration configuration;
+	
+	private CombatVersion version;
 	
 	public VanillaEffectFeature(FeatureConfiguration configuration) {
+		this.configuration = configuration;
+	}
+	
+	@Override
+	public void initDependencies() {
 		this.version = configuration.get(FeatureType.VERSION);
 	}
 	

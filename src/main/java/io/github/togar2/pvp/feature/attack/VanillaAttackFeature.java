@@ -14,7 +14,6 @@ import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import io.github.togar2.pvp.feature.food.ExhaustionFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.feature.knockback.KnockbackFeature;
-import io.github.togar2.pvp.utils.CombatVersion;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;
@@ -38,24 +37,28 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaAttackFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.ATTACK, VanillaAttackFeature::new,
 			FeatureType.ATTACK_COOLDOWN, FeatureType.EXHAUSTION, FeatureType.ITEM_DAMAGE,
-			FeatureType.ENCHANTMENT, FeatureType.CRITICAL, FeatureType.SWEEPING, FeatureType.KNOCKBACK,
-			FeatureType.VERSION
+			FeatureType.ENCHANTMENT, FeatureType.CRITICAL, FeatureType.SWEEPING, FeatureType.KNOCKBACK
 	);
 	
 	private static final double MAX_DISTANCE_SQUARED = 36.0;
 	
-	private final AttackCooldownFeature cooldownFeature;
-	private final ExhaustionFeature exhaustionFeature;
-	private final ItemDamageFeature itemDamageFeature;
-	private final EnchantmentFeature enchantmentFeature;;
+	private final FeatureConfiguration configuration;
 	
-	private final CriticalFeature criticalFeature;
-	private final SweepingFeature sweepingFeature;
-	private final KnockbackFeature knockbackFeature;
+	private AttackCooldownFeature cooldownFeature;
+	private ExhaustionFeature exhaustionFeature;
+	private ItemDamageFeature itemDamageFeature;
+	private EnchantmentFeature enchantmentFeature;;
 	
-	private final CombatVersion version;
+	private CriticalFeature criticalFeature;
+	private SweepingFeature sweepingFeature;
+	private KnockbackFeature knockbackFeature;
 	
 	public VanillaAttackFeature(FeatureConfiguration configuration) {
+		this.configuration = configuration;
+	}
+	
+	@Override
+	public void initDependencies() {
 		this.cooldownFeature = configuration.get(FeatureType.ATTACK_COOLDOWN);
 		this.exhaustionFeature = configuration.get(FeatureType.EXHAUSTION);
 		this.itemDamageFeature = configuration.get(FeatureType.ITEM_DAMAGE);
@@ -63,7 +66,6 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 		this.criticalFeature = configuration.get(FeatureType.CRITICAL);
 		this.sweepingFeature = configuration.get(FeatureType.SWEEPING);
 		this.knockbackFeature = configuration.get(FeatureType.KNOCKBACK);
-		this.version = configuration.get(FeatureType.VERSION);
 	}
 	
 	@Override

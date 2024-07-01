@@ -48,19 +48,26 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 	public static final Tag<Long> NEW_DAMAGE_TIME = Tag.Long("newDamageTime");
 	public static final Tag<Float> LAST_DAMAGE_AMOUNT = Tag.Float("lastDamageAmount");
 	
-	private final DifficultyProvider difficultyProvider;
+	private final FeatureConfiguration configuration;
 	
-	private final BlockFeature blockFeature;
-	private final ArmorFeature armorFeature;
-	private final TotemFeature totemFeature;
-	private final ExhaustionFeature exhaustionFeature;
-	private final KnockbackFeature knockbackFeature;
-	private final TrackingFeature trackingFeature;
-	private final ItemDamageFeature itemDamageFeature;
+	private DifficultyProvider difficultyProvider;
 	
-	private final CombatVersion version;
+	private BlockFeature blockFeature;
+	private ArmorFeature armorFeature;
+	private TotemFeature totemFeature;
+	private ExhaustionFeature exhaustionFeature;
+	private KnockbackFeature knockbackFeature;
+	private TrackingFeature trackingFeature;
+	private ItemDamageFeature itemDamageFeature;
+	
+	private CombatVersion version;
 	
 	public VanillaDamageFeature(FeatureConfiguration configuration) {
+		this.configuration = configuration;
+	}
+	
+	@Override
+	public void initDependencies() {
 		this.difficultyProvider = configuration.get(FeatureType.DIFFICULTY);
 		this.blockFeature = configuration.get(FeatureType.BLOCK);
 		this.armorFeature = configuration.get(FeatureType.ARMOR);

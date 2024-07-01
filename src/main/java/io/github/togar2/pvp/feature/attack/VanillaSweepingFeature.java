@@ -25,10 +25,17 @@ public class VanillaSweepingFeature implements SweepingFeature {
 			FeatureType.ENCHANTMENT, FeatureType.KNOCKBACK
 	);
 	
-	private final EnchantmentFeature enchantmentFeature;
-	private final KnockbackFeature knockbackFeature;
+	private final FeatureConfiguration configuration;
+	
+	private EnchantmentFeature enchantmentFeature;
+	private KnockbackFeature knockbackFeature;
 	
 	public VanillaSweepingFeature(FeatureConfiguration configuration) {
+		this.configuration = configuration;
+	}
+	
+	@Override
+	public void initDependencies() {
 		this.enchantmentFeature = configuration.get(FeatureType.ENCHANTMENT);
 		this.knockbackFeature = configuration.get(FeatureType.KNOCKBACK);
 	}

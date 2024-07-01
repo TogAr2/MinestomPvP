@@ -12,4 +12,11 @@ public class CombatFeatureSet extends FeatureConfiguration implements Registrabl
 			node.addChild(registrable.createNode());
 		}
 	}
+	
+	@Override
+	public void initDependencies() {
+		for (CombatFeature feature : listFeatures()) {
+			feature.initDependencies();
+		}
+	}
 }

@@ -21,10 +21,16 @@ public class VanillaArmorFeature implements ArmorFeature, CombatFeature {
 			FeatureType.ENCHANTMENT, FeatureType.VERSION
 	);
 	
-	private final EnchantmentFeature enchantmentFeature;
-	private final CombatVersion version;
+	private final FeatureConfiguration configuration;
+	private EnchantmentFeature enchantmentFeature;
+	private CombatVersion version;
 	
 	public VanillaArmorFeature(FeatureConfiguration configuration) {
+		this.configuration = configuration;
+	}
+	
+	@Override
+	public void initDependencies() {
 		this.enchantmentFeature = configuration.get(FeatureType.ENCHANTMENT);
 		this.version = configuration.get(FeatureType.VERSION);
 	}

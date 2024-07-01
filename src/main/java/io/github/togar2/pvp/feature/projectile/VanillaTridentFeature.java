@@ -42,12 +42,19 @@ public class VanillaTridentFeature implements TridentFeature, RegistrableFeature
 			FeatureType.ITEM_DAMAGE, FeatureType.ENCHANTMENT
 	);
 	
-	private final ItemDamageFeature itemDamageFeature;
-	private final EnchantmentFeature enchantmentFeature;
+	private final FeatureConfiguration configuration;
+	
+	private ItemDamageFeature itemDamageFeature;
+	private EnchantmentFeature enchantmentFeature;
 	
 	public static final Tag<Long> RIPTIDE_START = Tag.Long("riptideStart");
 	
 	public VanillaTridentFeature(FeatureConfiguration configuration) {
+		this.configuration = configuration;
+	}
+	
+	@Override
+	public void initDependencies() {
 		this.itemDamageFeature = configuration.get(FeatureType.ITEM_DAMAGE);
 		this.enchantmentFeature = configuration.get(FeatureType.ENCHANTMENT);
 	}

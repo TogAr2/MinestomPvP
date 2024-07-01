@@ -32,11 +32,18 @@ public class VanillaBlockFeature implements BlockFeature, CombatFeature {
 			FeatureType.ITEM_DAMAGE, FeatureType.ITEM_COOLDOWN, FeatureType.VERSION
 	);
 	
-	private final ItemDamageFeature itemDamageFeature;
-	private final ItemCooldownFeature itemCooldownFeature;
-	private final CombatVersion version;
+	private final FeatureConfiguration configuration;
+	
+	private ItemDamageFeature itemDamageFeature;
+	private ItemCooldownFeature itemCooldownFeature;
+	private CombatVersion version;
 	
 	public VanillaBlockFeature(FeatureConfiguration configuration) {
+		this.configuration = configuration;
+	}
+	
+	@Override
+	public void initDependencies() {
 		this.itemDamageFeature = configuration.get(FeatureType.ITEM_DAMAGE);
 		this.itemCooldownFeature = configuration.get(FeatureType.ITEM_COOLDOWN);
 		this.version = configuration.get(FeatureType.VERSION);
