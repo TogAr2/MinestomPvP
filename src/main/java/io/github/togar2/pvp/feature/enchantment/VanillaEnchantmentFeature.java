@@ -3,7 +3,6 @@ package io.github.togar2.pvp.feature.enchantment;
 import io.github.togar2.pvp.enchantment.CustomEnchantment;
 import io.github.togar2.pvp.enchantment.CustomEnchantments;
 import io.github.togar2.pvp.entity.EntityGroup;
-import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.enums.ArmorMaterial;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
@@ -96,7 +95,15 @@ public class VanillaEnchantmentFeature implements EnchantmentFeature, Registrabl
 	@Override
 	public int getProtectionAmount(LivingEntity entity, DamageType damageType) {
 		AtomicInteger result = new AtomicInteger();
-		forEachEnchantment(EntityUtils.getArmorItems(entity), (enchantment, level) ->
+		
+		List<ItemStack> armorItems = new ArrayList<>();
+		for (EquipmentSlot slot : EquipmentSlot.armors()) {
+			if (slot.isArmor() && !entity.getEquipment(slot).isAir()) {
+				armorItems.add(entity.getEquipment(slot));
+			}
+		}
+		
+		forEachEnchantment(armorItems, (enchantment, level) ->
 				result.addAndGet(enchantment.getProtectionAmount(level, damageType, this, configuration)));
 		return result.get();
 	}

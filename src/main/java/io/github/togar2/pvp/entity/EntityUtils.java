@@ -11,23 +11,10 @@ import net.minestom.server.utils.inventory.PlayerInventoryUtils;
 import net.minestom.server.utils.time.TimeUnit;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
 public class EntityUtils {
-	public static Iterable<ItemStack> getArmorItems(LivingEntity entity) {
-		List<ItemStack> list = new ArrayList<>();
-		for (EquipmentSlot slot : EquipmentSlot.armors()) {
-			if (slot.isArmor() && !entity.getEquipment(slot).isAir()) {
-				list.add(entity.getEquipment(slot));
-			}
-		}
-		
-		return list;
-	}
-	
 	public static void spawnItemAtLocation(Entity entity, ItemStack itemStack, double up) {
 		if (itemStack.isAir()) return;
 		
@@ -41,7 +28,7 @@ public class EntityUtils {
 	}
 	
 	public static Pair<ItemStack, Integer> getProjectile(Player player, Predicate<ItemStack> heldSupportedPredicate,
-	                                      Predicate<ItemStack> allSupportedPredicate) {
+	                                                     Predicate<ItemStack> allSupportedPredicate) {
 		Pair<ItemStack, Integer> held = getHeldItem(player, heldSupportedPredicate);
 		if (!held.first().isAir()) return held;
 		
