@@ -20,6 +20,7 @@ public class AttackConfig extends ElementConfig<EntityInstanceEvent> {
 	@Override
 	public EventNode<EntityInstanceEvent> createNode() {
 		return new CombatConfiguration().legacy(isLegacy())
+				.add(CombatFeatures.VANILLA_ENCHANTMENT)
 				.add(CombatFeatures.VANILLA_SPECTATE)
 				.add(CombatFeatures.VANILLA_ATTACK)
 				.add(CombatFeatures.VANILLA_ATTACK_COOLDOWN)

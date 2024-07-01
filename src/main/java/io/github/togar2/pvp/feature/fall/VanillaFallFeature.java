@@ -1,10 +1,11 @@
 package io.github.togar2.pvp.feature.fall;
 
-import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.feature.CombatFeature;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
+import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.state.PlayerStateFeature;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Point;
@@ -15,7 +16,6 @@ import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityTickEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
-import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.gamedata.tags.TagManager;
 import net.minestom.server.instance.Instance;
@@ -29,12 +29,25 @@ import net.minestom.server.tag.Tag;
 
 public class VanillaFallFeature implements FallFeature, CombatFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaFallFeature> DEFINED = new DefinedFeature<>(
-			FeatureType.FALL, configuration -> new VanillaFallFeature(),
-			VanillaFallFeature::initPlayer
+			FeatureType.FALL, VanillaFallFeature::new,
+			VanillaFallFeature::initPlayer,
+			FeatureType.PLAYER_STATE
 	);
 	
-	public static final Tag<Block> LAST_CLIMBED_BLOCK = Tag.Integer("lastClimbedBlock").map(Block::fromStateId, Block::stateId);
-	public static final Tag<Double> FALL_DISTANCE = Tag.Double("fallDistance");
+	public static final Tag<Double> FALL_DISTANCE = Tag.Transient("fallDistance");
+	
+	private final FeatureConfiguration configuration;
+	
+	private PlayerStateFeature playerStateFeature;
+	
+	public VanillaFallFeature(FeatureConfiguration configuration) {
+		this.configuration = configuration;
+	}
+	
+	@Override
+	public void initDependencies() {
+		this.playerStateFeature = configuration.get(FeatureType.PLAYER_STATE);
+	}
 	
 	public static void initPlayer(Player player, boolean firstInit) {
 		player.setTag(FALL_DISTANCE, 0.0);
@@ -60,17 +73,9 @@ public class VanillaFallFeature implements FallFeature, CombatFeature, Registrab
 			);
 		});
 		
-		node.addListener(PlayerTickEvent.class, event -> {
-			Player player = event.getPlayer();
-			if (player.isOnGround()) player.removeTag(LAST_CLIMBED_BLOCK);
-		});
-		
 		node.addListener(PlayerMoveEvent.class, event -> {
 			Player player = event.getPlayer();
-			if (EntityUtils.isClimbing(player)) {
-				player.setTag(LAST_CLIMBED_BLOCK, player.getInstance().getBlock(player.getPosition()));
-				player.setTag(FALL_DISTANCE, 0.0);
-			}
+			if (playerStateFeature.isClimbing(player)) player.setTag(FALL_DISTANCE, 0.0);
 		});
 	}
 	
@@ -153,11 +158,6 @@ public class VanillaFallFeature implements FallFeature, CombatFeature, Registrab
 	@Override
 	public void resetFallDistance(LivingEntity entity) {
 		entity.setTag(FALL_DISTANCE, 0.0);
-	}
-	
-	@Override
-	public Block getLastClimbedBlock(LivingEntity entity) {
-		return entity.hasTag(LAST_CLIMBED_BLOCK) ? entity.getTag(LAST_CLIMBED_BLOCK) : Block.AIR;
 	}
 	
 	protected Point getLandingPos(LivingEntity livingEntity, Pos position) {

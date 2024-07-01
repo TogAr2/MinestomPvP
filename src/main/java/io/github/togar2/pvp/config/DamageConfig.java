@@ -23,6 +23,7 @@ public class DamageConfig extends ElementConfig<EntityInstanceEvent> {
 				.add(CombatFeatures.VANILLA_DAMAGE)
 				.add(CombatFeatures.VANILLA_BLOCK)
 				.add(CombatFeatures.VANILLA_ARMOR)
+				.add(CombatFeatures.VANILLA_PLAYER_STATE)
 				.add(CombatFeatures.VANILLA_TOTEM)
 				.add(CombatFeatures.VANILLA_EXHAUSTION)
 				.add(CombatFeatures.VANILLA_KNOCKBACK)

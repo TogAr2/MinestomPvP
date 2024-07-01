@@ -6,6 +6,7 @@ import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.fall.FallFeature;
+import io.github.togar2.pvp.feature.state.PlayerStateFeature;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
@@ -23,7 +24,7 @@ public class VanillaDeathMessageFeature implements TrackingFeature,
 	public static final DefinedFeature<VanillaDeathMessageFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.DEATH_MESSAGE, VanillaDeathMessageFeature::new,
 			VanillaDeathMessageFeature::initPlayer,
-			FeatureType.FALL
+			FeatureType.FALL, FeatureType.PLAYER_STATE
 	);
 	
 	public static final Tag<CombatManager> COMBAT_MANAGER = Tag.Transient("combatManager");
@@ -31,6 +32,7 @@ public class VanillaDeathMessageFeature implements TrackingFeature,
 	private final FeatureConfiguration configuration;
 	
 	private FallFeature fallFeature;
+	private PlayerStateFeature playerStateFeature;
 	
 	public VanillaDeathMessageFeature(FeatureConfiguration configuration) {
 		this.configuration = configuration;
@@ -39,6 +41,7 @@ public class VanillaDeathMessageFeature implements TrackingFeature,
 	@Override
 	public void initDependencies() {
 		this.fallFeature = configuration.get(FeatureType.FALL);
+		this.playerStateFeature = configuration.get(FeatureType.PLAYER_STATE);
 	}
 	
 	public static void initPlayer(Player player, boolean firstInit) {
@@ -61,7 +64,7 @@ public class VanillaDeathMessageFeature implements TrackingFeature,
 	@Override
 	public void recordDamage(Player player, @Nullable Entity attacker, Damage damage) {
 		int id = attacker == null ? -1 : attacker.getEntityId();
-		player.getTag(COMBAT_MANAGER).recordDamage(id, damage, fallFeature);
+		player.getTag(COMBAT_MANAGER).recordDamage(id, damage, fallFeature, playerStateFeature);
 	}
 	
 	@Override

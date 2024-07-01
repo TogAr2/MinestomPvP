@@ -4,10 +4,8 @@ import io.github.togar2.pvp.projectile.Arrow;
 import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.damage.Damage;
-import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.utils.inventory.PlayerInventoryUtils;
 import net.minestom.server.utils.time.TimeUnit;
@@ -28,17 +26,6 @@ public class EntityUtils {
 		}
 		
 		return list;
-	}
-	
-	//TODO needs improving
-	public static boolean isClimbing(Entity entity) {
-		if (entity instanceof Player player && player.getGameMode() == GameMode.SPECTATOR) return false;
-		
-		var tag = MinecraftServer.getTagManager().getTag(net.minestom.server.gamedata.tags.Tag.BasicType.BLOCKS, "minecraft:climbable");
-		assert tag != null;
-		
-		Block block = Objects.requireNonNull(entity.getInstance()).getBlock(entity.getPosition());
-		return tag.contains(block.namespace());
 	}
 	
 	public static void spawnItemAtLocation(Entity entity, ItemStack itemStack, double up) {

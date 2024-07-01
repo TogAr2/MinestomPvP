@@ -23,6 +23,7 @@ import io.github.togar2.pvp.feature.potion.PotionFeature;
 import io.github.togar2.pvp.feature.projectile.*;
 import io.github.togar2.pvp.feature.provider.DifficultyProvider;
 import io.github.togar2.pvp.feature.spectate.SpectateFeature;
+import io.github.togar2.pvp.feature.state.PlayerStateFeature;
 import io.github.togar2.pvp.feature.totem.TotemFeature;
 import io.github.togar2.pvp.feature.tracking.DeathMessageFeature;
 import io.github.togar2.pvp.feature.tracking.TrackingFeature;
@@ -58,6 +59,7 @@ public record FeatureType<F extends CombatFeature>(String name, F defaultFeature
 	public static final FeatureType<TridentFeature> TRIDENT = of("TRIDENT", TridentFeature.NO_OP);
 	public static final FeatureType<DifficultyProvider> DIFFICULTY = of("DIFFICULTY", DifficultyProvider.DEFAULT);
 	public static final FeatureType<SpectateFeature> SPECTATE = of("SPECTATE", SpectateFeature.NO_OP);
+	public static final FeatureType<PlayerStateFeature> PLAYER_STATE = of("PLAYER_STATE", PlayerStateFeature.NO_OP);
 	public static final FeatureType<TotemFeature> TOTEM = of("TOTEM", TotemFeature.NO_OP);
 	public static final FeatureType<DeathMessageFeature> DEATH_MESSAGE = of("DEATH_MESSAGE", DeathMessageFeature.NO_OP);
 	public static final FeatureType<TrackingFeature> TRACKING = of("TRACKING", TrackingFeature.NO_OP);
