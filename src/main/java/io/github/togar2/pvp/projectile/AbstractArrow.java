@@ -3,7 +3,6 @@ package io.github.togar2.pvp.projectile;
 import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.events.PickupEntityEvent;
 import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
-import io.github.togar2.pvp.utils.EffectManager;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Pos;
@@ -200,9 +199,9 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 			onHurt(living);
 			
 			if (living != shooter && living instanceof Player
-					&& shooter instanceof Player && !isSilent()) {
-				EffectManager.sendGameState((Player) shooter,
-						ChangeGameStatePacket.Reason.ARROW_HIT_PLAYER, 0.0F);
+					&& shooter instanceof Player shooterPlayer && !isSilent()) {
+				shooterPlayer.getPlayerConnection().sendPacket(
+						new ChangeGameStatePacket(ChangeGameStatePacket.Reason.ARROW_HIT_PLAYER, 0.0F));
 			}
 			
 			if (!isSilent()) {

@@ -166,6 +166,6 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 		player.getViewersAsAudience().playSound(Sound.sound(
 				SoundEvent.ENTITY_GENERIC_DRINK, Sound.Source.PLAYER,
 				0.5f, random.nextFloat() * 0.1f + 0.9f
-		));
+		), player);
 	}
 }

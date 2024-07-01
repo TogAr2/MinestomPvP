@@ -180,13 +180,13 @@ public class VanillaFoodFeature implements FoodFeature, CombatFeature, Registrab
 			player.getViewersAsAudience().playSound(Sound.sound(
 					soundEvent, Sound.Source.PLAYER,
 					0.5f, random.nextFloat() * 0.1f + 0.9f
-			));
+			), player);
 		} else { // Eating
 			player.getViewersAsAudience().playSound(Sound.sound(
 					SoundEvent.ENTITY_GENERIC_EAT, Sound.Source.PLAYER,
 					0.5f + 0.5f * random.nextInt(2),
 					(random.nextFloat() - random.nextFloat()) * 0.2f + 1.0f
-			));
+			), player);
 		}
 	}
 	
