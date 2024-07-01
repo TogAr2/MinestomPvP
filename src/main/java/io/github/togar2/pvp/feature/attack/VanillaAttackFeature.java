@@ -1,7 +1,6 @@
 package io.github.togar2.pvp.feature.attack;
 
 import io.github.togar2.pvp.entity.EntityGroup;
-import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.entity.PvpPlayer;
 import io.github.togar2.pvp.enums.Tool;
 import io.github.togar2.pvp.events.FinalAttackEvent;
@@ -175,7 +174,7 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 			Pos targetPosition = target.getPosition();
 			target.sendPacketToViewersAndSelf(new ParticlePacket(
 					Particle.DAMAGE_INDICATOR, false,
-					targetPosition.x(), EntityUtils.getBodyY(target, 0.5), targetPosition.z(),
+					targetPosition.x(), targetPosition.y() + target.getBoundingBox().height() * 0.5, targetPosition.z(),
 					0.1f, 0, 0.1f,
 					0.2F, particleCount
 			));

@@ -5,10 +5,8 @@ import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.damage.Damage;
-import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.utils.inventory.PlayerInventoryUtils;
@@ -41,10 +39,6 @@ public class EntityUtils {
 		
 		Block block = Objects.requireNonNull(entity.getInstance()).getBlock(entity.getPosition());
 		return tag.contains(block.namespace());
-	}
-	
-	public static double getBodyY(Entity entity, double heightScale) {
-		return entity.getPosition().y() + entity.getBoundingBox().height() * heightScale;
 	}
 	
 	public static void spawnItemAtLocation(Entity entity, ItemStack itemStack, double up) {
@@ -82,40 +76,6 @@ public class EntityUtils {
 		if (predicate.test(stack)) return Pair.of(stack, (int) player.getHeldSlot());
 		
 		return Pair.of(ItemStack.AIR, -1);
-	}
-	
-	public static boolean randomTeleport(Entity entity, Pos to, boolean status) {
-		Instance instance = entity.getInstance();
-		assert instance != null;
-		
-		boolean success = false;
-		int lowestY = to.blockY();
-		if (lowestY == 0) lowestY++;
-		while (lowestY > MinecraftServer.getDimensionTypeRegistry().get(instance.getDimensionType()).minY()) {
-			Block block = instance.getBlock(to.blockX(), lowestY - 1, to.blockZ());
-			if (!block.isAir() && !block.isLiquid()) {
-				Block above = instance.getBlock(to.blockX(), lowestY, to.blockZ());
-				Block above2 = instance.getBlock(to.blockX(), lowestY + 1, to.blockZ());
-				if (above.isAir() && above2.isAir()) {
-					success = true;
-					break;
-				} else {
-					lowestY--;
-				}
-			} else {
-				lowestY--;
-			}
-		}
-		
-		if (!success) return false;
-		
-		entity.teleport(to.withY(lowestY));
-		
-		if (status) {
-			entity.triggerStatus((byte) 46);
-		}
-		
-		return true;
 	}
 	
 	public static Component getName(Entity entity) {

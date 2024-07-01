@@ -1,6 +1,5 @@
 package io.github.togar2.pvp.explosion;
 
-import io.github.togar2.pvp.entity.EntityUtils;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Vec;
@@ -41,7 +40,7 @@ public class TntEntity extends Entity {
 			remove();
 			if (instance.getExplosionSupplier() != null) instance.explode(
 					(float) position.x(),
-					(float) EntityUtils.getBodyY(this, 0.0625),
+					(float) (position.y() + boundingBox.height() * 0.0625),
 					(float) position.z(),
 					4.0f,
 					causingEntity == null ? null

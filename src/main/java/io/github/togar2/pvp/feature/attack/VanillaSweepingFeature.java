@@ -1,6 +1,5 @@
 package io.github.togar2.pvp.feature.attack;
 
-import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.enums.Tool;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
@@ -91,7 +90,7 @@ public class VanillaSweepingFeature implements SweepingFeature {
 		
 		attacker.sendPacketToViewersAndSelf(new ParticlePacket(
 				Particle.SWEEP_ATTACK, false,
-				pos.x() + x, EntityUtils.getBodyY(attacker, 0.5), pos.z() + z,
+				pos.x() + x, pos.y() + attacker.getBoundingBox().height() * 0.5, pos.z() + z,
 				(float) x, 0, (float) z,
 				0, 0
 		));

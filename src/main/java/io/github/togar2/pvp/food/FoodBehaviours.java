@@ -1,12 +1,13 @@
 package io.github.togar2.pvp.food;
 
-import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.potion.PotionEffect;
@@ -20,6 +21,37 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class FoodBehaviours {
 	private static final Map<Material, FoodBehaviour> COMPONENTS = new HashMap<>();
+	
+	private static boolean randomTeleport(Entity entity, Pos to) {
+		Instance instance = entity.getInstance();
+		assert instance != null;
+		
+		boolean success = false;
+		int lowestY = to.blockY();
+		if (lowestY == 0) lowestY++;
+		while (lowestY > MinecraftServer.getDimensionTypeRegistry().get(instance.getDimensionType()).minY()) {
+			Block block = instance.getBlock(to.blockX(), lowestY - 1, to.blockZ());
+			if (!block.isAir() && !block.isLiquid()) {
+				Block above = instance.getBlock(to.blockX(), lowestY, to.blockZ());
+				Block above2 = instance.getBlock(to.blockX(), lowestY + 1, to.blockZ());
+				if (above.isAir() && above2.isAir()) {
+					success = true;
+					break;
+				} else {
+					lowestY--;
+				}
+			} else {
+				lowestY--;
+			}
+		}
+		
+		if (!success) return false;
+		
+		entity.teleport(to.withY(lowestY));
+		entity.triggerStatus((byte) 46);
+		
+		return true;
+	}
 	
 	private static final FoodBehaviour CHORUS_FRUIT_BEHAVIOUR = new FoodBehaviour(ItemStack.AIR) {
 		@Override
@@ -51,7 +83,7 @@ public class FoodBehaviours {
 					player.getVehicle().removePassenger(player);
 				}
 				
-				if (EntityUtils.randomTeleport(player, new Pos(x, y, z, yaw, pitch), true)) {
+				if (randomTeleport(player, new Pos(x, y, z, yaw, pitch))) {
 					ViewUtil.packetGroup(player).playSound(Sound.sound(
 							SoundEvent.ITEM_CHORUS_FRUIT_TELEPORT, Sound.Source.PLAYER,
 							1.0f, 1.0f

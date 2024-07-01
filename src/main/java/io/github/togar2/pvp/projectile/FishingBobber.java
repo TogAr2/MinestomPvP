@@ -1,6 +1,5 @@
 package io.github.togar2.pvp.projectile;
 
-import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.feature.projectile.VanillaFishingRodFeature;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Pos;
@@ -72,7 +71,7 @@ public class FishingBobber extends CustomEntityProjectile {
 						state = State.IN_AIR;
 					} else {
 						Pos hookedPos = hooked.getPosition();
-						teleport(hookedPos.withY(EntityUtils.getBodyY(hooked, 0.8)));
+						teleport(hookedPos.withY(hookedPos.y() + hooked.getBoundingBox().height() * 0.8));
 					}
 				}
 			}
