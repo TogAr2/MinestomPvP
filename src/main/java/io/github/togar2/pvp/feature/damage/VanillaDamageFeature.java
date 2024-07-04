@@ -171,14 +171,19 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 		if (hurtSoundAndAnimation) {
 			entity.setTag(NEW_DAMAGE_TIME, entity.getAliveTicks() + finalDamageEvent.getInvulnerabilityTicks());
 			
-			// Send damage animation
-			entity.sendPacketToViewersAndSelf(new DamageEventPacket(
-					entity.getEntityId(),
-					MinecraftServer.getDamageTypeRegistry().getId(damage.getType()),
-					damage.getAttacker() == null ? 0 : damage.getAttacker().getEntityId() + 1,
-					damage.getSource() == null ? 0 : damage.getSource().getEntityId() + 1,
-					null
-			));
+			if (fullyBlocked) {
+				// Shield status
+				entity.triggerStatus((byte) 29);
+			} else {
+				// Send damage animation
+				entity.sendPacketToViewersAndSelf(new DamageEventPacket(
+						entity.getEntityId(),
+						MinecraftServer.getDamageTypeRegistry().getId(damage.getType()),
+						damage.getAttacker() == null ? 0 : damage.getAttacker().getEntityId() + 1,
+						damage.getSource() == null ? 0 : damage.getSource().getEntityId() + 1,
+						null
+				));
+			}
 			
 			if (!fullyBlocked && damage.getType() != DamageType.DROWN) {
 				if (attacker != null && !typeInfo.explosive()) {

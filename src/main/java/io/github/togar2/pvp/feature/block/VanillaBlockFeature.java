@@ -91,7 +91,7 @@ public class VanillaBlockFeature implements BlockFeature, CombatFeature {
 		float amount = damage.getAmount();
 		float resultingDamage = version.legacy() ? Math.max(0, (amount + 1) * 0.5f) : 0;
 		
-		DamageBlockEvent damageBlockEvent = new DamageBlockEvent(entity, amount, resultingDamage, version.modern());
+		DamageBlockEvent damageBlockEvent = new DamageBlockEvent(entity, amount, resultingDamage, false);
 		EventDispatcher.call(damageBlockEvent);
 		if (damageBlockEvent.isCancelled()) return false;
 		damage.setAmount(damageBlockEvent.getResultingDamage());
@@ -120,7 +120,7 @@ public class VanillaBlockFeature implements BlockFeature, CombatFeature {
 		if (!info.projectile() && damage.getAttacker() instanceof LivingEntity attacker)
 			takeShieldHit(entity, attacker, damageBlockEvent.knockbackAttacker());
 		
-		return amount == 0;
+		return resultingDamage == 0;
 	}
 	
 	protected void takeShieldHit(LivingEntity entity, LivingEntity attacker, boolean applyKnockback) {

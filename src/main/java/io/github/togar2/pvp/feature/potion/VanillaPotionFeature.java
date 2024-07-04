@@ -60,7 +60,7 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(PlayerUseItemEvent.class, event -> {
 			if (event.getItemStack().material() == Material.POTION) {
-				event.setItemUseTime((long) USE_TICKS * MinecraftServer.TICK_MS); // Potion use time is always 32 ticks
+				event.setItemUseTime(USE_TICKS); // Potion use time is always 32 ticks
 			}
 		});
 		
