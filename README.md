@@ -111,6 +111,7 @@ This extension provides several events:
 - `ExplosionEvent`: cancellable, called when an explosion will take place. Can be used to modify the affected blocks.
 - `FinalAttackEvent`: cancellable, called when a player attacks an entity. Can be used to set a few variables like sprint, critical, sweeping, etc.
 - `FinalDamageEvent`: cancellable, called when the final damage calculation (including armor and effects) is completed. This event should be used instead of `EntityDamageEvent`, unless you want to detect how much damage was originally dealt.
+- `FishingBobberRetrieveEvent`: cancellable, called when a player retrieves a fishing bobber.
 - `LegacyKnockbackEvent`: cancellable, called when an entity gets knocked back by another entity using legacy pvp. Same applies as for `EntityKnockbackEvent`. This event can be used to change the knockback settings.
 - `PickupEntityEvent`: cancellable, called when a player picks up an entity (arrow or trident).
 - `PlayerExhaustEvent`: cancellable, called when a players' exhaustion level changes.

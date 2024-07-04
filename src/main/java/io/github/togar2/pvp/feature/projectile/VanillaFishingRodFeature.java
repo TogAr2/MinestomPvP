@@ -1,5 +1,6 @@
 package io.github.togar2.pvp.feature.projectile;
 
+import io.github.togar2.pvp.events.FishingBobberRetrieveEvent;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
@@ -60,15 +61,20 @@ public class VanillaFishingRodFeature implements FishingRodFeature, RegistrableF
 			Player player = event.getPlayer();
 			
 			if (player.hasTag(FISHING_BOBBER)) {
-				int durability = player.getTag(FISHING_BOBBER).retrieve();
-				if (player.getGameMode() != GameMode.CREATIVE)
-					itemDamageFeature.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
-							EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, durability);
+				FishingBobber bobber = player.getTag(FISHING_BOBBER);
 				
-				ViewUtil.viewersAndSelf(player).playSound(Sound.sound(
-						SoundEvent.ENTITY_FISHING_BOBBER_RETRIEVE, Sound.Source.NEUTRAL,
-						1.0f, 0.4f / (random.nextFloat() * 0.4f + 0.8f)
-				), player);
+				FishingBobberRetrieveEvent retrieveEvent = new FishingBobberRetrieveEvent(player, bobber);
+				EventDispatcher.callCancellable(retrieveEvent, () -> {
+					int durability = bobber.retrieve();
+					if (player.getGameMode() != GameMode.CREATIVE)
+						itemDamageFeature.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
+								EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, durability);
+					
+					ViewUtil.viewersAndSelf(player).playSound(Sound.sound(
+							SoundEvent.ENTITY_FISHING_BOBBER_RETRIEVE, Sound.Source.NEUTRAL,
+							1.0f, 0.4f / (random.nextFloat() * 0.4f + 0.8f)
+					), player);
+				});
 			} else {
 				ViewUtil.viewersAndSelf(player).playSound(Sound.sound(
 						SoundEvent.ENTITY_FISHING_BOBBER_THROW, Sound.Source.NEUTRAL,
