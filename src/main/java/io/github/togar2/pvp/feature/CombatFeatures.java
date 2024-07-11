@@ -32,6 +32,11 @@ import io.github.togar2.pvp.utils.CombatVersion;
 
 import java.util.List;
 
+/**
+ * Contains {@link CombatFeatureSet} instances which can be used to get a full vanilla combat experience.
+ * <p>
+ * See {@link CombatFeatures#MODERN_VANILLA} and {@link CombatFeatures#LEGACY_VANILLA}.
+ */
 public class CombatFeatures {
 	public static final DefinedFeature<VanillaArmorFeature> VANILLA_ARMOR = VanillaArmorFeature.DEFINED;
 	public static final DefinedFeature<VanillaAttackFeature> VANILLA_ATTACK = VanillaAttackFeature.DEFINED;
@@ -76,12 +81,37 @@ public class CombatFeatures {
 			VANILLA_DEATH_MESSAGE
 	);
 	
-	public static final CombatFeatureSet MODERN_VANILLA = getVanilla(CombatVersion.MODERN, DifficultyProvider.DEFAULT).build();
+	private static final CombatFeatureSet MODERN_VANILLA = getVanilla(CombatVersion.MODERN, DifficultyProvider.DEFAULT).build();
 	
-	public static final CombatFeatureSet LEGACY_VANILLA = getVanilla(CombatVersion.LEGACY, DifficultyProvider.DEFAULT)
+	private static final CombatFeatureSet LEGACY_VANILLA = getVanilla(CombatVersion.LEGACY, DifficultyProvider.DEFAULT)
 			.add(LEGACY_VANILLA_BLOCK)
 			.build();
 	
+	/**
+	 * Returns a feature set for the full modern vanilla experience. Use {@link CombatFeatureSet#createNode()} to get an event node.
+	 *
+	 * @return the {@link CombatFeatureSet} with all modern features
+	 */
+	public static CombatFeatureSet modernVanilla() {
+		return MODERN_VANILLA;
+	}
+	
+	/**
+	 * Returns a feature set for the full legacy (pre-1.9) vanilla experience. Use {@link CombatFeatureSet#createNode()} to get an event node.
+	 *
+	 * @return the {@link CombatFeatureSet} with all legacy features
+	 */
+	public static CombatFeatureSet legacyVanilla() {
+		return LEGACY_VANILLA;
+	}
+	
+	/**
+	 * Returns a feature set with all features for the given combat version and difficulty provider.
+	 *
+	 * @param version the combat version
+	 * @param difficultyProvider the difficulty provider
+	 * @return the {@link CombatFeatureSet} with all features
+	 */
 	public static CombatConfiguration getVanilla(CombatVersion version, DifficultyProvider difficultyProvider) {
 		return new CombatConfiguration()
 				.version(version).difficulty(difficultyProvider)
