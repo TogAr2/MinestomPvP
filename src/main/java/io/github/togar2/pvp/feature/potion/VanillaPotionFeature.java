@@ -6,13 +6,11 @@ import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.effect.EffectFeature;
-import io.github.togar2.pvp.player.Tracker;
 import io.github.togar2.pvp.potion.effect.CombatPotionEffect;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
 import io.github.togar2.pvp.utils.CombatVersion;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.GameMode;
@@ -149,8 +147,7 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 		ItemStack stack = player.getItemInHand(Objects.requireNonNull(player.getItemUseHand()));
 		if (stack.material() != Material.POTION) return;
 		
-		long usedDuration = System.currentTimeMillis() - player.getTag(Tracker.ITEM_USE_START_TIME);
-		long usedTicks = usedDuration / MinecraftServer.TICK_MS;
+		long usedTicks = player.getCurrentItemUseTime();
 		long remainingUseTicks = USE_TICKS - usedTicks;
 		
 		boolean canTrigger = remainingUseTicks <= USE_TICKS - 7;

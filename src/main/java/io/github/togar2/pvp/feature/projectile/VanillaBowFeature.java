@@ -10,7 +10,6 @@ import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.effect.EffectFeature;
 import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
-import io.github.togar2.pvp.player.Tracker;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.ServerFlag;
@@ -95,8 +94,8 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 				projectileSlot = projectile.slot();
 			}
 			
-			long useDuration = System.currentTimeMillis() - player.getTag(Tracker.ITEM_USE_START_TIME);
-			double power = getBowPower(useDuration);
+			long useTicks = player.getCurrentItemUseTime();
+			double power = getBowPower(useTicks);
 			if (power < 0.1) return;
 			
 			// Arrow creation
@@ -145,8 +144,8 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 		});
 	}
 	
-	protected double getBowPower(long useDurationMillis) {
-		double seconds = useDurationMillis / 1000.0;
+	protected double getBowPower(long ticks) {
+		double seconds = ticks / (double) ServerFlag.SERVER_TICKS_PER_SECOND;
 		double power = (seconds * seconds + seconds * 2.0) / 3.0;
 		if (power > 1) {
 			power = 1;

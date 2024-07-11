@@ -8,7 +8,6 @@ import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.player.PvpPlayer;
-import io.github.togar2.pvp.player.Tracker;
 import io.github.togar2.pvp.utils.FluidUtil;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
@@ -66,8 +65,7 @@ public class VanillaTridentFeature implements TridentFeature, RegistrableFeature
 			ItemStack stack = event.getItemStack();
 			if (stack.material() != Material.TRIDENT) return;
 			
-			long useDuration = System.currentTimeMillis() - player.getTag(Tracker.ITEM_USE_START_TIME);
-			int ticks = (int) ((useDuration / 1000.0) * 20);
+			long ticks = player.getCurrentItemUseTime();
 			if (ticks < 10) return;
 			
 			int riptide = stack.get(ItemComponent.ENCHANTMENTS).level(Enchantment.RIPTIDE);

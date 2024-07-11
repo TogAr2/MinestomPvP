@@ -6,11 +6,9 @@ import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.cooldown.ItemCooldownFeature;
-import io.github.togar2.pvp.player.Tracker;
 import io.github.togar2.pvp.utils.PotionFlags;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventNode;
@@ -173,8 +171,7 @@ public class VanillaFoodFeature implements FoodFeature, CombatFeature, Registrab
 		if (component == null) return;
 		
 		long useTime = getUseTime(stack.material(), component);
-		long usedDuration = System.currentTimeMillis() - player.getTag(Tracker.ITEM_USE_START_TIME);
-		long usedTicks = usedDuration / MinecraftServer.TICK_MS;
+		long usedTicks = player.getCurrentItemUseTime();
 		long remainingUseTicks = useTime - usedTicks;
 		
 		boolean canTrigger = component.eatDurationTicks() < 32 || remainingUseTicks <= useTime - 7;

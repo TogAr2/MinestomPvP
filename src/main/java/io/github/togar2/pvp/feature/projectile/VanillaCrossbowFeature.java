@@ -10,10 +10,8 @@ import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.effect.EffectFeature;
 import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
-import io.github.togar2.pvp.player.Tracker;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
@@ -101,8 +99,7 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 			
 			int quickCharge = stack.get(ItemComponent.ENCHANTMENTS).level(Enchantment.QUICK_CHARGE);
 			
-			long useDuration = System.currentTimeMillis() - player.getTag(Tracker.ITEM_USE_START_TIME);
-			long useTicks = useDuration / MinecraftServer.TICK_MS;
+			long useTicks = player.getCurrentItemUseTime();
 			double progress = (getCrossbowUseDuration(stack) - useTicks) / (double) getCrossbowChargeDuration(stack);
 			
 			Boolean startSoundPlayed = player.getTag(START_SOUND_PLAYED);
@@ -141,8 +138,8 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 			int quickCharge = stack.get(ItemComponent.ENCHANTMENTS).level(Enchantment.QUICK_CHARGE);
 			
 			if (quickCharge < 6) {
-				long useDuration = System.currentTimeMillis() - player.getTag(Tracker.ITEM_USE_START_TIME);
-				double power = getCrossbowPowerForTime(useDuration, stack);
+				long useTicks = player.getCurrentItemUseTime();
+				double power = getCrossbowPowerForTime(useTicks, stack);
 				if (!(power >= 1.0F) || isCrossbowCharged(stack))
 					return;
 			}
@@ -174,8 +171,7 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 		return crossbowContainsProjectile(stack, Material.FIREWORK_ROCKET) ? 1.6 : 3.15;
 	}
 	
-	protected double getCrossbowPowerForTime(long useDurationMillis, ItemStack stack) {
-		long ticks = useDurationMillis / MinecraftServer.TICK_MS;
+	protected double getCrossbowPowerForTime(long ticks, ItemStack stack) {
 		double power = ticks / (double) getCrossbowChargeDuration(stack);
 		if (power > 1) {
 			power = 1;

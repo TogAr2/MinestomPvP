@@ -4,7 +4,6 @@ import io.github.togar2.pvp.enchantment.CombatEnchantments;
 import io.github.togar2.pvp.feature.CombatFeatures;
 import io.github.togar2.pvp.feature.config.CombatFeatureRegistry;
 import io.github.togar2.pvp.player.CustomPlayer;
-import io.github.togar2.pvp.player.Tracker;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
 import io.github.togar2.pvp.potion.item.CombatPotionTypes;
 import net.minestom.server.MinecraftServer;
@@ -51,7 +50,6 @@ public class MinestomPvP {
 		CombatPotionTypes.registerAll();
 		
 		CombatFeatureRegistry.init();
-		Tracker.register(MinecraftServer.getGlobalEventHandler());
 		MinecraftServer.getConnectionManager().setPlayerProvider(CustomPlayer::new);
 	}
 }
