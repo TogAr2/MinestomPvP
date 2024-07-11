@@ -6,7 +6,6 @@ import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.provider.DifficultyProvider;
-import io.github.togar2.pvp.player.PvpPlayer;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
@@ -88,10 +87,6 @@ public class VanillaExhaustionFeature implements ExhaustionFeature, RegistrableF
 			} else {
 				addExhaustion(player, version.legacy() ? 0.2f : 0.05f);
 			}
-			
-			//TODO this should DEFINITELY not be here... but where should it be?
-			if (player instanceof PvpPlayer custom)
-				custom.jump(); // Velocity change
 		}
 		
 		if (player.isOnGround()) {

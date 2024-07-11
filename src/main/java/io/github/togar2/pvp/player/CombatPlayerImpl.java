@@ -21,11 +21,11 @@ import java.util.UUID;
 import java.util.function.Function;
 
 @SuppressWarnings("UnstableApiUsage")
-public class CustomPlayer extends Player implements PvpPlayer {
+public class CombatPlayerImpl extends Player implements CombatPlayer {
 	private boolean velocityUpdate = false;
 	private PhysicsResult previousPhysicsResult = null;
 	
-	public CustomPlayer(@NotNull UUID uuid, @NotNull String username, @NotNull PlayerConnection playerConnection) {
+	public CombatPlayerImpl(@NotNull UUID uuid, @NotNull String username, @NotNull PlayerConnection playerConnection) {
 		super(uuid, username, playerConnection);
 		
 		// Default value is 2.0, but base value is 1.0 for players in vanilla

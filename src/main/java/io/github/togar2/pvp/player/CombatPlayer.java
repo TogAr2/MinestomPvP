@@ -3,12 +3,16 @@ package io.github.togar2.pvp.player;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
+import net.minestom.server.entity.Player;
+import net.minestom.server.event.Event;
+import net.minestom.server.event.EventNode;
+import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.TimedPotion;
 
 import java.util.function.Function;
 
-public interface PvpPlayer {
+public interface CombatPlayer {
     // Minestom methods
     TimedPotion getEffect(PotionEffect effect);
     boolean isSprinting();
@@ -41,4 +45,15 @@ public interface PvpPlayer {
     void setVelocityNoUpdate(Function<Vec, Vec> function);
     
     void sendImmediateVelocityUpdate();
+    
+    static void init(EventNode<Event> node) {
+        node.addListener(PlayerMoveEvent.class, event -> {
+            Player player = event.getPlayer();
+            if (player.isOnGround()
+                    && event.getNewPosition().y() > player.getPosition().y()
+                    && player instanceof CombatPlayer combatPlayer) {
+                combatPlayer.jump();
+            }
+        });
+    }
 }

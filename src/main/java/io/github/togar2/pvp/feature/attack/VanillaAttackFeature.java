@@ -12,7 +12,7 @@ import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import io.github.togar2.pvp.feature.food.ExhaustionFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.feature.knockback.KnockbackFeature;
-import io.github.togar2.pvp.player.PvpPlayer;
+import io.github.togar2.pvp.player.CombatPlayer;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;
@@ -113,7 +113,7 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 		knockbackFeature.applyAttackKnockback(attacker, living, attack.knockback());
 		if (attack.sweeping()) sweepingFeature.applySweeping(attacker, living, attack.damage());
 		
-		if (target instanceof PvpPlayer custom)
+		if (target instanceof CombatPlayer custom)
 			custom.sendImmediateVelocityUpdate();
 		
 		// Play attack sounds

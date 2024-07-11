@@ -7,7 +7,7 @@ import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.legacy.LegacyKnockbackSettings;
-import io.github.togar2.pvp.player.PvpPlayer;
+import io.github.togar2.pvp.player.CombatPlayer;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
@@ -119,7 +119,7 @@ public class VanillaKnockbackFeature implements KnockbackFeature, CombatFeature 
 		System.out.println(version);
 		
 		// If legacy, attacker velocity is reduced before the knockback
-		if (version.legacy() && attacker instanceof PvpPlayer custom)
+		if (version.legacy() && attacker instanceof CombatPlayer custom)
 			custom.afterSprintAttack();
 		
 		double dx = Math.sin(Math.toRadians(attacker.getPosition().yaw()));
@@ -140,7 +140,7 @@ public class VanillaKnockbackFeature implements KnockbackFeature, CombatFeature 
 		}
 		
 		// If not legacy, attacker velocity is reduced after the knockback
-		if (version.modern() && attacker instanceof PvpPlayer custom)
+		if (version.modern() && attacker instanceof CombatPlayer custom)
 			custom.afterSprintAttack();
 		
 		attacker.setSprinting(false);

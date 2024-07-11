@@ -11,13 +11,7 @@ import net.minestom.server.entity.metadata.other.FishingHookMeta;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
 public class FishingBobber extends CustomEntityProjectile {
-	public static final Map<UUID, FishingBobber> fishingBobbers = new ConcurrentHashMap<>();
-	
 	private final boolean legacy;
 	private int stuckTime;
 	private Entity hooked;
@@ -182,10 +176,6 @@ public class FishingBobber extends CustomEntityProjectile {
 	public void remove() {
 		Entity shooter = getShooter();
 		if (shooter != null) {
-			//TODO temp
-			if (fishingBobbers.get(shooter.getUuid()) == this) {
-				fishingBobbers.remove(getShooter().getUuid());
-			}
 			if (shooter.getTag(VanillaFishingRodFeature.FISHING_BOBBER) == this) {
 				shooter.removeTag(VanillaFishingRodFeature.FISHING_BOBBER);
 			}

@@ -7,7 +7,7 @@ import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
-import io.github.togar2.pvp.player.PvpPlayer;
+import io.github.togar2.pvp.player.CombatPlayer;
 import io.github.togar2.pvp.utils.FluidUtil;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
@@ -111,8 +111,8 @@ public class VanillaTridentFeature implements TridentFeature, RegistrableFeature
 								
 								var attackEvent = new EntityAttackEvent(player, entity);
 								EventDispatcher.call(attackEvent);
-								if (player instanceof PvpPlayer pvpPlayer)
-									pvpPlayer.setVelocityNoUpdate(velocity -> velocity.mul(-0.2));
+								if (player instanceof CombatPlayer combatPlayer)
+									combatPlayer.setVelocityNoUpdate(velocity -> velocity.mul(-0.2));
 							}
 						});
 				

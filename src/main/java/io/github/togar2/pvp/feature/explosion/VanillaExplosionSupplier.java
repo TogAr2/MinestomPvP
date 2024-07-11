@@ -2,7 +2,7 @@ package io.github.togar2.pvp.feature.explosion;
 
 import io.github.togar2.pvp.events.ExplosionEvent;
 import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
-import io.github.togar2.pvp.player.PvpPlayer;
+import io.github.togar2.pvp.player.CombatPlayer;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.collision.BoundingBox;
@@ -176,7 +176,7 @@ public final class VanillaExplosionSupplier implements ExplosionSupplier {
 								if (player.getGameMode().canTakeDamage() && !player.isFlying()) {
 									playerKnockback.put(player, knockbackVec);
 									
-									if (player instanceof PvpPlayer custom)
+									if (player instanceof CombatPlayer custom)
 										custom.setVelocityNoUpdate(velocity -> velocity.add(knockbackVec.mul(tps)));
 								}
 							} else {
