@@ -6,6 +6,7 @@ import net.minestom.server.collision.PhysicsResult;
 import net.minestom.server.collision.PhysicsUtils;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.entity.EntityVelocityEvent;
 import net.minestom.server.instance.Chunk;
@@ -26,6 +27,11 @@ public class CustomPlayer extends Player implements PvpPlayer {
 	
 	public CustomPlayer(@NotNull UUID uuid, @NotNull String username, @NotNull PlayerConnection playerConnection) {
 		super(uuid, username, playerConnection);
+		
+		// Default value is 2.0, but base value is 1.0 for players in vanilla
+		// This is difficult to implement as a feature and assumed everyone using
+		// this extension would want it to match vanilla
+		getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(1.0);
 	}
 	
 	@Override
