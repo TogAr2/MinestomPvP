@@ -1,4 +1,4 @@
-package io.github.togar2.pvp.entity;
+package io.github.togar2.pvp.utils;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -13,7 +13,7 @@ import net.minestom.server.utils.time.TimeUnit;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
-public class EntityUtils {
+public class EntityUtil {
 	public static void spawnItemAtLocation(Entity entity, ItemStack itemStack, double up) {
 		if (itemStack.isAir()) return;
 		

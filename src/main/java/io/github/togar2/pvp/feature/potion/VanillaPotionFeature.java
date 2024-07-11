@@ -1,14 +1,14 @@
 package io.github.togar2.pvp.feature.potion;
 
-import io.github.togar2.pvp.entity.Tracker;
+import io.github.togar2.pvp.entity.projectile.ThrownPotion;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.effect.EffectFeature;
-import io.github.togar2.pvp.potion.effect.CustomPotionEffect;
+import io.github.togar2.pvp.player.Tracker;
+import io.github.togar2.pvp.potion.effect.CombatPotionEffect;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
-import io.github.togar2.pvp.projectile.ThrownPotion;
 import io.github.togar2.pvp.utils.CombatVersion;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
@@ -76,10 +76,10 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 			
 			// Apply the potions
 			for (Potion potion : potions) {
-				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.effect());
+				CombatPotionEffect combatPotionEffect = CustomPotionEffects.get(potion.effect());
 				
-				if (customPotionEffect.isInstant()) {
-					customPotionEffect.applyInstantEffect(player, player, player, potion.amplifier(), 1.0, version);
+				if (combatPotionEffect.isInstant()) {
+					combatPotionEffect.applyInstantEffect(player, player, player, potion.amplifier(), 1.0, version);
 				} else {
 					player.addEffect(potion);
 				}

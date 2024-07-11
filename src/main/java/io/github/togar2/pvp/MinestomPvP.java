@@ -1,13 +1,12 @@
 package io.github.togar2.pvp;
 
-import io.github.togar2.pvp.enchantment.CustomEnchantments;
-import io.github.togar2.pvp.entity.CustomPlayer;
-import io.github.togar2.pvp.entity.Tracker;
+import io.github.togar2.pvp.enchantment.CombatEnchantments;
 import io.github.togar2.pvp.feature.CombatFeatures;
 import io.github.togar2.pvp.feature.config.CombatFeatureRegistry;
-import io.github.togar2.pvp.food.FoodBehaviours;
+import io.github.togar2.pvp.player.CustomPlayer;
+import io.github.togar2.pvp.player.Tracker;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
-import io.github.togar2.pvp.potion.item.CustomPotionTypes;
+import io.github.togar2.pvp.potion.item.CombatPotionTypes;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.attribute.Attribute;
@@ -15,7 +14,7 @@ import net.minestom.server.entity.attribute.AttributeInstance;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 
-public class PvpExtension {
+public class MinestomPvP {
 	public static EventNode<EntityInstanceEvent> events() {
 		return CombatFeatures.MODERN_VANILLA.createNode();
 	}
@@ -47,10 +46,9 @@ public class PvpExtension {
 	 * Initialize the PvP extension.
 	 */
 	public static void init() {
-		FoodBehaviours.registerAll();
-		CustomEnchantments.registerAll();
+		CombatEnchantments.registerAll();
 		CustomPotionEffects.registerAll();
-		CustomPotionTypes.registerAll();
+		CombatPotionTypes.registerAll();
 		
 		CombatFeatureRegistry.init();
 		Tracker.register(MinecraftServer.getGlobalEventHandler());

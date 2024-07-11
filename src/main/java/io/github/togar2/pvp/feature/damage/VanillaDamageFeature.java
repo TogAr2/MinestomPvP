@@ -1,7 +1,6 @@
 package io.github.togar2.pvp.feature.damage;
 
 import io.github.togar2.pvp.damage.DamageTypeInfo;
-import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.events.EntityPreDeathEvent;
 import io.github.togar2.pvp.events.FinalDamageEvent;
 import io.github.togar2.pvp.feature.FeatureType;
@@ -17,6 +16,7 @@ import io.github.togar2.pvp.feature.provider.DifficultyProvider;
 import io.github.togar2.pvp.feature.totem.TotemFeature;
 import io.github.togar2.pvp.feature.tracking.TrackingFeature;
 import io.github.togar2.pvp.utils.CombatVersion;
+import io.github.togar2.pvp.utils.EntityUtil;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
@@ -250,7 +250,7 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 		damage.setAmount(amount);
 		
 		// lastDamage field is set when event is not cancelled but should also when cancelled
-		if (register) EntityUtils.setLastDamage(entity, damage);
+		if (register) EntityUtil.setLastDamage(entity, damage);
 		
 		// The Minestom damage method should return false if there was no hurt animation,
 		// because otherwise the attack feature will deal extra knockback

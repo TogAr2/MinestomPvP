@@ -1,8 +1,8 @@
-package io.github.togar2.pvp.projectile;
+package io.github.togar2.pvp.entity.projectile;
 
-import io.github.togar2.pvp.entity.EntityGroup;
-import io.github.togar2.pvp.entity.EntityUtils;
+import io.github.togar2.pvp.enchantment.EntityGroup;
 import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
+import io.github.togar2.pvp.utils.EntityUtil;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Vec;
@@ -45,7 +45,7 @@ public class ThrownTrident extends AbstractArrow {
 			if (shooter.isRemoved() || (shooter instanceof LivingEntity living && living.isDead())
 					|| (shooter instanceof Player player && player.getGameMode() == GameMode.SPECTATOR)) {
 				if (pickupMode == PickupMode.ALLOWED)
-					EntityUtils.spawnItemAtLocation(this, tridentItem, 0.1);
+					EntityUtil.spawnItemAtLocation(this, tridentItem, 0.1);
 				remove();
 			} else {
 				// Move towards owner

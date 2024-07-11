@@ -1,6 +1,5 @@
 package io.github.togar2.pvp.enchantment;
 
-import io.github.togar2.pvp.entity.EntityGroup;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
@@ -16,18 +15,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class PvPEnchantment {
+public class CombatEnchantment {
 	private final DynamicRegistry.Key<Enchantment> enchantment;
 	private final EquipmentSlot[] slotTypes;
 	
 	private final Set<FeatureType<?>> dependencies;
 	
-	public PvPEnchantment(DynamicRegistry.Key<Enchantment> enchantment, EquipmentSlot... slotTypes) {
+	public CombatEnchantment(DynamicRegistry.Key<Enchantment> enchantment, EquipmentSlot... slotTypes) {
 		this(enchantment, Set.of(), slotTypes);
 	}
 	
-	public PvPEnchantment(DynamicRegistry.Key<Enchantment> enchantment,
-	                      Set<FeatureType<?>> dependencies, EquipmentSlot... slotTypes) {
+	public CombatEnchantment(DynamicRegistry.Key<Enchantment> enchantment,
+	                         Set<FeatureType<?>> dependencies, EquipmentSlot... slotTypes) {
 		this.enchantment = enchantment;
 		this.dependencies = dependencies;
 		this.slotTypes = slotTypes;

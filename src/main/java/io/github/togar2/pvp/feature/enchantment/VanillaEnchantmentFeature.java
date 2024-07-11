@@ -1,8 +1,8 @@
 package io.github.togar2.pvp.feature.enchantment;
 
-import io.github.togar2.pvp.enchantment.CustomEnchantments;
-import io.github.togar2.pvp.enchantment.PvPEnchantment;
-import io.github.togar2.pvp.entity.EntityGroup;
+import io.github.togar2.pvp.enchantment.CombatEnchantment;
+import io.github.togar2.pvp.enchantment.CombatEnchantments;
+import io.github.togar2.pvp.enchantment.EntityGroup;
 import io.github.togar2.pvp.enums.ArmorMaterial;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
@@ -30,7 +30,7 @@ import java.util.function.BiConsumer;
 public class VanillaEnchantmentFeature implements EnchantmentFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaEnchantmentFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.ENCHANTMENT, VanillaEnchantmentFeature::new,
-			CustomEnchantments.getAllFeatureDependencies()
+			CombatEnchantments.getAllFeatureDependencies()
 	);
 	
 	private final FeatureConfiguration configuration;
@@ -47,21 +47,21 @@ public class VanillaEnchantmentFeature implements EnchantmentFeature, Registrabl
 		});
 	}
 	
-	public static void forEachEnchantment(Iterable<ItemStack> stacks, BiConsumer<PvPEnchantment, Integer> consumer) {
+	public static void forEachEnchantment(Iterable<ItemStack> stacks, BiConsumer<CombatEnchantment, Integer> consumer) {
 		for (ItemStack itemStack : stacks) {
 			EnchantmentList enchantmentList = itemStack.get(ItemComponent.ENCHANTMENTS);
 			Set<DynamicRegistry.Key<Enchantment>> enchantments = enchantmentList.enchantments().keySet();
 			
 			for (DynamicRegistry.Key<Enchantment> enchantment : enchantments) {
-				PvPEnchantment pvPEnchantment = CustomEnchantments.get(enchantment);
-				consumer.accept(pvPEnchantment, enchantmentList.level(enchantment));
+				CombatEnchantment combatEnchantment = CombatEnchantments.get(enchantment);
+				consumer.accept(combatEnchantment, enchantmentList.level(enchantment));
 			}
 		}
 	}
 	
 	@Override
 	public int getEquipmentLevel(LivingEntity entity, DynamicRegistry.Key<Enchantment> enchantment) {
-		Iterator<ItemStack> iterator = CustomEnchantments.get(enchantment).getEquipment(entity).values().iterator();
+		Iterator<ItemStack> iterator = CombatEnchantments.get(enchantment).getEquipment(entity).values().iterator();
 		
 		int highest = 0;
 		while (iterator.hasNext()) {
@@ -75,7 +75,7 @@ public class VanillaEnchantmentFeature implements EnchantmentFeature, Registrabl
 	
 	@Override
 	public Map.Entry<EquipmentSlot, ItemStack> pickRandom(LivingEntity entity, DynamicRegistry.Key<Enchantment> enchantment) {
-		Map<EquipmentSlot, ItemStack> equipmentMap = CustomEnchantments.get(enchantment).getEquipment(entity);
+		Map<EquipmentSlot, ItemStack> equipmentMap = CombatEnchantments.get(enchantment).getEquipment(entity);
 		if (equipmentMap.isEmpty()) return null;
 		
 		List<Map.Entry<EquipmentSlot, ItemStack>> possibleStacks = new ArrayList<>();
@@ -112,8 +112,8 @@ public class VanillaEnchantmentFeature implements EnchantmentFeature, Registrabl
 	public float getAttackDamage(ItemStack stack, EntityGroup group) {
 		AtomicReference<Float> result = new AtomicReference<>((float) 0);
 		stack.get(ItemComponent.ENCHANTMENTS).enchantments().forEach((enchantment, level) -> {
-			PvPEnchantment pvPEnchantment = CustomEnchantments.get(enchantment);
-			result.updateAndGet(v -> v + pvPEnchantment.getAttackDamage(level, group, this, configuration));
+			CombatEnchantment combatEnchantment = CombatEnchantments.get(enchantment);
+			result.updateAndGet(v -> v + combatEnchantment.getAttackDamage(level, group, this, configuration));
 		});
 		
 		return result.get();

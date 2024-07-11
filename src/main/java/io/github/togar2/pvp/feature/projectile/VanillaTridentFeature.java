@@ -1,15 +1,15 @@
 package io.github.togar2.pvp.feature.projectile;
 
-import io.github.togar2.pvp.entity.PvpPlayer;
-import io.github.togar2.pvp.entity.Tracker;
+import io.github.togar2.pvp.entity.projectile.ThrownTrident;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
-import io.github.togar2.pvp.projectile.ThrownTrident;
-import io.github.togar2.pvp.utils.FluidUtils;
+import io.github.togar2.pvp.player.PvpPlayer;
+import io.github.togar2.pvp.player.Tracker;
+import io.github.togar2.pvp.utils.FluidUtil;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.ServerFlag;
@@ -71,7 +71,7 @@ public class VanillaTridentFeature implements TridentFeature, RegistrableFeature
 			if (ticks < 10) return;
 			
 			int riptide = stack.get(ItemComponent.ENCHANTMENTS).level(Enchantment.RIPTIDE);
-			if (riptide > 0 && !FluidUtils.isTouchingWater(player)) return;
+			if (riptide > 0 && !FluidUtil.isTouchingWater(player)) return;
 			
 			itemDamageFeature.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
 					EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, 1);

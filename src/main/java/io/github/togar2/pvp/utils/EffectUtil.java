@@ -7,7 +7,7 @@ import net.minestom.server.network.packet.server.play.EffectPacket;
 import net.minestom.server.utils.PacketUtils;
 import org.jetbrains.annotations.NotNull;
 
-public class EffectManager {
+public class EffectUtil {
 	public static void sendNearby(@NotNull Instance instance, @NotNull Effects effect,
 	                              int x, int y, int z, int data, double distance, boolean global) {
 		EffectPacket packet = new EffectPacket(effect.getId(), new Pos(x, y, z), data, global);

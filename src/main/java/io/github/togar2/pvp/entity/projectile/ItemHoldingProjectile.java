@@ -1,4 +1,4 @@
-package io.github.togar2.pvp.projectile;
+package io.github.togar2.pvp.entity.projectile;
 
 import net.minestom.server.item.ItemStack;
 import org.jetbrains.annotations.NotNull;

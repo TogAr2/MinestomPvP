@@ -1,7 +1,7 @@
 package io.github.togar2.pvp.feature.effect;
 
+import io.github.togar2.pvp.entity.projectile.Arrow;
 import io.github.togar2.pvp.feature.CombatFeature;
-import io.github.togar2.pvp.projectile.Arrow;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.item.component.PotionContents;

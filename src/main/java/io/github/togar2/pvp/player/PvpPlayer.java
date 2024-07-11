@@ -1,4 +1,4 @@
-package io.github.togar2.pvp.entity;
+package io.github.togar2.pvp.player;
 
 import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Pos;

@@ -1,6 +1,6 @@
-package io.github.togar2.pvp.projectile;
+package io.github.togar2.pvp.entity.projectile;
 
-import io.github.togar2.pvp.utils.ProjectileUtils;
+import io.github.togar2.pvp.utils.ProjectileUtil;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.collision.Aerodynamics;
 import net.minestom.server.collision.BoundingBox;
@@ -213,7 +213,7 @@ public class CustomEntityProjectile extends Entity {
 		
 		if (!isStuck()) {
 			Vec diff = velocity.div(ServerFlag.SERVER_TICKS_PER_SECOND);
-			PhysicsResult physicsResult = ProjectileUtils.simulateMovement(position, diff, POINT_BOX,
+			PhysicsResult physicsResult = ProjectileUtil.simulateMovement(position, diff, POINT_BOX,
 					instance.getWorldBorder(), instance, hasPhysics, previousPhysicsResult, true);
 			this.previousPhysicsResult = physicsResult;
 			

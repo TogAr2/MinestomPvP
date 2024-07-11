@@ -1,7 +1,7 @@
-package io.github.togar2.pvp.projectile;
+package io.github.togar2.pvp.entity.projectile;
 
 import io.github.togar2.pvp.feature.effect.EffectFeature;
-import io.github.togar2.pvp.utils.EffectManager;
+import io.github.togar2.pvp.utils.EffectUtil;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.effects.Effects;
@@ -67,7 +67,7 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 		}
 		
 		Effects effect = instantEffect ? Effects.INSTANT_SPLASH : Effects.SPLASH_POTION;
-		EffectManager.sendNearby(
+		EffectUtil.sendNearby(
 				Objects.requireNonNull(getInstance()), effect, position.blockX(),
 				position.blockY(), position.blockZ(), effectFeature.getPotionColor(potionContents),
 				64.0, false

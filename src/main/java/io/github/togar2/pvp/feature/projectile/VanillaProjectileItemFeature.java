@@ -1,8 +1,8 @@
 package io.github.togar2.pvp.feature.projectile;
 
+import io.github.togar2.pvp.entity.projectile.Arrow;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
-import io.github.togar2.pvp.projectile.Arrow;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.item.ItemStack;

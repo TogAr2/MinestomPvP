@@ -1,8 +1,8 @@
 package io.github.togar2.pvp.feature.explosion;
 
-import io.github.togar2.pvp.entity.PvpPlayer;
 import io.github.togar2.pvp.events.ExplosionEvent;
 import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
+import io.github.togar2.pvp.player.PvpPlayer;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.collision.BoundingBox;

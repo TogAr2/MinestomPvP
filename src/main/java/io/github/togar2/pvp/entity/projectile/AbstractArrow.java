@@ -1,8 +1,8 @@
-package io.github.togar2.pvp.projectile;
+package io.github.togar2.pvp.entity.projectile;
 
-import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.events.PickupEntityEvent;
 import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
+import io.github.togar2.pvp.utils.EntityUtil;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Pos;
@@ -219,7 +219,7 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 			
 			if (getVelocity().lengthSquared() < 1.0E-7D) {
 				if (pickupMode == PickupMode.ALLOWED) {
-					EntityUtils.spawnItemAtLocation(this, getPickupItem(), 0.1);
+					EntityUtil.spawnItemAtLocation(this, getPickupItem(), 0.1);
 				}
 				
 				return true;

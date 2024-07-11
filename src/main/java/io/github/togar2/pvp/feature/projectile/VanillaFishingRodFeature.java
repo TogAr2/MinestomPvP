@@ -1,12 +1,12 @@
 package io.github.togar2.pvp.feature.projectile;
 
+import io.github.togar2.pvp.entity.projectile.FishingBobber;
 import io.github.togar2.pvp.events.FishingBobberRetrieveEvent;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
-import io.github.togar2.pvp.projectile.FishingBobber;
 import io.github.togar2.pvp.utils.CombatVersion;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;

@@ -5,7 +5,7 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.potion.PotionEffect;
 
-public class AbsorptionPotionEffect extends CustomPotionEffect {
+public class AbsorptionPotionEffect extends CombatPotionEffect {
 	public AbsorptionPotionEffect() {
 		super(PotionEffect.ABSORPTION);
 	}

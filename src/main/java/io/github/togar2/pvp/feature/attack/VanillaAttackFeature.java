@@ -1,7 +1,6 @@
 package io.github.togar2.pvp.feature.attack;
 
-import io.github.togar2.pvp.entity.EntityGroup;
-import io.github.togar2.pvp.entity.PvpPlayer;
+import io.github.togar2.pvp.enchantment.EntityGroup;
 import io.github.togar2.pvp.enums.Tool;
 import io.github.togar2.pvp.events.FinalAttackEvent;
 import io.github.togar2.pvp.feature.FeatureType;
@@ -13,6 +12,7 @@ import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import io.github.togar2.pvp.feature.food.ExhaustionFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.feature.knockback.KnockbackFeature;
+import io.github.togar2.pvp.player.PvpPlayer;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;

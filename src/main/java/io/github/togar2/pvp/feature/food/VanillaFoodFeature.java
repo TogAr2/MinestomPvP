@@ -1,12 +1,12 @@
 package io.github.togar2.pvp.feature.food;
 
-import io.github.togar2.pvp.entity.Tracker;
 import io.github.togar2.pvp.feature.CombatFeature;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
-import io.github.togar2.pvp.food.FoodBehaviour;
-import io.github.togar2.pvp.food.FoodBehaviours;
+import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.cooldown.ItemCooldownFeature;
+import io.github.togar2.pvp.player.Tracker;
 import io.github.togar2.pvp.utils.PotionFlags;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
@@ -24,8 +24,10 @@ import net.minestom.server.item.Material;
 import net.minestom.server.item.component.Food;
 import net.minestom.server.item.component.SuspiciousStewEffects;
 import net.minestom.server.potion.Potion;
+import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.sound.SoundEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
@@ -33,8 +35,22 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class VanillaFoodFeature implements FoodFeature, CombatFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaFoodFeature> DEFINED = new DefinedFeature<>(
-			FeatureType.FOOD, configuration -> new VanillaFoodFeature()
+			FeatureType.FOOD, VanillaFoodFeature::new,
+			FeatureType.ITEM_COOLDOWN
 	);
+	
+	private final FeatureConfiguration configuration;
+	
+	private ItemCooldownFeature itemCooldownFeature;
+	
+	public VanillaFoodFeature(FeatureConfiguration configuration) {
+		this.configuration = configuration;
+	}
+	
+	@Override
+	public void initDependencies() {
+		this.itemCooldownFeature = configuration.get(FeatureType.ITEM_COOLDOWN);
+	}
 	
 	@Override
 	public void init(EventNode<EntityInstanceEvent> node) {
@@ -120,11 +136,8 @@ public class VanillaFoodFeature implements FoodFeature, CombatFeature, Registrab
 		
 		ItemStack leftOver = component.usingConvertsTo();
 		
-		FoodBehaviour behaviour = FoodBehaviours.fromMaterial(stack.material());
-		if (behaviour != null) {
-			behaviour.onEat(player, stack);
-			if (leftOver.isAir()) leftOver = behaviour.getConvertsTo();
-		}
+		onEat(player, stack);
+		if (leftOver.isAir()) leftOver = getUsingConvertsTo(stack);
 		
 		if (player.getGameMode() != GameMode.CREATIVE) {
 			if (!leftOver.isAir()) {
@@ -190,7 +203,31 @@ public class VanillaFoodFeature implements FoodFeature, CombatFeature, Registrab
 		}
 	}
 	
-	private static int getUseTime(@NotNull Material material, @NotNull Food foodComponent) {
+	protected static final ItemStack EMPTY_BUCKET = ItemStack.of(Material.BUCKET);
+	protected static final ItemStack EMPTY_BOTTLE = ItemStack.of(Material.GLASS_BOTTLE);
+	
+	protected @Nullable ItemStack getUsingConvertsTo(ItemStack stack) {
+		// Only applies to items of which this has not been defined in the registry
+		if (stack.material() == Material.MILK_BUCKET) {
+			return EMPTY_BUCKET;
+		} else if (stack.material() == Material.HONEY_BOTTLE) {
+			return EMPTY_BOTTLE;
+		}
+		
+		return null;
+	}
+	
+	protected void onEat(Player player, ItemStack stack) {
+		if (stack.material() == Material.MILK_BUCKET) {
+			player.clearEffects();
+		} else if (stack.material() == Material.HONEY_BOTTLE) {
+			player.removeEffect(PotionEffect.POISON);
+		} else if (stack.material() == Material.CHORUS_FRUIT) {
+			ChorusFruitUtil.tryChorusTeleport(player, itemCooldownFeature);
+		}
+	}
+	
+	protected int getUseTime(@NotNull Material material, @NotNull Food foodComponent) {
 		if (material == Material.HONEY_BOTTLE) return 40;
 		return foodComponent.eatDurationTicks();
 	}

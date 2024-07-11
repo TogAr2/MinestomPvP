@@ -1,6 +1,6 @@
 package io.github.togar2.pvp.feature.enchantment;
 
-import io.github.togar2.pvp.entity.EntityGroup;
+import io.github.togar2.pvp.enchantment.EntityGroup;
 import io.github.togar2.pvp.feature.CombatFeature;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;

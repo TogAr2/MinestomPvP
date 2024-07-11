@@ -1,7 +1,7 @@
 package io.github.togar2.pvp.enchantment.enchantments;
 
-import io.github.togar2.pvp.enchantment.PvPEnchantment;
-import io.github.togar2.pvp.entity.EntityGroup;
+import io.github.togar2.pvp.enchantment.CombatEnchantment;
+import io.github.togar2.pvp.enchantment.EntityGroup;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
@@ -17,7 +17,7 @@ import net.minestom.server.registry.DynamicRegistry;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class DamageEnchantment extends PvPEnchantment {
+public class DamageEnchantment extends CombatEnchantment {
 	private final Type type;
 	
 	public DamageEnchantment(DynamicRegistry.Key<Enchantment> enchantment, Type type, EquipmentSlot... slotTypes) {

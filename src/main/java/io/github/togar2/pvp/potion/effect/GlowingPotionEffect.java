@@ -4,7 +4,7 @@ import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.potion.PotionEffect;
 
-public class GlowingPotionEffect extends CustomPotionEffect {
+public class GlowingPotionEffect extends CombatPotionEffect {
 	public GlowingPotionEffect() {
 		super(PotionEffect.GLOWING);
 	}

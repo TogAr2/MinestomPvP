@@ -1,4 +1,4 @@
-package io.github.togar2.pvp.entity;
+package io.github.togar2.pvp.enchantment;
 
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;

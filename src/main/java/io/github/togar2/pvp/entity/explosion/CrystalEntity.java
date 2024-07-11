@@ -1,4 +1,4 @@
-package io.github.togar2.pvp.explosion;
+package io.github.togar2.pvp.entity.explosion;
 
 import io.github.togar2.pvp.damage.DamageTypeInfo;
 import net.minestom.server.entity.EntityType;

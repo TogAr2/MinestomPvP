@@ -1,6 +1,6 @@
 package io.github.togar2.pvp.test;
 
-import io.github.togar2.pvp.PvpExtension;
+import io.github.togar2.pvp.MinestomPvP;
 import io.github.togar2.pvp.feature.CombatFeatures;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.test.commands.Commands;
@@ -29,7 +29,7 @@ import java.util.Optional;
 public class PvpTest {
 	public static void main(String[] args) {
 		MinecraftServer server = MinecraftServer.init();
-		PvpExtension.init();
+		MinestomPvP.init();
 		//MinestomFluids.init();
 		//VelocityProxy.enable("tj7MulOtnIDe");
 		

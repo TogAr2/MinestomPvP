@@ -1,6 +1,8 @@
 package io.github.togar2.pvp.feature.projectile;
 
-import io.github.togar2.pvp.entity.Tracker;
+import io.github.togar2.pvp.entity.projectile.AbstractArrow;
+import io.github.togar2.pvp.entity.projectile.Arrow;
+import io.github.togar2.pvp.entity.projectile.SpectralArrow;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
@@ -8,9 +10,7 @@ import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.effect.EffectFeature;
 import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
-import io.github.togar2.pvp.projectile.AbstractArrow;
-import io.github.togar2.pvp.projectile.Arrow;
-import io.github.togar2.pvp.projectile.SpectralArrow;
+import io.github.togar2.pvp.player.Tracker;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;

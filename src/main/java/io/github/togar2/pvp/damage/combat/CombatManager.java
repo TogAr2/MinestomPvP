@@ -1,9 +1,9 @@
 package io.github.togar2.pvp.damage.combat;
 
 import io.github.togar2.pvp.damage.DamageTypeInfo;
-import io.github.togar2.pvp.entity.EntityUtils;
 import io.github.togar2.pvp.feature.fall.FallFeature;
 import io.github.togar2.pvp.feature.state.PlayerStateFeature;
+import io.github.togar2.pvp.utils.EntityUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -126,16 +126,16 @@ public class CombatManager {
 		if (firstAttacker != null && firstAttacker != lastAttacker) {
 			ItemStack weapon = firstAttacker instanceof LivingEntity ? ((LivingEntity) firstAttacker).getItemInMainHand() : ItemStack.AIR;
 			if (!weapon.isAir() && weapon.has(ItemComponent.CUSTOM_NAME)) {
-				return Component.translatable("death.fell.assist.item", getEntityName(), EntityUtils.getName(firstAttacker), weapon.get(ItemComponent.CUSTOM_NAME));
+				return Component.translatable("death.fell.assist.item", getEntityName(), EntityUtil.getName(firstAttacker), weapon.get(ItemComponent.CUSTOM_NAME));
 			} else {
-				return Component.translatable("death.fell.assist", getEntityName(), EntityUtils.getName(firstAttacker));
+				return Component.translatable("death.fell.assist", getEntityName(), EntityUtil.getName(firstAttacker));
 			}
 		} else if (lastAttacker != null) {
 			ItemStack weapon = lastAttacker instanceof LivingEntity ? ((LivingEntity) lastAttacker).getItemInMainHand() : ItemStack.AIR;
 			if (!weapon.isAir() && weapon.has(ItemComponent.CUSTOM_NAME)) {
-				return Component.translatable("death.fell.finish.item", getEntityName(), EntityUtils.getName(lastAttacker), weapon.get(ItemComponent.CUSTOM_NAME));
+				return Component.translatable("death.fell.finish.item", getEntityName(), EntityUtil.getName(lastAttacker), weapon.get(ItemComponent.CUSTOM_NAME));
 			} else {
-				return Component.translatable("death.fell.finish", getEntityName(), EntityUtils.getName(lastAttacker));
+				return Component.translatable("death.fell.finish", getEntityName(), EntityUtil.getName(lastAttacker));
 			}
 		} else {
 			return Component.translatable("death.fell.killer", getEntityName());
@@ -155,20 +155,20 @@ public class CombatManager {
 		Entity attacker = damage.getAttacker();
 		
 		if (source != null) {
-			Component ownerName = attacker == null ? EntityUtils.getName(source) : EntityUtils.getName(attacker);
+			Component ownerName = attacker == null ? EntityUtil.getName(source) : EntityUtil.getName(attacker);
 			ItemStack weapon = source instanceof LivingEntity living ? living.getItemInMainHand() : ItemStack.AIR;
 			if (!weapon.isAir() && weapon.has(ItemComponent.CUSTOM_NAME)) {
-				return Component.translatable(id + ".item", EntityUtils.getName(player), ownerName, weapon.get(ItemComponent.CUSTOM_NAME));
+				return Component.translatable(id + ".item", EntityUtil.getName(player), ownerName, weapon.get(ItemComponent.CUSTOM_NAME));
 			} else {
-				return Component.translatable(id, EntityUtils.getName(player), ownerName);
+				return Component.translatable(id, EntityUtil.getName(player), ownerName);
 			}
 		} else {
 			LivingEntity killer = getKillCredit();
 			if (killer == null) {
-				return Component.translatable(id, EntityUtils.getName(player));
+				return Component.translatable(id, EntityUtil.getName(player));
 			} else {
-				return Component.translatable(id + ".player", EntityUtils.getName(player),
-						EntityUtils.getName(killer));
+				return Component.translatable(id + ".player", EntityUtil.getName(player),
+						EntityUtil.getName(killer));
 			}
 		}
 	}
@@ -286,7 +286,7 @@ public class CombatManager {
 	}
 	
 	public Component getEntityName() {
-		return EntityUtils.getName(player);
+		return EntityUtil.getName(player);
 	}
 	
 	@SuppressWarnings("UnstableApiUsage")

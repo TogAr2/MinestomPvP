@@ -1,6 +1,6 @@
 package io.github.togar2.pvp.potion.effect;
 
-import io.github.togar2.pvp.entity.EntityGroup;
+import io.github.togar2.pvp.enchantment.EntityGroup;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.color.Color;
 import net.minestom.server.entity.Entity;
@@ -22,13 +22,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-public class CustomPotionEffect {
+public class CombatPotionEffect {
 	private final Map<Attribute, AttributeModifier> attributeModifiers = new HashMap<>();
 	private Map<Attribute, AttributeModifier> legacyAttributeModifiers;
 	private final PotionEffect potionEffect;
 	private final Function<Potion, Particle> particleSupplier;
 	
-	public CustomPotionEffect(PotionEffect potionEffect) {
+	public CombatPotionEffect(PotionEffect potionEffect) {
 		this.potionEffect = potionEffect;
 		this.particleSupplier = potion -> {
 			int alpha = potion.isAmbient() ? 38 : 255;
@@ -37,7 +37,7 @@ public class CustomPotionEffect {
 		};
 	}
 	
-	public CustomPotionEffect(PotionEffect potionEffect, Function<Potion, Particle> particleSupplier) {
+	public CombatPotionEffect(PotionEffect potionEffect, Function<Potion, Particle> particleSupplier) {
 		this.potionEffect = potionEffect;
 		this.particleSupplier = particleSupplier;
 	}
@@ -50,13 +50,13 @@ public class CustomPotionEffect {
 		return particleSupplier.apply(potion);
 	}
 	
-	public CustomPotionEffect addAttributeModifier(Attribute attribute, NamespaceID id,
+	public CombatPotionEffect addAttributeModifier(Attribute attribute, NamespaceID id,
 	                                               float amount, AttributeOperation operation) {
 		attributeModifiers.put(attribute, new AttributeModifier(id, amount, operation));
 		return this;
 	}
 	
-	public CustomPotionEffect addLegacyAttributeModifier(Attribute attribute, NamespaceID id,
+	public CombatPotionEffect addLegacyAttributeModifier(Attribute attribute, NamespaceID id,
 	                                                     float amount, AttributeOperation operation) {
 		if (legacyAttributeModifiers == null)
 			legacyAttributeModifiers = new HashMap<>();

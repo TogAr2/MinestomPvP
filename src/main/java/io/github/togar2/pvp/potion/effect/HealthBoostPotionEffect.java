@@ -5,7 +5,7 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.potion.PotionEffect;
 
-public class HealthBoostPotionEffect extends CustomPotionEffect {
+public class HealthBoostPotionEffect extends CombatPotionEffect {
 	public HealthBoostPotionEffect() {
 		super(PotionEffect.HEALTH_BOOST);
 	}

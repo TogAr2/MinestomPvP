@@ -1,4 +1,4 @@
-package io.github.togar2.pvp.explosion;
+package io.github.togar2.pvp.entity.explosion;
 
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.minestom.server.ServerFlag;

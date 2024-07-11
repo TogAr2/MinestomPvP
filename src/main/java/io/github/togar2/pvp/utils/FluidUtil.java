@@ -9,7 +9,7 @@ import net.minestom.server.instance.block.Block;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FluidUtils {
+public class FluidUtil {
 	public static int getLevel(Block block) {
 		String levelStr = block.getProperty("level");
 		if (levelStr == null) return 8;

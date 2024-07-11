@@ -1,4 +1,4 @@
-package io.github.togar2.pvp.projectile;
+package io.github.togar2.pvp.entity.projectile;
 
 import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import io.github.togar2.pvp.utils.PotionFlags;

@@ -1,6 +1,6 @@
 package io.github.togar2.pvp.events;
 
-import io.github.togar2.pvp.projectile.FishingBobber;
+import io.github.togar2.pvp.entity.projectile.FishingBobber;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.trait.CancellableEvent;
 import net.minestom.server.event.trait.PlayerInstanceEvent;

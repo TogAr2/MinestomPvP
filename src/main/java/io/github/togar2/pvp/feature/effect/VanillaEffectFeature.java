@@ -1,15 +1,15 @@
 package io.github.togar2.pvp.feature.effect;
 
+import io.github.togar2.pvp.entity.projectile.Arrow;
 import io.github.togar2.pvp.events.PotionVisibilityEvent;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
-import io.github.togar2.pvp.potion.effect.CustomPotionEffect;
+import io.github.togar2.pvp.potion.effect.CombatPotionEffect;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
-import io.github.togar2.pvp.potion.item.CustomPotionType;
-import io.github.togar2.pvp.potion.item.CustomPotionTypes;
-import io.github.togar2.pvp.projectile.Arrow;
+import io.github.togar2.pvp.potion.item.CombatPotionType;
+import io.github.togar2.pvp.potion.item.CombatPotionTypes;
 import io.github.togar2.pvp.utils.CombatVersion;
 import io.github.togar2.pvp.utils.PotionFlags;
 import net.kyori.adventure.util.RGBLike;
@@ -75,11 +75,11 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 				int durationLeft = potionMap.get(potion.potion().effect());
 				
 				if (durationLeft > 0) {
-					CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.potion().effect());
+					CombatPotionEffect combatPotionEffect = CustomPotionEffects.get(potion.potion().effect());
 					byte amplifier = potion.potion().amplifier();
 					
-					if (customPotionEffect.canApplyUpdateEffect(durationLeft, amplifier)) {
-						customPotionEffect.applyUpdateEffect(entity, amplifier, version);
+					if (combatPotionEffect.canApplyUpdateEffect(durationLeft, amplifier)) {
+						combatPotionEffect.applyUpdateEffect(entity, amplifier, version);
 					}
 					
 					potionMap.put(potion.potion().effect(), durationLeft - 1);
@@ -97,8 +97,8 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 			Map<PotionEffect, Integer> potionMap = getDurationLeftMap(entity);
 			potionMap.put(event.getPotion().effect(), event.getPotion().duration());
 			
-			CustomPotionEffect customPotionEffect = CustomPotionEffects.get(event.getPotion().effect());
-			customPotionEffect.onApplied(entity, event.getPotion().amplifier(), version);
+			CombatPotionEffect combatPotionEffect = CustomPotionEffects.get(event.getPotion().effect());
+			combatPotionEffect.onApplied(entity, event.getPotion().amplifier(), version);
 			
 			updatePotionVisibility(entity);
 		});
@@ -106,8 +106,8 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 		node.addListener(EntityPotionRemoveEvent.class, event -> {
 			if (!(event.getEntity() instanceof LivingEntity entity)) return;
 			
-			CustomPotionEffect customPotionEffect = CustomPotionEffects.get(event.getPotion().effect());
-			customPotionEffect.onRemoved(entity, event.getPotion().amplifier(), version);
+			CombatPotionEffect combatPotionEffect = CustomPotionEffects.get(event.getPotion().effect());
+			combatPotionEffect.onRemoved(entity, event.getPotion().amplifier(), version);
 			
 			//Delay update 1 tick because we need to have the removing effect removed
 			MinecraftServer.getSchedulerManager()
@@ -146,8 +146,8 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 		// PotionType effects plus custom effects
 		List<Potion> potions = new ArrayList<>();
 		
-		CustomPotionType customPotionType = CustomPotionTypes.get(potionType);
-		if (customPotionType != null) potions.addAll(customPotionType.getEffects(version));
+		CombatPotionType combatPotionType = CombatPotionTypes.get(potionType);
+		if (combatPotionType != null) potions.addAll(combatPotionType.getEffects(version));
 		
 		potions.addAll(customEffects.stream().map((customPotion) ->
 				new Potion(Objects.requireNonNull(customPotion.id()),
@@ -187,7 +187,7 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 					}
 					
 					if (potion.potion().hasParticles()) {
-						CustomPotionEffect effect = CustomPotionEffects.get(potion.potion().effect());
+						CombatPotionEffect effect = CustomPotionEffects.get(potion.potion().effect());
 						particles.add(effect.getParticle(potion.potion()));
 					}
 				}
@@ -210,12 +210,12 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 	public void addArrowEffects(LivingEntity entity, Arrow arrow) {
 		PotionContents potionContents = arrow.getPotion();
 		
-		CustomPotionType customPotionType = CustomPotionTypes.get(potionContents.potion());
-		if (customPotionType != null) {
-			for (Potion potion : customPotionType.getEffects(version)) {
-				CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.effect());
-				if (customPotionEffect.isInstant()) {
-					customPotionEffect.applyInstantEffect(arrow, null,
+		CombatPotionType combatPotionType = CombatPotionTypes.get(potionContents.potion());
+		if (combatPotionType != null) {
+			for (Potion potion : combatPotionType.getEffects(version)) {
+				CombatPotionEffect combatPotionEffect = CustomPotionEffects.get(potion.effect());
+				if (combatPotionEffect.isInstant()) {
+					combatPotionEffect.applyInstantEffect(arrow, null,
 							entity, potion.amplifier(), 1.0D, version);
 				} else {
 					int duration = Math.max(potion.duration() / 8, 1);
@@ -235,9 +235,9 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 										customPotion.showIcon()
 								)))
 				.forEach(potion -> {
-					CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.effect());
-					if (customPotionEffect.isInstant()) {
-						customPotionEffect.applyInstantEffect(arrow, null,
+					CombatPotionEffect combatPotionEffect = CustomPotionEffects.get(potion.effect());
+					if (combatPotionEffect.isInstant()) {
+						combatPotionEffect.applyInstantEffect(arrow, null,
 								entity, potion.amplifier(), 1.0D, version);
 					} else {
 						entity.addEffect(new Potion(potion.effect(), potion.amplifier(),
@@ -250,9 +250,9 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 	public void addSplashPotionEffects(LivingEntity entity, List<Potion> potions, double proximity,
 	                                   @Nullable Entity source, @Nullable Entity attacker) {
 		for (Potion potion : potions) {
-			CustomPotionEffect customPotionEffect = CustomPotionEffects.get(potion.effect());
-			if (customPotionEffect.isInstant()) {
-				customPotionEffect.applyInstantEffect(source, attacker,
+			CombatPotionEffect combatPotionEffect = CustomPotionEffects.get(potion.effect());
+			if (combatPotionEffect.isInstant()) {
+				combatPotionEffect.applyInstantEffect(source, attacker,
 						entity, potion.amplifier(), proximity, version);
 			} else {
 				int duration = potion.duration();
