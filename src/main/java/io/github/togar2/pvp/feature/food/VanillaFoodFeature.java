@@ -164,6 +164,11 @@ public class VanillaFoodFeature implements FoodFeature, CombatFeature, Registrab
 		addFood(player, foodComponent.nutrition(), foodComponent.saturationModifier());
 	}
 	
+	@Override
+	public void applySaturationEffect(Player player, byte amplifier) {
+		addFood(player, amplifier + 1, 1.0f);
+	}
+	
 	protected void tickEatingSounds(Player player) {
 		ItemStack stack = player.getItemInHand(Objects.requireNonNull(player.getItemUseHand()));
 		

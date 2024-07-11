@@ -115,6 +115,11 @@ public class VanillaExhaustionFeature implements ExhaustionFeature, RegistrableF
 	
 	@Override
 	public void addDamageExhaustion(Player player, DamageType type) {
-		addExhaustion(player, (float) type.exhaustion() * (version.legacy() ? 3 : 1));
+		addExhaustion(player, type.exhaustion() * (version.legacy() ? 3 : 1));
+	}
+	
+	@Override
+	public void applyHungerEffect(Player player, byte amplifier) {
+		addExhaustion(player, (version.legacy() ? 0.025f : 0.005f) * (float) (amplifier + 1));
 	}
 }

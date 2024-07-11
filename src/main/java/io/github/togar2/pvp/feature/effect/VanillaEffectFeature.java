@@ -6,6 +6,8 @@ import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.food.ExhaustionFeature;
+import io.github.togar2.pvp.feature.food.FoodFeature;
 import io.github.togar2.pvp.potion.effect.CombatPotionEffect;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
 import io.github.togar2.pvp.potion.item.CombatPotionType;
@@ -42,7 +44,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaEffectFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.EFFECT, VanillaEffectFeature::new,
-			FeatureType.VERSION
+			FeatureType.EXHAUSTION, FeatureType.FOOD, FeatureType.VERSION
 	);
 	
 	public static final Tag<Map<PotionEffect, Integer>> DURATION_LEFT = Tag.Transient("effectDurationLeft");
@@ -50,6 +52,8 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 	
 	private final FeatureConfiguration configuration;
 	
+	private ExhaustionFeature exhaustionFeature;
+	private FoodFeature foodFeature;
 	private CombatVersion version;
 	
 	public VanillaEffectFeature(FeatureConfiguration configuration) {
@@ -58,6 +62,8 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 	
 	@Override
 	public void initDependencies() {
+		this.exhaustionFeature = configuration.get(FeatureType.EXHAUSTION);
+		this.foodFeature = configuration.get(FeatureType.FOOD);
 		this.version = configuration.get(FeatureType.VERSION);
 	}
 	
@@ -79,7 +85,7 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 					byte amplifier = potion.potion().amplifier();
 					
 					if (combatPotionEffect.canApplyUpdateEffect(durationLeft, amplifier)) {
-						combatPotionEffect.applyUpdateEffect(entity, amplifier, version);
+						combatPotionEffect.applyUpdateEffect(entity, amplifier, exhaustionFeature, foodFeature);
 					}
 					
 					potionMap.put(potion.potion().effect(), durationLeft - 1);
@@ -216,7 +222,7 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 				CombatPotionEffect combatPotionEffect = CustomPotionEffects.get(potion.effect());
 				if (combatPotionEffect.isInstant()) {
 					combatPotionEffect.applyInstantEffect(arrow, null,
-							entity, potion.amplifier(), 1.0D, version);
+							entity, potion.amplifier(), 1.0D, exhaustionFeature, foodFeature);
 				} else {
 					int duration = Math.max(potion.duration() / 8, 1);
 					entity.addEffect(new Potion(potion.effect(), potion.amplifier(), duration, potion.flags()));
@@ -238,7 +244,7 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 					CombatPotionEffect combatPotionEffect = CustomPotionEffects.get(potion.effect());
 					if (combatPotionEffect.isInstant()) {
 						combatPotionEffect.applyInstantEffect(arrow, null,
-								entity, potion.amplifier(), 1.0D, version);
+								entity, potion.amplifier(), 1.0D, exhaustionFeature, foodFeature);
 					} else {
 						entity.addEffect(new Potion(potion.effect(), potion.amplifier(),
 								potion.duration(), potion.flags()));
@@ -253,7 +259,7 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 			CombatPotionEffect combatPotionEffect = CustomPotionEffects.get(potion.effect());
 			if (combatPotionEffect.isInstant()) {
 				combatPotionEffect.applyInstantEffect(source, attacker,
-						entity, potion.amplifier(), proximity, version);
+						entity, potion.amplifier(), proximity, exhaustionFeature, foodFeature);
 			} else {
 				int duration = potion.duration();
 				if (version.legacy()) duration = (int) Math.floor(duration * 0.75);

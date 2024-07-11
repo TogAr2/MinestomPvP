@@ -14,6 +14,9 @@ public interface ExhaustionFeature extends CombatFeature {
 		
 		@Override
 		public void addDamageExhaustion(Player player, DamageType type) {}
+		
+		@Override
+		public void applyHungerEffect(Player player, byte amplifier) {}
 	};
 	
 	void addExhaustion(Player player, float exhaustion);
@@ -21,4 +24,6 @@ public interface ExhaustionFeature extends CombatFeature {
 	void addAttackExhaustion(Player player);
 	
 	void addDamageExhaustion(Player player, DamageType type);
+	
+	void applyHungerEffect(Player player, byte amplifier);
 }

@@ -1,6 +1,8 @@
 package io.github.togar2.pvp.potion.effect;
 
 import io.github.togar2.pvp.enchantment.EntityGroup;
+import io.github.togar2.pvp.feature.food.ExhaustionFeature;
+import io.github.togar2.pvp.feature.food.FoodFeature;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.color.Color;
 import net.minestom.server.entity.Entity;
@@ -64,7 +66,8 @@ public class CombatPotionEffect {
 		return this;
 	}
 	
-	public void applyUpdateEffect(LivingEntity entity, byte amplifier, CombatVersion version) {
+	public void applyUpdateEffect(LivingEntity entity, byte amplifier,
+	                              ExhaustionFeature exhaustionFeature, FoodFeature foodFeature) {
 		if (potionEffect == PotionEffect.REGENERATION) {
 			if (entity.getHealth() < entity.getAttributeValue(Attribute.GENERIC_MAX_HEALTH)) {
 				entity.setHealth(entity.getHealth() + 1);
@@ -82,10 +85,10 @@ public class CombatPotionEffect {
 		
 		if (entity instanceof Player player) {
 			if (potionEffect == PotionEffect.HUNGER) {
-				//TODO feature EntityUtils.addExhaustion(player, version.legacy() ? 0.025F : 0.005F * (float) (amplifier + 1));
+				exhaustionFeature.applyHungerEffect(player, amplifier);
 				return;
 			} else if (potionEffect == PotionEffect.SATURATION) {
-				//TODO feature HungerManager.add(player, amplifier + 1, 1.0F);
+				foodFeature.applySaturationEffect(player, amplifier);
 				return;
 			}
 		}
@@ -102,11 +105,11 @@ public class CombatPotionEffect {
 	}
 	
 	public void applyInstantEffect(@Nullable Entity source, @Nullable Entity attacker, LivingEntity target,
-	                               byte amplifier, double proximity, CombatVersion version) {
+	                               byte amplifier, double proximity, ExhaustionFeature exhaustionFeature, FoodFeature foodFeature) {
 		EntityGroup targetGroup = EntityGroup.ofEntity(target);
 		
 		if (potionEffect != PotionEffect.INSTANT_DAMAGE && potionEffect != PotionEffect.INSTANT_HEALTH) {
-			applyUpdateEffect(target, amplifier, version);
+			applyUpdateEffect(target, amplifier, exhaustionFeature, foodFeature);
 			return;
 		}
 		
