@@ -6,9 +6,10 @@ import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.effect.EffectFeature;
+import io.github.togar2.pvp.feature.food.ExhaustionFeature;
+import io.github.togar2.pvp.feature.food.FoodFeature;
 import io.github.togar2.pvp.potion.effect.CombatPotionEffect;
 import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
-import io.github.togar2.pvp.utils.CombatVersion;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
@@ -33,7 +34,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaPotionFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.POTION, VanillaPotionFeature::new,
-			FeatureType.EFFECT, FeatureType.VERSION
+			FeatureType.EFFECT, FeatureType.EXHAUSTION, FeatureType.FOOD
 	);
 	
 	private static final int USE_TICKS = 32;
@@ -42,7 +43,8 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 	private final FeatureConfiguration configuration;
 	
 	private EffectFeature effectFeature;
-	private CombatVersion version;
+	private ExhaustionFeature exhaustionFeature;
+	private FoodFeature foodFeature;
 	
 	public VanillaPotionFeature(FeatureConfiguration configuration) {
 		this.configuration = configuration;
@@ -51,7 +53,8 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 	@Override
 	public void initDependencies() {
 		this.effectFeature = configuration.get(FeatureType.EFFECT);
-		this.version = configuration.get(FeatureType.VERSION);
+		this.exhaustionFeature = configuration.get(FeatureType.EXHAUSTION);
+		this.foodFeature = configuration.get(FeatureType.FOOD);
 	}
 	
 	@Override
@@ -77,7 +80,8 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 				CombatPotionEffect combatPotionEffect = CustomPotionEffects.get(potion.effect());
 				
 				if (combatPotionEffect.isInstant()) {
-					combatPotionEffect.applyInstantEffect(player, player, player, potion.amplifier(), 1.0, version);
+					combatPotionEffect.applyInstantEffect(player, player, player, potion.amplifier(),
+							1.0, exhaustionFeature, foodFeature);
 				} else {
 					player.addEffect(potion);
 				}
