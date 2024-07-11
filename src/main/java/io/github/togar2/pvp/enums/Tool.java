@@ -3,19 +3,15 @@ package io.github.togar2.pvp.enums;
 import io.github.togar2.pvp.utils.CombatVersion;
 import io.github.togar2.pvp.utils.ModifierId;
 import net.minestom.server.entity.EquipmentSlot;
+import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.entity.attribute.AttributeModifier;
 import net.minestom.server.entity.attribute.AttributeOperation;
-import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import net.minestom.server.item.component.AttributeList;
-import net.minestom.server.utils.NamespaceID;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public enum Tool {
@@ -83,45 +79,24 @@ public enum Tool {
 		this.isSword = isSword;
 	}
 	
-	//TODO these should be part of the feature
-	public static Map<Attribute, List<AttributeModifier>> getAttributes(@Nullable Tool tool, EquipmentSlot slot, ItemStack item, CombatVersion version) {
-		Map<Attribute, List<AttributeModifier>> modifiers = new HashMap<>();
-		AttributeList list = item.get(ItemComponent.ATTRIBUTE_MODIFIERS);
-		if (list != null) for (AttributeList.Modifier modifier : list.modifiers()) {
-			if (modifier.slot().contains(slot)) {
-				modifiers.computeIfAbsent(modifier.attribute(), k -> new ArrayList<>()).add(modifier.modifier());
-			}
+	public static void updateEquipmentAttributes(LivingEntity entity, ItemStack oldStack, ItemStack newStack,
+	                                             EquipmentSlot slot, CombatVersion version) {
+		if (slot != EquipmentSlot.MAIN_HAND) return;
+		
+		Tool oldTool = fromMaterial(oldStack.material());
+		Tool newTool = fromMaterial(newStack.material());
+		
+		// Remove attributes from previous tool
+		if (oldTool != null) {
+			entity.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).removeModifier(ModifierId.ATTACK_DAMAGE_MODIFIER_ID);
+			entity.getAttribute(Attribute.GENERIC_ATTACK_SPEED).removeModifier(ModifierId.ATTACK_SPEED_MODIFIER_ID);
 		}
 		
-		// Only add tool attributes if the material is a tool
-		if (tool != null) {
-			// Weapon attributes (attack damage, etc.) do not apply in offhand
-			if (slot == EquipmentSlot.MAIN_HAND) {
-				(version.legacy() ? tool.legacyAttributeModifiers : tool.attributeModifiers).forEach((attribute, modifier) ->
-						modifiers.computeIfAbsent(attribute, k -> new ArrayList<>()).add(modifier));
-			}
+		// Add attributes from new tool
+		if (newTool != null) {
+			(version.legacy() ? newTool.legacyAttributeModifiers : newTool.attributeModifiers).forEach((attribute, modifier) ->
+					entity.getAttribute(attribute).addModifier(modifier));
 		}
-		
-		return modifiers;
-	}
-	
-	public static Map<Attribute, List<NamespaceID>> getAttributeIds(@Nullable Tool tool, EquipmentSlot slot, ItemStack item) {
-		Map<Attribute, List<NamespaceID>> modifiers = new HashMap<>();
-		AttributeList list = item.get(ItemComponent.ATTRIBUTE_MODIFIERS);
-		if (list != null) for (AttributeList.Modifier modifier : list.modifiers()) {
-			if (modifier.slot().contains(slot)) {
-				modifiers.computeIfAbsent(modifier.attribute(), k -> new ArrayList<>()).add(modifier.modifier().id());
-			}
-		}
-		
-		if (tool != null) {
-			if (slot == EquipmentSlot.MAIN_HAND) {
-				modifiers.computeIfAbsent(Attribute.GENERIC_ATTACK_DAMAGE, k -> new ArrayList<>()).add(ModifierId.ATTACK_DAMAGE_MODIFIER_ID);
-				modifiers.computeIfAbsent(Attribute.GENERIC_ATTACK_SPEED, k -> new ArrayList<>()).add(ModifierId.ATTACK_SPEED_MODIFIER_ID);
-			}
-		}
-		
-		return modifiers;
 	}
 	
 	public boolean isAxe() {

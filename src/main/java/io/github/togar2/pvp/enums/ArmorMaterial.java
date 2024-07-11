@@ -3,20 +3,16 @@ package io.github.togar2.pvp.enums;
 import io.github.togar2.pvp.utils.CombatVersion;
 import io.github.togar2.pvp.utils.ModifierId;
 import net.minestom.server.entity.EquipmentSlot;
+import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.entity.attribute.AttributeModifier;
 import net.minestom.server.entity.attribute.AttributeOperation;
-import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import net.minestom.server.item.component.AttributeList;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.utils.NamespaceID;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public enum ArmorMaterial {
@@ -71,49 +67,32 @@ public enum ArmorMaterial {
 		return this.knockbackResistance;
 	}
 	
-	public static Map<Attribute, List<AttributeModifier>> getAttributes(@Nullable ArmorMaterial material, EquipmentSlot slot, ItemStack item, CombatVersion version) {
-		Map<Attribute, List<AttributeModifier>> modifiers = new HashMap<>();
-		AttributeList list = item.get(ItemComponent.ATTRIBUTE_MODIFIERS);
-		if (list != null) for (AttributeList.Modifier modifier : list.modifiers()) {
-			if (modifier.slot().contains(slot)) {
-				modifiers.computeIfAbsent(modifier.attribute(), k -> new ArrayList<>()).add(modifier.modifier());
+	public static void updateEquipmentAttributes(LivingEntity entity, ItemStack oldStack, ItemStack newStack,
+	                                             EquipmentSlot slot, CombatVersion version) {
+		ArmorMaterial oldMaterial = fromMaterial(oldStack.material());
+		ArmorMaterial newMaterial = fromMaterial(newStack.material());
+		
+		NamespaceID modifierId = getModifierId(slot);
+		
+		// Remove attributes from previous armor
+		if (oldMaterial != null) {
+			if (slot == getRequiredSlot(oldStack.material())) {
+				entity.getAttribute(Attribute.GENERIC_ARMOR).removeModifier(modifierId);
+				entity.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).removeModifier(modifierId);
+				entity.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).removeModifier(modifierId);
 			}
 		}
 		
-		// Only add armor attributes if the material is armor
-		if (material != null) {
-			if (slot == getRequiredSlot(item.material())) {
-				NamespaceID modifierId = getModifierId(slot);
-				modifiers.computeIfAbsent(Attribute.GENERIC_ARMOR, k -> new ArrayList<>()).add(new AttributeModifier(modifierId, material.getProtectionAmount(slot, version), AttributeOperation.ADD_VALUE));
-				modifiers.computeIfAbsent(Attribute.GENERIC_ARMOR_TOUGHNESS, k -> new ArrayList<>()).add(new AttributeModifier(modifierId, material.toughness, AttributeOperation.ADD_VALUE));
-				if (material.knockbackResistance > 0) {
-					modifiers.computeIfAbsent(Attribute.GENERIC_KNOCKBACK_RESISTANCE, k -> new ArrayList<>()).add(new AttributeModifier(modifierId, material.knockbackResistance, AttributeOperation.ADD_VALUE));
+		// Add attributes from new armor
+		if (newMaterial != null) {
+			if (slot == getRequiredSlot(newStack.material())) {
+				entity.getAttribute(Attribute.GENERIC_ARMOR).addModifier(new AttributeModifier(modifierId, newMaterial.getProtectionAmount(slot, version), AttributeOperation.ADD_VALUE));
+				entity.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).addModifier(new AttributeModifier(modifierId, newMaterial.getToughness(), AttributeOperation.ADD_VALUE));
+				if (newMaterial.getKnockbackResistance() > 0) {
+					entity.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).addModifier(new AttributeModifier(modifierId, newMaterial.getKnockbackResistance(), AttributeOperation.ADD_VALUE));
 				}
 			}
 		}
-		
-		return modifiers;
-	}
-	
-	public static Map<Attribute, List<NamespaceID>> getAttributeIds(@Nullable ArmorMaterial material, EquipmentSlot slot, ItemStack item) {
-		Map<Attribute, List<NamespaceID>> modifiers = new HashMap<>();
-		AttributeList list = item.get(ItemComponent.ATTRIBUTE_MODIFIERS);
-		if (list != null) for (AttributeList.Modifier modifier : list.modifiers()) {
-			if (modifier.slot().contains(slot)) {
-				modifiers.computeIfAbsent(modifier.attribute(), k -> new ArrayList<>()).add(modifier.modifier().id());
-			}
-		}
-		
-		if (material != null) {
-			if (slot == getRequiredSlot(item.material())) {
-				NamespaceID modifierId = getModifierId(slot);
-				modifiers.computeIfAbsent(Attribute.GENERIC_ARMOR, k -> new ArrayList<>()).add(modifierId);
-				modifiers.computeIfAbsent(Attribute.GENERIC_ARMOR_TOUGHNESS, k -> new ArrayList<>()).add(modifierId);
-				modifiers.computeIfAbsent(Attribute.GENERIC_KNOCKBACK_RESISTANCE, k -> new ArrayList<>()).add(modifierId);
-			}
-		}
-		
-		return modifiers;
 	}
 	
 	public static EquipmentSlot getRequiredSlot(Material material) {

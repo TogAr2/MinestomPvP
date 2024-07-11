@@ -10,17 +10,11 @@ import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.attribute.Attribute;
-import net.minestom.server.entity.attribute.AttributeInstance;
-import net.minestom.server.entity.attribute.AttributeModifier;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.item.EntityEquipEvent;
 import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.item.ItemStack;
-import net.minestom.server.utils.NamespaceID;
-
-import java.util.List;
-import java.util.Map;
 
 public class VanillaEquipmentFeature implements DataFeature<Attribute>, RegistrableFeature {
 	public static final DefinedFeature<VanillaEquipmentFeature> DEFINED = new DefinedFeature<>(
@@ -46,65 +40,27 @@ public class VanillaEquipmentFeature implements DataFeature<Attribute>, Registra
 	@Override
 	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(EntityEquipEvent.class, this::onEquip);
-		node.addListener(PlayerChangeHeldSlotEvent.class, event -> changeHandModifiers(
-				event.getPlayer(), EquipmentSlot.MAIN_HAND,
-				event.getPlayer().getInventory().getItemStack(event.getSlot())
-		));
+		node.addListener(PlayerChangeHeldSlotEvent.class, event -> {
+			LivingEntity entity = event.getPlayer();
+			ItemStack newItem = event.getPlayer().getInventory().getItemStack(event.getSlot());
+			Tool.updateEquipmentAttributes(entity, entity.getEquipment(EquipmentSlot.MAIN_HAND), newItem, EquipmentSlot.MAIN_HAND, version);
+		});
 	}
 	
 	protected void onEquip(EntityEquipEvent event) {
 		if (!(event.getEntity() instanceof LivingEntity entity)) return;
 		
-		//TODO all things related to tools and attributes need an overhaul. This is temporary
 		if (event.getSlot().isArmor()) {
-			changeArmorModifiers(entity, event.getSlot(), event.getEquippedItem());
+			EquipmentSlot slot = event.getSlot();
+			ArmorMaterial.updateEquipmentAttributes(entity, entity.getEquipment(slot), event.getEquippedItem(), slot, version);
 		} else if (event.getSlot().isHand()) {
-			changeHandModifiers(entity, event.getSlot(), event.getEquippedItem());
+			EquipmentSlot slot = event.getSlot();
+			Tool.updateEquipmentAttributes(entity, entity.getEquipment(slot), event.getEquippedItem(), slot, version);
 		}
 	}
 	
 	@Override
 	public double getValue(LivingEntity entity, Attribute attribute) {
 		return entity.getAttributeValue(attribute);
-	}
-	
-	private void changeArmorModifiers(LivingEntity entity, EquipmentSlot slot, ItemStack newItem) {
-		//Remove previous armor
-		ItemStack previousStack = entity.getEquipment(slot);
-		ArmorMaterial material = ArmorMaterial.fromMaterial(previousStack.material());
-		removeAttributeModifiers(entity, ArmorMaterial.getAttributeIds(material, slot, previousStack));
-		
-		//Add new armor
-		material = ArmorMaterial.fromMaterial(newItem.material());
-		addAttributeModifiers(entity, ArmorMaterial.getAttributes(material, slot, newItem, version));
-	}
-	
-	private void changeHandModifiers(LivingEntity entity, EquipmentSlot slot, ItemStack newItem) {
-		//Remove previous attribute modifiers
-		ItemStack previousStack = entity.getEquipment(slot);
-		Tool tool = Tool.fromMaterial(previousStack.material());
-		removeAttributeModifiers(entity, Tool.getAttributeIds(tool, slot, previousStack));
-		
-		//Add new attribute modifiers
-		tool = Tool.fromMaterial(newItem.material());
-		addAttributeModifiers(entity, Tool.getAttributes(tool, slot, newItem, version));
-	}
-	
-	private void removeAttributeModifiers(LivingEntity entity, Map<Attribute, List<NamespaceID>> modifiers) {
-		for (Map.Entry<Attribute, List<NamespaceID>> entry : modifiers.entrySet()) {
-			AttributeInstance attribute = entity.getAttribute(entry.getKey());
-			for (NamespaceID id : entry.getValue()) {
-				attribute.removeModifier(id);
-			}
-		}
-	}
-	
-	private void addAttributeModifiers(LivingEntity entity, Map<Attribute, List<AttributeModifier>> modifiers) {
-		for (Map.Entry<Attribute, List<AttributeModifier>> entry : modifiers.entrySet()) {
-			AttributeInstance attribute = entity.getAttribute(entry.getKey());
-			for (AttributeModifier modifier : entry.getValue()) {
-				attribute.addModifier(modifier);
-			}
-		}
 	}
 }
