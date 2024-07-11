@@ -1,7 +1,7 @@
 package io.github.togar2.pvp.feature.enchantment;
 
-import io.github.togar2.pvp.enchantment.CustomEnchantment;
 import io.github.togar2.pvp.enchantment.CustomEnchantments;
+import io.github.togar2.pvp.enchantment.PvPEnchantment;
 import io.github.togar2.pvp.entity.EntityGroup;
 import io.github.togar2.pvp.enums.ArmorMaterial;
 import io.github.togar2.pvp.feature.FeatureType;
@@ -47,14 +47,14 @@ public class VanillaEnchantmentFeature implements EnchantmentFeature, Registrabl
 		});
 	}
 	
-	public static void forEachEnchantment(Iterable<ItemStack> stacks, BiConsumer<CustomEnchantment, Integer> consumer) {
+	public static void forEachEnchantment(Iterable<ItemStack> stacks, BiConsumer<PvPEnchantment, Integer> consumer) {
 		for (ItemStack itemStack : stacks) {
 			EnchantmentList enchantmentList = itemStack.get(ItemComponent.ENCHANTMENTS);
 			Set<DynamicRegistry.Key<Enchantment>> enchantments = enchantmentList.enchantments().keySet();
 			
 			for (DynamicRegistry.Key<Enchantment> enchantment : enchantments) {
-				CustomEnchantment customEnchantment = CustomEnchantments.get(enchantment);
-				consumer.accept(customEnchantment, enchantmentList.level(enchantment));
+				PvPEnchantment pvPEnchantment = CustomEnchantments.get(enchantment);
+				consumer.accept(pvPEnchantment, enchantmentList.level(enchantment));
 			}
 		}
 	}
@@ -112,8 +112,8 @@ public class VanillaEnchantmentFeature implements EnchantmentFeature, Registrabl
 	public float getAttackDamage(ItemStack stack, EntityGroup group) {
 		AtomicReference<Float> result = new AtomicReference<>((float) 0);
 		stack.get(ItemComponent.ENCHANTMENTS).enchantments().forEach((enchantment, level) -> {
-			CustomEnchantment customEnchantment = CustomEnchantments.get(enchantment);
-			result.updateAndGet(v -> v + customEnchantment.getAttackDamage(level, group, this, configuration));
+			PvPEnchantment pvPEnchantment = CustomEnchantments.get(enchantment);
+			result.updateAndGet(v -> v + pvPEnchantment.getAttackDamage(level, group, this, configuration));
 		});
 		
 		return result.get();

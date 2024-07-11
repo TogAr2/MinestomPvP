@@ -1,6 +1,6 @@
 package io.github.togar2.pvp.enchantment.enchantments;
 
-import io.github.togar2.pvp.enchantment.CustomEnchantment;
+import io.github.togar2.pvp.enchantment.PvPEnchantment;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class ThornsEnchantment extends CustomEnchantment {
+public class ThornsEnchantment extends PvPEnchantment {
 	public ThornsEnchantment(EquipmentSlot... slotTypes) {
 		super(Enchantment.THORNS, Set.of(FeatureType.ITEM_DAMAGE), slotTypes);
 	}

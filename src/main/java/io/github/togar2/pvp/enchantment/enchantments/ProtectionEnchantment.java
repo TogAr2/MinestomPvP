@@ -1,7 +1,7 @@
 package io.github.togar2.pvp.enchantment.enchantments;
 
 import io.github.togar2.pvp.damage.DamageTypeInfo;
-import io.github.togar2.pvp.enchantment.CustomEnchantment;
+import io.github.togar2.pvp.enchantment.PvPEnchantment;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import net.minestom.server.MinecraftServer;
@@ -10,7 +10,7 @@ import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.item.enchant.Enchantment;
 import net.minestom.server.registry.DynamicRegistry;
 
-public class ProtectionEnchantment extends CustomEnchantment {
+public class ProtectionEnchantment extends PvPEnchantment {
 	private final Type type;
 	
 	public ProtectionEnchantment(DynamicRegistry.Key<Enchantment> enchantment, Type type, EquipmentSlot... slotTypes) {

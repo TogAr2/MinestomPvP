@@ -15,14 +15,14 @@ import java.util.Map;
 import java.util.Set;
 
 public class CustomEnchantments {
-	private static final Map<DynamicRegistry.Key<Enchantment>, CustomEnchantment> ENCHANTMENTS = new HashMap<>();
+	private static final Map<DynamicRegistry.Key<Enchantment>, PvPEnchantment> ENCHANTMENTS = new HashMap<>();
 	
-	public static CustomEnchantment get(DynamicRegistry.Key<Enchantment> enchantment) {
+	public static PvPEnchantment get(DynamicRegistry.Key<Enchantment> enchantment) {
 		return ENCHANTMENTS.get(enchantment);
 	}
 	
-	public static void register(CustomEnchantment... enchantments) {
-		for (CustomEnchantment enchantment : enchantments) {
+	public static void register(PvPEnchantment... enchantments) {
+		for (PvPEnchantment enchantment : enchantments) {
 			ENCHANTMENTS.put(enchantment.getEnchantment(), enchantment);
 		}
 	}
@@ -30,7 +30,7 @@ public class CustomEnchantments {
 	public static FeatureType<?>[] getAllFeatureDependencies() {
 		Set<FeatureType<?>> features = new HashSet<>();
 		
-		for (CustomEnchantment enchantment : ENCHANTMENTS.values()) {
+		for (PvPEnchantment enchantment : ENCHANTMENTS.values()) {
 			features.addAll(enchantment.getDependencies());
 		}
 		
@@ -55,39 +55,39 @@ public class CustomEnchantments {
 				new ProtectionEnchantment(Enchantment.FEATHER_FALLING, ProtectionEnchantment.Type.FALL, ALL_ARMOR_SLOTS),
 				new ProtectionEnchantment(Enchantment.BLAST_PROTECTION, ProtectionEnchantment.Type.EXPLOSION, ALL_ARMOR_SLOTS),
 				new ProtectionEnchantment(Enchantment.PROJECTILE_PROTECTION, ProtectionEnchantment.Type.PROJECTILE, ALL_ARMOR_SLOTS),
-				new CustomEnchantment(Enchantment.RESPIRATION, ALL_ARMOR_SLOTS),
-				new CustomEnchantment(Enchantment.AQUA_AFFINITY, ALL_ARMOR_SLOTS),
+				new PvPEnchantment(Enchantment.RESPIRATION, ALL_ARMOR_SLOTS),
+				new PvPEnchantment(Enchantment.AQUA_AFFINITY, ALL_ARMOR_SLOTS),
 				new ThornsEnchantment(ALL_ARMOR_SLOTS),
-				new CustomEnchantment(Enchantment.DEPTH_STRIDER, ALL_ARMOR_SLOTS),
-				new CustomEnchantment(Enchantment.FROST_WALKER, EquipmentSlot.BOOTS),
-				new CustomEnchantment(Enchantment.BINDING_CURSE, ALL_ARMOR_SLOTS),
-				new CustomEnchantment(Enchantment.SOUL_SPEED, EquipmentSlot.BOOTS),
+				new PvPEnchantment(Enchantment.DEPTH_STRIDER, ALL_ARMOR_SLOTS),
+				new PvPEnchantment(Enchantment.FROST_WALKER, EquipmentSlot.BOOTS),
+				new PvPEnchantment(Enchantment.BINDING_CURSE, ALL_ARMOR_SLOTS),
+				new PvPEnchantment(Enchantment.SOUL_SPEED, EquipmentSlot.BOOTS),
 				new DamageEnchantment(Enchantment.SHARPNESS, DamageEnchantment.Type.ALL, EquipmentSlot.MAIN_HAND),
 				new DamageEnchantment(Enchantment.SMITE, DamageEnchantment.Type.UNDEAD, EquipmentSlot.MAIN_HAND),
 				new DamageEnchantment(Enchantment.BANE_OF_ARTHROPODS, DamageEnchantment.Type.ARTHROPODS, EquipmentSlot.MAIN_HAND),
-				new CustomEnchantment(Enchantment.KNOCKBACK, EquipmentSlot.MAIN_HAND),
-				new CustomEnchantment(Enchantment.FIRE_ASPECT, EquipmentSlot.MAIN_HAND),
-				new CustomEnchantment(Enchantment.LOOTING, EquipmentSlot.MAIN_HAND),
-				new CustomEnchantment(Enchantment.SWEEPING_EDGE, EquipmentSlot.MAIN_HAND),
-				new CustomEnchantment(Enchantment.EFFICIENCY, EquipmentSlot.MAIN_HAND),
-				new CustomEnchantment(Enchantment.SILK_TOUCH, EquipmentSlot.MAIN_HAND),
-				new CustomEnchantment(Enchantment.UNBREAKING, EquipmentSlot.MAIN_HAND),
-				new CustomEnchantment(Enchantment.FORTUNE, EquipmentSlot.MAIN_HAND),
-				new CustomEnchantment(Enchantment.POWER, EquipmentSlot.MAIN_HAND),
-				new CustomEnchantment(Enchantment.PUNCH, EquipmentSlot.MAIN_HAND),
-				new CustomEnchantment(Enchantment.FLAME, EquipmentSlot.MAIN_HAND),
-				new CustomEnchantment(Enchantment.INFINITY, EquipmentSlot.MAIN_HAND),
-				new CustomEnchantment(Enchantment.LUCK_OF_THE_SEA, EquipmentSlot.MAIN_HAND),
-				new CustomEnchantment(Enchantment.LURE, EquipmentSlot.MAIN_HAND),
-				new CustomEnchantment(Enchantment.LOYALTY, EquipmentSlot.MAIN_HAND),
+				new PvPEnchantment(Enchantment.KNOCKBACK, EquipmentSlot.MAIN_HAND),
+				new PvPEnchantment(Enchantment.FIRE_ASPECT, EquipmentSlot.MAIN_HAND),
+				new PvPEnchantment(Enchantment.LOOTING, EquipmentSlot.MAIN_HAND),
+				new PvPEnchantment(Enchantment.SWEEPING_EDGE, EquipmentSlot.MAIN_HAND),
+				new PvPEnchantment(Enchantment.EFFICIENCY, EquipmentSlot.MAIN_HAND),
+				new PvPEnchantment(Enchantment.SILK_TOUCH, EquipmentSlot.MAIN_HAND),
+				new PvPEnchantment(Enchantment.UNBREAKING, EquipmentSlot.MAIN_HAND),
+				new PvPEnchantment(Enchantment.FORTUNE, EquipmentSlot.MAIN_HAND),
+				new PvPEnchantment(Enchantment.POWER, EquipmentSlot.MAIN_HAND),
+				new PvPEnchantment(Enchantment.PUNCH, EquipmentSlot.MAIN_HAND),
+				new PvPEnchantment(Enchantment.FLAME, EquipmentSlot.MAIN_HAND),
+				new PvPEnchantment(Enchantment.INFINITY, EquipmentSlot.MAIN_HAND),
+				new PvPEnchantment(Enchantment.LUCK_OF_THE_SEA, EquipmentSlot.MAIN_HAND),
+				new PvPEnchantment(Enchantment.LURE, EquipmentSlot.MAIN_HAND),
+				new PvPEnchantment(Enchantment.LOYALTY, EquipmentSlot.MAIN_HAND),
 				new ImpalingEnchantment(EquipmentSlot.MAIN_HAND),
-				new CustomEnchantment(Enchantment.RIPTIDE, EquipmentSlot.MAIN_HAND),
-				new CustomEnchantment(Enchantment.CHANNELING, EquipmentSlot.MAIN_HAND),
-				new CustomEnchantment(Enchantment.MULTISHOT, EquipmentSlot.MAIN_HAND),
-				new CustomEnchantment(Enchantment.QUICK_CHARGE, EquipmentSlot.MAIN_HAND),
-				new CustomEnchantment(Enchantment.PIERCING, EquipmentSlot.MAIN_HAND),
-				new CustomEnchantment(Enchantment.MENDING, EquipmentSlot.values()),
-				new CustomEnchantment(Enchantment.VANISHING_CURSE, EquipmentSlot.values())
+				new PvPEnchantment(Enchantment.RIPTIDE, EquipmentSlot.MAIN_HAND),
+				new PvPEnchantment(Enchantment.CHANNELING, EquipmentSlot.MAIN_HAND),
+				new PvPEnchantment(Enchantment.MULTISHOT, EquipmentSlot.MAIN_HAND),
+				new PvPEnchantment(Enchantment.QUICK_CHARGE, EquipmentSlot.MAIN_HAND),
+				new PvPEnchantment(Enchantment.PIERCING, EquipmentSlot.MAIN_HAND),
+				new PvPEnchantment(Enchantment.MENDING, EquipmentSlot.values()),
+				new PvPEnchantment(Enchantment.VANISHING_CURSE, EquipmentSlot.values())
 		);
 	}
 }

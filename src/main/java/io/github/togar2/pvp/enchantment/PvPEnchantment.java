@@ -16,18 +16,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class CustomEnchantment {
+public class PvPEnchantment {
 	private final DynamicRegistry.Key<Enchantment> enchantment;
 	private final EquipmentSlot[] slotTypes;
 	
 	private final Set<FeatureType<?>> dependencies;
 	
-	public CustomEnchantment(DynamicRegistry.Key<Enchantment> enchantment, EquipmentSlot... slotTypes) {
+	public PvPEnchantment(DynamicRegistry.Key<Enchantment> enchantment, EquipmentSlot... slotTypes) {
 		this(enchantment, Set.of(), slotTypes);
 	}
 	
-	public CustomEnchantment(DynamicRegistry.Key<Enchantment> enchantment,
-	                         Set<FeatureType<?>> dependencies, EquipmentSlot... slotTypes) {
+	public PvPEnchantment(DynamicRegistry.Key<Enchantment> enchantment,
+	                      Set<FeatureType<?>> dependencies, EquipmentSlot... slotTypes) {
 		this.enchantment = enchantment;
 		this.dependencies = dependencies;
 		this.slotTypes = slotTypes;
