@@ -53,13 +53,13 @@ public class CombatPotionEffect {
 	}
 	
 	public CombatPotionEffect addAttributeModifier(Attribute attribute, NamespaceID id,
-	                                               float amount, AttributeOperation operation) {
+	                                               double amount, AttributeOperation operation) {
 		attributeModifiers.put(attribute, new AttributeModifier(id, amount, operation));
 		return this;
 	}
 	
 	public CombatPotionEffect addLegacyAttributeModifier(Attribute attribute, NamespaceID id,
-	                                                     float amount, AttributeOperation operation) {
+	                                                     double amount, AttributeOperation operation) {
 		if (legacyAttributeModifiers == null)
 			legacyAttributeModifiers = new HashMap<>();
 		legacyAttributeModifiers.put(attribute, new AttributeModifier(id, amount, operation));
