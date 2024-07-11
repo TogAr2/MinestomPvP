@@ -19,10 +19,9 @@ import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.tag.Tag;
 import org.jetbrains.annotations.Nullable;
 
-public class VanillaDeathMessageFeature implements TrackingFeature,
-		DeathMessageFeature, RegistrableFeature {
+public class VanillaDeathMessageFeature implements TrackingFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaDeathMessageFeature> DEFINED = new DefinedFeature<>(
-			FeatureType.DEATH_MESSAGE, VanillaDeathMessageFeature::new,
+			FeatureType.TRACKING, VanillaDeathMessageFeature::new,
 			VanillaDeathMessageFeature::initPlayer,
 			FeatureType.FALL, FeatureType.PLAYER_STATE
 	);
