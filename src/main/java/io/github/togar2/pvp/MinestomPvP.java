@@ -16,11 +16,11 @@ import net.minestom.server.event.trait.EntityInstanceEvent;
 
 public class MinestomPvP {
 	public static EventNode<EntityInstanceEvent> events() {
-		return CombatFeatures.MODERN_VANILLA.createNode();
+		return CombatFeatures.modernVanilla().createNode();
 	}
 	
 	public static EventNode<EntityInstanceEvent> legacyEvents() {
-		return CombatFeatures.LEGACY_VANILLA.createNode();
+		return CombatFeatures.legacyVanilla().createNode();
 	}
 	
 	/**
