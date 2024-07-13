@@ -11,6 +11,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
+/**
+ * A (mutable) configuration for a feature.
+ * It contains dependencies for the feature, accessible by their feature type.
+ * See {@link FeatureConfiguration#get(FeatureType)}
+ */
 public class FeatureConfiguration {
 	protected final Map<FeatureType<?>, CombatFeature> combatFeatures = new HashMap<>();
 	
@@ -51,13 +56,7 @@ public class FeatureConfiguration {
 		combatFeatures.forEach(consumer);
 	}
 	
-	public FeatureConfiguration shallowCopy() {
-		FeatureConfiguration clone = new FeatureConfiguration();
-		clone.combatFeatures.putAll(combatFeatures);
-		return clone;
-	}
-	
-	public FeatureConfiguration overlay() {
+	FeatureConfiguration overlay() {
 		return new Overlay(this);
 	}
 	
@@ -76,10 +75,5 @@ public class FeatureConfiguration {
 				return backing.get(type);
 			}
 		}
-	}
-	
-	private static final FeatureConfiguration empty = new FeatureConfiguration();
-	public static FeatureConfiguration empty() {
-		return empty;
 	}
 }

@@ -33,8 +33,9 @@ import io.github.togar2.pvp.utils.CombatVersion;
 import java.util.List;
 
 /**
- * Contains {@link CombatFeatureSet} instances which can be used to get a full vanilla combat experience.
+ * Contains all the vanilla features which have been defined by MinestomPvP.
  * <p>
+ * It also Contains {@link CombatFeatureSet} instances which can be used to get a full vanilla combat experience.
  * See {@link CombatFeatures#MODERN_VANILLA} and {@link CombatFeatures#LEGACY_VANILLA}.
  */
 public class CombatFeatures {
@@ -116,5 +117,14 @@ public class CombatFeatures {
 		return new CombatConfiguration()
 				.version(version).difficulty(difficultyProvider)
 				.addAll(VANILLA);
+	}
+	
+	/**
+	 * Utility method to get an empty {@link CombatConfiguration} to which features can be added.
+	 *
+	 * @return the empty configuration
+	 */
+	public static CombatConfiguration empty() {
+		return new CombatConfiguration();
 	}
 }

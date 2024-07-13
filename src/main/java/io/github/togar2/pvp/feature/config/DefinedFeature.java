@@ -7,6 +7,20 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
+/**
+ * Represents a feature implementation which has been defined but not yet instantiated.
+ * It contains the feature type, all the feature types that this feature depends on and its constructor.
+ * The constructor always takes a {@link FeatureConfiguration} which the feature should store,
+ * and which it can get the dependencies from once {@link CombatFeature#initDependencies()} is called.
+ * <p>
+ * A defined feature can also contain a {@link PlayerInit},
+ * which describes everything that should happen when a players state is reset (they join, they respawn, etc.).
+ * This can for example be used to add certain tags to a player that a feature needs.
+ * Since features might be instantiated multiple times, this player init is contained in the feature definition
+ * and not every time when it is instantiated.
+ *
+ * @param <F> the feature class
+ */
 public class DefinedFeature<F extends CombatFeature> {
 	private final FeatureType<?> featureType;
 	private final Set<FeatureType<?>> dependencies;

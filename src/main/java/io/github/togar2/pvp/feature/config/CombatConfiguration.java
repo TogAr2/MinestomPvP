@@ -2,6 +2,7 @@ package io.github.togar2.pvp.feature.config;
 
 import io.github.togar2.pvp.feature.CombatFeature;
 import io.github.togar2.pvp.feature.CombatFeatureSet;
+import io.github.togar2.pvp.feature.CombatFeatures;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.provider.DifficultyProvider;
 import io.github.togar2.pvp.utils.CombatVersion;
@@ -9,6 +10,19 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+/**
+ * A configuration of combat features which can be used to easily resolve dependencies to other combat features.
+ * <p>
+ * Whereas {@link CombatFeatureSet} contains the full set of feature instances with resolved dependencies,
+ * this class can be used to add {@link DefinedFeature} instances (features which haven't yet been instantiated).
+ * Vanilla versions of these defined features can be found in {@link CombatFeatures}.
+ * <p>
+ * This class contains methods to easily configure the combat version and difficulty provider,
+ * see {@link CombatConfiguration#version(CombatVersion)} and {@link CombatConfiguration#difficulty(DifficultyProvider)}.
+ * <p>
+ * When calling {@link CombatConfiguration#build()}, it resolves all the dependencies
+ * and turns this configuration into a {@link CombatFeatureSet}.
+ */
 public class CombatConfiguration {
 	private final Set<ConstructableFeature> features = new HashSet<>();
 	
@@ -92,6 +106,11 @@ public class CombatConfiguration {
 		return new LazyFeatureInit(constructor, overrideMap);
 	}
 	
+	/**
+	 * Resolves all the dependencies and turns this configuration into a {@link CombatFeatureSet}.
+	 *
+	 * @return the combat feature set
+	 */
 	public CombatFeatureSet build() {
 		CombatFeatureSet result = new CombatFeatureSet();
 		
