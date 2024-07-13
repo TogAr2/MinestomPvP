@@ -9,7 +9,7 @@ import io.github.togar2.pvp.feature.effect.EffectFeature;
 import io.github.togar2.pvp.feature.food.ExhaustionFeature;
 import io.github.togar2.pvp.feature.food.FoodFeature;
 import io.github.togar2.pvp.potion.effect.CombatPotionEffect;
-import io.github.togar2.pvp.potion.effect.CustomPotionEffects;
+import io.github.togar2.pvp.potion.effect.CombatPotionEffects;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
@@ -77,7 +77,7 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 			
 			// Apply the potions
 			for (Potion potion : potions) {
-				CombatPotionEffect combatPotionEffect = CustomPotionEffects.get(potion.effect());
+				CombatPotionEffect combatPotionEffect = CombatPotionEffects.get(potion.effect());
 				
 				if (combatPotionEffect.isInstant()) {
 					combatPotionEffect.applyInstantEffect(player, player, player, potion.amplifier(),

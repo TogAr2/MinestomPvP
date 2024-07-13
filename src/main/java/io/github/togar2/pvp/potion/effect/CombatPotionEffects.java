@@ -9,7 +9,7 @@ import net.minestom.server.utils.NamespaceID;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CustomPotionEffects {
+public class CombatPotionEffects {
 	private static final Map<PotionEffect, CombatPotionEffect> POTION_EFFECTS = new HashMap<>();
 	
 	public static CombatPotionEffect get(PotionEffect potionEffect) {

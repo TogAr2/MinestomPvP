@@ -35,8 +35,10 @@ import java.util.List;
 /**
  * Contains all the vanilla features which have been defined by MinestomPvP.
  * <p>
- * It also Contains {@link CombatFeatureSet} instances which can be used to get a full vanilla combat experience.
- * See {@link CombatFeatures#MODERN_VANILLA} and {@link CombatFeatures#LEGACY_VANILLA}.
+ * It also contains {@link CombatFeatureSet} instances which can be used to get a full vanilla combat experience.
+ * See {@link CombatFeatures#modernVanilla()} and {@link CombatFeatures#legacyVanilla()}.
+ * <p>
+ * It is also possible to gain more control over which features are used, see {@link CombatFeatures#empty()}.
  */
 public class CombatFeatures {
 	public static final DefinedFeature<VanillaArmorFeature> VANILLA_ARMOR = VanillaArmorFeature.DEFINED;
