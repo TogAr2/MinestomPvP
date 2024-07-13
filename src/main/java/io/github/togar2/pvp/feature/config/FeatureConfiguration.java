@@ -25,11 +25,30 @@ public class FeatureConfiguration {
 		this.combatFeatures.putAll(combatFeatures);
 	}
 	
+	/**
+	 * Adds the specified feature as the specified type to this configuration.
+	 * This WILL overwrite any previous feature associated with the specified type.
+	 * <p>
+	 * This method is not generified to avoid internal complication.
+	 * DO NOT add a feature of a different type than specified, this WILL break things.
+	 *
+	 * @param type the feature type to add the feature as
+	 * @param feature the feature to add
+	 * @return this configuration
+	 */
 	public FeatureConfiguration add(FeatureType<?> type, CombatFeature feature) {
 		combatFeatures.put(type, feature);
 		return this;
 	}
 	
+	/**
+	 * Gets the feature which has been associated with the specified type in this configuration.
+	 * If there is none present, the default feature for this type will be returned.
+	 *
+	 * @param type the feature type
+	 * @return the feature associated with the feature type, or the default feature for this type
+	 * @param <T> the feature class
+	 */
 	@SuppressWarnings("unchecked")
 	public <T extends CombatFeature> @NotNull T get(FeatureType<T> type) {
 		return (T) combatFeatures.getOrDefault(type, type.defaultFeature());
