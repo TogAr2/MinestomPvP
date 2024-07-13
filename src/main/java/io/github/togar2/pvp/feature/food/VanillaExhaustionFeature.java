@@ -21,6 +21,9 @@ import net.minestom.server.world.Difficulty;
 
 import java.util.Objects;
 
+/**
+ * Vanilla implementation of {@link ExhaustionFeature}
+ */
 public class VanillaExhaustionFeature implements ExhaustionFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaExhaustionFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.EXHAUSTION, VanillaExhaustionFeature::new,

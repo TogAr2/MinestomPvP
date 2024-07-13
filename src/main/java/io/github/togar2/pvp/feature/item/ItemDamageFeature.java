@@ -5,6 +5,9 @@ import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.damage.DamageType;
 
+/**
+ * Combat feature which handles damaging items (durability).
+ */
 public interface ItemDamageFeature extends CombatFeature {
 	ItemDamageFeature NO_OP = new ItemDamageFeature() {
 		@Override

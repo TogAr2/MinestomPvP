@@ -17,6 +17,9 @@ import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.tag.Tag;
 import net.minestom.server.world.Difficulty;
 
+/**
+ * Vanilla implementation of {@link RegenerationFeature}
+ */
 public class VanillaRegenerationFeature implements RegenerationFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaRegenerationFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.REGENERATION, VanillaRegenerationFeature::new,

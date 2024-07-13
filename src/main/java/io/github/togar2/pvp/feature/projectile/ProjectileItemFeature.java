@@ -5,6 +5,9 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Combat feature which determines which projectile to use for bow and crossbow shooting.
+ */
 public interface ProjectileItemFeature extends CombatFeature {
 	ProjectileItemFeature NO_OP = new ProjectileItemFeature() {
 		@Override

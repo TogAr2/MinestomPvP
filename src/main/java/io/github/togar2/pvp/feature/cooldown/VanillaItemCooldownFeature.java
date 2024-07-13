@@ -17,6 +17,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * Vanilla implementation of {@link ItemCooldownFeature}
+ */
 public class VanillaItemCooldownFeature implements ItemCooldownFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaItemCooldownFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.ITEM_COOLDOWN, configuration -> new VanillaItemCooldownFeature(),

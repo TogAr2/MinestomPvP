@@ -21,6 +21,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Vanilla implementation of {@link KnockbackFeature}
+ */
 public class VanillaKnockbackFeature implements KnockbackFeature, CombatFeature {
 	public static final DefinedFeature<VanillaKnockbackFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.KNOCKBACK, VanillaKnockbackFeature::new,

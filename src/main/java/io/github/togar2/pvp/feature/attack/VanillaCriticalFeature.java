@@ -11,6 +11,9 @@ import net.minestom.server.potion.PotionEffect;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Vanilla implementation of {@link CriticalFeature}
+ */
 public class VanillaCriticalFeature implements CriticalFeature, CombatFeature {
 	public static final DefinedFeature<VanillaCriticalFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.CRITICAL, VanillaCriticalFeature::new,

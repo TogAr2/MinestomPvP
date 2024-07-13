@@ -5,6 +5,9 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.item.ItemStack;
 
+/**
+ * Combat feature which manages legacy blocking for a player.
+ */
 public interface LegacyBlockFeature extends BlockFeature {
 	LegacyBlockFeature NO_OP = new LegacyBlockFeature() {
 		@Override public boolean isBlocking(Player player) { return false; }

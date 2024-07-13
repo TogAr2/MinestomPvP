@@ -16,6 +16,9 @@ import net.minestom.server.item.Material;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 
+/**
+ * Vanilla implementation of {@link TotemFeature}
+ */
 public class VanillaTotemFeature implements TotemFeature, CombatFeature {
 	public static final DefinedFeature<VanillaTotemFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.TOTEM, configuration -> new VanillaTotemFeature()

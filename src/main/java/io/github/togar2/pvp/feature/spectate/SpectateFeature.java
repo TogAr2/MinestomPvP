@@ -4,6 +4,9 @@ import io.github.togar2.pvp.feature.CombatFeature;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
 
+/**
+ * Combat feature which handles spectating in spectator mode.
+ */
 public interface SpectateFeature extends CombatFeature {
 	SpectateFeature NO_OP = new SpectateFeature() {
 		@Override

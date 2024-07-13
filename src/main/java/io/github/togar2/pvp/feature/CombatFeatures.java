@@ -41,36 +41,126 @@ import java.util.List;
  * It is also possible to gain more control over which features are used, see {@link CombatFeatures#empty()}.
  */
 public class CombatFeatures {
+	/**
+	 * @see VanillaArmorFeature
+	 */
 	public static final DefinedFeature<VanillaArmorFeature> VANILLA_ARMOR = VanillaArmorFeature.DEFINED;
+	/**
+	 * @see VanillaAttackFeature
+	 */
 	public static final DefinedFeature<VanillaAttackFeature> VANILLA_ATTACK = VanillaAttackFeature.DEFINED;
+	/**
+	 * @see VanillaCriticalFeature
+	 */
 	public static final DefinedFeature<VanillaCriticalFeature> VANILLA_CRITICAL = VanillaCriticalFeature.DEFINED;
+	/**
+	 * @see VanillaSweepingFeature
+	 */
 	public static final DefinedFeature<VanillaSweepingFeature> VANILLA_SWEEPING = VanillaSweepingFeature.DEFINED;
+	/**
+	 * @see VanillaEquipmentFeature
+	 */
 	public static final DefinedFeature<VanillaEquipmentFeature> VANILLA_EQUIPMENT = VanillaEquipmentFeature.DEFINED;
+	/**
+	 * @see VanillaBlockFeature
+	 */
 	public static final DefinedFeature<VanillaBlockFeature> VANILLA_BLOCK = VanillaBlockFeature.DEFINED;
+	/**
+	 * @see VanillaAttackCooldownFeature
+	 */
 	public static final DefinedFeature<VanillaAttackCooldownFeature> VANILLA_ATTACK_COOLDOWN = VanillaAttackCooldownFeature.DEFINED;
+	/**
+	 * @see VanillaItemCooldownFeature
+	 */
 	public static final DefinedFeature<VanillaItemCooldownFeature> VANILLA_ITEM_COOLDOWN = VanillaItemCooldownFeature.DEFINED;
+	/**
+	 * @see VanillaDamageFeature
+	 */
 	public static final DefinedFeature<VanillaDamageFeature> VANILLA_DAMAGE = VanillaDamageFeature.DEFINED;
+	/**
+	 * @see VanillaEffectFeature
+	 */
 	public static final DefinedFeature<VanillaEffectFeature> VANILLA_EFFECT = VanillaEffectFeature.DEFINED;
+	/**
+	 * @see VanillaEnchantmentFeature
+	 */
 	public static final DefinedFeature<VanillaEnchantmentFeature> VANILLA_ENCHANTMENT = VanillaEnchantmentFeature.DEFINED;
+	/**
+	 * @see VanillaExplosionFeature
+	 */
 	public static final DefinedFeature<VanillaExplosionFeature> VANILLA_EXPLOSION = VanillaExplosionFeature.DEFINED;
+	/**
+	 * @see VanillaFallFeature
+	 */
 	public static final DefinedFeature<VanillaFallFeature> VANILLA_FALL = VanillaFallFeature.DEFINED;
+	/**
+	 * @see VanillaExhaustionFeature
+	 */
 	public static final DefinedFeature<VanillaExhaustionFeature> VANILLA_EXHAUSTION = VanillaExhaustionFeature.DEFINED;
+	/**
+	 * @see VanillaFoodFeature
+	 */
 	public static final DefinedFeature<VanillaFoodFeature> VANILLA_FOOD = VanillaFoodFeature.DEFINED;
+	/**
+	 * @see VanillaRegenerationFeature
+	 */
 	public static final DefinedFeature<VanillaRegenerationFeature> VANILLA_REGENERATION = VanillaRegenerationFeature.DEFINED;
+	/**
+	 * @see VanillaItemDamageFeature
+	 */
 	public static final DefinedFeature<VanillaItemDamageFeature> VANILLA_ITEM_DAMAGE = VanillaItemDamageFeature.DEFINED;
+	/**
+	 * @see VanillaKnockbackFeature
+	 */
 	public static final DefinedFeature<VanillaKnockbackFeature> VANILLA_KNOCKBACK = VanillaKnockbackFeature.DEFINED;
+	/**
+	 * @see VanillaPotionFeature
+	 */
 	public static final DefinedFeature<VanillaPotionFeature> VANILLA_POTION = VanillaPotionFeature.DEFINED;
+	/**
+	 * @see VanillaBowFeature
+	 */
 	public static final DefinedFeature<VanillaBowFeature> VANILLA_BOW = VanillaBowFeature.DEFINED;
+	/**
+	 * @see VanillaCrossbowFeature
+	 */
 	public static final DefinedFeature<VanillaCrossbowFeature> VANILLA_CROSSBOW = VanillaCrossbowFeature.DEFINED;
+	/**
+	 * @see VanillaFishingRodFeature
+	 */
 	public static final DefinedFeature<VanillaFishingRodFeature> VANILLA_FISHING_ROD = VanillaFishingRodFeature.DEFINED;
+	/**
+	 * @see VanillaMiscProjectileFeature
+	 */
 	public static final DefinedFeature<VanillaMiscProjectileFeature> VANILLA_MISC_PROJECTILE = VanillaMiscProjectileFeature.DEFINED;
+	/**
+	 * @see VanillaProjectileItemFeature
+	 */
 	public static final DefinedFeature<VanillaProjectileItemFeature> VANILLA_PROJECTILE_ITEM = VanillaProjectileItemFeature.DEFINED;
+	/**
+	 * @see VanillaTridentFeature
+	 */
 	public static final DefinedFeature<VanillaTridentFeature> VANILLA_TRIDENT = VanillaTridentFeature.DEFINED;
+	/**
+	 * @see VanillaSpectateFeature
+	 */
 	public static final DefinedFeature<VanillaSpectateFeature> VANILLA_SPECTATE = VanillaSpectateFeature.DEFINED;
+	/**
+     * @see VanillaPlayerStateFeature
+	 */
 	public static final DefinedFeature<VanillaPlayerStateFeature> VANILLA_PLAYER_STATE = VanillaPlayerStateFeature.DEFINED;
+	/**
+	 * @see VanillaTotemFeature
+	 */
 	public static final DefinedFeature<VanillaTotemFeature> VANILLA_TOTEM = VanillaTotemFeature.DEFINED;
+	/**
+	 * @see VanillaDeathMessageFeature
+	 */
 	public static final DefinedFeature<VanillaDeathMessageFeature> VANILLA_DEATH_MESSAGE = VanillaDeathMessageFeature.DEFINED;
 	
+	/**
+	 * @see LegacyVanillaBlockFeature
+	 */
 	public static final DefinedFeature<LegacyVanillaBlockFeature> LEGACY_VANILLA_BLOCK = LegacyVanillaBlockFeature.SHIELD;
 	
 	private static final List<DefinedFeature<?>> VANILLA = List.of(

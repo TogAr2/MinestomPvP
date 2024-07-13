@@ -12,6 +12,12 @@ import net.minestom.server.registry.DynamicRegistry;
 
 import java.util.Map;
 
+/**
+ * Combat feature which manages enchantments.
+ * <p>
+ * It contains methods which other features depend on,
+ * such as methods for the protection amount of armor enchantments and the attack damage amount of weapon enchantments.
+ */
 public interface EnchantmentFeature extends CombatFeature {
 	EnchantmentFeature NO_OP = new EnchantmentFeature() {
 		@Override
@@ -71,8 +77,22 @@ public interface EnchantmentFeature extends CombatFeature {
 		public void onTargetDamaged(LivingEntity user, Entity target) {}
 	};
 	
+	/**
+	 * Gets the highest level of en enchantment on an entity's equipment.
+	 *
+	 * @param entity the entity for which to determine the equipment level
+	 * @param enchantment the enchantment for which to determine the equipment level
+	 * @return the equipment level
+	 */
 	int getEquipmentLevel(LivingEntity entity, DynamicRegistry.Key<Enchantment> enchantment);
 	
+	/**
+	 * Picks a random equipment piece which has the specified enchantment.
+	 *
+	 * @param entity the entity to pick equipment from
+	 * @param enchantment the enchantment which the equipment should have
+	 * @return a map entry containing both the equipment slot and the item stack of the equipment piece
+	 */
 	Map.Entry<EquipmentSlot, ItemStack> pickRandom(LivingEntity entity, DynamicRegistry.Key<Enchantment> enchantment);
 	
 	int getProtectionAmount(LivingEntity entity, DamageType damageType);
@@ -91,7 +111,20 @@ public interface EnchantmentFeature extends CombatFeature {
 	
 	boolean shouldUnbreakingPreventDamage(ItemStack stack);
 	
+	/**
+	 * Handles an entity being damaged by an attacker. Usually applies thorns.
+	 *
+	 * @param user the entity being damaged
+	 * @param attacker the attacker
+	 */
 	void onUserDamaged(LivingEntity user, LivingEntity attacker);
 	
+	/**
+	 * Handles an entity damaging another entity.
+	 * Some enchantments could for example add extra effects to the target.
+	 *
+	 * @param user the attacker
+	 * @param target the target
+	 */
 	void onTargetDamaged(LivingEntity user, Entity target);
 }

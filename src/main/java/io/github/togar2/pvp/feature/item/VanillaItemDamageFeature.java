@@ -18,6 +18,9 @@ import net.minestom.server.item.ItemStack;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
+/**
+ * Vanilla implementation of {@link ItemDamageFeature}
+ */
 public class VanillaItemDamageFeature implements ItemDamageFeature {
 	public static final DefinedFeature<VanillaItemDamageFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.ITEM_DAMAGE, VanillaItemDamageFeature::new,

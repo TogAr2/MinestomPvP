@@ -27,6 +27,9 @@ import net.minestom.server.potion.TimedPotion;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
 
+/**
+ * Vanilla implementation of {@link FallFeature}
+ */
 public class VanillaFallFeature implements FallFeature, CombatFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaFallFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.FALL, VanillaFallFeature::new,

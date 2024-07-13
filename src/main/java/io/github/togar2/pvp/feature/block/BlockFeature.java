@@ -4,6 +4,9 @@ import io.github.togar2.pvp.feature.CombatFeature;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.damage.Damage;
 
+/**
+ * Combat feature used to determine whether an entity is blocking damage and how the block should be applied.
+ */
 public interface BlockFeature extends CombatFeature {
 	BlockFeature NO_OP = new BlockFeature() {
 		@Override

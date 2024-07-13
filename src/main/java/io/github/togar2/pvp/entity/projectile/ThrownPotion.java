@@ -52,7 +52,7 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 			if (item.material() == Material.LINGERING_POTION) {
 				//TODO lingering
 			} else {
-				applySplash(potions, entity);
+				applySplash(potionContents, entity);
 			}
 		}
 		
@@ -74,7 +74,7 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 		);
 	}
 	
-	private void applySplash(List<Potion> potions, @Nullable Entity hitEntity) {
+	private void applySplash(PotionContents potionContents, @Nullable Entity hitEntity) {
 		BoundingBox boundingBox = getBoundingBox().expand(8.0, 4.0, 8.0);
 		List<LivingEntity> entities = Objects.requireNonNull(getInstance()).getEntities().stream()
 				.filter(entity -> boundingBox.intersectEntity(getPosition().add(0, -2, 0), entity))
@@ -93,7 +93,7 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 			if (distanceSquared >= 16.0) continue;
 			
 			double proximity = entity == hitEntity ? 1.0 : (1.0 - Math.sqrt(distanceSquared) / 4.0);
-			effectFeature.addSplashPotionEffects(entity, potions, proximity, this, getShooter());
+			effectFeature.addSplashPotionEffects(entity, potionContents, proximity, this, getShooter());
 		}
 	}
 	

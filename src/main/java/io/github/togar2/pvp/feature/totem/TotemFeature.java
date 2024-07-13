@@ -4,6 +4,9 @@ import io.github.togar2.pvp.feature.CombatFeature;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.damage.DamageType;
 
+/**
+ * Combat feature which determines whether a totem protects a player and what happens afterward.
+ */
 public interface TotemFeature extends CombatFeature {
 	TotemFeature NO_OP = (entity, type) -> false;
 	

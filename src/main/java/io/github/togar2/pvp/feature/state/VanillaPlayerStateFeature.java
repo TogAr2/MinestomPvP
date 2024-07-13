@@ -16,6 +16,9 @@ import net.minestom.server.tag.Tag;
 
 import java.util.Objects;
 
+/**
+ * Vanilla implementation of {@link PlayerStateFeature}
+ */
 public class VanillaPlayerStateFeature implements PlayerStateFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaPlayerStateFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.PLAYER_STATE, configuration -> new VanillaPlayerStateFeature()

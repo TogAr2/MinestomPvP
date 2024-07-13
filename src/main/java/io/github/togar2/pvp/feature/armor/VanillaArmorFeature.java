@@ -15,6 +15,9 @@ import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.TimedPotion;
 import net.minestom.server.utils.MathUtils;
 
+/**
+ * Vanilla implementation of {@link ArmorFeature}
+ */
 public class VanillaArmorFeature implements ArmorFeature, CombatFeature {
 	public static final DefinedFeature<VanillaArmorFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.ARMOR, VanillaArmorFeature::new,

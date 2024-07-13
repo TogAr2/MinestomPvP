@@ -31,6 +31,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Vanilla implementation of {@link PotionFeature}
+ */
 public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaPotionFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.POTION, VanillaPotionFeature::new,

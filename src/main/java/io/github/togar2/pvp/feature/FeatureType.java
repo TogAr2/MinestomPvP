@@ -4,7 +4,7 @@ import io.github.togar2.pvp.feature.armor.ArmorFeature;
 import io.github.togar2.pvp.feature.attack.AttackFeature;
 import io.github.togar2.pvp.feature.attack.CriticalFeature;
 import io.github.togar2.pvp.feature.attack.SweepingFeature;
-import io.github.togar2.pvp.feature.attributes.DataFeature;
+import io.github.togar2.pvp.feature.attributes.EquipmentFeature;
 import io.github.togar2.pvp.feature.block.BlockFeature;
 import io.github.togar2.pvp.feature.block.LegacyBlockFeature;
 import io.github.togar2.pvp.feature.cooldown.AttackCooldownFeature;
@@ -27,7 +27,6 @@ import io.github.togar2.pvp.feature.state.PlayerStateFeature;
 import io.github.togar2.pvp.feature.totem.TotemFeature;
 import io.github.togar2.pvp.feature.tracking.TrackingFeature;
 import io.github.togar2.pvp.utils.CombatVersion;
-import net.minestom.server.entity.attribute.Attribute;
 
 /**
  * Represents a type of {@link CombatFeature}.
@@ -42,7 +41,7 @@ public record FeatureType<F extends CombatFeature>(String name, F defaultFeature
 	public static final FeatureType<AttackFeature> ATTACK = of("ATTACK", AttackFeature.NO_OP);
 	public static final FeatureType<CriticalFeature> CRITICAL = of("CRITICAL", CriticalFeature.NO_OP);
 	public static final FeatureType<SweepingFeature> SWEEPING = of("SWEEPING", SweepingFeature.NO_OP);
-	public static final FeatureType<DataFeature<Attribute>> EQUIPMENT_DATA = of("EQUIPMENT_DATA", DataFeature.NO_OP);
+	public static final FeatureType<EquipmentFeature> EQUIPMENT = of("EQUIPMENT_DATA", EquipmentFeature.NO_OP);
 	public static final FeatureType<BlockFeature> BLOCK = of("BLOCK", BlockFeature.NO_OP);
 	public static final FeatureType<LegacyBlockFeature> LEGACY_BLOCK = of("LEGACY_BLOCK", LegacyBlockFeature.NO_OP);
 	public static final FeatureType<AttackCooldownFeature> ATTACK_COOLDOWN = of("ATTACK_COOLDOWN", AttackCooldownFeature.NO_OP);

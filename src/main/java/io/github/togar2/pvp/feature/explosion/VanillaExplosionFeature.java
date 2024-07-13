@@ -25,6 +25,12 @@ import net.minestom.server.item.Material;
 import net.minestom.server.sound.SoundEvent;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Vanilla implementation of {@link ExplosionFeature}
+ * <p>
+ * Provides an explosion supplier which can be registered to an instance,
+ * see {@link VanillaExplosionFeature#getExplosionSupplier()}.
+ */
 public class VanillaExplosionFeature implements ExplosionFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaExplosionFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.EXPLOSION, VanillaExplosionFeature::new,

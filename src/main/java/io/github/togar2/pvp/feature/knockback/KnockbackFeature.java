@@ -4,6 +4,9 @@ import io.github.togar2.pvp.feature.CombatFeature;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.damage.Damage;
 
+/**
+ * Combat feature which handles different types of knockback.
+ */
 public interface KnockbackFeature extends CombatFeature {
 	KnockbackFeature NO_OP = new KnockbackFeature() {
 		@Override
@@ -23,7 +26,7 @@ public interface KnockbackFeature extends CombatFeature {
 	};
 	
 	/**
-	 * Apply base knockback to the target entity.
+	 * Applies base knockback to the target entity.
 	 *
 	 * @param damage the damage that caused the knockback
 	 * @param target the entity that is receiving the knockback

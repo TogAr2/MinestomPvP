@@ -3,6 +3,9 @@ package io.github.togar2.pvp.feature.attack;
 import io.github.togar2.pvp.feature.CombatFeature;
 import net.minestom.server.entity.LivingEntity;
 
+/**
+ * Combat feature used to determine whether an attack is a sweeping attack and also used for applying the sweeping.
+ */
 public interface SweepingFeature extends CombatFeature {
 	SweepingFeature NO_OP = new SweepingFeature() {
 		@Override

@@ -7,6 +7,13 @@ import net.minestom.server.instance.ExplosionSupplier;
 import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Combat feature which handles explosions. Contains a method to prime an explosive at a certain place.
+ * <p>
+ * Important to note is that implementations of this feature might provide an {@link ExplosionSupplier}.
+ * This explosion supplier should be registered to every (Minestom) instance which should allow explosions.
+ * See {@link ExplosionFeature#getExplosionSupplier()}.
+ */
 public interface ExplosionFeature extends CombatFeature {
 	ExplosionFeature NO_OP = new ExplosionFeature() {
 		@Override

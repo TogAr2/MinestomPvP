@@ -35,6 +35,9 @@ import net.minestom.server.tag.Tag;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Vanilla implementation of {@link TridentFeature}
+ */
 public class VanillaTridentFeature implements TridentFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaTridentFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.TRIDENT, VanillaTridentFeature::new,

@@ -4,6 +4,9 @@ import io.github.togar2.pvp.feature.CombatFeature;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.instance.block.Block;
 
+/**
+ * Combat feature which handles certain player states. For now this is only climbing.
+ */
 public interface PlayerStateFeature extends CombatFeature {
 	PlayerStateFeature NO_OP = new PlayerStateFeature() {
 		@Override

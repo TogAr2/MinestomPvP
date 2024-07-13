@@ -26,6 +26,9 @@ import net.minestom.server.sound.SoundEvent;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Vanilla implementation of {@link BlockFeature}
+ */
 public class VanillaBlockFeature implements BlockFeature, CombatFeature {
 	public static final DefinedFeature<VanillaBlockFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.BLOCK, VanillaBlockFeature::new,

@@ -31,6 +31,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Vanilla implementation of {@link FoodFeature}
+ * <p>
+ * This also includes eating of food items.
+ */
 public class VanillaFoodFeature implements FoodFeature, CombatFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaFoodFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.FOOD, VanillaFoodFeature::new,
@@ -152,9 +157,9 @@ public class VanillaFoodFeature implements FoodFeature, CombatFeature, Registrab
 	}
 	
 	@Override
-	public void addFood(Player player, int food, float exhaustion) {
+	public void addFood(Player player, int food, float saturationModifier) {
 		player.setFood(Math.min(food + player.getFood(), 20));
-		player.setFoodSaturation(Math.min(player.getFoodSaturation() + (float) food * exhaustion * 2.0f, player.getFood()));
+		player.setFoodSaturation(Math.min(player.getFoodSaturation() + (float) food * saturationModifier * 2.0f, player.getFood()));
 	}
 	
 	@Override

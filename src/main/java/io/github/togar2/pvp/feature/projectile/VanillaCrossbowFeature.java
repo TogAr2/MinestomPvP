@@ -35,6 +35,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Vanilla implementation of {@link CrossbowFeature}
+ */
 public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaCrossbowFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.CROSSBOW, VanillaCrossbowFeature::new,

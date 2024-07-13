@@ -9,16 +9,18 @@ import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
-import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.item.EntityEquipEvent;
 import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.item.ItemStack;
 
-public class VanillaEquipmentFeature implements DataFeature<Attribute>, RegistrableFeature {
+/**
+ * Vanilla implementation of {@link EquipmentFeature}
+ */
+public class VanillaEquipmentFeature implements EquipmentFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaEquipmentFeature> DEFINED = new DefinedFeature<>(
-			FeatureType.EQUIPMENT_DATA, VanillaEquipmentFeature::new,
+			FeatureType.EQUIPMENT, VanillaEquipmentFeature::new,
 			FeatureType.VERSION
 	);
 	
@@ -50,17 +52,11 @@ public class VanillaEquipmentFeature implements DataFeature<Attribute>, Registra
 	protected void onEquip(EntityEquipEvent event) {
 		if (!(event.getEntity() instanceof LivingEntity entity)) return;
 		
-		if (event.getSlot().isArmor()) {
-			EquipmentSlot slot = event.getSlot();
+		EquipmentSlot slot = event.getSlot();
+		if (slot.isArmor()) {
 			ArmorMaterial.updateEquipmentAttributes(entity, entity.getEquipment(slot), event.getEquippedItem(), slot, version);
-		} else if (event.getSlot().isHand()) {
-			EquipmentSlot slot = event.getSlot();
+		} else if (slot.isHand()) {
 			Tool.updateEquipmentAttributes(entity, entity.getEquipment(slot), event.getEquippedItem(), slot, version);
 		}
-	}
-	
-	@Override
-	public double getValue(LivingEntity entity, Attribute attribute) {
-		return entity.getAttributeValue(attribute);
 	}
 }

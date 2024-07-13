@@ -3,6 +3,9 @@ package io.github.togar2.pvp.feature.cooldown;
 import io.github.togar2.pvp.feature.CombatFeature;
 import net.minestom.server.entity.Player;
 
+/**
+ * Combat feature used to manage a players attack cooldown.
+ */
 public interface AttackCooldownFeature extends CombatFeature {
 	AttackCooldownFeature NO_OP = new AttackCooldownFeature() {
 		@Override

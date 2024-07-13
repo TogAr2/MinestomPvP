@@ -23,6 +23,9 @@ import net.minestom.server.sound.SoundEvent;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Vanilla implementation of {@link MiscProjectileFeature}
+ */
 public class VanillaMiscProjectileFeature implements MiscProjectileFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaMiscProjectileFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.MISC_PROJECTILE, VanillaMiscProjectileFeature::new,

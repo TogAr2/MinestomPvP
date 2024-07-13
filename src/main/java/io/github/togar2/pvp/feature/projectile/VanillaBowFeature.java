@@ -34,6 +34,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Vanilla implementation of {@link BowFeature}
+ */
 public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaBowFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.BOW, VanillaBowFeature::new,

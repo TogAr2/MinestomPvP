@@ -32,6 +32,11 @@ import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Vanilla implementation of {@link AttackFeature}
+ * <p>
+ * Listens on {@link EntityAttackEvent}
+ */
 public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaAttackFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.ATTACK, VanillaAttackFeature::new,

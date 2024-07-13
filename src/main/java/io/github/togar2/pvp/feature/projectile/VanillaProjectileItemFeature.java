@@ -12,6 +12,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
 
+/**
+ * Vanilla implementation of {@link ProjectileItemFeature}
+ */
 public class VanillaProjectileItemFeature implements ProjectileItemFeature {
 	public static final DefinedFeature<VanillaProjectileItemFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.PROJECTILE_ITEM, configuration -> new VanillaProjectileItemFeature()

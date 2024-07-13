@@ -29,6 +29,9 @@ import net.minestom.server.utils.MathUtils;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Vanilla implementation of {@link FishingRodFeature}
+ */
 public class VanillaFishingRodFeature implements FishingRodFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaFishingRodFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.FISHING_ROD, VanillaFishingRodFeature::new,

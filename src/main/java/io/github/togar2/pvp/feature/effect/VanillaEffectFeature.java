@@ -41,6 +41,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Vanilla implementation of {@link EffectFeature}
+ */
 public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaEffectFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.EFFECT, VanillaEffectFeature::new,
@@ -222,7 +225,7 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 				CombatPotionEffect combatPotionEffect = CombatPotionEffects.get(potion.effect());
 				if (combatPotionEffect.isInstant()) {
 					combatPotionEffect.applyInstantEffect(arrow, null,
-							entity, potion.amplifier(), 1.0D, exhaustionFeature, foodFeature);
+							entity, potion.amplifier(), 1.0, exhaustionFeature, foodFeature);
 				} else {
 					int duration = Math.max(potion.duration() / 8, 1);
 					entity.addEffect(new Potion(potion.effect(), potion.amplifier(), duration, potion.flags()));
@@ -244,7 +247,7 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 					CombatPotionEffect combatPotionEffect = CombatPotionEffects.get(potion.effect());
 					if (combatPotionEffect.isInstant()) {
 						combatPotionEffect.applyInstantEffect(arrow, null,
-								entity, potion.amplifier(), 1.0D, exhaustionFeature, foodFeature);
+								entity, potion.amplifier(), 1.0, exhaustionFeature, foodFeature);
 					} else {
 						entity.addEffect(new Potion(potion.effect(), potion.amplifier(),
 								potion.duration(), potion.flags()));
@@ -253,9 +256,9 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 	}
 	
 	@Override
-	public void addSplashPotionEffects(LivingEntity entity, List<Potion> potions, double proximity,
+	public void addSplashPotionEffects(LivingEntity entity, PotionContents potionContents, double proximity,
 	                                   @Nullable Entity source, @Nullable Entity attacker) {
-		for (Potion potion : potions) {
+		for (Potion potion : getAllPotions(potionContents)) {
 			CombatPotionEffect combatPotionEffect = CombatPotionEffects.get(potion.effect());
 			if (combatPotionEffect.isInstant()) {
 				combatPotionEffect.applyInstantEffect(source, attacker,

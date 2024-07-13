@@ -37,6 +37,10 @@ import net.minestom.server.tag.Tag;
 
 import java.util.Objects;
 
+/**
+ * Vanilla implementation of {@link DamageFeature}.
+ * Supports blocking, knockback, totems, armor, etc.
+ */
 public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaDamageFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.DAMAGE, VanillaDamageFeature::new,

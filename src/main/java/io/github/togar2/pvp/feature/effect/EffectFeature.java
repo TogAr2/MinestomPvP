@@ -13,6 +13,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Combat feature which manages potion effects and their effects on entities.
+ */
 public interface EffectFeature extends CombatFeature {
 	EffectFeature NO_OP = new EffectFeature() {
 		@Override
@@ -27,7 +30,7 @@ public interface EffectFeature extends CombatFeature {
 		
 		@Override public void updatePotionVisibility(LivingEntity entity) {}
 		@Override public void addArrowEffects(LivingEntity entity, Arrow arrow) {}
-		@Override public void addSplashPotionEffects(LivingEntity entity, List<Potion> potions, double proximity,
+		@Override public void addSplashPotionEffects(LivingEntity entity, PotionContents potionContents, double proximity,
 		                                             @Nullable Entity source, @Nullable Entity attacker) {}
 	};
 	
@@ -40,10 +43,31 @@ public interface EffectFeature extends CombatFeature {
 	
 	List<Potion> getAllPotions(PotionType potionType, Collection<CustomPotionEffect> customEffects);
 	
+	/**
+	 * Updates the potion visibility of an entity. This includes particles and invisibility status.
+	 *
+	 * @param entity the entity to update the potion visibility of
+	 */
 	void updatePotionVisibility(LivingEntity entity);
 	
+	/**
+	 * Applies the effects of a (tipped) arrow to an entity.
+	 *
+	 * @param entity the entity which was hit
+	 * @param arrow the arrow
+	 */
 	void addArrowEffects(LivingEntity entity, Arrow arrow);
 	
-	void addSplashPotionEffects(LivingEntity entity, List<Potion> potions, double proximity,
+	/**
+	 * Applies the effects of a splash potion to an entity.
+	 * The proximity is usually calculated following: {@code 1.0 - Math.sqrt(distanceSquared) / 4.0}
+	 *
+	 * @param entity         the entity which was hit
+	 * @param potionContents the potion contents of the splash potion
+	 * @param proximity      the proximity of the potion to the entity
+	 * @param source         the direct source of the splash (usually the splash potion)
+	 * @param attacker       the attacker of the splash (usually the thrower)
+	 */
+	void addSplashPotionEffects(LivingEntity entity, PotionContents potionContents, double proximity,
 	                            @Nullable Entity source, @Nullable Entity attacker);
 }

@@ -1,7 +1,6 @@
 package io.github.togar2.pvp.feature.spectate;
 
 import io.github.togar2.pvp.events.PlayerSpectateEvent;
-import io.github.togar2.pvp.feature.CombatFeature;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
@@ -16,7 +15,10 @@ import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.tag.Tag;
 
-public class VanillaSpectateFeature implements SpectateFeature, CombatFeature, RegistrableFeature {
+/**
+ * Vanilla implementation of {@link SpectateFeature}
+ */
+public class VanillaSpectateFeature implements SpectateFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaSpectateFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.SPECTATE, configuration -> new VanillaSpectateFeature()
 	);

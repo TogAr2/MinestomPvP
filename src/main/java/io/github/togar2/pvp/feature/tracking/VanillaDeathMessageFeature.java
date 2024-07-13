@@ -19,6 +19,9 @@ import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.tag.Tag;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Vanilla implementation of {@link TrackingFeature}
+ */
 public class VanillaDeathMessageFeature implements TrackingFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaDeathMessageFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.TRACKING, VanillaDeathMessageFeature::new,

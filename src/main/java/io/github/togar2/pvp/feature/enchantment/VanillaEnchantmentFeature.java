@@ -27,6 +27,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 
+/**
+ * Vanilla implementation of {@link EnchantmentFeature}
+ * <p>
+ * Utilizes the enchantment classes in the {@link io.github.togar2.pvp.enchantment} package.
+ */
 public class VanillaEnchantmentFeature implements EnchantmentFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaEnchantmentFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.ENCHANTMENT, VanillaEnchantmentFeature::new,

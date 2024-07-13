@@ -17,6 +17,9 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.tag.Tag;
 
+/**
+ * Vanilla implementation of {@link LegacyBlockFeature}
+ */
 public class LegacyVanillaBlockFeature extends VanillaBlockFeature
 		implements LegacyBlockFeature, RegistrableFeature {
 	public static final DefinedFeature<LegacyVanillaBlockFeature> SHIELD = new DefinedFeature<>(

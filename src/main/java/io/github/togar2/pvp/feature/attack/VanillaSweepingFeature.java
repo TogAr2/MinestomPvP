@@ -18,6 +18,9 @@ import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
 
+/**
+ * Vanilla implementation of {@link SweepingFeature}
+ */
 public class VanillaSweepingFeature implements SweepingFeature {
 	public static final DefinedFeature<VanillaSweepingFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.SWEEPING, VanillaSweepingFeature::new,

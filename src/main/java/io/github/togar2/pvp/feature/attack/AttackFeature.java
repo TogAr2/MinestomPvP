@@ -4,6 +4,9 @@ import io.github.togar2.pvp.feature.CombatFeature;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 
+/**
+ * Combat feature which handles an entity attacking another entity.
+ */
 public interface AttackFeature extends CombatFeature {
 	AttackFeature NO_OP = (attacker, target) -> false;
 	

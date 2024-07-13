@@ -1,9 +1,10 @@
 package io.github.togar2.pvp.feature.cooldown;
 
-import io.github.togar2.pvp.feature.CombatFeature;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
+import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.event.EventListener;
@@ -14,12 +15,28 @@ import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.tag.Tag;
 import net.minestom.server.utils.MathUtils;
 
-public class VanillaAttackCooldownFeature implements AttackCooldownFeature, CombatFeature, RegistrableFeature {
+/**
+ * Vanilla implementation of {@link AttackCooldownFeature}
+ */
+public class VanillaAttackCooldownFeature implements AttackCooldownFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaAttackCooldownFeature> DEFINED = new DefinedFeature<>(
-			FeatureType.ATTACK_COOLDOWN, configuration -> new VanillaAttackCooldownFeature()
+			FeatureType.ATTACK_COOLDOWN, VanillaAttackCooldownFeature::new,
+			FeatureType.VERSION
 	);
 	
 	public static final Tag<Long> LAST_ATTACKED_TICKS = Tag.Long("lastAttackedTicks");
+	
+	private final FeatureConfiguration configuration;
+	private CombatVersion version;
+	
+	public VanillaAttackCooldownFeature(FeatureConfiguration configuration) {
+		this.configuration = configuration;
+	}
+	
+	@Override
+	public void initDependencies() {
+		this.version = configuration.get(FeatureType.VERSION);
+	}
 	
 	@Override
 	public void init(EventNode<EntityInstanceEvent> node) {
@@ -41,6 +58,8 @@ public class VanillaAttackCooldownFeature implements AttackCooldownFeature, Comb
 	
 	@Override
 	public double getAttackCooldownProgress(Player player) {
+		if (version.legacy()) return 1.0;
+		
 		Long lastAttacked = player.getTag(LAST_ATTACKED_TICKS);
 		if (lastAttacked == null) return 1.0;
 		
