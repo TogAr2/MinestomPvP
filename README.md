@@ -149,7 +149,7 @@ The same applies to `ToolMaterial` (wood, stone, ...) and `ArmorMaterial`.
 
 ### Events
 
-This extension provides several events:
+The library provides several events:
 
 - `DamageBlockEvent`: cancellable, called when an entity blocks damage using a shield. This event can be used to set the remaining damage.
 - `EntityKnockbackEvent`: cancellable, called when an entity gets knocked back by another entity. Gets called twice for weapons with the knockback enchantment (once for default damage knockback, once for the extra knockback). This event can be used to set the knockback strength.
