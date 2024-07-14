@@ -11,8 +11,11 @@ You can easily pick which features you want to use.
 
 The maven repository is available on [jitpack](https://jitpack.io/#TogAr2/MinestomPvP).
 
+> MinestomPvP has been rewritten, see [Important changes](#important-changes)
+
 ## Table of Contents
 
+- [Important changes](#important-changes)
 - [Features](#features)
 - [Future Plans](#plans)
 - [Usage](#usage)
@@ -22,6 +25,16 @@ The maven repository is available on [jitpack](https://jitpack.io/#TogAr2/Minest
 - [Customization](#customization)
 - [Contributing](#contributing)
 - [Credits](#credits)
+
+## Important changes
+
+MinestomPvP has recently been rewritten. Most features are now independent of each other and can be used separately.
+
+Major changes include:
+- `PvpExtension` is now `MinestomPvP`
+- Configs have been removed in favor of a feature based configuration system
+- Registries are no longer prefixed by `Custom` but by `Combat`
+- `PvpPlayer` is now `CombatPlayer`, `CustomPlayer` is now `CombatPlayerImpl`
 
 ## Features
 
