@@ -91,7 +91,7 @@ CombatFeatureSet featureSet = CombatFeatures.empty()
 instance.eventNode().addChild(featureSet.createNode());
 ```
 
-As you can see, `CombatFeaturs.empty()` provides you with a builder-like structure (`CombatConfiguration`) to which features can be added.
+As you can see, `CombatFeatures.empty()` provides you with a builder-like structure (`CombatConfiguration`) to which features can be added.
 
 This combat configuration also contains convenience methods to easily set a combat version (`#version(CombatVersion)`) and the difficulty provider (`#difficulty(DifficultyProvider)`).
 The combat version is used by certain features to adjust some values and the difficulty provider is used by vanilla features containing behavior which is different depending on the difficulty.
