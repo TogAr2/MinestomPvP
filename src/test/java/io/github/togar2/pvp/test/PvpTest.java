@@ -129,10 +129,10 @@ public class PvpTest {
 //		MinecraftServer.getGlobalEventHandler().addListener(LegacyKnockbackEvent.class,
 //				event -> event.setSettings(settings));
 		
-		instance.setExplosionSupplier(CombatFeatures.MODERN_VANILLA.get(FeatureType.EXPLOSION).getExplosionSupplier());
+		instance.setExplosionSupplier(CombatFeatures.modernVanilla().get(FeatureType.EXPLOSION).getExplosionSupplier());
 		
 		GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-		eventHandler.addChild(CombatFeatures.MODERN_VANILLA.createNode());
+		eventHandler.addChild(CombatFeatures.modernVanilla().createNode());
 		//eventHandler.addChild(PvPConfig.defaultBuilder()
 		//		//.potion(PotionConfig.legacyBuilder().drinking(false))
 		//		.build().createNode()
