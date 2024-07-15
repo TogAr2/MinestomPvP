@@ -225,14 +225,14 @@ class MyCustomFeatureImpl implements MyCustomFeature, RegistrableFeature {
             MyCustomFeature.TYPE, configuration -> new MyCustomFeatureImpl()
     );
 
-	@Override
+    @Override
     public void init(EventNode<PlayerInstanceEvent> node) {
         node.addListener(PlayerChatEvent.class, event -> {
             // Do something...
         });
     }
 
-	@Override
+    @Override
     public boolean isItWorking() {
         return true;
     }
@@ -267,12 +267,12 @@ class MyCustomFeatureImpl implements MyCustomFeature {
         this.configuration = configuration;
     }
 
-	@Override
+    @Override
     public void initDependencies() {
         this.fallFeature = configuration.get(FeatureType.FALL);
     }
 
-	@Override
+    @Override
     public boolean isItWorking() {
         Player player; // Some player
         return fallFeature.getFallDistance(player) > 3;
