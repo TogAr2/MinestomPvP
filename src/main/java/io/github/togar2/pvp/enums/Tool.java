@@ -7,12 +7,14 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.entity.attribute.AttributeModifier;
 import net.minestom.server.entity.attribute.AttributeOperation;
+import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public enum Tool {
 	WOODEN_SWORD(ToolMaterial.WOOD, 3, 4.0F, -2.4F, false, true),
@@ -87,16 +89,22 @@ public enum Tool {
 		Tool newTool = fromMaterial(newStack.material());
 		
 		// Remove attributes from previous tool
-		if (oldTool != null) {
+		if (oldTool != null && hasDefaultAttributes(oldStack)) {
 			entity.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).removeModifier(ModifierId.ATTACK_DAMAGE_MODIFIER_ID);
 			entity.getAttribute(Attribute.GENERIC_ATTACK_SPEED).removeModifier(ModifierId.ATTACK_SPEED_MODIFIER_ID);
 		}
 		
 		// Add attributes from new tool
-		if (newTool != null) {
+		if (newTool != null && hasDefaultAttributes(newStack)) {
 			(version.legacy() ? newTool.legacyAttributeModifiers : newTool.attributeModifiers).forEach((attribute, modifier) ->
 					entity.getAttribute(attribute).addModifier(modifier));
 		}
+	}
+	
+	private static boolean hasDefaultAttributes(ItemStack stack) {
+		// When modifiers tag is not empty, default modifiers are not
+		return !stack.has(ItemComponent.ATTRIBUTE_MODIFIERS)
+				|| Objects.requireNonNull(stack.get(ItemComponent.ATTRIBUTE_MODIFIERS)).modifiers().isEmpty();
 	}
 	
 	public boolean isAxe() {

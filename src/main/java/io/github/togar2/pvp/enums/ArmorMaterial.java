@@ -7,6 +7,7 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.entity.attribute.AttributeModifier;
 import net.minestom.server.entity.attribute.AttributeOperation;
+import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.sound.SoundEvent;
@@ -14,6 +15,7 @@ import net.minestom.server.utils.NamespaceID;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public enum ArmorMaterial {
 	LEATHER(new int[]{1, 2, 3, 1}, new int[]{1, 3, 2, 1}, SoundEvent.ITEM_ARMOR_EQUIP_LEATHER, 0.0F, 0.0F, Material.LEATHER_BOOTS, Material.LEATHER_LEGGINGS, Material.LEATHER_CHESTPLATE, Material.LEATHER_HELMET),
@@ -75,7 +77,7 @@ public enum ArmorMaterial {
 		NamespaceID modifierId = getModifierId(slot);
 		
 		// Remove attributes from previous armor
-		if (oldMaterial != null) {
+		if (oldMaterial != null && hasDefaultAttributes(oldStack)) {
 			if (slot == getRequiredSlot(oldStack.material())) {
 				entity.getAttribute(Attribute.GENERIC_ARMOR).removeModifier(modifierId);
 				entity.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).removeModifier(modifierId);
@@ -84,7 +86,7 @@ public enum ArmorMaterial {
 		}
 		
 		// Add attributes from new armor
-		if (newMaterial != null) {
+		if (newMaterial != null && hasDefaultAttributes(newStack)) {
 			if (slot == getRequiredSlot(newStack.material())) {
 				entity.getAttribute(Attribute.GENERIC_ARMOR).addModifier(new AttributeModifier(modifierId, newMaterial.getProtectionAmount(slot, version), AttributeOperation.ADD_VALUE));
 				entity.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).addModifier(new AttributeModifier(modifierId, newMaterial.getToughness(), AttributeOperation.ADD_VALUE));
@@ -93,6 +95,12 @@ public enum ArmorMaterial {
 				}
 			}
 		}
+	}
+	
+	private static boolean hasDefaultAttributes(ItemStack stack) {
+		// When modifiers tag is not empty, default modifiers are not
+		return !stack.has(ItemComponent.ATTRIBUTE_MODIFIERS)
+				|| Objects.requireNonNull(stack.get(ItemComponent.ATTRIBUTE_MODIFIERS)).modifiers().isEmpty();
 	}
 	
 	public static EquipmentSlot getRequiredSlot(Material material) {
