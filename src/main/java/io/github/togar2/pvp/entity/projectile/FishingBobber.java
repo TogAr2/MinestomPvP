@@ -18,17 +18,25 @@ public class FishingBobber extends CustomEntityProjectile {
 	private State state = State.IN_AIR;
 	private Pos prevPos = Pos.ZERO;
 	
+	private final double customGravity;
+	
 	public FishingBobber(@Nullable Entity shooter, boolean legacy) {
 		super(shooter, EntityType.FISHING_BOBBER);
 		this.legacy = legacy;
 		setOwnerEntity(shooter);
 		
-		if (legacy) setAerodynamics(getAerodynamics().withGravity(0.04));
+		// Custom gravity logic: gravity is applied before movement
+		customGravity = legacy ? 0.04 : 0.03;
+		setAerodynamics(getAerodynamics().withGravity(0));
+		
+		// Minestom seems to like having wrong values in its registries
+		setAerodynamics(getAerodynamics().withHorizontalAirResistance(0.92).withVerticalAirResistance(0.92));
 	}
 	
 	@Override
 	public void tick(long time) {
 		prevPos = getPosition();
+		velocity = velocity.add(0, -customGravity * ServerFlag.SERVER_TICKS_PER_SECOND, 0);
 		super.tick(time);
 	}
 	
