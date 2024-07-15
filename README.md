@@ -188,11 +188,12 @@ The library provides several events:
 
 ### Custom combat features
 
-It is possible to create your own combat features, which can extend one of the existing combat features or be completely independent.
+It is possible to create your own combat features, which can extend an existing one or be completely independent.
+Below is an explanation followed by an example.
 
 In order to be compatible with the library, your combat features must implement `CombatFeature`.
-It is also possible to implement `RegistrableFeature` instead, which will provide you with a `#createNode()` method.
-In this case, you must also implement `RegistrableFeature#init(EventNode)`, in which all the listeners should be attached to the given event node.
+It is also possible to implement `RegistrableFeature` instead, which will provide you with a `createNode()` method.
+In this case, you must also implement `RegistrableFeature#init(EventNode)`, which attaches all the listeners to the given event node.
 
 After this, you must create a `FeatureType` for your custom feature.
 If you are implementing an existing feature, use existing feature types in the `FeatureType` class.
@@ -208,8 +209,7 @@ Example of a custom feature type, with 1 method which can be used by other featu
 
 ```java
 interface MyCustomFeature extends CombatFeature {
-	MyCustomFeature NO_OP = new MyCustomFeature() {
-	};
+	MyCustomFeature NO_OP = new MyCustomFeature() {};
 	
 	FeatureType TYPE = FeatureType.of("MY_CUSTOM", NO_OP);
 	
