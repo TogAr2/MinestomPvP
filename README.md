@@ -255,7 +255,7 @@ Say, you want to access a players fall distance in your own feature. You can do 
 
 ```java
 class MyCustomFeatureImpl implements MyCustomFeature {
-	public static final DefinedFeature<MyCustomFeatureImpl> DEFINED = new DefinedFeature<>(
+    public static final DefinedFeature<MyCustomFeatureImpl> DEFINED = new DefinedFeature<>(
             MyCustomFeature.TYPE, configuration -> new MyCustomFeatureImpl(configuration),
             FeatureType.FALL
     );
