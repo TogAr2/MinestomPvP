@@ -86,7 +86,9 @@ In the example above, it is being added to the global event handler, which means
 
 The combat feature used in this example is a `CombatFeatureSet`.
 This is essentially a container for a list of combat features.
-There are two feature sets already defined by MinestomPvP: modern combat (`CombatFeatures.modernVanilla()`) and legacy combat (`CombatFeatures.legacyVanilla()`).
+There are two feature sets already defined by MinestomPvP:
+- Full modern combat `CombatFeatures.modernVanilla()`
+- Full legacy (pre-1.9) combat `CombatFeatures.legacyVanilla()`
 
 ### Customization
 
