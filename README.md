@@ -280,7 +280,7 @@ class MyCustomFeatureImpl implements MyCustomFeature {
 }
 ```
 
-Note that the `FeatureConfiguration` which can be used to get the `FallFeature` from is only ready when `#initDependencies()` is called.
+Note that the `FeatureConfiguration` which can be used to get the `FallFeature` from is only ready when `initDependencies()` is called.
 This is due to complications with recursive dependencies between features.
 
 #### Player init
