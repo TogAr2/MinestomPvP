@@ -20,9 +20,11 @@ The maven repository is available on [jitpack](https://jitpack.io/#TogAr2/Minest
 - [Future Plans](#plans)
 - [Usage](#usage)
 - [Customization](#customization)
+- [Legacy PvP](#legacy-pvp)
 - [Integration](#integration)
+- [Registries](#registries)
 - [Events](#events)
-- [Customization](#customization)
+- [Custom combat features](#custom-combat-features)
 - [Contributing](#contributing)
 - [Credits](#credits)
 
