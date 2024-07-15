@@ -200,8 +200,7 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 			
 			if (living != shooter && living instanceof Player
 					&& shooter instanceof Player shooterPlayer && !isSilent()) {
-				shooterPlayer.getPlayerConnection().sendPacket(
-						new ChangeGameStatePacket(ChangeGameStatePacket.Reason.ARROW_HIT_PLAYER, 0.0F));
+				shooterPlayer.sendPacket(new ChangeGameStatePacket(ChangeGameStatePacket.Reason.ARROW_HIT_PLAYER, 0.0F));
 			}
 			
 			if (!isSilent()) {
