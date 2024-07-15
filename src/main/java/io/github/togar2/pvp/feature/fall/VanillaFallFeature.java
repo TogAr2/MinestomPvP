@@ -70,15 +70,12 @@ public class VanillaFallFeature implements FallFeature, CombatFeature, Registrab
 		// For players, handle fall damage on move event
 		node.addListener(PlayerMoveEvent.class, event -> {
 			Player player = event.getPlayer();
+			if (playerStateFeature.isClimbing(player)) player.setTag(FALL_DISTANCE, 0.0);
+			
 			handleFallDamage(
 					player, player.getPosition(),
 					event.getNewPosition(), event.isOnGround()
 			);
-		});
-		
-		node.addListener(PlayerMoveEvent.class, event -> {
-			Player player = event.getPlayer();
-			if (playerStateFeature.isClimbing(player)) player.setTag(FALL_DISTANCE, 0.0);
 		});
 	}
 	

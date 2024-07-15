@@ -13,6 +13,7 @@ import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.tag.Tag;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -30,7 +31,11 @@ public class VanillaPlayerStateFeature implements PlayerStateFeature, Registrabl
 	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(PlayerTickEvent.class, event -> {
 			Player player = event.getPlayer();
-			if (player.isOnGround()) player.removeTag(LAST_CLIMBED_BLOCK);
+			if (player.isOnGround() && player.hasTag(LAST_CLIMBED_BLOCK)) {
+				// Make sure fall damage message still has the correct climbed block
+				// Due to multithreading this can be triggered before the death message is computed
+				player.scheduleNextTick(p -> p.removeTag(LAST_CLIMBED_BLOCK));
+			}
 		});
 		
 		node.addListener(PlayerMoveEvent.class, event -> {
@@ -53,7 +58,7 @@ public class VanillaPlayerStateFeature implements PlayerStateFeature, Registrabl
 	}
 	
 	@Override
-	public Block getLastClimbedBlock(LivingEntity entity) {
-		return entity.hasTag(LAST_CLIMBED_BLOCK) ? entity.getTag(LAST_CLIMBED_BLOCK) : Block.AIR;
+	public @Nullable Block getLastClimbedBlock(LivingEntity entity) {
+		return entity.getTag(LAST_CLIMBED_BLOCK);
 	}
 }

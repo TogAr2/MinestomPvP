@@ -105,7 +105,7 @@ public class PvpTest {
 			if (event.getPacket() instanceof EntitySoundEffectPacket) return;
 			if (event.getPacket() instanceof CollectItemPacket) return;
 			if (event.getPacket() instanceof DestroyEntitiesPacket) return;
-			System.out.println(event.getPacket());
+			//System.out.println(event.getPacket());
 		});
 		
 		MinecraftServer.getCommandManager().register(new Command("shoot") {{
