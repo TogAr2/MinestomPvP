@@ -14,7 +14,6 @@ import net.minestom.server.network.player.PlayerConnection;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.TimedPotion;
 import net.minestom.server.utils.chunk.ChunkUtils;
-import net.minestom.server.utils.player.PlayerUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -88,9 +87,10 @@ public class CombatPlayerImpl extends Player implements CombatPlayer {
 			);
 		}
 		
-		if (!PlayerUtils.isSocketClient(this)) {
-			refreshPosition(physicsResult.newPosition(), true, true);
-		}
+		//TODO
+		//if (!PlayerUtils.isSocketClient(this)) {
+		//	refreshPosition(physicsResult.newPosition(), true, true);
+		//}
 		sendImmediateVelocityUpdate();
 	}
 }
