@@ -133,11 +133,12 @@ A lot of servers like to customize their 1.8 knockback. It is also possible to d
 
 To integrate this extension into your minestom server, you may have to tweak a little bit to make sure everything works correctly.
 
-The extension uses a custom player implementation, if you use one, it is recommended to extend `CustomPlayer`. If you for some reason can't, make sure to implement `PvpPlayer` in a similar fashion to `CustomPlayer`.
+The extension uses a custom player implementation, if you use one, it is recommended to extend `CombatPlayerImpl`. If you for some reason can't, make sure to implement `CombatPlayer` in a similar fashion to `CombatPlayerImpl`.
 The implementation of MinestomPvP is registered inside `MinestomPvP.init()`, so register yours after initializing the library.
 
 To allow explosions, you have to register an explosion supplier to every instance in which they are used.
-`ExplosionFeature` comes with an explosion supplier.
+Implementations of `ExplosionFeature` might provide an explosion supplier.
+
 ```java
 CombatFeatureSet featureSet;
 Instance instance;
