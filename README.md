@@ -127,8 +127,8 @@ Upon calling `CombatConfiguration#build()`, the combat configuration resolves al
 Earlier minecraft versions (pre-1.9) used a different PvP system, which to this day is still preferred by some. *Legacy* is the term used to describe this type of PvP throughout the library.
 You can get the `CombatFeatureSet` for legacy PvP using `CombatFeatures.legacyVanilla()`.
 
-To disable attack cooldown for a player and set their attack damage to the legacy value, use `MinestomPvP.setLegacyAttack(player, true)`.
-To enable the cooldown again and set the attack damage to the new value, use `false` instead of `true`.
+To disable attack cooldown for a player, use `MinestomPvP.setLegacyAttack(player, true)`.
+To enable the cooldown again, use `false` instead of `true`.
 
 #### Knockback
 
