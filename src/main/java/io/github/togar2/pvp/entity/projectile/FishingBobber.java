@@ -154,6 +154,8 @@ public class FishingBobber extends CustomEntityProjectile {
 	}
 	
 	private Vec calculateLegacyKnockback(Vec currentVelocity, Pos entityPos) {
+		currentVelocity = currentVelocity.div(ServerFlag.SERVER_TICKS_PER_SECOND);
+		
 		Pos position = getPosition();
 		double dx = position.x() - entityPos.x();
 		double dz = position.z() - entityPos.z();
@@ -177,7 +179,7 @@ public class FishingBobber extends CustomEntityProjectile {
 		if (y > 0.4)
 			y = 0.4;
 		
-		return new Vec(x, y, z).mul(ServerFlag.SERVER_TICKS_PER_SECOND * 0.8);
+		return new Vec(x, y, z).mul(ServerFlag.SERVER_TICKS_PER_SECOND);
 	}
 	
 	@Override

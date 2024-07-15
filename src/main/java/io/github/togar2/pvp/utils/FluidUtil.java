@@ -20,7 +20,6 @@ public class FluidUtil {
 	
 	public static double getHeight(Block block) {
 		int level = getLevel(block);
-		System.out.println(level);
 		return switch (level) {
 			case 1 -> 0.25;
 			case 2 -> 0.375;
