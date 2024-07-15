@@ -65,7 +65,11 @@ public class CombatPotionTypes {
 				new CombatPotionType(PotionType.LONG_WEAKNESS, new Potion(PotionEffect.WEAKNESS, (byte) 0, 4800, PotionFlags.defaultFlags())),
 				new CombatPotionType(PotionType.LUCK, new Potion(PotionEffect.LUCK, (byte) 0, 6000, PotionFlags.defaultFlags())),
 				new CombatPotionType(PotionType.SLOW_FALLING, new Potion(PotionEffect.SLOW_FALLING, (byte) 0, 1800, PotionFlags.defaultFlags())),
-				new CombatPotionType(PotionType.LONG_SLOW_FALLING, new Potion(PotionEffect.SLOW_FALLING, (byte) 0, 4800, PotionFlags.defaultFlags()))
+				new CombatPotionType(PotionType.LONG_SLOW_FALLING, new Potion(PotionEffect.SLOW_FALLING, (byte) 0, 4800, PotionFlags.defaultFlags())),
+				new CombatPotionType(PotionType.WIND_CHARGED, new Potion(PotionEffect.WIND_CHARGED, (byte) 0, 3600, PotionFlags.defaultFlags())),
+				new CombatPotionType(PotionType.WEAVING, new Potion(PotionEffect.WEAVING, (byte) 0, 3600, PotionFlags.defaultFlags())),
+				new CombatPotionType(PotionType.OOZING, new Potion(PotionEffect.OOZING, (byte) 0, 3600, PotionFlags.defaultFlags())),
+				new CombatPotionType(PotionType.INFESTED, new Potion(PotionEffect.INFESTED, (byte) 0, 3600, PotionFlags.defaultFlags()))
 		);
 	}
 }
