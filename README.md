@@ -80,15 +80,15 @@ MinecraftServer.getGlobalEventHandler().addChild(modernVanilla.createNode());
 
 This will give you a full vanilla experience without any customization.
 
-Every combat feature has a `#createNode()` method, which returns an `EventNode` with all listeners of the feature attached.
+Every combat feature has a `createNode()` method, which returns an `EventNode` with all listeners of the feature attached.
 This event node can be added to another event node to enable the feature within that scope.
 In the example above, it is being added to the global event handler, which means the feature will work everywhere.
 
 The combat feature used in this example is a `CombatFeatureSet`.
 This is essentially a container for a list of combat features.
 There are two feature sets already defined by MinestomPvP:
-- Full modern combat `CombatFeatures.modernVanilla()`
-- Full legacy (pre-1.9) combat `CombatFeatures.legacyVanilla()`
+- Full modern combat, `CombatFeatures.modernVanilla()`
+- Full legacy (pre-1.9) combat, `CombatFeatures.legacyVanilla()`
 
 ### Customization
 
@@ -108,14 +108,15 @@ instance.eventNode().addChild(featureSet.createNode());
 
 As you can see, `CombatFeatures.empty()` provides you with a builder-like structure (`CombatConfiguration`) to which features can be added.
 
-This combat configuration also contains convenience methods to easily set a combat version (`#version(CombatVersion)`) and the difficulty provider (`#difficulty(DifficultyProvider)`).
-The combat version is used by certain features to adjust some values and the difficulty provider is used by vanilla features containing behavior which is different depending on the difficulty.
+This combat configuration also contains convenience methods:
+- `version(CombatVersion)` to set a combat version, which is used by some vanilla features to adjust values which are different across versions
+- `difficulty(DifficultyProvider)` to set a difficulty provider, which is used by some vanilla features containing behavior which is different depending on the difficulty
 
-A player state feature is added alongside the fall feature, because the fall feature depends on it (to determine whether a player is climbing).
+In the example above, a player state feature is added alongside the fall feature, because the fall feature depends on it (to determine whether a player is climbing).
 `CombatConfiguration` takes care of handling these dependencies for you. The order in which the features are added does not matter.
 It is also possible to leave out the player state feature, in which case a no_op feature will be used, which in this case will always signal to the fall feature that the player is not climbing.
 
-Upon calling `#build`, the combat configuration resolves all these dependencies and creates a `CombatFeatureSet` in which all the features are instantiated.
+Upon calling `CombatConfiguration#build()`, the combat configuration resolves all these dependencies and creates a `CombatFeatureSet` in which all the features are instantiated.
 To keep in mind: features defined inside the `CombatFeatures` class are not yet instantiated, a `CombatConfiguration` will do this for you.
 An instantiated feature always knows its dependencies.
 
