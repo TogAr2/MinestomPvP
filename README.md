@@ -198,9 +198,9 @@ In this case, you must also implement `RegistrableFeature#init(EventNode)`, whic
 After this, you must create a `FeatureType` for your custom feature.
 If you are implementing an existing feature, use existing feature types in the `FeatureType` class.
 Otherwise, you can create your own using `FeatureType.of(String, F)`.
-The first argument will be the name, the second the no_op feature which will be used when no implementation is present.
+The first argument will be the name, the second the `NO_OP` feature which will be used when no implementation is present.
 It is recommended to create an interface for your custom feature type which extends `CombatFeature` (or `RegistrableFeature`).
-This way, you can easily specify methods which you want to expose to other features.
+This way, you can easily specify methods to expose to other features.
 
 Lastly, it is needed to create a `DefinedFeature` instance for your custom implementation.
 This defined feature defines an implementation of your feature type, and it can be used to add your implementation to a combat configuration.
@@ -221,20 +221,20 @@ Example of an implementation of this custom feature type, which listens for even
 
 ```java
 class MyCustomFeatureImpl implements MyCustomFeature, RegistrableFeature {
-	public static final DefinedFeature<MyCustomFeatureImpl> DEFINED = new DefinedFeature<>(
-			MyCustomFeature.TYPE, configuration -> new MyCustomFeatureImpl()
+    public static final DefinedFeature<MyCustomFeatureImpl> DEFINED = new DefinedFeature<>(
+            MyCustomFeature.TYPE, configuration -> new MyCustomFeatureImpl()
     );
-	
+
 	@Override
     public void init(EventNode<PlayerInstanceEvent> node) {
-		node.addListener(PlayerChatEvent.class, event -> {
-			// Do something...
+        node.addListener(PlayerChatEvent.class, event -> {
+            // Do something...
         });
     }
-	
+
 	@Override
     public boolean isItWorking() {
-		return true;
+        return true;
     }
 }
 ```
@@ -243,7 +243,7 @@ Now you can use your own feature:
 
 ```java
 MinecraftServer.getGlobalEventHandler().addChild(
-		CombatFeatures.empty()
+        CombatFeatures.empty()
             .add(MyCustomFeatureImpl.DEFINED)
             .build()
 );
@@ -256,26 +256,26 @@ Say, you want to access a players fall distance in your own feature. You can do 
 ```java
 class MyCustomFeatureImpl implements MyCustomFeature {
 	public static final DefinedFeature<MyCustomFeatureImpl> DEFINED = new DefinedFeature<>(
-			MyCustomFeature.TYPE, configuration -> new MyCustomFeatureImpl(configuration),
+            MyCustomFeature.TYPE, configuration -> new MyCustomFeatureImpl(configuration),
             FeatureType.FALL
     );
-	
-	private final FeatureConfiguration configuration;
-	private FallFeature fallFeature;
-	
-	public MyCustomFeatureImpl(FeatureConfiguration configuration) {
-		this.configuration = configuration;
+
+    private final FeatureConfiguration configuration;
+    private FallFeature fallFeature;
+
+    public MyCustomFeatureImpl(FeatureConfiguration configuration) {
+        this.configuration = configuration;
     }
-	
+
 	@Override
     public void initDependencies() {
-		this.fallFeature = configuration.get(FeatureType.FALL);
+        this.fallFeature = configuration.get(FeatureType.FALL);
     }
-	
+
 	@Override
     public boolean isItWorking() {
-		Player player; // Some player
-		return fallFeature.getFallDistance(player) > 3;
+        Player player; // Some player
+        return fallFeature.getFallDistance(player) > 3;
     }
 }
 ```
