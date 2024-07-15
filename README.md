@@ -112,13 +112,15 @@ This combat configuration also contains convenience methods:
 - `version(CombatVersion)` to set a combat version, which is used by some vanilla features to adjust values which are different across versions
 - `difficulty(DifficultyProvider)` to set a difficulty provider, which is used by some vanilla features containing behavior which is different depending on the difficulty
 
-In the example above, a player state feature is added alongside the fall feature, because the fall feature depends on it (to determine whether a player is climbing).
+In the example above, a `PLAYER_STATE` feature is added alongside the `FALL` feature, because the fall feature depends on it.
 `CombatConfiguration` takes care of handling these dependencies for you. The order in which the features are added does not matter.
-It is also possible to leave out the player state feature, in which case a no_op feature will be used, which in this case will always signal to the fall feature that the player is not climbing.
+It is also possible to leave out the `PLAYER_STATE` feature: a `NO_OP` feature will then be used, which in this case will always signal to the fall feature that the player is not climbing.
 
 Upon calling `CombatConfiguration#build()`, the combat configuration resolves all these dependencies and creates a `CombatFeatureSet` in which all the features are instantiated.
-To keep in mind: features defined inside the `CombatFeatures` class are not yet instantiated, a `CombatConfiguration` will do this for you.
-An instantiated feature always knows its dependencies.
+
+> Features defined inside the `CombatFeatures` class are not yet instantiated, but are a `DefinedFeature`.
+> The `CombatConfiguration` will instantiate the features for you, which will turn them into `CombatFeature` instances.
+> An instantiated feature always knows its dependencies.
 
 ### Legacy PvP
 
