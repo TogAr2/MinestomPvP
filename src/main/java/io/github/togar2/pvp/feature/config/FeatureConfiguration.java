@@ -21,10 +21,6 @@ public class FeatureConfiguration {
 	
 	public FeatureConfiguration() {}
 	
-	public FeatureConfiguration(Map<FeatureType<?>, CombatFeature> combatFeatures) {
-		this.combatFeatures.putAll(combatFeatures);
-	}
-	
 	/**
 	 * Adds the specified feature as the specified type to this configuration.
 	 * This WILL overwrite any previous feature associated with the specified type.

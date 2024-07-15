@@ -243,11 +243,11 @@ Now you can use your own feature:
 
 ```java
 MinecraftServer.getGlobalEventHandler().addChild(
-        CombatFeatures.empty()
-            .add(MyCustomFeatureImpl.DEFINED)
-            .build()
+        CombatFeatures.single(MyCustomFeatureImpl.DEFINED)
 );
 ```
+
+As you can see, it is also possible to use `CombatFeatures.single(DefinedFeature)` to instantiate a single feature without dependencies.
 
 #### Depending on other features
 

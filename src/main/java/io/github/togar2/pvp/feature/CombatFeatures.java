@@ -9,6 +9,7 @@ import io.github.togar2.pvp.feature.block.LegacyVanillaBlockFeature;
 import io.github.togar2.pvp.feature.block.VanillaBlockFeature;
 import io.github.togar2.pvp.feature.config.CombatConfiguration;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
+import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.cooldown.VanillaAttackCooldownFeature;
 import io.github.togar2.pvp.feature.cooldown.VanillaItemCooldownFeature;
 import io.github.togar2.pvp.feature.damage.VanillaDamageFeature;
@@ -218,5 +219,15 @@ public class CombatFeatures {
 	 */
 	public static CombatConfiguration empty() {
 		return new CombatConfiguration();
+	}
+	
+	/**
+	 * Utility method to construct a single feature without dependencies in a clean way.
+	 *
+	 * @param feature the single feature implementation to construct
+	 * @return the constructed feature
+	 */
+	public static CombatFeature single(DefinedFeature<?> feature) {
+		return feature.construct(new FeatureConfiguration());
 	}
 }
