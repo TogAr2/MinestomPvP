@@ -13,6 +13,7 @@ import io.github.togar2.pvp.feature.food.ExhaustionFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.feature.knockback.KnockbackFeature;
 import io.github.togar2.pvp.player.CombatPlayer;
+import io.github.togar2.pvp.utils.CombatVersion;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;
@@ -41,7 +42,7 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaAttackFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.ATTACK, VanillaAttackFeature::new,
 			FeatureType.ATTACK_COOLDOWN, FeatureType.EXHAUSTION, FeatureType.ITEM_DAMAGE,
-			FeatureType.ENCHANTMENT, FeatureType.CRITICAL, FeatureType.SWEEPING, FeatureType.KNOCKBACK
+			FeatureType.ENCHANTMENT, FeatureType.CRITICAL, FeatureType.SWEEPING, FeatureType.KNOCKBACK, FeatureType.VERSION
 	);
 	
 	private static final double MAX_DISTANCE_SQUARED = 36.0;
@@ -57,6 +58,8 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 	private SweepingFeature sweepingFeature;
 	private KnockbackFeature knockbackFeature;
 	
+	private CombatVersion version;
+	
 	public VanillaAttackFeature(FeatureConfiguration configuration) {
 		this.configuration = configuration;
 	}
@@ -70,6 +73,7 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 		this.criticalFeature = configuration.get(FeatureType.CRITICAL);
 		this.sweepingFeature = configuration.get(FeatureType.SWEEPING);
 		this.knockbackFeature = configuration.get(FeatureType.KNOCKBACK);
+		this.version = configuration.get(FeatureType.VERSION);
 	}
 	
 	@Override
@@ -225,10 +229,12 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 		boolean critical = preSounds.critical();
 		boolean sweeping = preSounds.sweeping();
 		
+		boolean sounds = version.modern();
+		
 		// Call event which can modify attack values
 		FinalAttackEvent finalAttackEvent = new FinalAttackEvent(
 				attacker, target, sprintAttack, critical, sweeping, damage,
-				magicalDamage, true, true
+				magicalDamage, sounds, sounds
 		);
 		EventDispatcher.call(finalAttackEvent);
 		if (finalAttackEvent.isCancelled()) return null;

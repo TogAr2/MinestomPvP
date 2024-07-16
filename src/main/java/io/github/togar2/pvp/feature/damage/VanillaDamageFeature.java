@@ -194,7 +194,6 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 					knockbackFeature.applyDamageKnockback(damage, entity);
 				} else {
 					// Update velocity
-					//TODO does this even do anything?
 					entity.setVelocity(entity.getVelocity());
 				}
 			}
