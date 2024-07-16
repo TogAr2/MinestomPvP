@@ -1,36 +1,39 @@
 package io.github.togar2.pvp.enchantment.enchantments;
 
-import io.github.togar2.pvp.enchantment.CustomEnchantment;
-import io.github.togar2.pvp.enchantment.EnchantmentUtils;
-import io.github.togar2.pvp.utils.ItemUtils;
+import io.github.togar2.pvp.enchantment.CombatEnchantment;
+import io.github.togar2.pvp.feature.FeatureType;
+import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
-import net.minestom.server.item.Enchantment;
 import net.minestom.server.item.ItemStack;
+import net.minestom.server.item.enchant.Enchantment;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class ThornsEnchantment extends CustomEnchantment {
+public class ThornsEnchantment extends CombatEnchantment {
 	public ThornsEnchantment(EquipmentSlot... slotTypes) {
-		super(Enchantment.THORNS, slotTypes);
+		super(Enchantment.THORNS, Set.of(FeatureType.ITEM_DAMAGE), slotTypes);
 	}
 	
 	@Override
-	public void onUserDamaged(LivingEntity user, LivingEntity attacker, int level) {
+	public void onUserDamaged(LivingEntity user, LivingEntity attacker, int level,
+	                          EnchantmentFeature feature, FeatureConfiguration configuration) {
 		ThreadLocalRandom random = ThreadLocalRandom.current();
 		if (!shouldDamageAttacker(level, random)) return;
 		
-		Map.Entry<EquipmentSlot, ItemStack> entry = EnchantmentUtils.pickRandom(user, this);
+		Map.Entry<EquipmentSlot, ItemStack> entry = feature.pickRandom(user, Enchantment.THORNS);
 		
 		if (attacker != null) {
 			attacker.damage(new Damage(DamageType.THORNS, user, user, null, getDamageAmount(level, random)));
 		}
 		
 		if (entry != null) {
-			ItemUtils.damageEquipment(user, entry.getKey(), 2);
+			configuration.get(FeatureType.ITEM_DAMAGE).damageEquipment(user, entry.getKey(), 2);
 		}
 	}
 	

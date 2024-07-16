@@ -1,7 +1,7 @@
 package io.github.togar2.pvp.damage.combat;
 
 import io.github.togar2.pvp.damage.DamageTypeInfo;
-import io.github.togar2.pvp.entity.EntityUtils;
+import io.github.togar2.pvp.utils.EntityUtil;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
@@ -28,6 +28,6 @@ public record CombatEntry(Damage damage, @Nullable String fallLocation, double f
 	}
 	
 	public @Nullable Component getAttackerName() {
-		return getAttacker() == null ? null : EntityUtils.getName(getAttacker());
+		return getAttacker() == null ? null : EntityUtil.getName(getAttacker());
 	}
 }

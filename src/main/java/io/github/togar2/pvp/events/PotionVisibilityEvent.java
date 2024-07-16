@@ -3,7 +3,10 @@ package io.github.togar2.pvp.events;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.event.trait.CancellableEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
+import net.minestom.server.particle.Particle;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 /**
  * Called when an entities potion state (ambient, particle color and invisibility) is updated.
@@ -12,16 +15,16 @@ public class PotionVisibilityEvent implements EntityInstanceEvent, CancellableEv
 	
 	private final LivingEntity entity;
 	private boolean ambient;
-	private int color;
+	private List<Particle> particles;
 	private boolean invisible;
 	
 	private boolean cancelled;
 	
 	public PotionVisibilityEvent(@NotNull LivingEntity entity, boolean ambient,
-	                             int color, boolean invisible) {
+	                             List<Particle> particles, boolean invisible) {
 		this.entity = entity;
 		this.ambient = ambient;
-		this.color = color;
+		this.particles = particles;
 		this.invisible = invisible;
 	}
 	
@@ -49,23 +52,23 @@ public class PotionVisibilityEvent implements EntityInstanceEvent, CancellableEv
 	}
 	
 	/**
-	 * Gets the potion particle color.
-	 * Will be 0 for no potion particles.
+	 * Gets the potion particle emitters.
+	 * Will be empty for no potion particles.
 	 *
 	 * @return the potion color
 	 */
-	public int getColor() {
-		return color;
+	public @NotNull List<Particle> getParticles() {
+		return particles;
 	}
 	
 	/**
-	 * Sets the potion particle color.
-	 * Set to 0 to disable potion particles.
+	 * Sets the potion particle emitters.
+	 * Set to an empty list to disable potion particles.
 	 *
-	 * @param color the potion color
+	 * @param particles the potion color
 	 */
-	public void setColor(int color) {
-		this.color = color;
+	public void setParticles(@NotNull List<Particle> particles) {
+		this.particles = particles;
 	}
 	
 	/**

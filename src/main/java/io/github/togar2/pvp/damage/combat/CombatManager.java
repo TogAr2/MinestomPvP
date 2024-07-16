@@ -1,44 +1,54 @@
 package io.github.togar2.pvp.damage.combat;
 
 import io.github.togar2.pvp.damage.DamageTypeInfo;
-import io.github.togar2.pvp.entity.EntityUtils;
-import io.github.togar2.pvp.entity.Tracker;
-import io.github.togar2.pvp.listeners.DamageListener;
+import io.github.togar2.pvp.feature.fall.FallFeature;
+import io.github.togar2.pvp.feature.state.PlayerStateFeature;
+import io.github.togar2.pvp.utils.EntityUtil;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.Damage;
+import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.network.packet.server.play.EndCombatEventPacket;
 import net.minestom.server.network.packet.server.play.EnterCombatEventPacket;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CombatManager {
+	private static final Component BAD_RESPAWN_POINT_MESSAGE = Component.text("[")
+			.append(Component.translatable("death.attack.badRespawnPoint.link")
+					.clickEvent(ClickEvent.openUrl("https://bugs.mojang.com/browse/MCPE-28723"))
+					.hoverEvent(HoverEvent.showText(Component.text("MCPE-28723"))))
+			.append(Component.text("]"));
+	
 	private final List<CombatEntry> entries = new ArrayList<>();
 	private final Player player;
+	private int lastDamagedBy = -1;
 	private long lastDamageTime;
 	private long combatStartTime;
 	private long combatEndTime;
 	private boolean inCombat;
 	private boolean takingDamage;
-	private String nextFallLocation;
 	
 	public CombatManager(Player player) {
 		this.player = player;
 	}
 	
-	public void prepareForDamage() {
-		nextFallLocation = null;
-		Block lastClimbedBlock = player.getTag(Tracker.LAST_CLIMBED_BLOCK);
+	public @Nullable String getFallLocation(PlayerStateFeature playerStateFeature) {
+		Block lastClimbedBlock = playerStateFeature.getLastClimbedBlock(player);
 		if (lastClimbedBlock == null) {
 			//TODO check for water at feet
-			return;
+			return null;
 		}
 		
 		if (lastClimbedBlock.compare(Block.LADDER) || lastClimbedBlock.compare(Block.ACACIA_TRAPDOOR)
@@ -46,40 +56,36 @@ public class CombatManager {
 				|| lastClimbedBlock.compare(Block.IRON_TRAPDOOR) || lastClimbedBlock.compare(Block.DARK_OAK_TRAPDOOR)
 				|| lastClimbedBlock.compare(Block.JUNGLE_TRAPDOOR) || lastClimbedBlock.compare(Block.OAK_TRAPDOOR)
 				|| lastClimbedBlock.compare(Block.SPRUCE_TRAPDOOR) || lastClimbedBlock.compare(Block.WARPED_TRAPDOOR)) {
-			nextFallLocation = "ladder";
-			return;
+			return "ladder";
 		}
 		
 		if (lastClimbedBlock.compare(Block.VINE)) {
-			nextFallLocation = "vines";
-			return;
+			return "vines";
 		}
 		
 		if (lastClimbedBlock.compare(Block.WEEPING_VINES) || lastClimbedBlock.compare(Block.WEEPING_VINES_PLANT)) {
-			nextFallLocation = "weeping_vines";
-			return;
+			return "weeping_vines";
 		}
 		
 		if (lastClimbedBlock.compare(Block.TWISTING_VINES) || lastClimbedBlock.compare(Block.TWISTING_VINES_PLANT)) {
-			nextFallLocation = "twisting_vines";
-			return;
+			return "twisting_vines";
 		}
 		
 		if (lastClimbedBlock.compare(Block.SCAFFOLDING)) {
-			nextFallLocation = "scaffolding";
-			return;
+			return "scaffolding";
 		}
 		
-		nextFallLocation = "other_climbable";
+		return "other_climbable";
 	}
 	
-	public void recordDamage(Damage damage) {
+	public void recordDamage(int attackerId, Damage damage,
+	                         FallFeature fallFeature, PlayerStateFeature playerStateFeature) {
 		recheckStatus();
-		prepareForDamage();
 		
-		CombatEntry entry = new CombatEntry(damage, nextFallLocation, player.getTag(Tracker.FALL_DISTANCE));
+		CombatEntry entry = new CombatEntry(damage, getFallLocation(playerStateFeature), fallFeature.getFallDistance(player));
 		entries.add(entry);
 		
+		lastDamagedBy = attackerId;
 		lastDamageTime = System.currentTimeMillis();
 		takingDamage = true;
 		
@@ -107,7 +113,7 @@ public class CombatManager {
 			fall = heaviestFall != null;
 		}
 		
-		if (!fall) return DamageListener.getAttackDeathMessage(player, lastEntry.damage());
+		if (!fall) return getAttackDeathMessage(lastEntry.damage());
 		
 		DamageTypeInfo heaviestFallInfo = DamageTypeInfo.of(heaviestFall.damage().getType());
 		if (heaviestFallInfo.fall() || heaviestFallInfo.outOfWorld()) {
@@ -119,24 +125,67 @@ public class CombatManager {
 		
 		if (firstAttacker != null && firstAttacker != lastAttacker) {
 			ItemStack weapon = firstAttacker instanceof LivingEntity ? ((LivingEntity) firstAttacker).getItemInMainHand() : ItemStack.AIR;
-			if (!weapon.isAir() && weapon.getDisplayName() != null) {
-				return Component.translatable("death.fell.assist.item", getEntityName(), EntityUtils.getName(firstAttacker), weapon.getDisplayName());
+			if (!weapon.isAir() && weapon.has(ItemComponent.CUSTOM_NAME)) {
+				return Component.translatable("death.fell.assist.item", getEntityName(), EntityUtil.getName(firstAttacker), weapon.get(ItemComponent.CUSTOM_NAME));
 			} else {
-				return Component.translatable("death.fell.assist", getEntityName(), EntityUtils.getName(firstAttacker));
+				return Component.translatable("death.fell.assist", getEntityName(), EntityUtil.getName(firstAttacker));
 			}
 		} else if (lastAttacker != null) {
 			ItemStack weapon = lastAttacker instanceof LivingEntity ? ((LivingEntity) lastAttacker).getItemInMainHand() : ItemStack.AIR;
-			if (!weapon.isAir() && weapon.getDisplayName() != null) {
-				return Component.translatable("death.fell.finish.item", getEntityName(), EntityUtils.getName(lastAttacker), weapon.getDisplayName());
+			if (!weapon.isAir() && weapon.has(ItemComponent.CUSTOM_NAME)) {
+				return Component.translatable("death.fell.finish.item", getEntityName(), EntityUtil.getName(lastAttacker), weapon.get(ItemComponent.CUSTOM_NAME));
 			} else {
-				return Component.translatable("death.fell.finish", getEntityName(), EntityUtils.getName(lastAttacker));
+				return Component.translatable("death.fell.finish", getEntityName(), EntityUtil.getName(lastAttacker));
 			}
 		} else {
 			return Component.translatable("death.fell.killer", getEntityName());
 		}
 	}
 	
-	public @Nullable LivingEntity getKiller() {
+	private Component getAttackDeathMessage(@NotNull Damage damage) {
+		if (damage.getType() == DamageType.BAD_RESPAWN_POINT) {
+			return Component.translatable("death.attack.badRespawnPoint.message", player.getName(), BAD_RESPAWN_POINT_MESSAGE);
+		}
+		
+		DamageType damageType = MinecraftServer.getDamageTypeRegistry().get(damage.getType());
+		if (damageType == null) return Component.empty();
+		String id = "death.attack." + damageType.messageId();
+		
+		Entity source = damage.getSource();
+		Entity attacker = damage.getAttacker();
+		
+		if (source != null) {
+			Component ownerName = attacker == null ? EntityUtil.getName(source) : EntityUtil.getName(attacker);
+			ItemStack weapon = source instanceof LivingEntity living ? living.getItemInMainHand() : ItemStack.AIR;
+			if (!weapon.isAir() && weapon.has(ItemComponent.CUSTOM_NAME)) {
+				return Component.translatable(id + ".item", EntityUtil.getName(player), ownerName, weapon.get(ItemComponent.CUSTOM_NAME));
+			} else {
+				return Component.translatable(id, EntityUtil.getName(player), ownerName);
+			}
+		} else {
+			LivingEntity killer = getKillCredit();
+			if (killer == null) {
+				return Component.translatable(id, EntityUtil.getName(player));
+			} else {
+				return Component.translatable(id + ".player", EntityUtil.getName(player),
+						EntityUtil.getName(killer));
+			}
+		}
+	}
+	
+	private @Nullable LivingEntity getKillCredit() {
+		LivingEntity killer = getKiller();
+		if (killer != null) return killer;
+		
+		if (lastDamagedBy != -1) {
+			Entity entity = player.getInstance().getEntityById(lastDamagedBy);
+			if (entity instanceof LivingEntity living) return living;
+		}
+		
+		return null;
+	}
+	
+	private @Nullable LivingEntity getKiller() {
 		LivingEntity entity = null;
 		Player player = null;
 		float livingDamage = 0.0F;
@@ -200,6 +249,21 @@ public class CombatManager {
 		return inCombat ? System.currentTimeMillis() - combatStartTime : combatEndTime - combatStartTime;
 	}
 	
+	public void tick() {
+		if (player.isDead() || player.getAliveTicks() % 20 == 0)
+			recheckStatus();
+		
+		if (lastDamagedBy != -1) {
+			Entity lastDamager = player.getInstance().getEntityById(lastDamagedBy);
+			if (lastDamager instanceof LivingEntity living && living.isDead()) {
+				lastDamagedBy = -1;
+			} else if (System.currentTimeMillis() - lastDamageTime > 5000) {
+				// After 5 seconds of no attack the last damaged by does not count anymore
+				lastDamagedBy = -1;
+			}
+		}
+	}
+	
 	public void recheckStatus() {
 		// Check if combat should end
 		int idleMillis = inCombat ? 300 * MinecraftServer.TICK_MS : 100 * MinecraftServer.TICK_MS;
@@ -222,7 +286,7 @@ public class CombatManager {
 	}
 	
 	public Component getEntityName() {
-		return EntityUtils.getName(player);
+		return EntityUtil.getName(player);
 	}
 	
 	@SuppressWarnings("UnstableApiUsage")
@@ -262,9 +326,5 @@ public class CombatManager {
 	
 	public boolean isTakingDamage() {
 		return takingDamage;
-	}
-	
-	public String getNextFallLocation() {
-		return nextFallLocation;
 	}
 }

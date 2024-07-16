@@ -13,16 +13,17 @@ public class DamageBlockEvent implements EntityInstanceEvent, CancellableEvent {
 	
 	private final LivingEntity entity;
 	private final float damage;
-	private boolean knockbackAttacker;
 	private float resultingDamage;
+	private boolean knockbackAttacker;
 	
 	private boolean cancelled;
 	
-	public DamageBlockEvent(@NotNull LivingEntity entity, float damage, float resultingDamage) {
+	public DamageBlockEvent(@NotNull LivingEntity entity, float damage,
+	                        float resultingDamage, boolean knockbackAttacker) {
 		this.entity = entity;
 		this.damage = damage;
-		this.knockbackAttacker = true;
 		this.resultingDamage = resultingDamage;
+		this.knockbackAttacker = knockbackAttacker;
 	}
 	
 	@NotNull

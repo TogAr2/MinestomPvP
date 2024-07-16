@@ -1,19 +1,16 @@
 package io.github.togar2.pvp.test;
 
-import io.github.togar2.pvp.PvpExtension;
-import io.github.togar2.pvp.config.PvPConfig;
-import io.github.togar2.pvp.entity.CustomPlayer;
-import io.github.togar2.pvp.events.EntityKnockbackEvent;
-import io.github.togar2.pvp.explosion.PvpExplosionSupplier;
+import io.github.togar2.pvp.MinestomPvP;
+import io.github.togar2.pvp.feature.CombatFeatures;
+import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.test.commands.Commands;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.attribute.Attribute;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.*;
+import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.entity.damage.EntityDamage;
-import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.*;
 import net.minestom.server.extras.lan.OpenToLAN;
@@ -22,6 +19,7 @@ import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.common.KeepAlivePacket;
 import net.minestom.server.network.packet.server.play.*;
+import net.minestom.server.registry.DynamicRegistry;
 import net.minestom.server.utils.NamespaceID;
 import net.minestom.server.utils.time.TimeUnit;
 import net.minestom.server.world.DimensionType;
@@ -31,14 +29,15 @@ import java.util.Optional;
 public class PvpTest {
 	public static void main(String[] args) {
 		MinecraftServer server = MinecraftServer.init();
-		PvpExtension.init();
+		MinestomPvP.init();
 		//MinestomFluids.init();
 		//VelocityProxy.enable("tj7MulOtnIDe");
 		
-		DimensionType fullbright = DimensionType.builder(NamespaceID.from("idk")).ambientLight(1.0f).build();
-		MinecraftServer.getDimensionTypeManager().addDimension(fullbright);
+		DimensionType fullbright = DimensionType.builder().ambientLight(1.0f).build();
+		DynamicRegistry.Key<DimensionType> fullbrightKey =
+				MinecraftServer.getDimensionTypeRegistry().register(NamespaceID.from("idk"), fullbright);
 		
-		Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(fullbright);
+		Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(fullbrightKey);
 		instance.setGenerator(new DemoGenerator());
 		instance.enableAutoChunkLoad(true);
 		
@@ -49,19 +48,19 @@ public class PvpTest {
 			
 			EntityCreature entity = new EntityCreature(EntityType.ZOMBIE);
 			entity.setInstance(instance, spawn);
-			entity.getAttribute(Attribute.MAX_HEALTH).setBaseValue(500);
+			entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(500);
 			entity.heal();
-
+			
 			MinecraftServer.getSchedulerManager().buildTask(() -> {
 				Optional<Player> player = MinecraftServer.getConnectionManager()
 						.getOnlinePlayers().stream()
 						.filter(p -> p.getDistanceSquared(entity) < 6)
 						.findAny();
-
+				
 				if (player.isPresent()) {
 					if (!player.get().damage(new EntityDamage(entity, 1.0f)))
 						return;
-
+					
 //					LegacyKnockbackEvent legacyKnockbackEvent = new LegacyKnockbackEvent(player.get(), entity, true);
 //					EventDispatcher.callCancellable(legacyKnockbackEvent, () -> {
 //						LegacyKnockbackSettings settings = legacyKnockbackEvent.getSettings();
@@ -72,18 +71,18 @@ public class PvpTest {
 //								Math.cos(entity.getPosition().yaw() * 3.1415927F / 180.0F) * 1 * settings.extraHorizontal()
 //						));
 //					});
-					EntityKnockbackEvent entityKnockbackEvent = new EntityKnockbackEvent(player.get(), entity, true, false, 1 * 0.5F);
-					EventDispatcher.callCancellable(entityKnockbackEvent, () -> {
-						float strength = entityKnockbackEvent.getStrength();
-						player.get().takeKnockback(strength, Math.sin(Math.toRadians(entity.getPosition().yaw())), -Math.cos(Math.toRadians(entity.getPosition().yaw())));
-					});
-					
-					if (player.get() instanceof CustomPlayer customPlayer)
-						customPlayer.sendImmediateVelocityUpdate();
+//					EntityKnockbackEvent entityKnockbackEvent = new EntityKnockbackEvent(player.get(), entity, true, false, 1 * 0.5F);
+//					EventDispatcher.callCancellable(entityKnockbackEvent, () -> {
+//						float strength = entityKnockbackEvent.getStrength();
+//						player.get().takeKnockback(strength, Math.sin(Math.toRadians(entity.getPosition().yaw())), -Math.cos(Math.toRadians(entity.getPosition().yaw())));
+//					});
+//
+//					if (player.get() instanceof CustomPlayer customPlayer)
+//						customPlayer.sendImmediateVelocityUpdate();
 				}
-
-				event.getPlayer().setFood(20);
-			}).repeat(3, TimeUnit.SERVER_TICK).schedule();
+				
+				//event.getPlayer().setFood(20);
+			}).repeat(20, TimeUnit.SERVER_TICK).schedule();
 		});
 		
 		MinecraftServer.getGlobalEventHandler().addListener(PlayerSpawnEvent.class, event -> {
@@ -106,7 +105,7 @@ public class PvpTest {
 			if (event.getPacket() instanceof EntitySoundEffectPacket) return;
 			if (event.getPacket() instanceof CollectItemPacket) return;
 			if (event.getPacket() instanceof DestroyEntitiesPacket) return;
-			System.out.println(event.getPacket());
+			//System.out.println(event.getPacket());
 		});
 		
 		MinecraftServer.getCommandManager().register(new Command("shoot") {{
@@ -130,13 +129,14 @@ public class PvpTest {
 //		MinecraftServer.getGlobalEventHandler().addListener(LegacyKnockbackEvent.class,
 //				event -> event.setSettings(settings));
 		
-		instance.setExplosionSupplier(PvpExplosionSupplier.INSTANCE);
+		instance.setExplosionSupplier(CombatFeatures.legacyVanilla().get(FeatureType.EXPLOSION).getExplosionSupplier());
 		
 		GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-		eventHandler.addChild(PvPConfig.defaultBuilder()
-				//.potion(PotionConfig.legacyBuilder().drinking(false))
-				.build().createNode()
-		);
+		eventHandler.addChild(CombatFeatures.legacyVanilla().createNode());
+		//eventHandler.addChild(PvPConfig.defaultBuilder()
+		//		//.potion(PotionConfig.legacyBuilder().drinking(false))
+		//		.build().createNode()
+		//);
 		
 		//eventHandler.addChild(MinestomFluids.events());
 		

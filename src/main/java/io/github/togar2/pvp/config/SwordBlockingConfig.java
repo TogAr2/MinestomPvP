@@ -1,10 +1,15 @@
 package io.github.togar2.pvp.config;
 
-import io.github.togar2.pvp.legacy.SwordBlockHandler;
+import io.github.togar2.pvp.feature.CombatFeatures;
+import io.github.togar2.pvp.feature.config.CombatConfiguration;
 import net.minestom.server.event.EventNode;
-import net.minestom.server.event.trait.PlayerInstanceEvent;
+import net.minestom.server.event.trait.EntityInstanceEvent;
 
-public class SwordBlockingConfig extends ElementConfig<PlayerInstanceEvent> {
+/**
+ * @deprecated use {@link CombatConfiguration} instead
+ */
+@Deprecated
+public class SwordBlockingConfig extends ElementConfig<EntityInstanceEvent> {
 	public static final SwordBlockingConfig LEGACY = new SwordBlockingConfig();
 	
 	public SwordBlockingConfig() {
@@ -12,7 +17,9 @@ public class SwordBlockingConfig extends ElementConfig<PlayerInstanceEvent> {
 	}
 	
 	@Override
-	public EventNode<PlayerInstanceEvent> createNode() {
-		return SwordBlockHandler.events();
+	public EventNode<EntityInstanceEvent> createNode() {
+		return new CombatConfiguration().legacy(isLegacy())
+				.add(CombatFeatures.LEGACY_VANILLA_BLOCK)
+				.build().createNode();
 	}
 }

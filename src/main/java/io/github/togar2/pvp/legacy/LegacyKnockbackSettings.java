@@ -1,6 +1,6 @@
 package io.github.togar2.pvp.legacy;
 
-import net.minestom.server.MinecraftServer;
+import net.minestom.server.ServerFlag;
 
 /**
  * Class which contains settings for legacy knockback.
@@ -14,7 +14,7 @@ public record LegacyKnockbackSettings(double horizontal, double vertical,
 	
 	public LegacyKnockbackSettings(double horizontal, double vertical, double verticalLimit,
 	                               double extraHorizontal, double extraVertical) {
-		double tps = MinecraftServer.TICK_PER_SECOND;
+		double tps = ServerFlag.SERVER_TICKS_PER_SECOND;
 		this.horizontal = horizontal * tps;
 		this.vertical = vertical * tps;
 		this.verticalLimit = verticalLimit * tps;

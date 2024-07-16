@@ -11,29 +11,27 @@ import org.jetbrains.annotations.NotNull;
  * but only when an entity is attacked by another entity which causes the knockback.
  * <br><br>
  * You should be aware that when the attacker has a knockback weapon, this event will be called twice:
- * once for the default damage knockback, once for for the extra knockback.
- * You can determine which knockback this is by using {@code isExtraKnockback()}.
- *
+ * once for the default damage knockback, once for the extra knockback.
+ * <br>
  * When the attack was a sweeping attack, this event is also called twice for the affected entities:
  * once for the extra sweeping knockback, once for the default knockback.
- * You can determine if this event was the sweeping by using {@code isSweepingKnockback()}.
+ * <br><br>
+ * You can determine which type of knockback this is by using {@link #getType()}.
  */
 public class EntityKnockbackEvent implements EntityInstanceEvent, CancellableEvent {
 	
 	private final Entity entity;
 	private final Entity attacker;
-	private final boolean extraKnockback;
-	private final boolean sweepingKnockback;
+	private final KnockbackType type;
 	private float strength;
 	
 	private boolean cancelled;
 	
 	public EntityKnockbackEvent(@NotNull Entity entity, @NotNull Entity attacker,
-	                            boolean extraKnockback, boolean sweepingKnockback, float strength) {
+	                            KnockbackType type, float strength) {
 		this.entity = entity;
 		this.attacker = attacker;
-		this.extraKnockback = extraKnockback;
-		this.sweepingKnockback = sweepingKnockback;
+		this.type = type;
 		this.strength = strength;
 	}
 	
@@ -55,23 +53,12 @@ public class EntityKnockbackEvent implements EntityInstanceEvent, CancellableEve
 	}
 	
 	/**
-	 * Gets whether this knockback is the extra knockback
-	 * caused by a knockback enchanted weapon.
+	 * Gets the type of knockback. See the values of {@link KnockbackType} for more information.
 	 *
-	 * @return true if it is, false otherwise
+	 * @return the knockback type
 	 */
-	public boolean isExtraKnockback() {
-		return extraKnockback;
-	}
-	
-	/**
-	 * Gets whether this knockback is the extra knockback
-	 * applied to entities affected by sweeping.
-	 *
-	 * @return true if it is, false otherwise
-	 */
-	public boolean isSweepingKnockback() {
-		return sweepingKnockback;
+	public KnockbackType getType() {
+		return type;
 	}
 	
 	/**
@@ -100,5 +87,20 @@ public class EntityKnockbackEvent implements EntityInstanceEvent, CancellableEve
 	@Override
 	public void setCancelled(boolean cancel) {
 		this.cancelled = cancel;
+	}
+	
+	public enum KnockbackType {
+		/**
+		 * Default knockback from a damage source
+		 */
+		DAMAGE,
+		/**
+		 * Attack knockback for strong attacks by players or from the knockback enchantment
+		 */
+		ATTACK,
+		/**
+		 * Sweeping knockback when an entity is close to an entity which was hit by a sweeping weapon
+		 */
+		SWEEPING
 	}
 }

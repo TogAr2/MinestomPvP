@@ -4,6 +4,7 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
+import net.minestom.server.registry.DynamicRegistry;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,12 +23,12 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 		);
 	}
 	
-	public static DamageTypeInfo of(DamageType type) {
+	public static DamageTypeInfo of(DynamicRegistry.Key<DamageType> type) {
 		return INFO_MAP.getOrDefault(type, DEFAULT);
 	}
 	
 	//TODO check source and add missing
-	public static final Map<DamageType, DamageTypeInfo> INFO_MAP = new HashMap<>() {
+	public static final Map<DynamicRegistry.Key<DamageType>, DamageTypeInfo> INFO_MAP = new HashMap<>() {
 		{
 			put(DamageType.IN_FIRE, new DamageTypeInfo().bypassesArmor(true).fire(true));
 			put(DamageType.ON_FIRE, new DamageTypeInfo().bypassesArmor(true).fire(true));
@@ -38,7 +39,6 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 			put(DamageType.DROWN, new DamageTypeInfo().bypassesArmor(true));
 			put(DamageType.STARVE, new DamageTypeInfo().bypassesArmor(true).unblockable(true));
 			put(DamageType.FALL, new DamageTypeInfo().bypassesArmor(true).fall(true));
-			//TODO put(DamageType.ENDER_PEARL, new DamageTypeInfo().bypassesArmor(true).fall(true));
 			put(DamageType.FLY_INTO_WALL, new DamageTypeInfo().bypassesArmor(true));
 			put(DamageType.OUT_OF_WORLD, new DamageTypeInfo().bypassesArmor(true).outOfWorld(true));
 			put(DamageType.GENERIC, new DamageTypeInfo().bypassesArmor(true));

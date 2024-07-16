@@ -4,29 +4,43 @@ I am currently in the process of rewriting the entirety of this codebase in the 
 
 # MinestomPvP
 
-[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
-[![license](https://img.shields.io/github/license/TogAr2/MinestomPvP.svg?style=flat-square)](LICENSE)
-[![platform](https://img.shields.io/badge/platform-Minestom-ff69b4?style=flat-square)](https://github.com/Minestom/Minestom)
-[![](https://jitpack.io/v/TogAr2/MinestomPvP.svg?style=flat-square)](https://jitpack.io/#TogAr2/MinestomPvP)
+[![license](https://img.shields.io/github/license/TogAr2/MinestomPvP.svg?style=for-the-badge)](LICENSE)
+[![platform](https://img.shields.io/badge/platform-Minestom-ff69b4?style=for-the-badge)](https://github.com/Minestom/Minestom)
 
 MinestomPvP is an extension for Minestom.
 It tries to mimic vanilla (modern **and** pre-1.9) PvP as good as possible, while also focusing on customizability and usability.
 
 But, MinestomPvP does not only provide PvP, it also provides everything around it (e.g., status effects and food).
-You can easily choose which features you want to use.
+You can easily pick which features you want to use.
 
 The maven repository is available on [jitpack](https://jitpack.io/#TogAr2/MinestomPvP).
 
+> MinestomPvP has been rewritten, see [Important changes](#important-changes)
+
 ## Table of Contents
 
+- [Important changes](#important-changes)
 - [Features](#features)
 - [Future Plans](#plans)
 - [Usage](#usage)
-- [Integration](#integration)
-- [Events](#events)
 - [Customization](#customization)
+- [Legacy PvP](#legacy-pvp)
+- [Integration](#integration)
+- [Registries](#registries)
+- [Events](#events)
+- [Custom combat features](#custom-combat-features)
 - [Contributing](#contributing)
 - [Credits](#credits)
+
+## Important changes
+
+MinestomPvP has recently been rewritten. Most features are now independent of each other and can be used separately.
+
+Major changes include:
+- `PvpExtension` is now `MinestomPvP`
+- Configs have been removed in favor of a feature based configuration system
+- Registries are no longer prefixed by `Custom` but by `Combat`
+- `PvpPlayer` is now `CombatPlayer`, `CustomPlayer` is now `CombatPlayerImpl`
 
 ## Features
 
@@ -54,42 +68,73 @@ Currently, most vanilla PvP features are supported.
 - Lingering potions
 - Fireworks (for crossbows)
 - Support for (some) water mechanics (e.g. slowing projectiles down)
+- 1.21 features (the library is already 1.21 compatible, just doesn't support its combat features)
+- Rework of the tool & armor registry to allow for customization
 
 ## Usage
 
-Before doing anything else, you should call `PvpExtension.init()`. This will make sure everything is registered correctly.
-After you've initialized the library, you can get an `EventNode` with all PvP related events listening using `PvpExtension.events()`.
-By adding this node as a child to any other node, you enable pvp in that scope.
+Before doing anything else, you should call `MinestomPvP.init()`. This will make sure everything is registered correctly.
 
-Example (adds PvP to the global event handler, so everywhere):
+After you've initialized the library, you can start using combat features.
+For the most basic setup you can use the following:
 ```java
-PvpExtension.init();
-MinecraftServer.getGlobalEventHandler().addChild(PvpExtension.events());
+MinestomPvP.init();
+
+CombatFeatureSet modernVanilla = CombatFeatures.modernVanilla();
+MinecraftServer.getGlobalEventHandler().addChild(modernVanilla.createNode());
 ```
 
-You can customize which features of this extension you want to enable or disable by using `PvPConfig`.
-Obtain a builder by using one of the static methods of `PvPConfig`: `#defaultBuilder()` (returns a builder with the default options), `#legacyBuilder()` (returns a builder with the legacy options) or `#emptyBuilder()` (has everything disabled by default). You can add custom settings to it by using the methods of the builder. To create an `EventNode` from your config builder, use `#build().createNode()`.
+This will give you a full vanilla experience without any customization.
 
-Example:
+Every combat feature has a `createNode()` method, which returns an `EventNode` with all listeners of the feature attached.
+This event node can be added to another event node to enable the feature within that scope.
+In the example above, it is being added to the global event handler, which means the feature will work everywhere.
+
+The combat feature used in this example is a `CombatFeatureSet`.
+This is essentially a container for a list of combat features.
+There are two feature sets already defined by MinestomPvP:
+- Full modern combat, `CombatFeatures.modernVanilla()`
+- Full legacy (pre-1.9) combat, `CombatFeatures.legacyVanilla()`
+
+### Customization
+
+The `CombatFeatures` class contains a field for every individual combat feature which has been defined by MinestomPvP itself.
+For example, you can add fall damage to your instance like so:
+
 ```java
-eventHandler.addChild(
-    PvPConfig.emptyBuilder()
-        .potion(PotionConfig.legacyBuilder().drinking(false))
-        .build().createNode()
-);
-```
-This example would result in potion effects and splash potions still working, but not drinkable potions.
-Everything else not to do with potions would be disabled as well, since it is using `PvPConfig.emptyBuilder()`.
+Instance instance;
 
-In case you want to customize mechanics in a way that is not currently possible with the configs, see [Customization](#customization).
+CombatFeatureSet featureSet = CombatFeatures.empty()
+        .version(CombatVersion.MODERN)
+        .add(CombatFeatures.VANILLA_FALL)
+        .add(CombatFeatures.VANILLA_PLAYER_STATE)
+        .build();
+instance.eventNode().addChild(featureSet.createNode());
+```
+
+As you can see, `CombatFeatures.empty()` provides you with a builder-like structure (`CombatConfiguration`) to which features can be added.
+
+This combat configuration also contains convenience methods:
+- `version(CombatVersion)` to set a combat version, which is used by some vanilla features to adjust values which are different across versions
+- `difficulty(DifficultyProvider)` to set a difficulty provider, which is used by some vanilla features containing behavior which is different depending on the difficulty
+
+In the example above, a `PLAYER_STATE` feature is added alongside the `FALL` feature, because the fall feature depends on it.
+`CombatConfiguration` takes care of handling these dependencies for you. The order in which the features are added does not matter.
+It is also possible to leave out the `PLAYER_STATE` feature: a `NO_OP` feature will then be used, which in this case will always signal to the fall feature that the player is not climbing.
+
+Upon calling `CombatConfiguration#build()`, the combat configuration resolves all these dependencies and creates a `CombatFeatureSet` in which all the features are instantiated.
+
+> Features defined inside the `CombatFeatures` class are not yet instantiated, but are a `DefinedFeature`.
+> The `CombatConfiguration` will instantiate the features for you, which will turn them into `CombatFeature` instances.
+> An instantiated feature always knows its dependencies.
 
 ### Legacy PvP
 
 Earlier minecraft versions (pre-1.9) used a different PvP system, which to this day is still preferred by some. *Legacy* is the term used to describe this type of PvP throughout the library.
-You can get the `EventNode` for legacy PvP using `PvpExtension.legacyEvents()`, and adjust its settings by using the method described above.
+You can get the `CombatFeatureSet` for legacy PvP using `CombatFeatures.legacyVanilla()`.
 
-To disable attack cooldown for a player and set their attack damage to the legacy value, use `PvpExtension.setLegacyAttack(player, true)`.
-To enable the cooldown again and set the attack damage to the new value, use `false` instead of `true`.
+To disable attack cooldown for a player, use `MinestomPvP.setLegacyAttack(player, true)`.
+To enable the cooldown again, use `false` instead of `true`.
 
 #### Knockback
 
@@ -99,16 +144,37 @@ A lot of servers like to customize their 1.8 knockback. It is also possible to d
 
 To integrate this extension into your minestom server, you may have to tweak a little bit to make sure everything works correctly.
 
-The extension uses a custom player implementation, if you use one, it is recommended to extend `CustomPlayer`. If you for some reason can't, make sure to implement `PvpPlayer` in a similar fashion to `CustomPlayer`. The implementation is registered inside `PvpExtension.init()`, so register yours after the call.
+The extension uses a custom player implementation, if you use one, it is recommended to extend `CombatPlayerImpl`. If you for some reason can't, make sure to implement `CombatPlayer` in a similar fashion to `CombatPlayerImpl`.
+The implementation of MinestomPvP is registered inside `MinestomPvP.init()`, so register yours after initializing the library.
 
-To allow explosions, you have to register `PvpExplosionSupplier` to every instance in which they are used.
+To allow explosions, you have to register an explosion supplier to every instance in which they are used.
+Implementations of `ExplosionFeature` might provide an explosion supplier.
+
+```java
+CombatFeatureSet featureSet;
+Instance instance;
+
+instance.setExplosionSupplier(featureSet.get(FeatureType.EXPLOSION).getExplosionSupplier());
 ```
-instance.setExplosionSupplier(PvpExplosionSupplier.INSTANCE);
-```
+
+Keep in mind that the explosion supplier can be different depending on the explosion feature,
+so always register the one from the explosion feature which is active in the instance.
+
+### Registries
+
+MinestomPvP has several registries, which you can also register to in order to create custom behavior:
+- `CombatEnchantments`: a registry of enchantment behaviors, used by `EnchantmentFeature`
+- `CombatPotionEffects`: a registry of potion effect behaviors, used by `EffectFeature`
+- `CombatPotionTypes`: a registry of potion types and which effects they contain, used by `EffectFeature`
+
+You can use the static `#register(...)` method in those classes to add custom entries.
+
+You can also use the class `Tool`, which contains all tools and their properties (not all properties are currently included, will change soon).
+The same applies to `ToolMaterial` (wood, stone, ...) and `ArmorMaterial`.
 
 ### Events
 
-This extension provides several events:
+The library provides several events:
 
 - `DamageBlockEvent`: cancellable, called when an entity blocks damage using a shield. This event can be used to set the remaining damage.
 - `EntityKnockbackEvent`: cancellable, called when an entity gets knocked back by another entity. Gets called twice for weapons with the knockback enchantment (once for default damage knockback, once for the extra knockback). This event can be used to set the knockback strength.
@@ -117,6 +183,7 @@ This extension provides several events:
 - `ExplosionEvent`: cancellable, called when an explosion will take place. Can be used to modify the affected blocks.
 - `FinalAttackEvent`: cancellable, called when a player attacks an entity. Can be used to set a few variables like sprint, critical, sweeping, etc.
 - `FinalDamageEvent`: cancellable, called when the final damage calculation (including armor and effects) is completed. This event should be used instead of `EntityDamageEvent`, unless you want to detect how much damage was originally dealt.
+- `FishingBobberRetrieveEvent`: cancellable, called when a player retrieves a fishing bobber.
 - `LegacyKnockbackEvent`: cancellable, called when an entity gets knocked back by another entity using legacy pvp. Same applies as for `EntityKnockbackEvent`. This event can be used to change the knockback settings.
 - `PickupEntityEvent`: cancellable, called when a player picks up an entity (arrow or trident).
 - `PlayerExhaustEvent`: cancellable, called when a players' exhaustion level changes.
@@ -125,19 +192,114 @@ This extension provides several events:
 - `PotionVisibilityEvent`: cancellable, called when an entities potion state (ambient, particle color and invisibility) is updated.
 - `TotemUseEvent`: cancellable, called when a totem prevents an entity from dying.
 
-### Customization
+### Custom combat features
 
-It is possible to add your own features to this extension. For example, you can extend the current enchantment behavior by registering an enchantment using `CustomEnchantments`. This will provide you with a few methods for when the enchantment is used. It is also possible to do the same for potion effects using `CustomPotionEffects`, which will provide you with a few methods for when the effect is applied and removed.
+It is possible to create your own combat features, which can extend an existing one or be completely independent.
+Below is an explanation followed by an example.
 
-You can use the class `Tool`, which contains all tools and their properties (not all properties are currently included, will change soon).
-The same applies to `ToolMaterial` (wood, stone, ...) and `ArmorMaterial`.
+In order to be compatible with the library, your combat features must implement `CombatFeature`.
+It is also possible to implement `RegistrableFeature` instead, which will provide you with a `createNode()` method.
+In this case, you must also implement `RegistrableFeature#init(EventNode)`, which attaches all the listeners to the given event node.
 
-In case you want to override mechanics in a way that is not currently possible with the configs, you can use the config to set a different handler. These handlers contain several protected methods which you can override in order to further customize the behaviour. This method is not recommended (when updating, you might miss out on changes because you have overridden a method), so only use it as a last resort. In most cases it might be better to just disable that specific part of MinestomPvP and write your own handling logic.
+After this, you must create a `FeatureType` for your custom feature.
+If you are implementing an existing feature, use existing feature types in the `FeatureType` class.
+Otherwise, you can create your own using `FeatureType.of(String, F)`.
+The first argument will be the name, the second the `NO_OP` feature which will be used when no implementation is present.
+It is recommended to create an interface for your custom feature type which extends `CombatFeature` (or `RegistrableFeature`).
+This way, you can easily specify methods to expose to other features.
 
-The following handlers are currently available to override:
-- `AttackHandler` (set inside `AttackConfig`)
-- `DamageHandler` (set inside `DamageConfig`)
-- `FallDamageHandler` (set inside `DamageConfig`)
+Lastly, it is needed to create a `DefinedFeature` instance for your custom implementation.
+This defined feature defines an implementation of your feature type, and it can be used to add your implementation to a combat configuration.
+
+Example of a custom feature type, with 1 method which can be used by other features:
+
+```java
+interface MyCustomFeature extends CombatFeature {
+	MyCustomFeature NO_OP = new MyCustomFeature() {};
+	
+	FeatureType TYPE = FeatureType.of("MY_CUSTOM", NO_OP);
+	
+	boolean isItWorking();
+}
+```
+
+Example of an implementation of this custom feature type, which listens for events and implements the method:
+
+```java
+class MyCustomFeatureImpl implements MyCustomFeature, RegistrableFeature {
+    public static final DefinedFeature<MyCustomFeatureImpl> DEFINED = new DefinedFeature<>(
+            MyCustomFeature.TYPE, configuration -> new MyCustomFeatureImpl()
+    );
+
+    @Override
+    public void init(EventNode<PlayerInstanceEvent> node) {
+        node.addListener(PlayerChatEvent.class, event -> {
+            // Do something...
+        });
+    }
+
+    @Override
+    public boolean isItWorking() {
+        return true;
+    }
+}
+```
+
+Now you can use your own feature:
+
+```java
+MinecraftServer.getGlobalEventHandler().addChild(
+        CombatFeatures.single(MyCustomFeatureImpl.DEFINED)
+);
+```
+
+As you can see, it is also possible to use `CombatFeatures.single(DefinedFeature)` to instantiate a single feature without dependencies.
+
+#### Depending on other features
+
+Say, you want to access a players fall distance in your own feature. You can do this by depending on `FallFeature`.
+
+```java
+class MyCustomFeatureImpl implements MyCustomFeature {
+    public static final DefinedFeature<MyCustomFeatureImpl> DEFINED = new DefinedFeature<>(
+            MyCustomFeature.TYPE, configuration -> new MyCustomFeatureImpl(configuration),
+            FeatureType.FALL
+    );
+
+    private final FeatureConfiguration configuration;
+    private FallFeature fallFeature;
+
+    public MyCustomFeatureImpl(FeatureConfiguration configuration) {
+        this.configuration = configuration;
+    }
+
+    @Override
+    public void initDependencies() {
+        this.fallFeature = configuration.get(FeatureType.FALL);
+    }
+
+    @Override
+    public boolean isItWorking() {
+        Player player; // Some player
+        return fallFeature.getFallDistance(player) > 3;
+    }
+}
+```
+
+Note that the `FeatureConfiguration` which can be used to get the `FallFeature` from is only ready when `initDependencies()` is called.
+This is due to complications with recursive dependencies between features.
+
+#### Player init
+
+You might want to initialize certain things for a player upon joining or whenever they get reset (respawn).
+This is possible by using the player init of a defined feature. Its constructor can also take a `DefinedFeature.PlayerInit`.
+This is a class whose `init(Player player, boolean firstInit)` method will be called upon a player join or reset.
+
+You can for example use this player init to set tags on a player. The vanilla implementation of `FallFeature` uses it to set the fall distance tag on the player to 0.
+
+There are two criteria to use the player init:
+- The logic does not depend on other features and as such can be defined once for every feature implementation, and not for every instance of this implementation.
+- The logic is required to be ran for the feature to work. If this is done inside the feature itself it might be out of scope (e.g. player join event is not called on an instance, so the feature might miss it).
 
 ## Contributing
 
