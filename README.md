@@ -1,7 +1,3 @@
-## IMPORTANT NOTE
-
-I am currently in the process of rewriting the entirety of this codebase in the rewrite branch. Until then, no major changes to master will be made. Until the rewrite is complete, an up to date fork by Am-Gone can be found [here](https://github.com/Am-Gone/MinestomPvP/tree/master).
-
 # MinestomPvP
 
 [![license](https://img.shields.io/github/license/TogAr2/MinestomPvP.svg?style=for-the-badge)](LICENSE)
