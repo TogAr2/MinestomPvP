@@ -4,6 +4,7 @@ import io.github.togar2.pvp.enchantment.EntityGroup;
 import io.github.togar2.pvp.feature.food.ExhaustionFeature;
 import io.github.togar2.pvp.feature.food.FoodFeature;
 import io.github.togar2.pvp.utils.CombatVersion;
+import net.minestom.server.color.AlphaColor;
 import net.minestom.server.color.Color;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
@@ -34,8 +35,7 @@ public class CombatPotionEffect {
 		this.potionEffect = potionEffect;
 		this.particleSupplier = potion -> {
 			int alpha = potion.isAmbient() ? 38 : 255;
-			//TODO why does Minestom not support an alpha value??
-			return Particle.ENTITY_EFFECT.withColor(new Color(potion.effect().registry().color()));
+			return Particle.ENTITY_EFFECT.withColor(new AlphaColor(alpha, new Color(potion.effect().registry().color())));
 		};
 	}
 	
