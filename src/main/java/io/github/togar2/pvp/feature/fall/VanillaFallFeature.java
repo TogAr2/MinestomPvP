@@ -116,7 +116,7 @@ public class VanillaFallFeature implements FallFeature, CombatFeature, Registrab
 					0.15f, particleCount
 			));
 			
-			entity.setTag(EXTRA_FALL_PARTICLES, false);
+			entity.removeTag(EXTRA_FALL_PARTICLES);
 		}
 		
 		double safeFallDistance = entity.getAttributeValue(Attribute.GENERIC_SAFE_FALL_DISTANCE);
