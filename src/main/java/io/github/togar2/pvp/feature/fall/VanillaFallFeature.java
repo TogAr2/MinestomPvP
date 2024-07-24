@@ -10,8 +10,10 @@ import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityTickEvent;
@@ -23,7 +25,6 @@ import net.minestom.server.instance.block.Block;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.potion.PotionEffect;
-import net.minestom.server.potion.TimedPotion;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
 
@@ -38,6 +39,7 @@ public class VanillaFallFeature implements FallFeature, CombatFeature, Registrab
 	);
 	
 	public static final Tag<Double> FALL_DISTANCE = Tag.Transient("fallDistance");
+	public static final Tag<Boolean> EXTRA_FALL_PARTICLES = Tag.Transient("extraFallParticles");
 	
 	private final FeatureConfiguration configuration;
 	
@@ -100,11 +102,27 @@ public class VanillaFallFeature implements FallFeature, CombatFeature, Registrab
 			return;
 		}
 		
-		if (fallDistance > 3.0) {
-			assert entity.getInstance() != null;
-			Block block = entity.getInstance().getBlock(getLandingPos(entity, newPos));
+		Point landingPos = getLandingPos(entity, newPos);
+		Block block = entity.getInstance().getBlock(landingPos);
+		
+		if (entity.hasTag(EXTRA_FALL_PARTICLES) && entity.getTag(EXTRA_FALL_PARTICLES) && fallDistance > 0.0) {
+			Vec position = Vec.fromPoint(landingPos).apply(Vec.Operator.FLOOR).add(0.5, 1, 0.5);
+			int particleCount = (int) Math.max(0, Math.min(200, 50 * fallDistance));
+			
+			entity.sendPacketToViewersAndSelf(new ParticlePacket(
+					Particle.BLOCK.withBlock(block),
+					position.x(), position.y(), position.z(),
+					0.3f, 0.3f, 0.3f,
+					0.15f, particleCount
+			));
+			
+			entity.setTag(EXTRA_FALL_PARTICLES, false);
+		}
+		
+		double safeFallDistance = entity.getAttributeValue(Attribute.GENERIC_SAFE_FALL_DISTANCE);
+		if (fallDistance > safeFallDistance) {
 			if (!block.isAir()) {
-				double damageDistance = Math.ceil(fallDistance - 3.0);
+				double damageDistance = Math.ceil(fallDistance - safeFallDistance);
 				double particleMultiplier = Math.min(0.2 + damageDistance / 15.0, 2.5);
 				int particleCount = (int) (150 * particleMultiplier);
 				
@@ -142,12 +160,8 @@ public class VanillaFallFeature implements FallFeature, CombatFeature, Registrab
 	
 	@Override
 	public int getFallDamage(LivingEntity entity, double fallDistance) {
-		TimedPotion effect = entity.getEffect(PotionEffect.JUMP_BOOST);
-		double reduce = effect != null
-				? effect.potion().amplifier() + 1
-				: 0.0;
-		
-		return (int) Math.floor(fallDistance - 3.0 - reduce);
+		double safeFallDistance = entity.getAttributeValue(Attribute.GENERIC_SAFE_FALL_DISTANCE);
+		return (int) Math.ceil((fallDistance - safeFallDistance) * entity.getAttributeValue(Attribute.GENERIC_FALL_DAMAGE_MULTIPLIER));
 	}
 	
 	@Override
@@ -158,6 +172,12 @@ public class VanillaFallFeature implements FallFeature, CombatFeature, Registrab
 	@Override
 	public void resetFallDistance(LivingEntity entity) {
 		entity.setTag(FALL_DISTANCE, 0.0);
+	}
+	
+	@Override
+	public void setExtraFallParticles(LivingEntity entity, boolean extraFallParticles) {
+		if (extraFallParticles) entity.setTag(EXTRA_FALL_PARTICLES, true);
+		else entity.removeTag(EXTRA_FALL_PARTICLES);
 	}
 	
 	protected Point getLandingPos(LivingEntity livingEntity, Pos position) {
