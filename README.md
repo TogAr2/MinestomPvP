@@ -180,6 +180,7 @@ The library provides several events:
 - `EntityPreDeathEvent`: cancellable, a form of `EntityDeathEvent` but cancellable and with a damage type. Can be used to cancel the death while still applying after-damage effects, such as attack sounds.
 - `EquipmentDamageEvent`: cancellable, called when an item in an equipment slot gets damaged.
 - `ExplosionEvent`: cancellable, called when an explosion will take place. Can be used to modify the affected blocks.
+- `ExplosivePrimeEvent`: cancellable, called when a tnt gets ignited, either by a player or by a nearby explosion.
 - `FinalAttackEvent`: cancellable, called when a player attacks an entity. Can be used to set a few variables like sprint, critical, sweeping, etc.
 - `FinalDamageEvent`: cancellable, called when the final damage calculation (including armor and effects) is completed. This event should be used instead of `EntityDamageEvent`, unless you want to detect how much damage was originally dealt.
 - `FishingBobberRetrieveEvent`: cancellable, called when a player retrieves a fishing bobber.

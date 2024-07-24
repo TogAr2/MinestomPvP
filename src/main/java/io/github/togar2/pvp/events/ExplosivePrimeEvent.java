@@ -8,7 +8,7 @@ import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Called when a tnt gets ignited, either by a player or by a close explosion.
+ * Called when a tnt gets ignited, either by a player or by a nearby explosion.
  * You can get the cause by using {@link ExplosivePrimeEvent#getCause()}
  */
 public class ExplosivePrimeEvent implements InstanceEvent, CancellableEvent {
