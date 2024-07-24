@@ -20,6 +20,7 @@ public class ExplosionConfig extends ElementConfig<EntityInstanceEvent> {
 	public EventNode<EntityInstanceEvent> createNode() {
 		return new CombatConfiguration().legacy(isLegacy())
 				.add(CombatFeatures.VANILLA_EXPLOSION)
+				.add(CombatFeatures.VANILLA_EXPLOSIVE)
 				.build().createNode();
 	}
 }

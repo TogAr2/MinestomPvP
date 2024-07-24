@@ -16,6 +16,7 @@ import io.github.togar2.pvp.feature.damage.VanillaDamageFeature;
 import io.github.togar2.pvp.feature.effect.VanillaEffectFeature;
 import io.github.togar2.pvp.feature.enchantment.VanillaEnchantmentFeature;
 import io.github.togar2.pvp.feature.explosion.VanillaExplosionFeature;
+import io.github.togar2.pvp.feature.explosion.VanillaExplosiveFeature;
 import io.github.togar2.pvp.feature.fall.VanillaFallFeature;
 import io.github.togar2.pvp.feature.food.VanillaExhaustionFeature;
 import io.github.togar2.pvp.feature.food.VanillaFoodFeature;
@@ -90,6 +91,10 @@ public class CombatFeatures {
 	 * @see VanillaExplosionFeature
 	 */
 	public static final DefinedFeature<VanillaExplosionFeature> VANILLA_EXPLOSION = VanillaExplosionFeature.DEFINED;
+	/**
+	 * @see VanillaExplosiveFeature
+	 */
+	public static final DefinedFeature<VanillaExplosiveFeature> VANILLA_EXPLOSIVE = VanillaExplosiveFeature.DEFINED;
 	/**
 	 * @see VanillaFallFeature
 	 */
@@ -168,11 +173,11 @@ public class CombatFeatures {
 			VANILLA_ARMOR, VANILLA_ATTACK, VANILLA_CRITICAL, VANILLA_SWEEPING,
 			VANILLA_EQUIPMENT, VANILLA_BLOCK, VANILLA_ATTACK_COOLDOWN, VANILLA_ITEM_COOLDOWN,
 			VANILLA_DAMAGE, VANILLA_EFFECT, VANILLA_ENCHANTMENT, VANILLA_EXPLOSION,
-			VANILLA_FALL, VANILLA_EXHAUSTION, VANILLA_FOOD, VANILLA_REGENERATION,
-			VANILLA_ITEM_DAMAGE, VANILLA_KNOCKBACK, VANILLA_POTION, VANILLA_BOW,
-			VANILLA_CROSSBOW, VANILLA_FISHING_ROD, VANILLA_MISC_PROJECTILE, VANILLA_PROJECTILE_ITEM,
-			VANILLA_TRIDENT, VANILLA_SPECTATE, VANILLA_PLAYER_STATE, VANILLA_TOTEM,
-			VANILLA_DEATH_MESSAGE
+			VANILLA_EXPLOSIVE, VANILLA_FALL, VANILLA_EXHAUSTION, VANILLA_FOOD,
+			VANILLA_REGENERATION, VANILLA_ITEM_DAMAGE, VANILLA_KNOCKBACK, VANILLA_POTION,
+			VANILLA_BOW, VANILLA_CROSSBOW, VANILLA_FISHING_ROD, VANILLA_MISC_PROJECTILE,
+			VANILLA_PROJECTILE_ITEM, VANILLA_TRIDENT, VANILLA_SPECTATE, VANILLA_PLAYER_STATE,
+			VANILLA_TOTEM, VANILLA_DEATH_MESSAGE
 	);
 	
 	private static final CombatFeatureSet MODERN_VANILLA = getVanilla(CombatVersion.MODERN, DifficultyProvider.DEFAULT).build();
