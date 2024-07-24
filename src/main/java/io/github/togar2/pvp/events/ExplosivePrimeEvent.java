@@ -9,9 +9,9 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Called when a tnt gets ignited, either by a player or by a close explosion.
- * You can get the cause by using {@link TntIgniteEvent#getCause()}
+ * You can get the cause by using {@link ExplosivePrimeEvent#getCause()}
  */
-public class TntIgniteEvent implements InstanceEvent, CancellableEvent {
+public class ExplosivePrimeEvent implements InstanceEvent, CancellableEvent {
 	
 	private final Instance instance;
 	private final Point blockPosition;
@@ -20,8 +20,8 @@ public class TntIgniteEvent implements InstanceEvent, CancellableEvent {
 	private int fuse;
 	private boolean cancelled;
 	
-	public TntIgniteEvent(@NotNull Instance instance, @NotNull Point blockPosition,
-	                      @NotNull ExplosionFeature.IgnitionCause cause, int fuse) {
+	public ExplosivePrimeEvent(@NotNull Instance instance, @NotNull Point blockPosition,
+	                           @NotNull ExplosionFeature.IgnitionCause cause, int fuse) {
 		this.instance = instance;
 		this.blockPosition = blockPosition;
 		this.cause = cause;
