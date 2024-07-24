@@ -143,7 +143,7 @@ public class VanillaFoodFeature implements FoodFeature, CombatFeature, Registrab
 		if (leftOver.isAir()) leftOver = getUsingConvertsTo(stack);
 		
 		if (player.getGameMode() != GameMode.CREATIVE) {
-			if (!leftOver.isAir()) {
+			if (leftOver != null && !leftOver.isAir()) {
 				if (stack.amount() == 1) {
 					player.setItemInHand(hand, leftOver);
 				} else {
