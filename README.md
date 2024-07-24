@@ -172,6 +172,9 @@ The same applies to `ToolMaterial` (wood, stone, ...) and `ArmorMaterial`.
 
 The library provides several events:
 
+- `AnchorChargeEvent`: cancellable, called when a player charges a respawn anchor.
+- `AnchorExplodeEvent`: cancellable, called when a player clicks on a respawn anchor to explode it.
+- `CrystalPlaceEvent`: cancellable, called when a player places an end crystal.
 - `DamageBlockEvent`: cancellable, called when an entity blocks damage using a shield. This event can be used to set the remaining damage.
 - `EntityKnockbackEvent`: cancellable, called when an entity gets knocked back by another entity. Gets called twice for weapons with the knockback enchantment (once for default damage knockback, once for the extra knockback). This event can be used to set the knockback strength.
 - `EntityPreDeathEvent`: cancellable, a form of `EntityDeathEvent` but cancellable and with a damage type. Can be used to cancel the death while still applying after-damage effects, such as attack sounds.

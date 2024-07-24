@@ -1,6 +1,9 @@
 package io.github.togar2.pvp.feature.explosion;
 
 import io.github.togar2.pvp.entity.explosion.CrystalEntity;
+import io.github.togar2.pvp.events.AnchorChargeEvent;
+import io.github.togar2.pvp.events.AnchorExplodeEvent;
+import io.github.togar2.pvp.events.CrystalPlaceEvent;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
@@ -16,6 +19,7 @@ import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
+import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.player.PlayerBlockInteractEvent;
 import net.minestom.server.event.player.PlayerUseItemOnBlockEvent;
@@ -89,11 +93,16 @@ public class VanillaExplosiveFeature implements ExplosiveFeature, RegistrableFea
 				if (entity.getBoundingBox().intersectBox(above.sub(entity.getPosition()), checkIntersect)) return;
 			}
 			
-			CrystalEntity entity = new CrystalEntity();
-			entity.setInstance(instance, above.add(0.5, 0, 0.5));
+			Point spawnPosition = above.add(0.5, 0, 0.5);
+			var crystalPlaceEvent = new CrystalPlaceEvent(event.getPlayer(), spawnPosition);
 			
-			if (event.getPlayer().getGameMode() != GameMode.CREATIVE)
-				event.getPlayer().setItemInHand(event.getHand(), event.getItemStack().consume(1));
+			EventDispatcher.callCancellable(crystalPlaceEvent, () -> {
+				CrystalEntity entity = new CrystalEntity();
+				entity.setInstance(instance, crystalPlaceEvent.getSpawnPosition());
+				
+				if (event.getPlayer().getGameMode() != GameMode.CREATIVE)
+					event.getPlayer().setItemInHand(event.getHand(), event.getItemStack().consume(1));
+			});
 		});
 		
 		node.addListener(PlayerBlockInteractEvent.class, event -> {
@@ -102,7 +111,7 @@ public class VanillaExplosiveFeature implements ExplosiveFeature, RegistrableFea
 			Player player = event.getPlayer();
 			if (!block.compare(Block.RESPAWN_ANCHOR)) return;
 			
-			// Exit if offhand has glowstone but current hand is main
+			// Exit if offhand has glowstone but current hand is main, to prevent exploding when it should be charged instead
 			if (event.getHand() == Player.Hand.MAIN
 					&& player.getItemInMainHand().material() != Material.GLOWSTONE
 					&& player.getItemInOffHand().material() == Material.GLOWSTONE)
@@ -111,35 +120,43 @@ public class VanillaExplosiveFeature implements ExplosiveFeature, RegistrableFea
 			ItemStack stack = player.getItemInHand(event.getHand());
 			int charges = Integer.parseInt(block.getProperty("charges"));
 			if (stack.material() == Material.GLOWSTONE && charges < 4) {
-				instance.setBlock(event.getBlockPosition(),
-						block.withProperty("charges", String.valueOf(charges + 1)));
-				ViewUtil.packetGroup(player).playSound(Sound.sound(
-						SoundEvent.BLOCK_RESPAWN_ANCHOR_CHARGE, Sound.Source.BLOCK,
-						1.0f, 1.0f
-				), event.getBlockPosition().add( 0.5, 0.5, 0.5));
+				var anchorChargeEvent = new AnchorChargeEvent(player, event.getBlockPosition());
+				EventDispatcher.call(anchorChargeEvent);
 				
-				if (player.getGameMode() != GameMode.CREATIVE)
-					player.setItemInHand(event.getHand(), player.getItemInHand(event.getHand()).consume(1));
-				
-				event.setBlockingItemUse(true);
-				return;
+				if (!anchorChargeEvent.isCancelled()) {
+					instance.setBlock(event.getBlockPosition(),
+							block.withProperty("charges", String.valueOf(charges + 1)));
+					ViewUtil.packetGroup(player).playSound(Sound.sound(
+							SoundEvent.BLOCK_RESPAWN_ANCHOR_CHARGE, Sound.Source.BLOCK,
+							1.0f, 1.0f
+					), event.getBlockPosition().add(0.5, 0.5, 0.5));
+					
+					if (player.getGameMode() != GameMode.CREATIVE)
+						player.setItemInHand(event.getHand(), player.getItemInHand(event.getHand()).consume(1));
+					
+					event.setBlockingItemUse(true);
+					return;
+				}
 			}
 			
 			if (charges == 0) return;
 			
 			if (instance.getExplosionSupplier() != null
 					&& MinecraftServer.getDimensionTypeRegistry().get(instance.getDimensionType()).respawnAnchorWorks()) {
-				instance.setBlock(event.getBlockPosition(), Block.AIR);
-				instance.explode(
-						(float) (event.getBlockPosition().x() + 0.5),
-						(float) (event.getBlockPosition().y() + 0.5),
-						(float) (event.getBlockPosition().z() + 0.5),
-						5.0f,
-						CompoundBinaryTag.builder()
-								.putBoolean("fire", true)
-								.putBoolean("anchor", true)
-								.build()
-				);
+				var anchorExplodeEvent = new AnchorExplodeEvent(player, event.getBlockPosition());
+				EventDispatcher.callCancellable(anchorExplodeEvent, () -> {
+					instance.setBlock(event.getBlockPosition(), Block.AIR);
+					instance.explode(
+							(float) (event.getBlockPosition().x() + 0.5),
+							(float) (event.getBlockPosition().y() + 0.5),
+							(float) (event.getBlockPosition().z() + 0.5),
+							5.0f,
+							CompoundBinaryTag.builder()
+									.putBoolean("fire", true)
+									.putBoolean("anchor", true)
+									.build()
+					);
+				});
 			}
 			
 			event.setBlockingItemUse(true);
