@@ -66,7 +66,7 @@ public class VanillaExplosiveFeature implements ExplosiveFeature, RegistrableFea
 			Block block = instance.getBlock(position);
 			if (!block.compare(Block.TNT)) return;
 			
-			explosionFeature.primeExplosive(instance, position, player, 80);
+			explosionFeature.primeExplosive(instance, position, new ExplosionFeature.IgnitionCause.ByPlayer(player), 80);
 			instance.setBlock(position, Block.AIR);
 			
 			if (player.getGameMode() != GameMode.CREATIVE) {

@@ -197,7 +197,8 @@ public final class VanillaExplosionSupplier implements ExplosionSupplier {
 				for (int i = 0; i < blocks.size(); i++) {
 					final var pos = blocks.get(i);
 					if (instance.getBlock(pos).compare(Block.TNT)) {
-						feature.primeExplosive(instance, pos, getCausingEntity(instance),
+						LivingEntity causingEntity = getCausingEntity(instance);
+						feature.primeExplosive(instance, pos, new ExplosionFeature.IgnitionCause.Explosion(causingEntity),
 								ThreadLocalRandom.current().nextInt(20) + 10);
 					}
 					instance.setBlock(pos, Block.AIR);
@@ -236,7 +237,7 @@ public final class VanillaExplosionSupplier implements ExplosionSupplier {
 				postSend(instance, blocks);
 			}
 			
-			private LivingEntity getCausingEntity(Instance instance) {
+			private @Nullable LivingEntity getCausingEntity(Instance instance) {
 				LivingEntity causingEntity = null;
 				if (additionalData != null && additionalData.keySet().contains("causingEntity")) {
 					UUID causingUuid = UUID.fromString(additionalData.getString("causingEntity"));

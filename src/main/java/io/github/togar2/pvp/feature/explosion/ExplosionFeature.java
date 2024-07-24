@@ -3,8 +3,10 @@ package io.github.togar2.pvp.feature.explosion;
 import io.github.togar2.pvp.feature.CombatFeature;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.entity.LivingEntity;
+import net.minestom.server.entity.Player;
 import net.minestom.server.instance.ExplosionSupplier;
 import net.minestom.server.instance.Instance;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -22,10 +24,33 @@ public interface ExplosionFeature extends CombatFeature {
 		}
 		
 		@Override
-		public void primeExplosive(Instance instance, Point blockPosition, @Nullable LivingEntity cause, int fuse) {}
+		public void primeExplosive(Instance instance, Point blockPosition, @NotNull IgnitionCause cause, int fuse) {}
 	};
 	
 	@Nullable ExplosionSupplier getExplosionSupplier();
 	
-	void primeExplosive(Instance instance, Point blockPosition, @Nullable LivingEntity cause, int fuse);
+	void primeExplosive(Instance instance, Point blockPosition, @NotNull IgnitionCause cause, int fuse);
+	
+	sealed interface IgnitionCause {
+		@Nullable LivingEntity causingEntity();
+		
+		/**
+		 * Ignition cause when a player directly ignites an explosive.
+		 *
+		 * @param player the player which ignited the explosive
+		 */
+		record ByPlayer(Player player) implements IgnitionCause {
+			@Override
+			public @Nullable LivingEntity causingEntity() {
+				return player;
+			}
+		}
+		
+		/**
+		 * Ignition cause when an explosion causes another explosive to ignite.
+		 *
+		 * @param causingEntity the entity which caused the original explosion
+		 */
+		record Explosion(LivingEntity causingEntity) implements IgnitionCause {}
+	}
 }
