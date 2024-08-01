@@ -91,4 +91,36 @@ public class FeatureConfiguration {
 			}
 		}
 	}
+	
+	public static FeatureConfiguration of(FeatureType<?> type1, CombatFeature feature1) {
+		return new FeatureConfiguration()
+				.add(type1, feature1);
+	}
+	
+	public static FeatureConfiguration of(FeatureType<?> type1, CombatFeature feature1,
+	                                      FeatureType<?> type2, CombatFeature feature2) {
+		return new FeatureConfiguration()
+				.add(type1, feature1)
+				.add(type2, feature2);
+	}
+	
+	public static FeatureConfiguration of(FeatureType<?> type1, CombatFeature feature1,
+	                                      FeatureType<?> type2, CombatFeature feature2,
+	                                      FeatureType<?> type3, CombatFeature feature3) {
+		return new FeatureConfiguration()
+				.add(type1, feature1)
+				.add(type2, feature2)
+				.add(type3, feature3);
+	}
+	
+	public static FeatureConfiguration of(FeatureType<?> type1, CombatFeature feature1,
+	                                      FeatureType<?> type2, CombatFeature feature2,
+	                                      FeatureType<?> type3, CombatFeature feature3,
+	                                      FeatureType<?> type4, CombatFeature feature4) {
+		return new FeatureConfiguration()
+				.add(type1, feature1)
+				.add(type2, feature2)
+				.add(type3, feature3)
+				.add(type4, feature4);
+	}
 }
