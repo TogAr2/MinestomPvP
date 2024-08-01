@@ -65,7 +65,7 @@ public class ExplosionEvent implements InstanceEvent, CancellableEvent {
 	 *
 	 * @param damageObject the new damage object
 	 */
-	public void setDamageObject(Damage damageObject) {
+	public void setDamageObject(@NotNull Damage damageObject) {
 		this.damageObject = damageObject;
 	}
 	
