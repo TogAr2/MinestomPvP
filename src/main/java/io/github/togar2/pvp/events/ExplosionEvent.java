@@ -1,6 +1,8 @@
 package io.github.togar2.pvp.events;
 
 import net.minestom.server.coordinate.Point;
+import net.minestom.server.entity.Entity;
+import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.event.trait.CancellableEvent;
 import net.minestom.server.event.trait.InstanceEvent;
 import net.minestom.server.instance.Instance;
@@ -14,12 +16,17 @@ import java.util.List;
 public class ExplosionEvent implements InstanceEvent, CancellableEvent {
 	private final Instance instance;
 	private final List<Point> affectedBlocks;
+	private final List<Entity> affectedEntities;
 	
+	private Damage damageObject;
 	private boolean cancelled;
 	
-	public ExplosionEvent(@NotNull Instance instance, @NotNull List<Point> affectedBlocks) {
+	public ExplosionEvent(@NotNull Instance instance, @NotNull List<Point> affectedBlocks,
+	                      @NotNull List<Entity> affectedEntities, @NotNull Damage damageObject) {
 		this.instance = instance;
 		this.affectedBlocks = affectedBlocks;
+		this.affectedEntities = affectedEntities;
+		this.damageObject = damageObject;
 	}
 	
 	/**
@@ -30,6 +37,36 @@ public class ExplosionEvent implements InstanceEvent, CancellableEvent {
 	 */
 	public @NotNull List<Point> getAffectedBlocks() {
 		return affectedBlocks;
+	}
+	
+	/**
+	 * Gets the entities affected by this explosion.
+	 * The list may be modified.
+	 *
+	 * @return the list of entities affected by the explosion
+	 */
+	public @NotNull List<Entity> getAffectedEntities() {
+		return affectedEntities;
+	}
+	
+	/**
+	 * Gets the damage object which will be used to damage any affected entities.
+	 * The damage amount of this object will be overwritten depending on the entity.
+	 *
+	 * @return the damage object
+	 */
+	public @NotNull Damage getDamageObject() {
+		return damageObject;
+	}
+	
+	/**
+	 * Sets the damage object which will be used to damage any affected entities.
+	 * The damage amount of this object will be overwritten depending on the entity.
+	 *
+	 * @param damageObject the new damage object
+	 */
+	public void setDamageObject(Damage damageObject) {
+		this.damageObject = damageObject;
 	}
 	
 	@Override

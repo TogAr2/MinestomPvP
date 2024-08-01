@@ -27,7 +27,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 public final class VanillaExplosionSupplier implements ExplosionSupplier {
 	private final ExplosionFeature feature;
@@ -97,11 +96,6 @@ public final class VanillaExplosionSupplier implements ExplosionSupplier {
 					}
 				}
 				
-				// Blocks list may be modified during the event call
-				ExplosionEvent explosionEvent = new ExplosionEvent(instance, blocks);
-				EventDispatcher.call(explosionEvent);
-				if (explosionEvent.isCancelled()) return null;
-				
 				double strength = this.getStrength() * 2.0F;
 				int minX_ = (int) Math.floor(this.getCenterX() - strength - 1.0D);
 				int maxX_ = (int) Math.floor(this.getCenterX() + strength + 1.0D);
@@ -123,12 +117,12 @@ public final class VanillaExplosionSupplier implements ExplosionSupplier {
 						maxZ - minZ
 				);
 				
-				Vec src = new Vec(getCenterX(), getCenterY() - (explosionBox.height() / 2), getCenterZ());
+				Vec centerPoint = new Vec(getCenterX(), getCenterY(), getCenterZ());
 				
-				Set<Entity> entities = instance.getEntities().stream()
+				Vec src = centerPoint.sub(0, explosionBox.height() / 2, 0);
+				List<Entity> entities = instance.getEntities().stream()
 						.filter(entity -> explosionBox.intersectEntity(src, entity))
-						.collect(Collectors.toSet());
-				Vec centerPoint = new Vec(this.getCenterX(), this.getCenterY(), this.getCenterZ());
+						.toList();
 				
 				boolean anchor = false;
 				if (additionalData != null && additionalData.keySet().contains("anchor")) {
@@ -142,6 +136,12 @@ public final class VanillaExplosionSupplier implements ExplosionSupplier {
 					LivingEntity causingEntity = getCausingEntity(instance);
 					damageObj = new Damage(DamageType.PLAYER_EXPLOSION, causingEntity, causingEntity, null, 0);
 				}
+				
+				// Blocks list may be modified during the event call
+				ExplosionEvent explosionEvent = new ExplosionEvent(instance, blocks, entities, damageObj);
+				EventDispatcher.call(explosionEvent);
+				if (explosionEvent.isCancelled()) return null;
+				damageObj = explosionEvent.getDamageObject();
 				
 				for (Entity entity : entities) {
 					double currentStrength = entity.getPosition().distance(centerPoint) / strength;
