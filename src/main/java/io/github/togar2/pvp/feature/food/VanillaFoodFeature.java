@@ -157,9 +157,14 @@ public class VanillaFoodFeature implements FoodFeature, CombatFeature, Registrab
 	}
 	
 	@Override
-	public void addFood(Player player, int food, float saturationModifier) {
+	public void addFood(Player player, int food, float saturation) {
 		player.setFood(Math.min(food + player.getFood(), 20));
-		player.setFoodSaturation(Math.min(player.getFoodSaturation() + (float) food * saturationModifier * 2.0f, player.getFood()));
+		player.setFoodSaturation(Math.min(player.getFoodSaturation() + saturation, player.getFood()));
+	}
+	
+	@Override
+	public void eat(Player player, int food, float saturationModifier) {
+		addFood(player, food, (float) food * saturationModifier * 2.0f);
 	}
 	
 	@Override
@@ -171,7 +176,7 @@ public class VanillaFoodFeature implements FoodFeature, CombatFeature, Registrab
 	
 	@Override
 	public void applySaturationEffect(Player player, byte amplifier) {
-		addFood(player, amplifier + 1, 1.0f);
+		eat(player, amplifier + 1, 1.0f);
 	}
 	
 	protected void tickEatingSounds(Player player) {
