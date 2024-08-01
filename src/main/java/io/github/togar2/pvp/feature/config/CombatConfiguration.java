@@ -24,7 +24,7 @@ import java.util.*;
  * and turns this configuration into a {@link CombatFeatureSet}.
  */
 public class CombatConfiguration {
-	private final Set<ConstructableFeature> features = new HashSet<>();
+	private final Map<FeatureType<?>, ConstructableFeature> features = new HashMap<>();
 	
 	public final CombatConfiguration addAll(Collection<DefinedFeature<?>> constructors) {
 		for (DefinedFeature<?> constructor : constructors) {
@@ -56,21 +56,55 @@ public class CombatConfiguration {
 		return add(FeatureType.DIFFICULTY, difficulty);
 	}
 	
+	/**
+	 * Adds a feature to the configuration. This will overwrite any existing feature of this type.
+	 *
+	 * @param feature the feature to add
+	 * @return this
+	 */
 	public CombatConfiguration add(ConstructableFeature feature) {
-		features.add(feature);
+		features.put(feature.type, feature);
 		return this;
 	}
 	
+	/**
+	 * Adds a feature to the configuration. This will overwrite any existing feature of this type.
+	 *
+	 * @param type the type of the feature
+	 * @param feature the feature to add
+	 * @return this
+	 */
 	public CombatConfiguration add(FeatureType<?> type, CombatFeature feature) {
 		return add(wrap(type, feature));
 	}
 	
+	/**
+	 * Adds a feature to the configuration. This will overwrite any existing feature of this type.
+	 * Any dependencies the feature might have will first be looked up inside the override configuration.
+	 *
+	 * @param constructor the defined feature
+	 * @param override the override configuration
+	 * @return this
+	 */
 	public CombatConfiguration add(DefinedFeature<?> constructor, FeatureConfiguration override) {
 		return add(wrap(constructor, override));
 	}
 	
+	/**
+	 * Adds a feature to the configuration. This will overwrite any existing feature of this type.
+	 * Any dependencies the feature might have will first be looked up inside the override configuration.
+	 *
+	 * @param constructor the type of the feature
+	 * @param override list of features to override the configuration of the base feature
+	 * @return this
+	 */
 	public CombatConfiguration add(DefinedFeature<?> constructor, DefinedFeature<?>... override) {
 		return add(wrap(constructor, override));
+	}
+	
+	public CombatConfiguration remove(FeatureType<?> type) {
+		features.remove(type);
+		return this;
 	}
 	
 	public static ConstructableFeature wrap(FeatureType<?> type, CombatFeature feature) {
@@ -116,7 +150,7 @@ public class CombatConfiguration {
 		
 		//List<ConstructableFeature> buildOrder = getBuildOrder();
 		
-		for (ConstructableFeature feature : features) {
+		for (ConstructableFeature feature : features.values()) {
 			CombatFeature currentResult = feature.construct(result);
 			result.add(feature.type, currentResult);
 		}
@@ -139,7 +173,7 @@ public class CombatConfiguration {
 		while (true) {
 			// Find unprocessed feature
 			ConstructableFeature unprocessed = null;
-			for (ConstructableFeature feature : features) {
+			for (ConstructableFeature feature : features.values()) {
 				if (order.contains(feature)) continue;
 				if (visiting.contains(feature)) continue;
 				unprocessed = feature;
@@ -173,12 +207,7 @@ public class CombatConfiguration {
 	}
 	
 	private @Nullable ConstructableFeature getFeatureOf(FeatureType<?> type) {
-		for (ConstructableFeature feature : features) {
-			if (feature.type == type)
-				return feature;
-		}
-		
-		return null;
+		return features.get(type);
 	}
 	
 	public sealed abstract static class ConstructableFeature {
