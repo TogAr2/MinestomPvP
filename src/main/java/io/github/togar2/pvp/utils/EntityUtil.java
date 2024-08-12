@@ -24,7 +24,9 @@ public class EntityUtil {
 	
 	public static Component getName(Entity entity) {
 		HoverEvent<HoverEvent.ShowEntity> hoverEvent = HoverEvent.showEntity(entity.getEntityType().key(), entity.getUuid());
-		if (entity instanceof Player) {
+		if (entity.getCustomName() != null) {
+			return entity.getCustomName().hoverEvent(hoverEvent);
+		} else if (entity instanceof Player) {
 			return ((Player) entity).getName().hoverEvent(hoverEvent);
 		} else {
 			// Use entity type without underscores and starting with capital letter
