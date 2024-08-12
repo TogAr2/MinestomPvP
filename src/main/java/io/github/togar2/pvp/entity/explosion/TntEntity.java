@@ -7,7 +7,6 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
-import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.metadata.other.PrimedTntMeta;
 import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.Nullable;
@@ -15,9 +14,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class TntEntity extends Entity {
-	private final LivingEntity causingEntity;
+	private final Entity causingEntity;
 	
-	public TntEntity(@Nullable LivingEntity causingEntity) {
+	public TntEntity(@Nullable Entity causingEntity) {
 		super(EntityType.TNT);
 		this.causingEntity = causingEntity;
 		

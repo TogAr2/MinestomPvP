@@ -133,7 +133,7 @@ public final class VanillaExplosionSupplier implements ExplosionSupplier {
 				if (anchor) {
 					damageObj = new Damage(DamageType.BAD_RESPAWN_POINT, null, null, null, 0);
 				} else {
-					LivingEntity causingEntity = getCausingEntity(instance);
+					Entity causingEntity = getCausingEntity(instance);
 					damageObj = new Damage(DamageType.PLAYER_EXPLOSION, causingEntity, causingEntity, null, 0);
 				}
 				
@@ -197,7 +197,7 @@ public final class VanillaExplosionSupplier implements ExplosionSupplier {
 				for (int i = 0; i < blocks.size(); i++) {
 					final var pos = blocks.get(i);
 					if (instance.getBlock(pos).compare(Block.TNT)) {
-						LivingEntity causingEntity = getCausingEntity(instance);
+						Entity causingEntity = getCausingEntity(instance);
 						feature.primeExplosive(instance, pos, new ExplosionFeature.IgnitionCause.Explosion(causingEntity),
 								ThreadLocalRandom.current().nextInt(20) + 10);
 					}
@@ -237,13 +237,12 @@ public final class VanillaExplosionSupplier implements ExplosionSupplier {
 				postSend(instance, blocks);
 			}
 			
-			private @Nullable LivingEntity getCausingEntity(Instance instance) {
-				LivingEntity causingEntity = null;
+			private @Nullable Entity getCausingEntity(Instance instance) {
+				Entity causingEntity = null;
 				if (additionalData != null && additionalData.keySet().contains("causingEntity")) {
 					UUID causingUuid = UUID.fromString(additionalData.getString("causingEntity"));
-					causingEntity = (LivingEntity) instance.getEntities().stream()
-							.filter(entity -> entity instanceof LivingEntity
-									&& entity.getUuid().equals(causingUuid))
+					causingEntity = instance.getEntities().stream()
+							.filter(entity -> entity.getUuid().equals(causingUuid))
 							.findAny().orElse(null);
 				}
 				

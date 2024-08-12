@@ -2,7 +2,7 @@ package io.github.togar2.pvp.feature.explosion;
 
 import io.github.togar2.pvp.feature.CombatFeature;
 import net.minestom.server.coordinate.Point;
-import net.minestom.server.entity.LivingEntity;
+import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.instance.ExplosionSupplier;
 import net.minestom.server.instance.Instance;
@@ -32,7 +32,7 @@ public interface ExplosionFeature extends CombatFeature {
 	void primeExplosive(Instance instance, Point blockPosition, @NotNull IgnitionCause cause, int fuse);
 	
 	sealed interface IgnitionCause {
-		@Nullable LivingEntity causingEntity();
+		@Nullable Entity causingEntity();
 		
 		/**
 		 * Ignition cause when a player directly ignites an explosive.
@@ -41,7 +41,7 @@ public interface ExplosionFeature extends CombatFeature {
 		 */
 		record ByPlayer(Player player) implements IgnitionCause {
 			@Override
-			public @Nullable LivingEntity causingEntity() {
+			public @Nullable Player causingEntity() {
 				return player;
 			}
 		}
@@ -51,6 +51,6 @@ public interface ExplosionFeature extends CombatFeature {
 		 *
 		 * @param causingEntity the entity which caused the original explosion
 		 */
-		record Explosion(LivingEntity causingEntity) implements IgnitionCause {}
+		record Explosion(Entity causingEntity) implements IgnitionCause {}
 	}
 }
