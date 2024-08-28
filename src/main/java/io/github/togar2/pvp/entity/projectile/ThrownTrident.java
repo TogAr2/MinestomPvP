@@ -29,7 +29,7 @@ public class ThrownTrident extends AbstractArrow {
 		this.tridentItem = tridentItem;
 		
 		ThrownTridentMeta meta = ((ThrownTridentMeta) getEntityMeta());
-		meta.setLoyaltyLevel(tridentItem.get(ItemComponent.ENCHANTMENTS).level(Enchantment.LOYALTY));
+		meta.setLoyaltyLevel((byte) tridentItem.get(ItemComponent.ENCHANTMENTS).level(Enchantment.LOYALTY));
 		
 		meta.setHasEnchantmentGlint(!Objects.requireNonNull(tridentItem.get(ItemComponent.ENCHANTMENTS))
 				.enchantments().isEmpty());

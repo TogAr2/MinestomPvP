@@ -2,10 +2,7 @@ package io.github.togar2.pvp.entity.projectile;
 
 import io.github.togar2.pvp.utils.ProjectileUtil;
 import net.minestom.server.ServerFlag;
-import net.minestom.server.collision.Aerodynamics;
-import net.minestom.server.collision.BoundingBox;
-import net.minestom.server.collision.CollisionUtils;
-import net.minestom.server.collision.PhysicsResult;
+import net.minestom.server.collision.*;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -21,6 +18,7 @@ import net.minestom.server.utils.chunk.ChunkUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
@@ -223,19 +221,20 @@ public class CustomEntityProjectile extends Entity {
 				// We won't check collisions with self for first ticks of projectile's life, because it spawns in the
 				// shooter and will immediately be triggered by him.
 				boolean noCollideShooter = getAliveTicks() < 6;
-				PhysicsResult entityResult = CollisionUtils.checkEntityCollisions(instance, boundingBox.expand(0.1, 0.3, 0.1),
+				Collection<EntityCollisionResult> entityResult = CollisionUtils.checkEntityCollisions(instance, boundingBox.expand(0.1, 0.3, 0.1),
 						position.add(0, -0.3, 0), diff, 3, e -> {
 							if (noCollideShooter && e == shooter) return false;
 							return e != this && canHit(e);
 						}, physicsResult);
-				
-				if (entityResult.hasCollision() && entityResult.collisionShapes()[0] instanceof Entity collided) {
+
+				if (!entityResult.isEmpty()) {
 					AtomicBoolean entityCollisionSucceeded = new AtomicBoolean();
 					
 					Vec prevVelocity = velocity;
+					EntityCollisionResult collided = entityResult.stream().findFirst().orElse(null);
 					
-					var event = new ProjectileCollideWithEntityEvent(this, Pos.fromPoint(entityResult.newPosition()), collided);
-					EventDispatcher.callCancellable(event, () -> entityCollisionSucceeded.set(onHit(collided)));
+					var event = new ProjectileCollideWithEntityEvent(this, Pos.fromPoint(collided.collisionPoint()), collided.entity());
+					EventDispatcher.callCancellable(event, () -> entityCollisionSucceeded.set(onHit(collided.entity())));
 					
 					if (entityCollisionSucceeded.get()) {
 						// Don't remove now because rest of Entity#tick might throw errors
