@@ -185,6 +185,7 @@ The library provides several events:
 - `FinalDamageEvent`: cancellable, called when the final damage calculation (including armor and effects) is completed. This event should be used instead of `EntityDamageEvent`, unless you want to detect how much damage was originally dealt.
 - `FishingBobberRetrieveEvent`: cancellable, called when a player retrieves a fishing bobber.
 - `LegacyKnockbackEvent`: cancellable, called when an entity gets knocked back by another entity using legacy pvp. Same applies as for `EntityKnockbackEvent`. This event can be used to change the knockback settings.
+- `PrepareAttackEvent`: cancellable, called before calculations for a given melee attack are done. Can be used to cancel the attack from happening in known situations where attacks shouldn't occur - ie; in a lobby/waiting phase.
 - `PickupEntityEvent`: cancellable, called when a player picks up an entity (arrow or trident).
 - `PlayerExhaustEvent`: cancellable, called when a players' exhaustion level changes.
 - `PlayerRegenerateEvent`: cancellable, called when a player naturally regenerates health.
