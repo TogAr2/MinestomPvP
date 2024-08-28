@@ -16,8 +16,8 @@ java {
 }
 
 dependencies {
-    compileOnly 'net.minestom:minestom-snapshots:6fc64e3a5d'
-    testImplementation 'net.minestom:minestom-snapshots:6fc64e3a5d'
+    compileOnly 'net.minestom:minestom-snapshots:a521c4e7cd'
+    testImplementation 'net.minestom:minestom-snapshots:a521c4e7cd'
     //testImplementation 'com.github.TogAr2:MinestomFluids:b237b13a4b'
 }
 
@@ -26,5 +26,8 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
         }
+    }
+    repositories {
+        mavenLocal()
     }
 }
