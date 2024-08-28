@@ -85,8 +85,6 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 				&& !player.isDead()
 				&& player.getDistanceSquared(event.getTarget()) < MAX_DISTANCE_SQUARED) {
 				performAttack(player, event.getTarget());
-			} else if (event.getEntity() instanceof LivingEntity living && !living.isDead() && living.getDistanceSquared(event.getTarget()) < MAX_DISTANCE_SQUARED) {
-				performAttack(living, event.getTarget());
 			}
 		});
 	}
