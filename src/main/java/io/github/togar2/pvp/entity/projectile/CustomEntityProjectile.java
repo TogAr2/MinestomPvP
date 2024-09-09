@@ -48,7 +48,8 @@ public class CustomEntityProjectile extends Entity {
 	}
 	
 	private void setup() {
-		hasCollision = false;
+		collidesWithEntities = false;
+		preventBlockPlacement = false;
 		setAerodynamics(new Aerodynamics(getAerodynamics().gravity(), 0.99, 0.99));
 		if (getEntityMeta() instanceof ProjectileMeta) {
 			((ProjectileMeta) getEntityMeta()).setShooter(shooter);
