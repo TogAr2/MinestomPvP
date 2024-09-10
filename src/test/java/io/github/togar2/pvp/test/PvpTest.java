@@ -111,7 +111,7 @@ public class PvpTest {
 		MinecraftServer.getCommandManager().register(new Command("shoot") {{
 			setDefaultExecutor((sender, args) -> {
 				if (sender instanceof Player player) {
-					PlayerProjectile projectile = new PlayerProjectile(player, EntityType.ARROW);
+					EntityProjectile projectile = new EntityProjectile(player, EntityType.ARROW);
 					projectile.setInstance(player.getInstance(), player.getPosition().add(0, player.getEyeHeight(), 0));
 					projectile.shoot(player.getPosition().add(player.getPosition().direction()).add(0, 2, 0), 1, 0);
 					player.sendMessage("oui");
