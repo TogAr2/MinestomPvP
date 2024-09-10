@@ -120,9 +120,9 @@ public final class VanillaExplosionSupplier implements ExplosionSupplier {
 				Vec centerPoint = new Vec(getCenterX(), getCenterY(), getCenterZ());
 				
 				Vec src = centerPoint.sub(0, explosionBox.height() / 2, 0);
-				List<Entity> entities = instance.getEntities().stream()
+				List<Entity> entities = new ArrayList<>(instance.getEntities().stream()
 						.filter(entity -> explosionBox.intersectEntity(src, entity))
-						.toList();
+						.toList());
 				
 				boolean anchor = false;
 				if (additionalData != null && additionalData.keySet().contains("anchor")) {
@@ -137,7 +137,7 @@ public final class VanillaExplosionSupplier implements ExplosionSupplier {
 					damageObj = new Damage(DamageType.PLAYER_EXPLOSION, causingEntity, causingEntity, null, 0);
 				}
 				
-				// Blocks list may be modified during the event call
+				// Blocks and entities list may be modified during the event call
 				ExplosionEvent explosionEvent = new ExplosionEvent(instance, blocks, entities, damageObj);
 				EventDispatcher.call(explosionEvent);
 				if (explosionEvent.isCancelled()) return null;
