@@ -1,7 +1,7 @@
 package io.github.togar2.pvp.events;
 
 import net.minestom.server.entity.Entity;
-import net.minestom.server.entity.damage.DamageType;
+import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.event.trait.CancellableEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import org.jetbrains.annotations.NotNull;
@@ -14,14 +14,14 @@ import org.jetbrains.annotations.NotNull;
 public class EntityPreDeathEvent implements EntityInstanceEvent, CancellableEvent {
 	
 	private final Entity entity;
-	private final DamageType damageType;
+	private final Damage damage;
 	
 	private boolean cancelled;
 	private boolean cancelDeath;
 	
-	public EntityPreDeathEvent(@NotNull Entity entity, @NotNull DamageType damageType) {
+	public EntityPreDeathEvent(@NotNull Entity entity, @NotNull Damage damage) {
 		this.entity = entity;
-		this.damageType = damageType;
+		this.damage = damage;
 	}
 	
 	@Override
@@ -29,8 +29,15 @@ public class EntityPreDeathEvent implements EntityInstanceEvent, CancellableEven
 		return entity;
 	}
 	
-	public @NotNull DamageType getDamageType() {
-		return damageType;
+	/**
+	 * Returns the damage type which was used to apply the last damage to the entity.
+	 * <br>
+	 * WARNING: Modifying this object will have no effect.
+	 *
+	 * @return the damage object
+	 */
+	public @NotNull Damage getDamage() {
+		return damage;
 	}
 	
 	/**

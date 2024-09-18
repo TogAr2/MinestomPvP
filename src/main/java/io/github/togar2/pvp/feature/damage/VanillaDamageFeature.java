@@ -243,8 +243,10 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 				1.0f, 1.0f, 0
 		));
 		
+		damage.setAmount(amount);
+		
 		if (death && !event.isCancelled()) {
-			EntityPreDeathEvent entityPreDeathEvent = new EntityPreDeathEvent(entity, damageType);
+			EntityPreDeathEvent entityPreDeathEvent = new EntityPreDeathEvent(entity, damage);
 			EventDispatcher.call(entityPreDeathEvent);
 			if (entityPreDeathEvent.isCancelled()) event.setCancelled(true);
 			if (entityPreDeathEvent.isCancelDeath()) amount = 0;
