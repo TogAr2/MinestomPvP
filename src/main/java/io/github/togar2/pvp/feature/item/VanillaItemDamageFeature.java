@@ -41,7 +41,7 @@ public class VanillaItemDamageFeature implements ItemDamageFeature {
 	}
 	
 	protected ItemStack damage(ItemStack stack, int amount) {
-		if (amount == 0 || stack.get(ItemComponent.MAX_DAMAGE, 0) <= 0)
+		if (amount == 0 || stack.has(ItemComponent.UNBREAKABLE) || stack.get(ItemComponent.MAX_DAMAGE, 0) <= 0)
 			return stack;
 		
 		int preventAmount = 0;
