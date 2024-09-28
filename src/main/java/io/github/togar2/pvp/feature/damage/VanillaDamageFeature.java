@@ -151,7 +151,7 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 		amount = armorFeature.getDamageWithProtection(entity, damageType, amount);
 		
 		damage.setAmount(amount);
-		FinalDamageEvent finalDamageEvent = new FinalDamageEvent(entity, damage, 10);
+		FinalDamageEvent finalDamageEvent = new FinalDamageEvent(entity, damage, 10, FinalDamageEvent.AnimationType.MODERN);
 		EventDispatcher.call(finalDamageEvent);
 		// New amount has been set in the Damage class
 		amount = damage.getAmount();
@@ -180,13 +180,18 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 				entity.triggerStatus((byte) 29);
 			} else {
 				// Send damage animation
-				entity.sendPacketToViewersAndSelf(new DamageEventPacket(
-						entity.getEntityId(),
-						MinecraftServer.getDamageTypeRegistry().getId(damage.getType()),
-						damage.getAttacker() == null ? 0 : damage.getAttacker().getEntityId() + 1,
-						damage.getSource() == null ? 0 : damage.getSource().getEntityId() + 1,
-						null
-				));
+				FinalDamageEvent.AnimationType animationType = finalDamageEvent.getAnimationType();
+				
+				if (animationType != FinalDamageEvent.AnimationType.NONE) {
+					boolean legacyAnimation = animationType == FinalDamageEvent.AnimationType.LEGACY;
+					entity.sendPacketToViewersAndSelf(new DamageEventPacket(
+							entity.getEntityId(),
+							MinecraftServer.getDamageTypeRegistry().getId(damage.getType()),
+							legacyAnimation || damage.getAttacker() == null ? 0 : damage.getAttacker().getEntityId() + 1,
+							legacyAnimation || damage.getSource() == null ? 0 : damage.getSource().getEntityId() + 1,
+							null
+					));
+				}
 			}
 			
 			if (!fullyBlocked && damage.getType() != DamageType.DROWN) {

@@ -16,13 +16,16 @@ public class FinalDamageEvent implements EntityInstanceEvent, CancellableEvent {
 	private final LivingEntity entity;
 	private final Damage damage;
 	private int invulnerabilityTicks;
+	private AnimationType animationType;
 	
 	private boolean cancelled;
 	
-	public FinalDamageEvent(@NotNull LivingEntity entity, @NotNull Damage damage, int invulnerabilityTicks) {
+	public FinalDamageEvent(@NotNull LivingEntity entity, @NotNull Damage damage,
+	                        int invulnerabilityTicks, @NotNull AnimationType animationType) {
 		this.entity = entity;
 		this.damage = damage;
 		this.invulnerabilityTicks = invulnerabilityTicks;
+		this.animationType = animationType;
 	}
 	
 	@NotNull
@@ -61,6 +64,26 @@ public class FinalDamageEvent implements EntityInstanceEvent, CancellableEvent {
 	}
 	
 	/**
+	 * Gets the animation type, which determines how the client tilts the camera on damage.
+	 *
+	 * @return the animation type
+	 * @see AnimationType
+	 */
+	public @NotNull AnimationType getAnimationType() {
+		return animationType;
+	}
+	
+	/**
+	 * Sets the animation type, which determines how the client tilts the camera on damage.
+	 *
+	 * @param animationType the animation type
+	 * @see AnimationType
+	 */
+	public void setAnimationType(@NotNull AnimationType animationType) {
+		this.animationType = animationType;
+	}
+	
+	/**
 	 * Checks if the damage will kill the entity.
 	 * <br><br>
 	 * This requires some computing, caching the result may
@@ -95,5 +118,25 @@ public class FinalDamageEvent implements EntityInstanceEvent, CancellableEvent {
 	@Override
 	public void setCancelled(boolean cancel) {
 		this.cancelled = cancel;
+	}
+	
+	/**
+	 * @see #NONE
+	 * @see #MODERN
+	 * @see #LEGACY
+	 */
+	public enum AnimationType {
+		/**
+		 * No damage animation
+		 */
+		NONE,
+		/**
+		 * Modern damage animation, which tilts the camera based on the location of the damage source
+		 */
+		MODERN,
+		/**
+		 * Legacy damage animation, which always tilts the camera in the same way
+		 */
+		LEGACY
 	}
 }
