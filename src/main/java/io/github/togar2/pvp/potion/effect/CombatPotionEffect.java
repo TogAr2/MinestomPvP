@@ -69,7 +69,7 @@ public class CombatPotionEffect {
 	public void applyUpdateEffect(LivingEntity entity, byte amplifier,
 	                              ExhaustionFeature exhaustionFeature, FoodFeature foodFeature) {
 		if (potionEffect == PotionEffect.REGENERATION) {
-			if (entity.getHealth() < entity.getAttributeValue(Attribute.GENERIC_MAX_HEALTH)) {
+			if (entity.getHealth() < entity.getAttributeValue(Attribute.MAX_HEALTH)) {
 				entity.setHealth(entity.getHealth() + 1);
 			}
 			return;

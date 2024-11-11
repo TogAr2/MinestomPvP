@@ -200,7 +200,7 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 	}
 
 	protected @Nullable AttackValues.Final prepareAttack(LivingEntity attacker, Entity target) {
-		float damage = (float) attacker.getAttributeValue(Attribute.GENERIC_ATTACK_DAMAGE);
+		float damage = (float) attacker.getAttributeValue(Attribute.ATTACK_DAMAGE);
 		float magicalDamage = enchantmentFeature.getAttackDamage(
 			attacker.getItemInMainHand(),
 			target instanceof LivingEntity living ? EntityGroup.ofEntity(living) : EntityGroup.DEFAULT
