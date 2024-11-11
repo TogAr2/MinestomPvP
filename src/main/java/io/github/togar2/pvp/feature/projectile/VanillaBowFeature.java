@@ -1,5 +1,10 @@
 package io.github.togar2.pvp.feature.projectile;
 
+import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
+
+import org.jetbrains.annotations.Nullable;
+
 import io.github.togar2.pvp.entity.projectile.AbstractArrow;
 import io.github.togar2.pvp.entity.projectile.Arrow;
 import io.github.togar2.pvp.entity.projectile.SpectralArrow;
@@ -19,6 +24,7 @@ import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.PlayerHand;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.item.ItemUpdateStateEvent;
 import net.minestom.server.event.player.PlayerItemAnimationEvent;
@@ -29,10 +35,6 @@ import net.minestom.server.item.Material;
 import net.minestom.server.item.component.EnchantmentList;
 import net.minestom.server.item.enchant.Enchantment;
 import net.minestom.server.sound.SoundEvent;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Objects;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Vanilla implementation of {@link BowFeature}
@@ -116,7 +118,7 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 			if (enchantmentList.level(Enchantment.FLAME) > 0)
 				arrow.setFireTicksLeft(100 * ServerFlag.SERVER_TICKS_PER_SECOND); // 100 seconds
 			
-			itemDamageFeature.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
+			itemDamageFeature.damageEquipment(player, event.getHand() == PlayerHand.MAIN ?
 					EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, 1);
 			
 			boolean reallyInfinite = infinite && projectileItem.material() == Material.ARROW;

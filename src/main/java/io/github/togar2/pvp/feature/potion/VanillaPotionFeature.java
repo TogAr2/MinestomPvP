@@ -1,5 +1,9 @@
 package io.github.togar2.pvp.feature.potion;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
+
 import io.github.togar2.pvp.entity.projectile.ThrownPotion;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
@@ -16,6 +20,7 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.PlayerHand;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.item.ItemUsageCompleteEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
@@ -26,10 +31,6 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.sound.SoundEvent;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Vanilla implementation of {@link PotionFeature}
@@ -132,7 +133,7 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 		});
 	}
 	
-	protected void throwPotion(Player player, ItemStack stack, Player.Hand hand) {
+	protected void throwPotion(Player player, ItemStack stack, PlayerHand hand) {
 		ThrownPotion thrownPotion = new ThrownPotion(player, effectFeature);
 		thrownPotion.setItem(stack);
 		

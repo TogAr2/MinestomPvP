@@ -8,7 +8,7 @@ import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.utils.PotionFlags;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.LivingEntity;
-import net.minestom.server.entity.Player;
+import net.minestom.server.entity.PlayerHand;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.item.ItemStack;
@@ -29,7 +29,7 @@ public class VanillaTotemFeature implements TotemFeature, CombatFeature {
 		if (DamageTypeInfo.of(MinecraftServer.getDamageTypeRegistry().getKey(type)).outOfWorld()) return false;
 		
 		boolean hasTotem = false;
-		for (Player.Hand hand : Player.Hand.values()) {
+		for (PlayerHand hand : PlayerHand.values()) {
 			ItemStack stack = entity.getItemInHand(hand);
 			if (stack.material() == Material.TOTEM_OF_UNDYING) {
 				TotemUseEvent totemUseEvent = new TotemUseEvent(entity, hand);
