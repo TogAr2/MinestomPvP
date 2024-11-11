@@ -71,10 +71,6 @@ public class Arrow extends AbstractArrow {
 		((ArrowMeta) getEntityMeta()).setColor(color);
 	}
 	
-	private int getColor() {
-		return ((ArrowMeta) getEntityMeta()).getColor();
-	}
-	
 	public @NotNull PotionContents getPotion() {
 		return itemStack.get(ItemComponent.POTION_CONTENTS, PotionContents.EMPTY);
 	}
