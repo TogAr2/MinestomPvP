@@ -98,7 +98,7 @@ public class VanillaKnockbackFeature implements KnockbackFeature, CombatFeature 
 		
 		LegacyKnockbackSettings settings = legacyKnockbackEvent.getSettings();
 		
-		double kbResistance = target.getAttributeValue(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+		double kbResistance = target.getAttributeValue(Attribute.KNOCKBACK_RESISTANCE);
 		double horizontal = settings.horizontal() * (1 - kbResistance) * knockback;
 		double vertical = settings.vertical() * (1 - kbResistance) * knockback;
 		Vec horizontalModifier = new Vec(dx, dz).normalize().mul(horizontal);
