@@ -7,6 +7,7 @@ import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.collision.CollisionUtils;
+import net.minestom.server.coordinate.BlockVec;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
@@ -22,6 +23,9 @@ import net.minestom.server.instance.ExplosionSupplier;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.network.packet.server.play.ExplosionPacket;
+import net.minestom.server.particle.Particle;
+import net.minestom.server.sound.SoundEvent;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -214,8 +218,7 @@ public final class VanillaExplosionSupplier implements ExplosionSupplier {
 				if (chunk != null) {
 					for (Player player : chunk.getViewers()) {
 						Vec knockbackVec = playerKnockback.getOrDefault(player, Vec.ZERO);
-						player.sendPacket(new ExplosionPacket(centerX, centerY, centerZ, strength,
-								records, (float) knockbackVec.x(), (float) knockbackVec.y(), (float) knockbackVec.z()));
+						player.sendPacket(new ExplosionPacket(new BlockVec(centerX, centerY, centerZ), knockbackVec, Particle.EXPLOSION, SoundEvent.ENTITY_GENERIC_EXPLODE));
 					}
 				}
 				playerKnockback.clear();
