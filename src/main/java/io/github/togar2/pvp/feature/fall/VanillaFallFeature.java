@@ -1,6 +1,5 @@
 package io.github.togar2.pvp.feature.fall;
 
-import io.github.togar2.pvp.feature.CombatFeature;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
@@ -31,7 +30,7 @@ import net.minestom.server.tag.Tag;
 /**
  * Vanilla implementation of {@link FallFeature}
  */
-public class VanillaFallFeature implements FallFeature, CombatFeature, RegistrableFeature {
+public class VanillaFallFeature implements FallFeature, RegistrableFeature {
 	public static final DefinedFeature<VanillaFallFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.FALL, VanillaFallFeature::new,
 			VanillaFallFeature::initPlayer,

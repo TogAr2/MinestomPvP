@@ -5,7 +5,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import io.github.togar2.pvp.damage.DamageTypeInfo;
 import io.github.togar2.pvp.enums.Tool;
 import io.github.togar2.pvp.events.DamageBlockEvent;
-import io.github.togar2.pvp.feature.CombatFeature;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
@@ -30,7 +29,7 @@ import net.minestom.server.sound.SoundEvent;
 /**
  * Vanilla implementation of {@link BlockFeature}
  */
-public class VanillaBlockFeature implements BlockFeature, CombatFeature {
+public class VanillaBlockFeature implements BlockFeature {
 	public static final DefinedFeature<VanillaBlockFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.BLOCK, VanillaBlockFeature::new,
 			FeatureType.ITEM_DAMAGE, FeatureType.ITEM_COOLDOWN, FeatureType.VERSION

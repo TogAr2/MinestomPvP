@@ -2,7 +2,6 @@ package io.github.togar2.pvp.feature.knockback;
 
 import io.github.togar2.pvp.events.EntityKnockbackEvent;
 import io.github.togar2.pvp.events.LegacyKnockbackEvent;
-import io.github.togar2.pvp.feature.CombatFeature;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
@@ -24,7 +23,7 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * Vanilla implementation of {@link KnockbackFeature}
  */
-public class VanillaKnockbackFeature implements KnockbackFeature, CombatFeature {
+public class VanillaKnockbackFeature implements KnockbackFeature {
 	public static final DefinedFeature<VanillaKnockbackFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.KNOCKBACK, VanillaKnockbackFeature::new,
 			FeatureType.VERSION

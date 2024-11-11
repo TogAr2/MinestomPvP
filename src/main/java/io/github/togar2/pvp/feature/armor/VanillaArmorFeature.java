@@ -1,7 +1,6 @@
 package io.github.togar2.pvp.feature.armor;
 
 import io.github.togar2.pvp.damage.DamageTypeInfo;
-import io.github.togar2.pvp.feature.CombatFeature;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
@@ -18,7 +17,7 @@ import net.minestom.server.utils.MathUtils;
 /**
  * Vanilla implementation of {@link ArmorFeature}
  */
-public class VanillaArmorFeature implements ArmorFeature, CombatFeature {
+public class VanillaArmorFeature implements ArmorFeature {
 	public static final DefinedFeature<VanillaArmorFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.ARMOR, VanillaArmorFeature::new,
 			FeatureType.ENCHANTMENT, FeatureType.VERSION

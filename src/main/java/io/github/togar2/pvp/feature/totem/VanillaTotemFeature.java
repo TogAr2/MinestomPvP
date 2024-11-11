@@ -2,7 +2,6 @@ package io.github.togar2.pvp.feature.totem;
 
 import io.github.togar2.pvp.damage.DamageTypeInfo;
 import io.github.togar2.pvp.events.TotemUseEvent;
-import io.github.togar2.pvp.feature.CombatFeature;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.utils.PotionFlags;
@@ -19,7 +18,7 @@ import net.minestom.server.potion.PotionEffect;
 /**
  * Vanilla implementation of {@link TotemFeature}
  */
-public class VanillaTotemFeature implements TotemFeature, CombatFeature {
+public class VanillaTotemFeature implements TotemFeature {
 	public static final DefinedFeature<VanillaTotemFeature> DEFINED = new DefinedFeature<>(
 			FeatureType.TOTEM, configuration -> new VanillaTotemFeature()
 	);
