@@ -160,7 +160,7 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 		
 		potions.addAll(customEffects.stream().map((customPotion) ->
 				new Potion(Objects.requireNonNull(customPotion.id()),
-						customPotion.amplifier(), customPotion.duration(),
+						(byte)customPotion.amplifier(), customPotion.duration(),
 						PotionFlags.create(
 								customPotion.isAmbient(),
 								customPotion.showParticles(),
@@ -237,7 +237,7 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 		
 		potionContents.customEffects().stream().map(customPotion ->
 						new Potion(Objects.requireNonNull(customPotion.id()),
-								customPotion.amplifier(), customPotion.duration(),
+								(byte)customPotion.amplifier(), customPotion.duration(),
 								PotionFlags.create(
 										customPotion.isAmbient(),
 										customPotion.showParticles(),
