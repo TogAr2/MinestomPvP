@@ -11,7 +11,7 @@ public class HealthBoostPotionEffect extends CombatPotionEffect {
 	}
 	
 	@Override
-	public void onRemoved(LivingEntity entity, byte amplifier, CombatVersion version) {
+	public void onRemoved(LivingEntity entity, int amplifier, CombatVersion version) {
 		super.onRemoved(entity, amplifier, version);
 		
 		if (entity.getHealth() > entity.getAttributeValue(Attribute.MAX_HEALTH)) {

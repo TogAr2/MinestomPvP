@@ -186,7 +186,7 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 			int particleCount = (int) (damageDone * 0.5);
 			Pos targetPosition = target.getPosition();
 			target.sendPacketToViewersAndSelf(new ParticlePacket(
-				Particle.DAMAGE_INDICATOR, false,
+				Particle.DAMAGE_INDICATOR, false, false,
 				targetPosition.x(), targetPosition.y() + target.getBoundingBox().height() * 0.5, targetPosition.z(),
 				0.1f, 0, 0.1f,
 				0.2F, particleCount

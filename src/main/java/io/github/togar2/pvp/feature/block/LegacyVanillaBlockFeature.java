@@ -8,7 +8,7 @@ import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.PlayerHand;
 import net.minestom.server.event.EventNode;
-import net.minestom.server.event.item.ItemUpdateStateEvent;
+import net.minestom.server.event.item.PlayerFinishItemUseEvent;
 import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
 import net.minestom.server.event.player.PlayerHandAnimationEvent;
 import net.minestom.server.event.player.PlayerSwapItemEvent;
@@ -48,7 +48,7 @@ public class LegacyVanillaBlockFeature extends VanillaBlockFeature
 	@Override
 	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(PlayerUseItemEvent.class, this::handleUseItem);
-		node.addListener(ItemUpdateStateEvent.class, this::handleUpdateState);
+		node.addListener(PlayerFinishItemUseEvent.class, this::handleUpdateState);
 		node.addListener(PlayerSwapItemEvent.class, this::handleSwapItem);
 		node.addListener(PlayerChangeHeldSlotEvent.class, this::handleChangeSlot);
 		
@@ -97,7 +97,7 @@ public class LegacyVanillaBlockFeature extends VanillaBlockFeature
 		}
 	}
 	
-	protected void handleUpdateState(ItemUpdateStateEvent event) {
+	protected void handleUpdateState(PlayerFinishItemUseEvent event) {
 		if (event.getHand() == PlayerHand.OFF && event.getItemStack().isSimilar(blockingItem))
 			unblock(event.getPlayer());
 	}

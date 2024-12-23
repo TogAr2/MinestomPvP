@@ -85,7 +85,7 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 				
 				if (durationLeft > 0) {
 					CombatPotionEffect combatPotionEffect = CombatPotionEffects.get(potion.potion().effect());
-					byte amplifier = potion.potion().amplifier();
+					int amplifier = potion.potion().amplifier();
 					
 					if (combatPotionEffect.canApplyUpdateEffect(durationLeft, amplifier)) {
 						combatPotionEffect.applyUpdateEffect(entity, amplifier, exhaustionFeature, foodFeature);

@@ -92,7 +92,7 @@ public class VanillaSweepingFeature implements SweepingFeature {
 		double z = Math.cos(Math.toRadians(pos.yaw()));
 		
 		attacker.sendPacketToViewersAndSelf(new ParticlePacket(
-				Particle.SWEEP_ATTACK, false,
+				Particle.SWEEP_ATTACK, false,false,
 				pos.x() + x, pos.y() + attacker.getBoundingBox().height() * 0.5, pos.z() + z,
 				(float) x, 0, (float) z,
 				0, 0

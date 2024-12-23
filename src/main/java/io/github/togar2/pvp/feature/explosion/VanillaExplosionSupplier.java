@@ -177,7 +177,7 @@ public final class VanillaExplosionSupplier implements ExplosionSupplier {
 							
 							int tps = ServerFlag.SERVER_TICKS_PER_SECOND;
 							if (entity instanceof Player player) {
-								if (player.getGameMode().canTakeDamage() && !player.isFlying()) {
+								if (!player.getGameMode().invulnerable() && !player.isFlying()) {
 									playerKnockback.put(player, knockbackVec);
 									
 									if (player instanceof CombatPlayer custom)

@@ -126,7 +126,7 @@ public class VanillaFallFeature implements FallFeature, RegistrableFeature {
 				int particleCount = (int) (150 * particleMultiplier);
 				
 				entity.sendPacketToViewersAndSelf(new ParticlePacket(
-						Particle.BLOCK.withBlock(block),
+						Particle.BLOCK.withBlock(block), false,
 						false,
 						newPos.x(), newPos.y(), newPos.z(),
 						0, 0, 0,
@@ -137,7 +137,7 @@ public class VanillaFallFeature implements FallFeature, RegistrableFeature {
 		
 		entity.setTag(FALL_DISTANCE, 0.0);
 		
-		if (entity instanceof Player player && !player.getGameMode().canTakeDamage()) return;
+		if (entity instanceof Player player && player.getGameMode().invulnerable()) return;
 		int damage = getFallDamage(entity, fallDistance);
 		if (damage > 0) {
 			playFallSound(entity, damage);

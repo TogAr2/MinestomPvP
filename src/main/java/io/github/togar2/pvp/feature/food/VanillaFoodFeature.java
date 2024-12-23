@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
+import net.minestom.server.event.item.PlayerFinishItemUseEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,7 +22,6 @@ import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.PlayerHand;
 import net.minestom.server.event.EventNode;
-import net.minestom.server.event.item.ItemUsageCompleteEvent;
 import net.minestom.server.event.player.PlayerPreEatEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
@@ -90,7 +90,7 @@ public class VanillaFoodFeature implements FoodFeature, RegistrableFeature {
 			if (consumableComponent != null) event.setEatingTime(getUseTime(event.getItemStack().material(), consumableComponent));
 		});
 		
-		node.addListener(ItemUsageCompleteEvent.class, event -> {
+		node.addListener(PlayerFinishItemUseEvent.class, event -> {
 			if (event.getItemStack().material() != Material.MILK_BUCKET
 					&& !(event.getItemStack().has(ItemComponent.FOOD) || event.getItemStack().has(ItemComponent.CONSUMABLE)))
 				return;
@@ -226,7 +226,7 @@ public class VanillaFoodFeature implements FoodFeature, RegistrableFeature {
 	}
 	
 	@Override
-	public void applySaturationEffect(Player player, byte amplifier) {
+	public void applySaturationEffect(Player player, int amplifier) {
 		eat(player, amplifier + 1, 1.0f);
 	}
 	

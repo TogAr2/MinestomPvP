@@ -25,7 +25,7 @@ import net.minestom.server.entity.PlayerHand;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityAttackEvent;
-import net.minestom.server.event.item.ItemUpdateStateEvent;
+import net.minestom.server.event.item.PlayerFinishItemUseEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.instance.EntityTracker;
@@ -64,7 +64,7 @@ public class VanillaTridentFeature implements TridentFeature, RegistrableFeature
 	
 	@Override
 	public void init(EventNode<EntityInstanceEvent> node) {
-		node.addListener(ItemUpdateStateEvent.class, event -> {
+		node.addListener(PlayerFinishItemUseEvent.class, event -> {
 			Player player = event.getPlayer();
 			ItemStack stack = event.getItemStack();
 			if (stack.material() != Material.TRIDENT) return;

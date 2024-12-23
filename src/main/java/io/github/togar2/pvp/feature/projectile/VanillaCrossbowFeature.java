@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
+import net.minestom.server.event.item.PlayerFinishItemUseEvent;
 import org.jetbrains.annotations.Nullable;
 
 import io.github.togar2.pvp.entity.projectile.AbstractArrow;
@@ -26,7 +27,6 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.entity.PlayerHand;
 import net.minestom.server.entity.metadata.LivingEntityMeta;
 import net.minestom.server.event.EventNode;
-import net.minestom.server.event.item.ItemUpdateStateEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
@@ -135,7 +135,7 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 			}
 		});
 		
-		node.addListener(ItemUpdateStateEvent.class, event -> {
+		node.addListener(PlayerFinishItemUseEvent.class, event -> {
 			Player player = event.getPlayer();
 			ItemStack stack = event.getItemStack();
 			if (stack.material() != Material.CROSSBOW) return;

@@ -56,7 +56,7 @@ public class VanillaRegenerationFeature implements RegenerationFeature, Registra
 	}
 	
 	protected void onTick(Player player) {
-		if (!player.getGameMode().canTakeDamage()) return;
+		if (player.getGameMode().invulnerable()) return;
 		Difficulty difficulty = difficultyFeature.getValue(player);
 		
 		int food = player.getFood();
