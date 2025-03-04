@@ -111,8 +111,7 @@ public class VanillaFoodFeature implements FoodFeature, RegistrableFeature {
 		
 		Food component = stack.get(ItemComponent.FOOD);
 		Consumable consumable = stack.get(ItemComponent.CONSUMABLE);
-		assert component != null;
-		assert consumable != null;
+		if (component == null || consumable == null) return;
 		ThreadLocalRandom random = ThreadLocalRandom.current();
 		
 		triggerEatingSound(player, stack.material());

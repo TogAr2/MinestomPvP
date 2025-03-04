@@ -14,7 +14,7 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
                              boolean magic, boolean explosive, boolean fall, boolean thorns, boolean projectile,
                              boolean freeze) {
 	private static final DamageTypeInfo DEFAULT = new DamageTypeInfo();
-	
+
 	public DamageTypeInfo() {
 		this(
 				false, false, false,
@@ -22,14 +22,13 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 				false, false, false, false, false, false
 		);
 	}
-	
+
 	public static DamageTypeInfo of(DynamicRegistry.Key<DamageType> type) {
 		return INFO_MAP.getOrDefault(type, DEFAULT);
 	}
-	
+
 	//TODO check source and add missing
 	public static final Map<DynamicRegistry.Key<DamageType>, DamageTypeInfo> INFO_MAP = new HashMap<>() {
-		private static final long serialVersionUID = -1415972772651275647L;
 		{
 			put(DamageType.IN_FIRE, new DamageTypeInfo().bypassesArmor(true).fire(true));
 			put(DamageType.ON_FIRE, new DamageTypeInfo().bypassesArmor(true).fire(true));
@@ -72,7 +71,7 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 			put(DamageType.OUTSIDE_BORDER, new DamageTypeInfo().bypassesArmor(true));
 		}
 	};
-	
+
 	public DamageTypeInfo damagesHelmet(boolean damagesHelmet) {
 		return new DamageTypeInfo(
 				damagesHelmet, bypassesArmor, outOfWorld,
@@ -81,7 +80,7 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 				freeze
 		);
 	}
-	
+
 	public DamageTypeInfo bypassesArmor(boolean bypassesArmor) {
 		return new DamageTypeInfo(
 				damagesHelmet, bypassesArmor, outOfWorld,
@@ -90,7 +89,7 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 				freeze
 		);
 	}
-	
+
 	public DamageTypeInfo outOfWorld(boolean outOfWorld) {
 		return new DamageTypeInfo(
 				damagesHelmet, bypassesArmor, outOfWorld,
@@ -99,7 +98,7 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 				freeze
 		);
 	}
-	
+
 	public DamageTypeInfo unblockable(boolean unblockable) {
 		return new DamageTypeInfo(
 				damagesHelmet, bypassesArmor, outOfWorld,
@@ -108,7 +107,7 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 				freeze
 		);
 	}
-	
+
 	public DamageTypeInfo fire(boolean fire) {
 		return new DamageTypeInfo(
 				damagesHelmet, bypassesArmor, outOfWorld,
@@ -117,7 +116,7 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 				freeze
 		);
 	}
-	
+
 	public DamageTypeInfo scale(ScaleWithDifficulty scale) {
 		return new DamageTypeInfo(
 				damagesHelmet, bypassesArmor, outOfWorld,
@@ -126,7 +125,7 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 				freeze
 		);
 	}
-	
+
 	public DamageTypeInfo magic(boolean magic) {
 		return new DamageTypeInfo(
 				damagesHelmet, bypassesArmor, outOfWorld,
@@ -135,7 +134,7 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 				freeze
 		);
 	}
-	
+
 	public DamageTypeInfo explosive(boolean explosive) {
 		return new DamageTypeInfo(
 				damagesHelmet, bypassesArmor, outOfWorld,
@@ -144,7 +143,7 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 				freeze
 		);
 	}
-	
+
 	public DamageTypeInfo fall(boolean fall) {
 		return new DamageTypeInfo(
 				damagesHelmet, bypassesArmor, outOfWorld,
@@ -153,7 +152,7 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 				freeze
 		);
 	}
-	
+
 	public DamageTypeInfo thorns(boolean thorns) {
 		return new DamageTypeInfo(
 				damagesHelmet, bypassesArmor, outOfWorld,
@@ -162,7 +161,7 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 				freeze
 		);
 	}
-	
+
 	public DamageTypeInfo projectile(boolean projectile) {
 		return new DamageTypeInfo(
 				damagesHelmet, bypassesArmor, outOfWorld,
@@ -171,7 +170,7 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 				freeze
 		);
 	}
-	
+
 	public DamageTypeInfo freeze(boolean freeze) {
 		return new DamageTypeInfo(
 				damagesHelmet, bypassesArmor, outOfWorld,
@@ -180,13 +179,13 @@ public record DamageTypeInfo(boolean damagesHelmet, boolean bypassesArmor, boole
 				freeze
 		);
 	}
-	
+
 	public enum ScaleWithDifficulty {
 		ALWAYS,
 		WHEN_CAUSED_BY_LIVING_NON_PLAYER,
 		NEVER
 	}
-	
+
 	public boolean shouldScaleWithDifficulty(Damage damage) {
 		return switch (scaleWithDifficulty) {
 			case ALWAYS -> true;

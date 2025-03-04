@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 import net.minestom.server.event.item.PlayerBeginItemUseEvent;
+import net.minestom.server.event.item.PlayerCancelItemUseEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.item.ItemAnimation;
 import org.jetbrains.annotations.Nullable;
@@ -76,7 +77,7 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 			}
 		});
 		
-		node.addListener(PlayerUseItemEvent.class, event -> {
+		node.addListener(PlayerCancelItemUseEvent.class, event -> {
 			Player player = event.getPlayer();
 			ItemStack stack = event.getItemStack();
 			if (stack.material() != Material.BOW) return;

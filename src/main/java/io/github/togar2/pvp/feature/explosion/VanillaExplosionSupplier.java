@@ -218,7 +218,8 @@ public final class VanillaExplosionSupplier implements ExplosionSupplier {
 				if (chunk != null) {
 					for (Player player : chunk.getViewers()) {
 						Vec knockbackVec = playerKnockback.getOrDefault(player, Vec.ZERO);
-						player.sendPacket(new ExplosionPacket(new BlockVec(centerX, centerY, centerZ), knockbackVec, Particle.EXPLOSION, SoundEvent.ENTITY_GENERIC_EXPLODE));
+						player.sendPacket(new ExplosionPacket(new BlockVec(centerX, centerY, centerZ),
+								knockbackVec, Particle.EXPLOSION, SoundEvent.ENTITY_GENERIC_EXPLODE));
 					}
 				}
 				playerKnockback.clear();
