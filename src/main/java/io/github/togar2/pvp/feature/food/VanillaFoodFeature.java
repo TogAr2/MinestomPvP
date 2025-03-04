@@ -151,24 +151,7 @@ public class VanillaFoodFeature implements FoodFeature, RegistrableFeature {
 					return;
 				}
 				case TeleportRandomly(float diameter) -> {
-					final Pos pos = player.getPosition();
-					Instance instance = player.getInstance();
-					assert instance != null;
-					List<Pos> potentials = new ArrayList<Pos>();
-					for (float y = diameter; y >= -diameter; y--) {
-						for (float x = diameter; x >= -diameter; x--) {
-							for (float z = diameter; z >= -diameter; z--) {
-								Pos potential = pos.add(x, y, z);
-								if (!instance.getBlock(potential).isSolid() && !instance.getBlock(potential.add(0, 1, 0)).isSolid() && instance.getBlock(potential.add(0, -1, 0)).isSolid()) {
-									potentials.add(potential);
-								} else if (potentials.size() >= 1024) {
-									break;
-								}
-							}
-						}
-					}
-					if (potentials.isEmpty()) return; // TODO: do some fail over?
-					player.teleport(potentials.get(ThreadLocalRandom.current().nextInt(0, potentials.size())));
+					ChorusFruitUtil.tryChorusTeleport(player, itemCooldownFeature);
 					return;
 				}
 				case PlaySound(SoundEvent sound) -> {
