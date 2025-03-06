@@ -4,6 +4,8 @@ import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.attribute.Attribute;
+import net.minestom.server.entity.attribute.AttributeInstance;
 import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.player.PlayerMoveEvent;
@@ -15,11 +17,12 @@ import java.util.function.Function;
 public interface CombatPlayer {
     // Minestom methods
     TimedPotion getEffect(PotionEffect effect);
+    AttributeInstance getAttribute(Attribute attribute);
     boolean isSprinting();
     Pos getPosition();
     
     default double getJumpVelocity() {
-        return 0.42;
+        return getAttribute(Attribute.GENERIC_JUMP_STRENGTH).getValue();
     }
     
     default double getJumpBoostVelocityModifier() {
