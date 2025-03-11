@@ -5,6 +5,7 @@ import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
+import net.minestom.server.entity.metadata.projectile.ArrowMeta;
 import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
@@ -33,7 +34,6 @@ public class Arrow extends AbstractArrow {
 	@Override
 	public void update(long time) {
 		super.update(time);
-		
 		if (onGround && stuckTime >= 600 && (!itemStack.has(ItemComponent.POTION_CONTENTS)
 				|| !Objects.equals(itemStack.get(ItemComponent.POTION_CONTENTS), PotionContents.EMPTY))) {
 			triggerStatus((byte) 0);
@@ -48,6 +48,7 @@ public class Arrow extends AbstractArrow {
 	
 	public void setItemStack(ItemStack itemStack) {
 		this.itemStack = itemStack;
+		updateColor();
 	}
 	
 	@Override
@@ -55,16 +56,33 @@ public class Arrow extends AbstractArrow {
 		effectFeature.addArrowEffects(entity, this);
 	}
 	
+	private void updateColor() {
+		PotionContents potionContents = itemStack.get(ItemComponent.POTION_CONTENTS);
+		if (potionContents == null || potionContents.equals(PotionContents.EMPTY)) {
+			setColor(-1);
+			return;
+		}
+		
+		setColor(effectFeature.getPotionColor(potionContents));
+	}
+	
+	private void setColor(int color) {
+		((ArrowMeta) getEntityMeta()).setColor(color);
+	}
+	
 	public @NotNull PotionContents getPotion() {
 		return itemStack.get(ItemComponent.POTION_CONTENTS, PotionContents.EMPTY);
 	}
 	
 	public void setPotion(@NotNull PotionContents potion) {
-		this.itemStack = ItemStack.of(Material.TIPPED_ARROW).with(ItemComponent.POTION_CONTENTS, potion);
+		if (itemStack.material() != Material.TIPPED_ARROW)
+			itemStack = ItemStack.of(Material.TIPPED_ARROW);
+		itemStack = itemStack.with(ItemComponent.POTION_CONTENTS, potion);
+		updateColor();
 	}
 	
 	public void addArrowEffect(CustomPotionEffect effect) {
-		this.itemStack = itemStack.with(ItemComponent.POTION_CONTENTS, (UnaryOperator<PotionContents>) potionContents -> {
+		itemStack = itemStack.with(ItemComponent.POTION_CONTENTS, (UnaryOperator<PotionContents>) potionContents -> {
 			List<CustomPotionEffect> list = new ArrayList<>(potionContents.customEffects());
 			list.add(effect);
 			return new PotionContents(potionContents.potion(), potionContents.customColor(), list);
