@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CustomEntityProjectile extends Entity {
 	private static final BoundingBox POINT_BOX = new BoundingBox(0, 0, 0);
@@ -227,24 +226,23 @@ public class CustomEntityProjectile extends Entity {
 							if (noCollideShooter && e == shooter) return false;
 							return e != this && canHit(e);
 						}, physicsResult);
-
+				
 				if (!entityResult.isEmpty()) {
-					AtomicBoolean entityCollisionSucceeded = new AtomicBoolean();
-					
 					Vec prevVelocity = velocity;
 					EntityCollisionResult collided = entityResult.stream().findFirst().orElse(null);
 					
 					var event = new ProjectileCollideWithEntityEvent(this, Pos.fromPoint(collided.collisionPoint()), collided.entity());
-					EventDispatcher.callCancellable(event, () -> entityCollisionSucceeded.set(onHit(collided.entity())));
-					
-					if (entityCollisionSucceeded.get()) {
-						// Don't remove now because rest of Entity#tick might throw errors
-						scheduler().scheduleNextProcess(this::remove);
-						// Prevent hitting blocks
-						return;
-					} else {
-						// If velocity has been changed because of bounce, prevent projectile from moving further
-						if (velocity != prevVelocity) newPosition = position;
+					EventDispatcher.call(event);
+					if (!event.isCancelled()) {
+						if (onHit(collided.entity())) {
+							// Don't remove now because rest of Entity#tick might throw errors
+							scheduler().scheduleNextProcess(this::remove);
+							// Prevent hitting blocks
+							return;
+						} else {
+							// If velocity has been changed because of bounce, prevent projectile from moving further
+							if (velocity != prevVelocity) newPosition = position;
+						}
 					}
 				}
 			}
@@ -261,21 +259,17 @@ public class CustomEntityProjectile extends Entity {
 				Point collidedPosition = collisionDirection.add(physicsResult.newPosition()).apply(Vec.Operator.FLOOR);
 				Block block = instance.getBlock(collidedPosition);
 				
-				AtomicBoolean shouldRemove = new AtomicBoolean();
-				
 				var event = new ProjectileCollideWithBlockEvent(this, physicsResult.newPosition().withCoord(collidedPosition), block);
-				EventDispatcher.callCancellable(event, () -> {
+				EventDispatcher.call(event);
+				if (!event.isCancelled()) {
 					setNoGravity(true);
+					setVelocity(Vec.ZERO);
 					this.collisionDirection = collisionDirection;
-					shouldRemove.set(onStuck());
-					scheduler().scheduleNextProcess(() -> {
-						this.setVelocity(Vec.ZERO);
-					});
-				});
-				
-				if (shouldRemove.get()) {
-					// Don't remove now because rest of Entity#tick might throw errors
-					scheduler().scheduleNextProcess(this::remove);
+					
+					if (onStuck()) {
+						// Don't remove now because rest of Entity#tick might throw errors
+						scheduler().scheduleNextProcess(this::remove);
+					}
 				}
 			}
 			

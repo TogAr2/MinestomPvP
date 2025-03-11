@@ -15,9 +15,17 @@ java {
     withSourcesJar()
 }
 
+//TODO temporary
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://jitpack.io'
+    }
+}
+
 dependencies {
-    compileOnly 'net.minestom:minestom-snapshots:1_21_4-bb14804d42'
-    testImplementation 'net.minestom:minestom-snapshots:1_21_4-bb14804d42'
+    compileOnly 'com.github.TogAr2:Minestom:cc7597bdef'
+    testImplementation 'com.github.TogAr2:Minestom:cc7597bdef'
     //testImplementation 'com.github.TogAr2:MinestomFluids:b237b13a4b'
 }
 

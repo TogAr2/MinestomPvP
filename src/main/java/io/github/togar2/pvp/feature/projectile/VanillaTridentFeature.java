@@ -1,8 +1,5 @@
 package io.github.togar2.pvp.feature.projectile;
 
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import io.github.togar2.pvp.entity.projectile.ThrownTrident;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
@@ -17,16 +14,11 @@ import net.kyori.adventure.sound.Sound;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
-import net.minestom.server.entity.EquipmentSlot;
-import net.minestom.server.entity.GameMode;
-import net.minestom.server.entity.LivingEntity;
-import net.minestom.server.entity.Player;
-import net.minestom.server.entity.PlayerHand;
+import net.minestom.server.entity.*;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.item.PlayerCancelItemUseEvent;
-import net.minestom.server.event.item.PlayerFinishItemUseEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.instance.EntityTracker;
@@ -36,6 +28,9 @@ import net.minestom.server.item.Material;
 import net.minestom.server.item.enchant.Enchantment;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
+
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Vanilla implementation of {@link TridentFeature}
@@ -85,9 +80,8 @@ public class VanillaTridentFeature implements TridentFeature, RegistrableFeature
 				ThrownTrident trident = new ThrownTrident(player, stack, enchantmentFeature);
 				
 				Pos position = player.getPosition().add(0, player.getEyeHeight() - 0.1, 0);
-				trident.setInstance(Objects.requireNonNull(player.getInstance()), position);
-				
 				trident.shootFromRotation(position.pitch(), position.yaw(), 0, 2.5, 1.0);
+				trident.setInstance(Objects.requireNonNull(player.getInstance()), position.withView(trident.getPosition()));
 				
 				Vec playerVel = player.getVelocity();
 				trident.setVelocity(trident.getVelocity().add(playerVel.x(),

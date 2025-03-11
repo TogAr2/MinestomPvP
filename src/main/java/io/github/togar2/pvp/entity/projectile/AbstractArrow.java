@@ -122,6 +122,7 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 	
 	@Override
 	public void onUnstuck() {
+		((AbstractArrowMeta) getEntityMeta()).setInGround(false);
 		ThreadLocalRandom random = ThreadLocalRandom.current();
 		setVelocity(velocity.div(ServerFlag.SERVER_TICKS_PER_SECOND).mul(
 				random.nextDouble() * 0.2,
@@ -239,6 +240,7 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 		}
 		
 		pickupDelay = 7;
+		((AbstractArrowMeta) getEntityMeta()).setInGround(true);
 		setCritical(false);
 		setPiercingLevel((byte) 0);
 		setSound(SoundEvent.ENTITY_ARROW_HIT);
@@ -248,7 +250,7 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 	}
 	
 	public boolean canBePickedUp(@Nullable Player player) {
-		if (!((onGround || hasNoGravity()) && pickupDelay <= 0)) {
+		if (!(onGround || hasNoGravity()) || pickupDelay > 0) {
 			return false;
 		}
 		

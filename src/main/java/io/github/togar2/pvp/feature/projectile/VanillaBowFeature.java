@@ -1,14 +1,5 @@
 package io.github.togar2.pvp.feature.projectile;
 
-import java.util.Objects;
-import java.util.concurrent.ThreadLocalRandom;
-
-import net.minestom.server.event.item.PlayerBeginItemUseEvent;
-import net.minestom.server.event.item.PlayerCancelItemUseEvent;
-import net.minestom.server.event.player.PlayerUseItemEvent;
-import net.minestom.server.item.ItemAnimation;
-import org.jetbrains.annotations.Nullable;
-
 import io.github.togar2.pvp.entity.projectile.AbstractArrow;
 import io.github.togar2.pvp.entity.projectile.Arrow;
 import io.github.togar2.pvp.entity.projectile.SpectralArrow;
@@ -24,19 +15,22 @@ import net.kyori.adventure.sound.Sound;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
-import net.minestom.server.entity.Entity;
-import net.minestom.server.entity.EquipmentSlot;
-import net.minestom.server.entity.GameMode;
-import net.minestom.server.entity.Player;
-import net.minestom.server.entity.PlayerHand;
+import net.minestom.server.entity.*;
 import net.minestom.server.event.EventNode;
+import net.minestom.server.event.item.PlayerBeginItemUseEvent;
+import net.minestom.server.event.item.PlayerCancelItemUseEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
+import net.minestom.server.item.ItemAnimation;
 import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.item.component.EnchantmentList;
 import net.minestom.server.item.enchant.Enchantment;
 import net.minestom.server.sound.SoundEvent;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Vanilla implementation of {@link BowFeature}
@@ -136,7 +130,7 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 			Vec playerVel = player.getVelocity();
 			arrow.setVelocity(arrow.getVelocity().add(playerVel.x(),
 					player.isOnGround() ? 0.0D : playerVel.y(), playerVel.z()));
-			arrow.setInstance(Objects.requireNonNull(player.getInstance()), position);
+			arrow.setInstance(Objects.requireNonNull(player.getInstance()), position.withView(arrow.getPosition()));
 			
 			ThreadLocalRandom random = ThreadLocalRandom.current();
 			ViewUtil.viewersAndSelf(player).playSound(Sound.sound(

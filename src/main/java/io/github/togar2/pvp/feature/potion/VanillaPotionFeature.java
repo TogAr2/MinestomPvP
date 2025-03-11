@@ -143,9 +143,8 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 		thrownPotion.setItem(stack);
 		
 		Pos position = player.getPosition().add(0, player.getEyeHeight(), 0);
-		thrownPotion.setInstance(Objects.requireNonNull(player.getInstance()), position);
-		
 		thrownPotion.shootFromRotation(position.pitch(), position.yaw(), -20, 0.5, 1.0);
+		thrownPotion.setInstance(Objects.requireNonNull(player.getInstance()), position.withView(thrownPotion.getPosition()));
 		
 		Vec playerVel = player.getVelocity();
 		thrownPotion.setVelocity(thrownPotion.getVelocity().add(playerVel.x(),
