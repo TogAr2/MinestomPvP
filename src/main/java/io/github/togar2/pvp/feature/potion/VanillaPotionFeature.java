@@ -1,9 +1,5 @@
 package io.github.togar2.pvp.feature.potion;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.ThreadLocalRandom;
-
 import io.github.togar2.pvp.entity.projectile.ThrownPotion;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
@@ -32,6 +28,10 @@ import net.minestom.server.item.Material;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.sound.SoundEvent;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  * Vanilla implementation of {@link PotionFeature}
  */
@@ -42,7 +42,6 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 	);
 	
 	private static final int USE_TICKS = 32;
-	private static final ItemStack GLASS_BOTTLE = ItemStack.of(Material.GLASS_BOTTLE);
 	
 	private final FeatureConfiguration configuration;
 	
@@ -92,11 +91,17 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 			}
 			
 			if (player.getGameMode() != GameMode.CREATIVE) {
-				if (stack.amount() == 1) {
-					player.setItemInHand(event.getHand(), GLASS_BOTTLE);
+				ItemStack remainder = stack.get(ItemComponent.USE_REMAINDER);
+				
+				if (remainder != null && !remainder.isAir()) {
+					if (stack.amount() == 1) {
+						player.setItemInHand(event.getHand(), remainder);
+					} else {
+						player.setItemInHand(event.getHand(), stack.withAmount(stack.amount() - 1));
+						player.getInventory().addItemStack(remainder);
+					}
 				} else {
 					player.setItemInHand(event.getHand(), stack.withAmount(stack.amount() - 1));
-					player.getInventory().addItemStack(GLASS_BOTTLE);
 				}
 			}
 		});

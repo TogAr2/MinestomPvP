@@ -136,7 +136,7 @@ public class VanillaFoodFeature implements FoodFeature, RegistrableFeature {
 					player.getActiveEffects().stream().map(TimedPotion::potion).map(Potion::effect).filter(potionEffects::contains).forEach(player::removeEffect);
 					return;
 				}
-				case ClearAllEffects clearEffects -> {
+				case ClearAllEffects ignored -> {
 					player.clearEffects();
 					return;
 				}
@@ -160,16 +160,15 @@ public class VanillaFoodFeature implements FoodFeature, RegistrableFeature {
 			}
 		}
 		
-		ItemStack leftOver = getUsingConvertsTo(stack);
-		if (leftOver.isAir()) leftOver = getUsingConvertsTo(stack);
-
 		if (player.getGameMode() != GameMode.CREATIVE) {
-			if (leftOver != null && !leftOver.isAir()) {
+			ItemStack remainder = stack.get(ItemComponent.USE_REMAINDER);
+			
+			if (remainder != null && !remainder.isAir()) {
 				if (stack.amount() == 1) {
-					player.setItemInHand(hand, leftOver);
+					player.setItemInHand(hand, remainder);
 				} else {
 					player.setItemInHand(hand, stack.withAmount(stack.amount() - 1));
-					player.getInventory().addItemStack(leftOver);
+					player.getInventory().addItemStack(remainder);
 				}
 			} else {
 				player.setItemInHand(hand, stack.withAmount(stack.amount() - 1));
@@ -224,27 +223,5 @@ public class VanillaFoodFeature implements FoodFeature, RegistrableFeature {
 				0.5f + 0.5f * random.nextInt(2),
 				(random.nextFloat() - random.nextFloat()) * 0.2f + 1.0f
 		), player);
-	}
-	
-	protected static final ItemStack EMPTY_BUCKET = ItemStack.of(Material.BUCKET);
-	protected static final ItemStack EMPTY_BOTTLE = ItemStack.of(Material.GLASS_BOTTLE);
-	protected static final ItemStack EMPTY_BOWL = ItemStack.of(Material.BOWL);
-	
-	protected ItemStack getUsingConvertsTo(ItemStack stack) {
-		if (stack.material() == Material.MILK_BUCKET) {
-			return EMPTY_BUCKET;
-		} else if (stack.material() == Material.HONEY_BOTTLE) {
-			return EMPTY_BOTTLE;
-		} else if (stack.material() == Material.SUSPICIOUS_STEW) {
-			return EMPTY_BOWL;
-		} else if (stack.material() == Material.MUSHROOM_STEW) {
-			return EMPTY_BOWL;
-		} else if (stack.material() == Material.BEETROOT_SOUP) {
-			return EMPTY_BOWL;
-		} else if (stack.material() == Material.RABBIT_STEW) {
-			return EMPTY_BOWL;
-		}
-		
-		return ItemStack.AIR;
 	}
 }
