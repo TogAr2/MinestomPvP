@@ -124,11 +124,11 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 	public void onUnstuck() {
 		((AbstractArrowMeta) getEntityMeta()).setInGround(false);
 		ThreadLocalRandom random = ThreadLocalRandom.current();
-		setVelocity(velocity.div(ServerFlag.SERVER_TICKS_PER_SECOND).mul(
+		setVelocity(velocity.mul(
 				random.nextDouble() * 0.2,
 				random.nextDouble() * 0.2,
 				random.nextDouble() * 0.2
-		).mul(ServerFlag.SERVER_TICKS_PER_SECOND));
+		));
 		ticks = 0;
 	}
 	
