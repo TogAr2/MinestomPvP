@@ -198,9 +198,9 @@ public class VanillaFallFeature implements FallFeature, RegistrableFeature {
 		assert walls != null;
 		assert fenceGates != null;
 		
-		if (fences.contains(block.namespace())
-				|| walls.contains(block.namespace())
-				|| fenceGates.contains(block.namespace())) {
+		if (fences.contains(block.key())
+				|| walls.contains(block.key())
+				|| fenceGates.contains(block.key())) {
 			return offsetDown;
 		}
 		

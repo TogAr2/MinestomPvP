@@ -4,6 +4,7 @@ import io.github.togar2.pvp.enchantment.EntityGroup;
 import io.github.togar2.pvp.feature.food.ExhaustionFeature;
 import io.github.togar2.pvp.feature.food.FoodFeature;
 import io.github.togar2.pvp.utils.CombatVersion;
+import net.kyori.adventure.key.Key;
 import net.minestom.server.color.AlphaColor;
 import net.minestom.server.color.Color;
 import net.minestom.server.entity.Entity;
@@ -18,7 +19,6 @@ import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
-import net.minestom.server.utils.NamespaceID;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -52,13 +52,13 @@ public class CombatPotionEffect {
 		return particleSupplier.apply(potion);
 	}
 	
-	public CombatPotionEffect addAttributeModifier(Attribute attribute, NamespaceID id,
+	public CombatPotionEffect addAttributeModifier(Attribute attribute, Key id,
 	                                               double amount, AttributeOperation operation) {
 		attributeModifiers.put(attribute, new AttributeModifier(id, amount, operation));
 		return this;
 	}
 	
-	public CombatPotionEffect addLegacyAttributeModifier(Attribute attribute, NamespaceID id,
+	public CombatPotionEffect addLegacyAttributeModifier(Attribute attribute, Key id,
 	                                                     double amount, AttributeOperation operation) {
 		if (legacyAttributeModifiers == null)
 			legacyAttributeModifiers = new HashMap<>();

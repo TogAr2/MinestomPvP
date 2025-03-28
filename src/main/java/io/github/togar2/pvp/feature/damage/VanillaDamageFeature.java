@@ -121,7 +121,7 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 		
 		if (typeInfo.freeze() && Objects.requireNonNull(MinecraftServer.getTagManager().getTag(
 						net.minestom.server.gamedata.tags.Tag.BasicType.ENTITY_TYPES, "minecraft:freeze_hurts_extra_types"))
-				.contains(entity.getEntityType().namespace())) {
+				.contains(entity.getEntityType().key())) {
 			amount *= 5.0F;
 		}
 		

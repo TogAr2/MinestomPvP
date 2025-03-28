@@ -116,6 +116,6 @@ public class LegacyVanillaBlockFeature extends VanillaBlockFeature
 	
 	@Override
 	public boolean canBlockWith(Player player, ItemStack stack) {
-		return stack.material().registry().namespace().value().contains("sword");
+		return stack.material().registry().key().value().contains("sword");
 	}
 }

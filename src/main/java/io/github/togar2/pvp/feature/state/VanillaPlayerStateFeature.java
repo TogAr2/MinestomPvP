@@ -54,7 +54,7 @@ public class VanillaPlayerStateFeature implements PlayerStateFeature, Registrabl
 		assert tag != null;
 		
 		Block block = Objects.requireNonNull(entity.getInstance()).getBlock(entity.getPosition());
-		return tag.contains(block.namespace());
+		return tag.contains(block.key());
 	}
 	
 	@Override

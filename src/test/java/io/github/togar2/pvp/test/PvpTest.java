@@ -4,6 +4,7 @@ import io.github.togar2.pvp.MinestomPvP;
 import io.github.togar2.pvp.feature.CombatFeatures;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.test.commands.Commands;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.builder.Command;
@@ -20,7 +21,6 @@ import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.common.KeepAlivePacket;
 import net.minestom.server.network.packet.server.play.*;
 import net.minestom.server.registry.DynamicRegistry;
-import net.minestom.server.utils.NamespaceID;
 import net.minestom.server.utils.time.TimeUnit;
 import net.minestom.server.world.DimensionType;
 
@@ -35,7 +35,7 @@ public class PvpTest {
 		
 		DimensionType fullbright = DimensionType.builder().ambientLight(1.0f).respawnAnchorWorks(true).build();
 		DynamicRegistry.Key<DimensionType> fullbrightKey =
-				MinecraftServer.getDimensionTypeRegistry().register(NamespaceID.from("idk"), fullbright);
+				MinecraftServer.getDimensionTypeRegistry().register(Key.key("idk"), fullbright);
 		
 		Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(fullbrightKey);
 		instance.setGenerator(new DemoGenerator());

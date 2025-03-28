@@ -94,7 +94,7 @@ public class VanillaItemDamageFeature implements ItemDamageFeature {
 		for (EquipmentSlot slot : slots) {
 			ItemStack stack = entity.getEquipment(slot);
 			DamageTypeInfo info = DamageTypeInfo.of(MinecraftServer.getDamageTypeRegistry().getKey(damageType));
-			if (!(info.fire() && stack.material().namespace().value().toLowerCase().contains("netherite"))
+			if (!(info.fire() && stack.material().key().value().toLowerCase().contains("netherite"))
 					&& ArmorMaterial.fromMaterial(stack.material()) != null) {
 				damageEquipment(entity, slot, (int) damage);
 			}

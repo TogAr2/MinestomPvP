@@ -2,6 +2,7 @@ package io.github.togar2.pvp.enums;
 
 import io.github.togar2.pvp.utils.CombatVersion;
 import io.github.togar2.pvp.utils.ModifierId;
+import net.kyori.adventure.key.Key;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.attribute.Attribute;
@@ -11,7 +12,6 @@ import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.sound.SoundEvent;
-import net.minestom.server.utils.NamespaceID;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -74,7 +74,7 @@ public enum ArmorMaterial {
 		ArmorMaterial oldMaterial = fromMaterial(oldStack.material());
 		ArmorMaterial newMaterial = fromMaterial(newStack.material());
 		
-		NamespaceID modifierId = getModifierId(slot);
+		Key modifierId = getModifierId(slot);
 		
 		// Remove attributes from previous armor
 		if (oldMaterial != null && hasDefaultAttributes(oldStack)) {
@@ -114,7 +114,7 @@ public enum ArmorMaterial {
 		return MATERIAL_TO_ARMOR_MATERIAL.get(material);
 	}
 	
-	public static NamespaceID getModifierId(EquipmentSlot slot) {
+	public static Key getModifierId(EquipmentSlot slot) {
 		return ModifierId.ARMOR_MODIFIERS[slot.ordinal() - 2];
 	}
 	
