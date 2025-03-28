@@ -1,15 +1,15 @@
 package io.github.togar2.pvp.utils;
 
-import net.minestom.server.utils.NamespaceID;
+import net.kyori.adventure.key.Key;
 
 public class ModifierId {
-	public static final NamespaceID ATTACK_DAMAGE_MODIFIER_ID = NamespaceID.from("minecraft:base_attack_damage");
-	public static final NamespaceID ATTACK_SPEED_MODIFIER_ID = NamespaceID.from("minecraft:base_attack_speed");
+	public static final Key ATTACK_DAMAGE_MODIFIER_ID = Key.key("minecraft:base_attack_damage");
+	public static final Key ATTACK_SPEED_MODIFIER_ID = Key.key("minecraft:base_attack_speed");
 	
-	public static final NamespaceID[] ARMOR_MODIFIERS = new NamespaceID[]{
-			NamespaceID.from("minecraft:armor.boots"),
-			NamespaceID.from("minecraft:armor.leggings"),
-			NamespaceID.from("minecraft:armor.chestplate"),
-			NamespaceID.from("minecraft:armor.helmet"),
+	public static final Key[] ARMOR_MODIFIERS = new Key[]{
+			Key.key("minecraft:armor.boots"),
+			Key.key("minecraft:armor.leggings"),
+			Key.key("minecraft:armor.chestplate"),
+			Key.key("minecraft:armor.helmet"),
 	};
 }

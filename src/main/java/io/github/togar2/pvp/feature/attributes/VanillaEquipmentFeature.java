@@ -44,7 +44,7 @@ public class VanillaEquipmentFeature implements EquipmentFeature, RegistrableFea
 		node.addListener(EntityEquipEvent.class, this::onEquip);
 		node.addListener(PlayerChangeHeldSlotEvent.class, event -> {
 			LivingEntity entity = event.getPlayer();
-			ItemStack newItem = event.getPlayer().getInventory().getItemStack(event.getSlot());
+			ItemStack newItem = event.getPlayer().getInventory().getItemStack(event.getNewSlot());
 			Tool.updateEquipmentAttributes(entity, entity.getEquipment(EquipmentSlot.MAIN_HAND), newItem, EquipmentSlot.MAIN_HAND, version);
 		});
 	}

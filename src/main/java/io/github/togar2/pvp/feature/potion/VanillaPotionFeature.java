@@ -16,8 +16,9 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.PlayerHand;
 import net.minestom.server.event.EventNode;
-import net.minestom.server.event.item.ItemUsageCompleteEvent;
+import net.minestom.server.event.item.PlayerFinishItemUseEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
@@ -41,7 +42,6 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 	);
 	
 	private static final int USE_TICKS = 32;
-	private static final ItemStack GLASS_BOTTLE = ItemStack.of(Material.GLASS_BOTTLE);
 	
 	private final FeatureConfiguration configuration;
 	
@@ -68,7 +68,7 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 			}
 		});
 		
-		node.addListener(ItemUsageCompleteEvent.class, event -> {
+		node.addListener(PlayerFinishItemUseEvent.class, event -> {
 			if (event.getItemStack().material() != Material.POTION) return;
 			
 			Player player = event.getPlayer();
@@ -91,11 +91,17 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 			}
 			
 			if (player.getGameMode() != GameMode.CREATIVE) {
-				if (stack.amount() == 1) {
-					player.setItemInHand(event.getHand(), GLASS_BOTTLE);
+				ItemStack remainder = stack.get(ItemComponent.USE_REMAINDER);
+				
+				if (remainder != null && !remainder.isAir()) {
+					if (stack.amount() == 1) {
+						player.setItemInHand(event.getHand(), remainder);
+					} else {
+						player.setItemInHand(event.getHand(), stack.withAmount(stack.amount() - 1));
+						player.getInventory().addItemStack(remainder);
+					}
 				} else {
 					player.setItemInHand(event.getHand(), stack.withAmount(stack.amount() - 1));
-					player.getInventory().addItemStack(GLASS_BOTTLE);
 				}
 			}
 		});
@@ -132,14 +138,13 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 		});
 	}
 	
-	protected void throwPotion(Player player, ItemStack stack, Player.Hand hand) {
+	protected void throwPotion(Player player, ItemStack stack, PlayerHand hand) {
 		ThrownPotion thrownPotion = new ThrownPotion(player, effectFeature);
 		thrownPotion.setItem(stack);
 		
 		Pos position = player.getPosition().add(0, player.getEyeHeight(), 0);
-		thrownPotion.setInstance(Objects.requireNonNull(player.getInstance()), position);
-		
 		thrownPotion.shootFromRotation(position.pitch(), position.yaw(), -20, 0.5, 1.0);
+		thrownPotion.setInstance(Objects.requireNonNull(player.getInstance()), position.withView(thrownPotion.getPosition()));
 		
 		Vec playerVel = player.getVelocity();
 		thrownPotion.setVelocity(thrownPotion.getVelocity().add(playerVel.x(),

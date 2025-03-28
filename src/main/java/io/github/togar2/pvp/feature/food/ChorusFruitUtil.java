@@ -48,10 +48,11 @@ public class ChorusFruitUtil {
 		return true;
 	}
 	
-	public static void tryChorusTeleport(Player player, ItemCooldownFeature cooldownFeature) {
+	public static void tryChorusTeleport(Player player, ItemCooldownFeature cooldownFeature, float diameter) {
 		ThreadLocalRandom random = ThreadLocalRandom.current();
 		Instance instance = player.getInstance();
 		assert instance != null;
+		float radius = diameter / 2.0f;
 		
 		Pos prevPosition = player.getPosition();
 		double prevX = prevPosition.x();
@@ -66,11 +67,11 @@ public class ChorusFruitUtil {
 		
 		// Max 16 tries
 		for (int i = 0; i < 16; i++) {
-			double x = prevX + (random.nextDouble() - 0.5) * 16.0;
+			double x = prevX + (random.nextDouble() - 0.5) * radius;
 			double y = MathUtils.clamp(prevY + (random.nextInt(16) - 8),
 					dimensionType.minY(), dimensionType.minY()
 							+ dimensionType.logicalHeight() - 1);
-			double z = prevZ + (random.nextDouble() - 0.5) * 16.0;
+			double z = prevZ + (random.nextDouble() - 0.5) * radius;
 			
 			if (player.getVehicle() != null) {
 				player.getVehicle().removePassenger(player);

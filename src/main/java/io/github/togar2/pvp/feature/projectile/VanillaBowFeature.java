@@ -15,14 +15,12 @@ import net.kyori.adventure.sound.Sound;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
-import net.minestom.server.entity.Entity;
-import net.minestom.server.entity.EquipmentSlot;
-import net.minestom.server.entity.GameMode;
-import net.minestom.server.entity.Player;
+import net.minestom.server.entity.*;
 import net.minestom.server.event.EventNode;
-import net.minestom.server.event.item.ItemUpdateStateEvent;
-import net.minestom.server.event.player.PlayerItemAnimationEvent;
+import net.minestom.server.event.item.PlayerBeginItemUseEvent;
+import net.minestom.server.event.item.PlayerCancelItemUseEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
+import net.minestom.server.item.ItemAnimation;
 import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
@@ -64,8 +62,8 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 	
 	@Override
 	public void init(EventNode<EntityInstanceEvent> node) {
-		node.addListener(PlayerItemAnimationEvent.class, event -> {
-			if (event.getItemAnimationType() == PlayerItemAnimationEvent.ItemAnimationType.BOW) {
+		node.addListener(PlayerBeginItemUseEvent.class, event -> {
+			if (event.getAnimation() == ItemAnimation.BOW) {
 				if (event.getPlayer().getGameMode() != GameMode.CREATIVE
 						&& projectileItemFeature.getBowProjectile(event.getPlayer()) == null) {
 					event.setCancelled(true);
@@ -73,7 +71,7 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 			}
 		});
 		
-		node.addListener(ItemUpdateStateEvent.class, event -> {
+		node.addListener(PlayerCancelItemUseEvent.class, event -> {
 			Player player = event.getPlayer();
 			ItemStack stack = event.getItemStack();
 			if (stack.material() != Material.BOW) return;
@@ -116,7 +114,7 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 			if (enchantmentList.level(Enchantment.FLAME) > 0)
 				arrow.setFireTicksLeft(100 * ServerFlag.SERVER_TICKS_PER_SECOND); // 100 seconds
 			
-			itemDamageFeature.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
+			itemDamageFeature.damageEquipment(player, event.getHand() == PlayerHand.MAIN ?
 					EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, 1);
 			
 			boolean reallyInfinite = infinite && projectileItem.material() == Material.ARROW;
@@ -132,7 +130,7 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 			Vec playerVel = player.getVelocity();
 			arrow.setVelocity(arrow.getVelocity().add(playerVel.x(),
 					player.isOnGround() ? 0.0D : playerVel.y(), playerVel.z()));
-			arrow.setInstance(Objects.requireNonNull(player.getInstance()), position);
+			arrow.setInstance(Objects.requireNonNull(player.getInstance()), position.withView(arrow.getPosition()));
 			
 			ThreadLocalRandom random = ThreadLocalRandom.current();
 			ViewUtil.viewersAndSelf(player).playSound(Sound.sound(

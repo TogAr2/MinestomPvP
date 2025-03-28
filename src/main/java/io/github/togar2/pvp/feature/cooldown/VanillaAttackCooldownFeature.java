@@ -45,7 +45,7 @@ public class VanillaAttackCooldownFeature implements AttackCooldownFeature, Regi
 		
 		node.addListener(EventListener.builder(PlayerChangeHeldSlotEvent.class).handler(event -> {
 			if (!event.getPlayer().getItemInMainHand()
-					.isSimilar(event.getPlayer().getInventory().getItemStack(event.getSlot()))) {
+					.isSimilar(event.getPlayer().getInventory().getItemStack(event.getNewSlot()))) {
 				resetCooldownProgress(event.getPlayer());
 			}
 		}).build());
@@ -71,6 +71,6 @@ public class VanillaAttackCooldownFeature implements AttackCooldownFeature, Regi
 	}
 	
 	protected double getAttackCooldownProgressPerTick(Player player) {
-		return (1 / player.getAttributeValue(Attribute.GENERIC_ATTACK_SPEED)) * 20;
+		return (1 / player.getAttributeValue(Attribute.ATTACK_SPEED)) * 20;
 	}
 }

@@ -3,6 +3,7 @@ package io.github.togar2.pvp.entity.projectile;
 import io.github.togar2.pvp.utils.ProjectileUtil;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.collision.*;
+import net.minestom.server.coordinate.BlockVec;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -22,7 +23,6 @@ import java.util.Collection;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CustomEntityProjectile extends Entity {
 	private static final BoundingBox POINT_BOX = new BoundingBox(0, 0, 0);
@@ -174,18 +174,11 @@ public class CustomEntityProjectile extends Entity {
 	}
 	
 	private boolean shouldUnstuck() {
-		Vec blockPosition = this.position.asVec().apply(Vec.Operator.FLOOR);
-		return isFree(blockPosition.add(collisionDirection.x(), 0, 0))
-				&& isFree(blockPosition.add(0, collisionDirection.y(), 0))
-				&& isFree(blockPosition.add(0, 0, collisionDirection.z()));
-	}
-	
-	private boolean isFree(Point collidedPoint) {
+		Point collidedPoint = position.add(collisionDirection.mul(0.003)); // Move slightly inside the collided block
+		Point collidedBlockVec = new BlockVec(collidedPoint);
 		Block block = instance.getBlock(collidedPoint);
 		
-		// Move position slightly towards collision point because we will check for collision
-		Point intersectPos = position.add(collidedPoint.sub(position).mul(0.003));
-		return !block.registry().collisionShape().intersectBox(intersectPos.sub(collidedPoint).sub(0, 0.6, 0), UNSTUCK_BOX);
+		return !block.registry().collisionShape().intersectBox(collidedPoint.sub(collidedBlockVec).sub(0, 0.6, 0), UNSTUCK_BOX);
 	}
 	
 	protected boolean canHit(Entity entity) {
@@ -227,24 +220,23 @@ public class CustomEntityProjectile extends Entity {
 							if (noCollideShooter && e == shooter) return false;
 							return e != this && canHit(e);
 						}, physicsResult);
-
+				
 				if (!entityResult.isEmpty()) {
-					AtomicBoolean entityCollisionSucceeded = new AtomicBoolean();
-					
 					Vec prevVelocity = velocity;
 					EntityCollisionResult collided = entityResult.stream().findFirst().orElse(null);
 					
 					var event = new ProjectileCollideWithEntityEvent(this, Pos.fromPoint(collided.collisionPoint()), collided.entity());
-					EventDispatcher.callCancellable(event, () -> entityCollisionSucceeded.set(onHit(collided.entity())));
-					
-					if (entityCollisionSucceeded.get()) {
-						// Don't remove now because rest of Entity#tick might throw errors
-						scheduler().scheduleNextProcess(this::remove);
-						// Prevent hitting blocks
-						return;
-					} else {
-						// If velocity has been changed because of bounce, prevent projectile from moving further
-						if (velocity != prevVelocity) newPosition = position;
+					EventDispatcher.call(event);
+					if (!event.isCancelled()) {
+						if (onHit(collided.entity())) {
+							// Don't remove now because rest of Entity#tick might throw errors
+							scheduler().scheduleNextProcess(this::remove);
+							// Prevent hitting blocks
+							return;
+						} else {
+							// If velocity has been changed because of bounce, prevent projectile from moving further
+							if (velocity != prevVelocity) newPosition = position;
+						}
 					}
 				}
 			}
@@ -261,18 +253,17 @@ public class CustomEntityProjectile extends Entity {
 				Point collidedPosition = collisionDirection.add(physicsResult.newPosition()).apply(Vec.Operator.FLOOR);
 				Block block = instance.getBlock(collidedPosition);
 				
-				AtomicBoolean shouldRemove = new AtomicBoolean();
-				
 				var event = new ProjectileCollideWithBlockEvent(this, physicsResult.newPosition().withCoord(collidedPosition), block);
-				EventDispatcher.callCancellable(event, () -> {
+				EventDispatcher.call(event);
+				if (!event.isCancelled()) {
 					setNoGravity(true);
+					setVelocity(Vec.ZERO);
 					this.collisionDirection = collisionDirection;
-					shouldRemove.set(onStuck());
-				});
-				
-				if (shouldRemove.get()) {
-					// Don't remove now because rest of Entity#tick might throw errors
-					scheduler().scheduleNextProcess(this::remove);
+					
+					if (onStuck()) {
+						// Don't remove now because rest of Entity#tick might throw errors
+						scheduler().scheduleNextProcess(this::remove);
+					}
 				}
 			}
 			

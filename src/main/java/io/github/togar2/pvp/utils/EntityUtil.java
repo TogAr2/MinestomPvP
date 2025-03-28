@@ -30,7 +30,7 @@ public class EntityUtil {
 			return ((Player) entity).getName().hoverEvent(hoverEvent);
 		} else {
 			// Use entity type without underscores and starting with capital letter
-			String name = entity.getEntityType().namespace().value().replace('_', ' ');
+			String name = entity.getEntityType().key().value().replace('_', ' ');
 			name = name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
 			return Component.text(name).hoverEvent(hoverEvent);
 		}

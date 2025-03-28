@@ -4,6 +4,7 @@ import io.github.togar2.pvp.enchantment.EntityGroup;
 import io.github.togar2.pvp.feature.food.ExhaustionFeature;
 import io.github.togar2.pvp.feature.food.FoodFeature;
 import io.github.togar2.pvp.utils.CombatVersion;
+import net.kyori.adventure.key.Key;
 import net.minestom.server.color.AlphaColor;
 import net.minestom.server.color.Color;
 import net.minestom.server.entity.Entity;
@@ -18,7 +19,6 @@ import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
-import net.minestom.server.utils.NamespaceID;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -52,13 +52,13 @@ public class CombatPotionEffect {
 		return particleSupplier.apply(potion);
 	}
 	
-	public CombatPotionEffect addAttributeModifier(Attribute attribute, NamespaceID id,
+	public CombatPotionEffect addAttributeModifier(Attribute attribute, Key id,
 	                                               double amount, AttributeOperation operation) {
 		attributeModifiers.put(attribute, new AttributeModifier(id, amount, operation));
 		return this;
 	}
 	
-	public CombatPotionEffect addLegacyAttributeModifier(Attribute attribute, NamespaceID id,
+	public CombatPotionEffect addLegacyAttributeModifier(Attribute attribute, Key id,
 	                                                     double amount, AttributeOperation operation) {
 		if (legacyAttributeModifiers == null)
 			legacyAttributeModifiers = new HashMap<>();
@@ -66,10 +66,10 @@ public class CombatPotionEffect {
 		return this;
 	}
 	
-	public void applyUpdateEffect(LivingEntity entity, byte amplifier,
+	public void applyUpdateEffect(LivingEntity entity, int amplifier,
 	                              ExhaustionFeature exhaustionFeature, FoodFeature foodFeature) {
 		if (potionEffect == PotionEffect.REGENERATION) {
-			if (entity.getHealth() < entity.getAttributeValue(Attribute.GENERIC_MAX_HEALTH)) {
+			if (entity.getHealth() < entity.getAttributeValue(Attribute.MAX_HEALTH)) {
 				entity.setHealth(entity.getHealth() + 1);
 			}
 			return;
@@ -105,7 +105,7 @@ public class CombatPotionEffect {
 	}
 	
 	public void applyInstantEffect(@Nullable Entity source, @Nullable Entity attacker, LivingEntity target,
-	                               byte amplifier, double proximity, ExhaustionFeature exhaustionFeature, FoodFeature foodFeature) {
+	                               int amplifier, double proximity, ExhaustionFeature exhaustionFeature, FoodFeature foodFeature) {
 		EntityGroup targetGroup = EntityGroup.ofEntity(target);
 		
 		if (potionEffect != PotionEffect.INSTANT_DAMAGE && potionEffect != PotionEffect.INSTANT_HEALTH) {
@@ -131,7 +131,7 @@ public class CombatPotionEffect {
 				|| (!group.isUndead() && potionEffect == PotionEffect.INSTANT_HEALTH);
 	}
 	
-	public boolean canApplyUpdateEffect(int duration, byte amplifier) {
+	public boolean canApplyUpdateEffect(int duration, int amplifier) {
 		if (isInstant()) return duration >= 1;
 		
 		int applyInterval;
@@ -156,7 +156,7 @@ public class CombatPotionEffect {
 		return potionEffect.registry().isInstantaneous();
 	}
 	
-	public void onApplied(LivingEntity entity, byte amplifier, CombatVersion version) {
+	public void onApplied(LivingEntity entity, int amplifier, CombatVersion version) {
 		Map<Attribute, AttributeModifier> modifiers;
 		if (version.legacy() && legacyAttributeModifiers != null) {
 			modifiers = legacyAttributeModifiers;
@@ -171,7 +171,7 @@ public class CombatPotionEffect {
 		});
 	}
 	
-	public void onRemoved(LivingEntity entity, byte amplifier, CombatVersion version) {
+	public void onRemoved(LivingEntity entity, int amplifier, CombatVersion version) {
 		Map<Attribute, AttributeModifier> modifiers;
 		if (version.legacy() && legacyAttributeModifiers != null) {
 			modifiers = legacyAttributeModifiers;
@@ -183,7 +183,7 @@ public class CombatPotionEffect {
 				entity.getAttribute(attribute).removeModifier(modifier));
 	}
 	
-	private double adjustModifierAmount(byte amplifier, AttributeModifier modifier) {
+	private double adjustModifierAmount(int amplifier, AttributeModifier modifier) {
 		return modifier.amount() * (amplifier + 1);
 	}
 }

@@ -14,14 +14,11 @@ import net.kyori.adventure.sound.Sound;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
-import net.minestom.server.entity.EquipmentSlot;
-import net.minestom.server.entity.GameMode;
-import net.minestom.server.entity.LivingEntity;
-import net.minestom.server.entity.Player;
+import net.minestom.server.entity.*;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityAttackEvent;
-import net.minestom.server.event.item.ItemUpdateStateEvent;
+import net.minestom.server.event.item.PlayerCancelItemUseEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.instance.EntityTracker;
@@ -63,7 +60,7 @@ public class VanillaTridentFeature implements TridentFeature, RegistrableFeature
 	
 	@Override
 	public void init(EventNode<EntityInstanceEvent> node) {
-		node.addListener(ItemUpdateStateEvent.class, event -> {
+		node.addListener(PlayerCancelItemUseEvent.class, event -> {
 			Player player = event.getPlayer();
 			ItemStack stack = event.getItemStack();
 			if (stack.material() != Material.TRIDENT) return;
@@ -74,7 +71,7 @@ public class VanillaTridentFeature implements TridentFeature, RegistrableFeature
 			int riptide = stack.get(ItemComponent.ENCHANTMENTS).level(Enchantment.RIPTIDE);
 			if (riptide > 0 && !FluidUtil.isTouchingWater(player)) return;
 			
-			itemDamageFeature.damageEquipment(player, event.getHand() == Player.Hand.MAIN ?
+			itemDamageFeature.damageEquipment(player, event.getHand() == PlayerHand.MAIN ?
 					EquipmentSlot.MAIN_HAND : EquipmentSlot.OFF_HAND, 1);
 			
 			if (riptide > 0) {
@@ -83,9 +80,8 @@ public class VanillaTridentFeature implements TridentFeature, RegistrableFeature
 				ThrownTrident trident = new ThrownTrident(player, stack, enchantmentFeature);
 				
 				Pos position = player.getPosition().add(0, player.getEyeHeight() - 0.1, 0);
-				trident.setInstance(Objects.requireNonNull(player.getInstance()), position);
-				
 				trident.shootFromRotation(position.pitch(), position.yaw(), 0, 2.5, 1.0);
+				trident.setInstance(Objects.requireNonNull(player.getInstance()), position.withView(trident.getPosition()));
 				
 				Vec playerVel = player.getVelocity();
 				trident.setVelocity(trident.getVelocity().add(playerVel.x(),

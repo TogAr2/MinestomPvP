@@ -2,6 +2,7 @@ package io.github.togar2.pvp.enums;
 
 import io.github.togar2.pvp.utils.CombatVersion;
 import io.github.togar2.pvp.utils.ModifierId;
+import net.kyori.adventure.key.Key;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.attribute.Attribute;
@@ -11,7 +12,6 @@ import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.sound.SoundEvent;
-import net.minestom.server.utils.NamespaceID;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -74,24 +74,24 @@ public enum ArmorMaterial {
 		ArmorMaterial oldMaterial = fromMaterial(oldStack.material());
 		ArmorMaterial newMaterial = fromMaterial(newStack.material());
 		
-		NamespaceID modifierId = getModifierId(slot);
+		Key modifierId = getModifierId(slot);
 		
 		// Remove attributes from previous armor
 		if (oldMaterial != null && hasDefaultAttributes(oldStack)) {
 			if (slot == getRequiredSlot(oldStack.material())) {
-				entity.getAttribute(Attribute.GENERIC_ARMOR).removeModifier(modifierId);
-				entity.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).removeModifier(modifierId);
-				entity.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).removeModifier(modifierId);
+				entity.getAttribute(Attribute.ARMOR).removeModifier(modifierId);
+				entity.getAttribute(Attribute.ARMOR_TOUGHNESS).removeModifier(modifierId);
+				entity.getAttribute(Attribute.KNOCKBACK_RESISTANCE).removeModifier(modifierId);
 			}
 		}
 		
 		// Add attributes from new armor
 		if (newMaterial != null && hasDefaultAttributes(newStack)) {
 			if (slot == getRequiredSlot(newStack.material())) {
-				entity.getAttribute(Attribute.GENERIC_ARMOR).addModifier(new AttributeModifier(modifierId, newMaterial.getProtectionAmount(slot, version), AttributeOperation.ADD_VALUE));
-				entity.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).addModifier(new AttributeModifier(modifierId, newMaterial.getToughness(), AttributeOperation.ADD_VALUE));
+				entity.getAttribute(Attribute.ARMOR).addModifier(new AttributeModifier(modifierId, newMaterial.getProtectionAmount(slot, version), AttributeOperation.ADD_VALUE));
+				entity.getAttribute(Attribute.ARMOR_TOUGHNESS).addModifier(new AttributeModifier(modifierId, newMaterial.getToughness(), AttributeOperation.ADD_VALUE));
 				if (newMaterial.getKnockbackResistance() > 0) {
-					entity.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).addModifier(new AttributeModifier(modifierId, newMaterial.getKnockbackResistance(), AttributeOperation.ADD_VALUE));
+					entity.getAttribute(Attribute.KNOCKBACK_RESISTANCE).addModifier(new AttributeModifier(modifierId, newMaterial.getKnockbackResistance(), AttributeOperation.ADD_VALUE));
 				}
 			}
 		}
@@ -114,7 +114,7 @@ public enum ArmorMaterial {
 		return MATERIAL_TO_ARMOR_MATERIAL.get(material);
 	}
 	
-	public static NamespaceID getModifierId(EquipmentSlot slot) {
+	public static Key getModifierId(EquipmentSlot slot) {
 		return ModifierId.ARMOR_MODIFIERS[slot.ordinal() - 2];
 	}
 	
