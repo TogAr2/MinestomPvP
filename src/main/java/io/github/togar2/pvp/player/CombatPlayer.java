@@ -22,7 +22,7 @@ public interface CombatPlayer {
     Pos getPosition();
     
     default double getJumpVelocity() {
-        return getAttribute(Attribute.GENERIC_JUMP_STRENGTH).getValue();
+        return getAttribute(Attribute.JUMP_STRENGTH).getValue();
     }
     
     default double getJumpBoostVelocityModifier() {
