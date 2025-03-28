@@ -3,19 +3,16 @@
 [![license](https://img.shields.io/github/license/TogAr2/MinestomPvP.svg?style=for-the-badge)](LICENSE)
 [![platform](https://img.shields.io/badge/platform-Minestom-ff69b4?style=for-the-badge)](https://github.com/Minestom/Minestom)
 
-MinestomPvP is an extension for Minestom.
+MinestomPvP is a combat library for Minestom.
 It tries to mimic vanilla (modern **and** pre-1.9) PvP as good as possible, while also focusing on customizability and usability.
 
-But, MinestomPvP does not only provide PvP, it also provides everything around it (e.g., status effects and food).
-You can easily pick which features you want to use.
+Not only does MinestomPvP provide PvP mechanics, it also provides several related features (e.g., status effects and food).
+You can easily declare which features you want to use.
 
 The maven repository is available on [jitpack](https://jitpack.io/#TogAr2/MinestomPvP).
 
-> MinestomPvP has been rewritten, see [Important changes](#important-changes)
-
 ## Table of Contents
 
-- [Important changes](#important-changes)
 - [Features](#features)
 - [Future Plans](#plans)
 - [Usage](#usage)
@@ -28,19 +25,9 @@ The maven repository is available on [jitpack](https://jitpack.io/#TogAr2/Minest
 - [Contributing](#contributing)
 - [Credits](#credits)
 
-## Important changes
-
-MinestomPvP has recently been rewritten. Most features are now independent of each other and can be used separately.
-
-Major changes include:
-- `PvpExtension` is now `MinestomPvP`
-- Configs have been removed in favor of a feature based configuration system
-- Registries are no longer prefixed by `Custom` but by `Combat`
-- `PvpPlayer` is now `CombatPlayer`, `CustomPlayer` is now `CombatPlayerImpl`
-
 ## Features
 
-Currently, most vanilla PvP features are supported.
+Currently, most vanilla PvP mechanics are supported.
 
 - Attack cooldown
 - Damage invulnerability
