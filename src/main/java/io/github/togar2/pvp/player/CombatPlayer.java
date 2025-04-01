@@ -21,6 +21,12 @@ public interface CombatPlayer {
     boolean isSprinting();
     Pos getPosition();
     
+    /**
+     * Does not guarantee anything, the implementation uses Minestom physics logic which does not take into account many edge cases.
+     * @return true if the player is likely on the ground clientside
+     */
+    boolean isOnGroundClientSide();
+    
     default double getJumpVelocity() {
         return getAttribute(Attribute.JUMP_STRENGTH).getValue();
     }

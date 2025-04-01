@@ -59,7 +59,7 @@ public class VanillaKnockbackFeature implements KnockbackFeature {
 		
 		// Set the velocity
 		if (version.legacy()) {
-			if (!applyLegacyDamageKnockback(target, attacker, source, false, 1, dx, dz)) return false;
+			if (!applyLegacyKnockback(target, attacker, source, false, 1, dx, dz)) return false;
 		} else {
 			if (!applyModernKnockback(target, attacker, source,
 					EntityKnockbackEvent.KnockbackType.DAMAGE, 0.4f, dx, dz)) return false;
@@ -88,8 +88,8 @@ public class VanillaKnockbackFeature implements KnockbackFeature {
 		return true;
 	}
 	
-	protected boolean applyLegacyDamageKnockback(LivingEntity target, Entity attacker, @Nullable Entity source,
-	                                             boolean extra, int knockback, double dx, double dz) {
+	protected boolean applyLegacyKnockback(LivingEntity target, Entity attacker, @Nullable Entity source,
+	                                       boolean extra, int knockback, double dx, double dz) {
 		LegacyKnockbackEvent legacyKnockbackEvent = new LegacyKnockbackEvent(
 				target, source == null ? attacker : source, extra);
 		EventDispatcher.call(legacyKnockbackEvent);
@@ -126,7 +126,7 @@ public class VanillaKnockbackFeature implements KnockbackFeature {
 		double dz = -Math.cos(Math.toRadians(attacker.getPosition().yaw()));
 		
 		if (version.legacy()) {
-			if (!applyLegacyDamageKnockback(
+			if (!applyLegacyKnockback(
 					target, attacker, attacker,
 					true, knockback,
 					dx, dz
