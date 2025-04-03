@@ -91,9 +91,12 @@ public class VanillaKnockbackFeature implements KnockbackFeature {
 			vertical = settings.vertical();
 		} else {
 			// Extra knockback
+			double baseVertical = legacy ?
+					settings.extraVertical() : // Legacy: defaults to 0.1
+					settings.vertical() + settings.extraVertical(); // Modern: defaults to 0.1 + 0.4 = 0.5
+			
 			horizontal = settings.extraHorizontal() * extraKnockback;
-			vertical = settings.extraVertical() * extraKnockback;
-			if (!legacy) vertical += settings.vertical();
+			vertical = baseVertical * extraKnockback;
 		}
 		
 		horizontal *= (1 - kbResistance);
