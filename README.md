@@ -60,7 +60,7 @@ Currently, most vanilla PvP mechanics are supported.
 Before doing anything else, you should call `MinestomPvP.init()`. This will make sure everything is registered correctly.
 
 > [!NOTE]
-> `MinestomPvP.init() has a few side effects which may be unwanted and can be disabled: see [Integration](#integration)`.
+> `MinestomPvP.init()` has a few side effects which may be unwanted and can be disabled: see [Integration](#integration).
 
 After you've initialized the library, you can start using combat features.
 A very basic setup would be:
