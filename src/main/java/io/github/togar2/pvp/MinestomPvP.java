@@ -7,12 +7,15 @@ import io.github.togar2.pvp.player.CombatPlayer;
 import io.github.togar2.pvp.player.CombatPlayerImpl;
 import io.github.togar2.pvp.potion.effect.CombatPotionEffects;
 import io.github.togar2.pvp.potion.item.CombatPotionTypes;
+import io.github.togar2.pvp.utils.AccurateLatencyListener;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.entity.attribute.AttributeInstance;
 import net.minestom.server.event.EventNode;
+import net.minestom.server.event.player.PlayerPacketOutEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
+import net.minestom.server.network.packet.client.common.ClientKeepAlivePacket;
 
 /**
  * The main class of MinestomPvP, which contains the {@link MinestomPvP#init()} method.
@@ -66,6 +69,8 @@ public class MinestomPvP {
 		CombatFeatureRegistry.init();
 		
 		MinecraftServer.getConnectionManager().setPlayerProvider(CombatPlayerImpl::new);
+		MinecraftServer.getPacketListenerManager().setPlayListener(ClientKeepAlivePacket.class, AccurateLatencyListener::listener);
+		MinecraftServer.getGlobalEventHandler().addListener(PlayerPacketOutEvent.class, AccurateLatencyListener::onSend);
 		CombatPlayer.init(MinecraftServer.getGlobalEventHandler());
 	}
 }
