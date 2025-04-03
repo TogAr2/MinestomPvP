@@ -23,9 +23,11 @@ public interface CombatPlayer {
     
     /**
      * Does not guarantee anything, the implementation uses Minestom physics logic which does not take into account many edge cases.
-     * @return true if the player is likely on the ground clientside
+     * It is also quite performance intensive, not suitable for calling often.
+     * @param ticks the amount of ticks to test for
+     * @return true if the player will likely be on the ground in the given amount of ticks
      */
-    boolean isOnGroundClientSide();
+    boolean isOnGroundAfterTicks(int ticks);
     
     default double getJumpVelocity() {
         return getAttribute(Attribute.JUMP_STRENGTH).getValue();

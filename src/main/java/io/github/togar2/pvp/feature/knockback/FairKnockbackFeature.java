@@ -32,10 +32,16 @@ import org.jetbrains.annotations.Nullable;
  * The changes made by this feature only apply to players with more than 25 ms ping.
  */
 public class FairKnockbackFeature extends VanillaKnockbackFeature {
+	/**
+	 * @see FairKnockbackFeature
+	 */
 	public static final DefinedFeature<FairKnockbackFeature> ONLY_RISING = new DefinedFeature<>(
 			FeatureType.KNOCKBACK, configuration -> new FairKnockbackFeature(configuration, false),
 			FeatureType.VERSION
 	);
+	/**
+	 * @see FairKnockbackFeature
+	 */
 	public static final DefinedFeature<FairKnockbackFeature> RISING_AND_FALLING = new DefinedFeature<>(
 			FeatureType.KNOCKBACK, configuration -> new FairKnockbackFeature(configuration, true),
 			FeatureType.VERSION
@@ -71,16 +77,18 @@ public class FairKnockbackFeature extends VanillaKnockbackFeature {
 		final double verticalLimit = .4d * ServerFlag.SERVER_TICKS_PER_SECOND;
 		
 		Vec velocity = target.getVelocity();
+		
+		int latencyTicks = getLatencyTicks(player.getLatency());
 		double vertical;
-		if (isOnGroundClientSide(player)) {
+		if (isOnGroundClientSide(player, latencyTicks)) {
 			vertical = Math.min(verticalLimit, velocity.y() / 2d + strength);
 		} else if (compensateFallKnockback) {
-			int latencyTicks = (int) (player.getLatency() / 1000.0) * ServerFlag.SERVER_TICKS_PER_SECOND;
 			vertical = getCompensatedVerticalVelocity(player.getAerodynamics(), velocity.y(), latencyTicks);
 		} else {
 			vertical = velocity.y();
 		}
 		
+		//player.refreshOnGround(false);
 		target.setVelocity(new Vec(
 				velocity.x() / 2d - velocityModifier.x(),
 				vertical,
@@ -110,17 +118,18 @@ public class FairKnockbackFeature extends VanillaKnockbackFeature {
 		
 		Vec velocity = target.getVelocity();
 		
+		int latencyTicks = getLatencyTicks(player.getLatency());
 		double yVel;
-		if (isOnGroundClientSide(player)) {
+		if (isOnGroundClientSide(player, latencyTicks)) {
 			//TODO divide by 2 at y component or not?
 			yVel = Math.min(settings.verticalLimit(), velocity.y() + vertical);
 		} else if (compensateFallKnockback) {
-			int latencyTicks = (int) (player.getLatency() / 1000.0) * ServerFlag.SERVER_TICKS_PER_SECOND;
 			yVel = getCompensatedVerticalVelocity(player.getAerodynamics(), velocity.y(), latencyTicks);
 		} else {
 			yVel = velocity.y();
 		}
 		
+		player.refreshOnGround(false);
 		target.setVelocity(new Vec(
 				velocity.x() / 2d - horizontalModifier.x(),
 				yVel,
@@ -130,11 +139,11 @@ public class FairKnockbackFeature extends VanillaKnockbackFeature {
 		return true;
 	}
 	
-	protected boolean isOnGroundClientSide(Player player) {
+	protected boolean isOnGroundClientSide(Player player, int latencyTicks) {
 		if (player.isOnGround() || !(player instanceof CombatPlayer combatPlayer)) return true;
 		if (player.getGravityTickCount() > 30) return false; // Very uncertain, default to false
 		
-		// These are all cases in which isOnGroundClientSide() will not be accurate
+		// These are all cases in which isOnGroundAfterTicks() will not be accurate
 		Block block = player.getInstance().getBlock(player.getPosition());
 		if (player.isFlyingWithElytra()
 				|| block.compare(Block.WATER)
@@ -143,7 +152,7 @@ public class FairKnockbackFeature extends VanillaKnockbackFeature {
 				|| block.compare(Block.SCAFFOLDING))
 			return false;
 		
-		return combatPlayer.isOnGroundClientSide();
+		return combatPlayer.isOnGroundAfterTicks(latencyTicks);
 	}
 	
 	/**
@@ -162,5 +171,9 @@ public class FairKnockbackFeature extends VanillaKnockbackFeature {
 		}
 		
 		return velocity;
+	}
+	
+	private static int getLatencyTicks(int latencyMillis) {
+		return Math.ceilDiv(latencyMillis * ServerFlag.SERVER_TICKS_PER_SECOND, 1000) + 2;
 	}
 }

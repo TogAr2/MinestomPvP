@@ -22,6 +22,7 @@ import io.github.togar2.pvp.feature.food.VanillaExhaustionFeature;
 import io.github.togar2.pvp.feature.food.VanillaFoodFeature;
 import io.github.togar2.pvp.feature.food.VanillaRegenerationFeature;
 import io.github.togar2.pvp.feature.item.VanillaItemDamageFeature;
+import io.github.togar2.pvp.feature.knockback.FairKnockbackFeature;
 import io.github.togar2.pvp.feature.knockback.VanillaKnockbackFeature;
 import io.github.togar2.pvp.feature.potion.VanillaPotionFeature;
 import io.github.togar2.pvp.feature.projectile.*;
@@ -168,6 +169,15 @@ public class CombatFeatures {
 	 * @see LegacyVanillaBlockFeature
 	 */
 	public static final DefinedFeature<LegacyVanillaBlockFeature> LEGACY_VANILLA_BLOCK = LegacyVanillaBlockFeature.SHIELD;
+	
+	/**
+	 * @see FairKnockbackFeature
+	 */
+	public static final DefinedFeature<FairKnockbackFeature> FAIR_RISING_KNOCKBACK = FairKnockbackFeature.ONLY_RISING;
+	/**
+	 * @see FairKnockbackFeature
+	 */
+	public static final DefinedFeature<FairKnockbackFeature> FAIR_RISING_FALLING_KNOCKBACK = FairKnockbackFeature.RISING_AND_FALLING;
 	
 	private static final List<DefinedFeature<?>> VANILLA = List.of(
 			VANILLA_ARMOR, VANILLA_ATTACK, VANILLA_CRITICAL, VANILLA_SWEEPING,
