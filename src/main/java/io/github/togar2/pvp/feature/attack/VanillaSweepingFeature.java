@@ -1,5 +1,6 @@
 package io.github.togar2.pvp.feature.attack;
 
+import io.github.togar2.pvp.enchantment.EntityGroup;
 import io.github.togar2.pvp.enums.Tool;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
@@ -84,10 +85,13 @@ public class VanillaSweepingFeature implements SweepingFeature {
 				affectedEntities.add(living);
 				knockbackFeature.applySweepingKnockback(attacker, target);
 				
+				float currentDamage = sweepingDamage + enchantmentFeature.getAttackDamage(
+						attacker.getItemInMainHand(), EntityGroup.ofEntity(target));
+				
 				living.damage(new Damage(
 						attacker instanceof Player ? DamageType.PLAYER_ATTACK : DamageType.MOB_ATTACK,
 						attacker, attacker,
-						null, sweepingDamage
+						null, currentDamage
 				));
 			}
 		}
