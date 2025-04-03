@@ -88,7 +88,6 @@ public class FairKnockbackFeature extends VanillaKnockbackFeature {
 			vertical = velocity.y();
 		}
 		
-		//player.refreshOnGround(false);
 		target.setVelocity(new Vec(
 				velocity.x() / 2d - velocityModifier.x(),
 				vertical,
@@ -129,7 +128,6 @@ public class FairKnockbackFeature extends VanillaKnockbackFeature {
 			yVel = velocity.y();
 		}
 		
-		player.refreshOnGround(false);
 		target.setVelocity(new Vec(
 				velocity.x() / 2d - horizontalModifier.x(),
 				yVel,

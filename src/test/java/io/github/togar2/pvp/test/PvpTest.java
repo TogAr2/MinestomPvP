@@ -149,7 +149,7 @@ public class PvpTest {
 		GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
 		eventHandler.addChild(CombatFeatures.getVanilla(CombatVersion.MODERN, DifficultyProvider.DEFAULT)
 						.remove(FeatureType.KNOCKBACK)
-						.add(CombatFeatures.FAIR_RISING_KNOCKBACK)
+						.add(CombatFeatures.FAIR_RISING_FALLING_KNOCKBACK)
 						.build().createNode());
 		//eventHandler.addChild(PvPConfig.defaultBuilder()
 		//		//.potion(PotionConfig.legacyBuilder().drinking(false))
