@@ -42,7 +42,7 @@ public interface CombatPlayer {
     default void jump() {
         int tps = ServerFlag.SERVER_TICKS_PER_SECOND;
         double yVel = getJumpVelocity() + getJumpBoostVelocityModifier();
-        setVelocityNoUpdate(velocity -> velocity.withY(yVel * tps));
+        setVelocityNoUpdate(velocity -> velocity.withY(Math.max(velocity.y(), yVel * tps)));
         if (isSprinting()) {
             double angle = getPosition().yaw() * (Math.PI / 180);
             setVelocityNoUpdate(velocity -> velocity.add(-Math.sin(angle) * 0.2 * tps, 0, Math.cos(angle) * 0.2 * tps));
@@ -60,7 +60,7 @@ public interface CombatPlayer {
     static void init(EventNode<Event> node) {
         node.addListener(PlayerMoveEvent.class, event -> {
             Player player = event.getPlayer();
-            if (player.isOnGround()
+            if (player.isOnGround() && !event.isOnGround()
                     && event.getNewPosition().y() > player.getPosition().y()
                     && player instanceof CombatPlayer combatPlayer) {
                 combatPlayer.jump();
