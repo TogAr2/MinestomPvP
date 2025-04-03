@@ -4,7 +4,6 @@ import io.github.togar2.pvp.events.EntityKnockbackEvent;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
-import io.github.togar2.pvp.legacy.KnockbackSettings;
 import io.github.togar2.pvp.player.CombatPlayer;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.collision.Aerodynamics;
@@ -12,8 +11,6 @@ import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
-import net.minestom.server.entity.attribute.Attribute;
-import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.instance.block.Block;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,48 +59,36 @@ public class FairKnockbackFeature extends VanillaKnockbackFeature {
 		if (!(target instanceof Player player) || player.getLatency() < PING_OFFSET)
 			return super.applyKnockback(target, attacker, source, type, extraKnockback, dx, dz, legacy);
 		
-		EntityKnockbackEvent knockbackEvent = new EntityKnockbackEvent(target, source == null ? attacker : source, type);
-		EventDispatcher.call(knockbackEvent);
-		if (knockbackEvent.isCancelled()) return false;
-		
-		KnockbackSettings settings = knockbackEvent.getSettings();
-		
-		double kbResistance = target.getAttributeValue(Attribute.KNOCKBACK_RESISTANCE);
-		double horizontal, vertical;
-		if (extraKnockback <= 0) {
-			// Default knockback
-			horizontal = settings.horizontal();
-			vertical = settings.vertical();
-		} else {
-			// Extra knockback
-			horizontal = settings.extraHorizontal() * extraKnockback;
-			vertical = settings.extraVertical() * extraKnockback;
-		}
-		
-		horizontal *= (1 - kbResistance);
-		vertical *= (1 - kbResistance);
-		if (horizontal <= 0 && vertical <= 0) return false;
-		
-		Vec horizontalModifier = new Vec(dx, dz).normalize().mul(horizontal);
-		double verticalLimit = settings.verticalLimit();
+		KnockbackValues values = prepareKnockback(target, attacker, source, type, extraKnockback, dx, dz, legacy);
+		if (values == null) return false;
 		
 		Vec velocity = target.getVelocity();
-		
-		int latencyTicks = getLatencyTicks(player.getLatency());
-		double resultingVertical;
-		if (isOnGroundClientSide(player, latencyTicks)) {
-			resultingVertical = Math.min(verticalLimit, velocity.y() / (legacy ? 1d : 2d) + vertical);
-		} else if (compensateFallKnockback) {
-			resultingVertical = getCompensatedVerticalVelocity(player.getAerodynamics(), velocity.y(), latencyTicks);
+		if (legacy && type == EntityKnockbackEvent.KnockbackType.ATTACK) {
+			// For legacy versions, extra knockback is added directly on top of the original velocity
+			target.setVelocity(velocity.add(
+					-values.horizontalModifier().x(),
+					values.vertical(),
+					-values.horizontalModifier().z()
+			));
 		} else {
-			resultingVertical = velocity.y();
+			// For modern versions and legacy non-attack knockback, the velocity is first divided by 2
+			
+			int latencyTicks = getLatencyTicks(player.getLatency());
+			double vertical;
+			if (isOnGroundClientSide(player, latencyTicks)) {
+				vertical = Math.min(values.verticalLimit(), velocity.y() / 2d + values.vertical());
+			} else if (compensateFallKnockback) {
+				vertical = getCompensatedVerticalVelocity(player.getAerodynamics(), velocity.y(), latencyTicks);
+			} else {
+				vertical = velocity.y();
+			}
+			
+			target.setVelocity(new Vec(
+					velocity.x() / 2d - values.horizontalModifier().x(),
+					vertical,
+					velocity.z() / 2d - values.horizontalModifier().z()
+			));
 		}
-		
-		target.setVelocity(new Vec(
-				velocity.x() / 2d - horizontalModifier.x(),
-				resultingVertical,
-				velocity.z() / 2d - horizontalModifier.z()
-		));
 		
 		return true;
 	}

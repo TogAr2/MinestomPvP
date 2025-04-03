@@ -72,12 +72,14 @@ public class VanillaKnockbackFeature implements KnockbackFeature {
 		return true;
 	}
 	
-	protected boolean applyKnockback(LivingEntity target, Entity attacker, @Nullable Entity source,
-	                                 EntityKnockbackEvent.KnockbackType type, int extraKnockback,
-	                                 double dx, double dz, boolean legacy) {
+	public record KnockbackValues(Vec horizontalModifier, double vertical, double verticalLimit) {}
+	
+	protected @Nullable KnockbackValues prepareKnockback(LivingEntity target, Entity attacker, @Nullable Entity source,
+	                                EntityKnockbackEvent.KnockbackType type, int extraKnockback,
+	                                double dx, double dz, boolean legacy) {
 		EntityKnockbackEvent knockbackEvent = new EntityKnockbackEvent(target, source == null ? attacker : source, type);
 		EventDispatcher.call(knockbackEvent);
-		if (knockbackEvent.isCancelled()) return false;
+		if (knockbackEvent.isCancelled()) return null;
 		
 		KnockbackSettings settings = knockbackEvent.getSettings();
 		
@@ -96,24 +98,32 @@ public class VanillaKnockbackFeature implements KnockbackFeature {
 		
 		horizontal *= (1 - kbResistance);
 		vertical *= (1 - kbResistance);
-		if (horizontal <= 0 && vertical <= 0) return false;
+		if (horizontal <= 0 && vertical <= 0) return null;
 		
 		Vec horizontalModifier = new Vec(dx, dz).normalize().mul(horizontal);
+		return new KnockbackValues(horizontalModifier, vertical, settings.verticalLimit());
+	}
+	
+	protected boolean applyKnockback(LivingEntity target, Entity attacker, @Nullable Entity source,
+	                                 EntityKnockbackEvent.KnockbackType type, int extraKnockback,
+	                                 double dx, double dz, boolean legacy) {
+		KnockbackValues values = prepareKnockback(target, attacker, source, type, extraKnockback, dx, dz, legacy);
+		if (values == null) return false;
 		
 		Vec velocity = target.getVelocity();
 		if (legacy && type == EntityKnockbackEvent.KnockbackType.ATTACK) {
 			// For legacy versions, extra knockback is added directly on top of the original velocity
-			target.setVelocity(target.getVelocity().add(
-					-horizontalModifier.x(),
-					vertical,
-					-horizontalModifier.z()
+			target.setVelocity(velocity.add(
+					-values.horizontalModifier().x(),
+					values.vertical(),
+					-values.horizontalModifier().z()
 			));
 		} else {
 			// For modern versions and legacy non-attack knockback, the velocity is first divided by 2
 			target.setVelocity(new Vec(
-					velocity.x() / 2d - horizontalModifier.x(),
-					target.isOnGround() ? Math.min(settings.verticalLimit(), velocity.y() / 2d + vertical) : velocity.y(),
-					velocity.z() / 2d - horizontalModifier.z()
+					velocity.x() / 2d - values.horizontalModifier().x(),
+					target.isOnGround() ? Math.min(values.verticalLimit(), velocity.y() / 2d + values.vertical()) : velocity.y(),
+					velocity.z() / 2d - values.horizontalModifier().z()
 			));
 		}
 		
