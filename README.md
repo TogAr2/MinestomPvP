@@ -133,6 +133,10 @@ A builder is obtainable by using `KnockbackSettings.builder()`. For more informa
 > [!NOTE]
 > Despite this config being designed for legacy combat, `KnockbackSettings` also works for modern combat.
 
+Some servers also use latency-compensated knockback to improve the experience fighting against and playing with high ping.
+MinestomPvP provides `FairKnockbackFeature` for this purpose. It has two modes: `ONLY_RISING` and `RISING_AND_FALLING`.
+For more information, see the documentation of [`FairKnockbackFeature`](src/main/java/io/github/togar2/pvp/feature/knockback/FairKnockbackFeature.java).
+
 ### Integration
 
 To integrate this extension into your minestom server, you may have to tweak a little bit to make sure everything works correctly.
