@@ -68,14 +68,13 @@ public class VanillaEnchantmentFeature implements EnchantmentFeature, Registrabl
 	public int getEquipmentLevel(LivingEntity entity, DynamicRegistry.Key<Enchantment> enchantment) {
 		Iterator<ItemStack> iterator = CombatEnchantments.get(enchantment).getEquipment(entity).values().iterator();
 		
-		int highest = 0;
+		int total = 0;
 		while (iterator.hasNext()) {
 			ItemStack itemStack = iterator.next();
-			int level = itemStack.get(ItemComponent.ENCHANTMENTS).level(enchantment);
-			if (level > highest) highest = level;
+			total += itemStack.get(ItemComponent.ENCHANTMENTS).level(enchantment);
 		}
 		
-		return highest;
+		return total;
 	}
 	
 	@Override
