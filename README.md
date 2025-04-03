@@ -111,6 +111,7 @@ It is also possible to leave out the `PLAYER_STATE` feature: a `NO_OP` feature w
 
 Upon calling `CombatConfiguration#build()`, the combat configuration resolves all these dependencies and creates a `CombatFeatureSet` in which all the features are instantiated.
 
+> [!NOTE]
 > Features defined inside the `CombatFeatures` class are not yet instantiated, but are a `DefinedFeature`.
 > The `CombatConfiguration` will instantiate the features for you, which will turn them into `CombatFeature` instances.
 > An instantiated feature always knows its dependencies.
@@ -141,12 +142,16 @@ Among other things, the initialization method `MinestomPvP.init()` will:
 - register a custom packet listener for `ClientKeepAlivePacket`
 
 These effects can be disabled by using `MinestomPvP.init(false, false)`.
-It is however **not** recommended to disable the custom player implementation, since it makes some important changes to handling of player movement.
+
+> [!CAUTION]
+> It is **not** recommended to disable the custom player implementation, since it makes some important changes to handling of player movement.
+
 If you are using a custom player implementation yourself, it is recommended to extend `CombatPlayerImpl`, or implement `CombatPlayer` in a similar fashion.
 Your implementation needs to be registered after the call to `MinestomPvP.init()`.
 
 The custom packet listener increases the accuracy of latency measurements between server and clients, which is used in the latency-compensated `FairKnockbackFeature`.
-If you are using `FairKnockbackFeature`, you may also benefit from decreasing the keep-alive-delay server flag.
+> [!NOTE]
+> If you are using `FairKnockbackFeature`, you may also benefit from decreasing the `minestom.keep-alive-delay` server flag.
 
 To allow explosions, you have to register an explosion supplier to every instance in which they are used.
 Implementations of `ExplosionFeature` might provide an explosion supplier.
