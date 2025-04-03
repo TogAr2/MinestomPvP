@@ -83,7 +83,7 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 				potionMap.putIfAbsent(potion.potion().effect(), potion.potion().duration() - 1);
 				int durationLeft = potionMap.get(potion.potion().effect());
 				
-				if (durationLeft > 0) {
+				if (durationLeft > 0 || durationLeft == -1) {
 					CombatPotionEffect combatPotionEffect = CombatPotionEffects.get(potion.potion().effect());
 					int amplifier = potion.potion().amplifier();
 					
@@ -91,8 +91,12 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 						combatPotionEffect.applyUpdateEffect(entity, amplifier, exhaustionFeature, foodFeature);
 					}
 					
-					potionMap.put(potion.potion().effect(), durationLeft - 1);
+					if (durationLeft != -1) potionMap.put(potion.potion().effect(), durationLeft - 1);
 				}
+			}
+			
+			if (entity instanceof Player player && player.hasEffect(PotionEffect.ABSORPTION) && player.getAdditionalHearts() <= 0) {
+				player.removeEffect(PotionEffect.ABSORPTION);
 			}
 			
 			//TODO keep track of underlying potions with longer duration

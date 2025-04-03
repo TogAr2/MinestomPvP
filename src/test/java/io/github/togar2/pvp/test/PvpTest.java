@@ -1,14 +1,20 @@
 package io.github.togar2.pvp.test;
 
 import io.github.togar2.pvp.MinestomPvP;
+import io.github.togar2.pvp.events.EntityKnockbackEvent;
 import io.github.togar2.pvp.feature.CombatFeatures;
 import io.github.togar2.pvp.feature.FeatureType;
+import io.github.togar2.pvp.feature.provider.DifficultyProvider;
+import io.github.togar2.pvp.legacy.KnockbackSettings;
 import io.github.togar2.pvp.test.commands.Commands;
+import io.github.togar2.pvp.utils.CombatVersion;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.builder.Command;
+import net.minestom.server.command.builder.arguments.minecraft.ArgumentEntity;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.entity.damage.EntityDamage;
@@ -20,11 +26,16 @@ import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.common.KeepAlivePacket;
 import net.minestom.server.network.packet.server.play.*;
+import net.minestom.server.network.player.GameProfile;
+import net.minestom.server.potion.Potion;
+import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.registry.DynamicRegistry;
 import net.minestom.server.utils.time.TimeUnit;
 import net.minestom.server.world.DimensionType;
 
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class PvpTest {
 	public static void main(String[] args) {
@@ -40,6 +51,10 @@ public class PvpTest {
 		Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(fullbrightKey);
 		instance.setGenerator(new DemoGenerator());
 		instance.enableAutoChunkLoad(true);
+		
+		MinecraftServer.getGlobalEventHandler().addListener(AsyncPlayerPreLoginEvent.class, event -> {
+			event.setGameProfile(new GameProfile(UUID.randomUUID(), event.getGameProfile().name()));
+		});
 		
 		Pos spawn = new Pos(0, 60, 0);
 		MinecraftServer.getGlobalEventHandler().addListener(AsyncPlayerConfigurationEvent.class, event -> {
@@ -90,7 +105,9 @@ public class PvpTest {
 			//PvpExtension.setLegacyAttack(event.getPlayer(), true);
 			
 			event.getPlayer().setPermissionLevel(4);
-			//event.getPlayer().addEffect(new Potion(PotionEffect.REGENERATION, (byte) 10, CustomPotionEffect.PERMANENT));
+			event.getPlayer().addEffect(new Potion(PotionEffect.REGENERATION, (byte) 10, Potion.INFINITE_DURATION));
+			event.getPlayer().addEffect(new Potion(PotionEffect.RESISTANCE, (byte) 10, Potion.INFINITE_DURATION));
+			event.getPlayer().addEffect(new Potion(PotionEffect.SATURATION, (byte) 10, Potion.INFINITE_DURATION));
 		});
 		
 		MinecraftServer.getGlobalEventHandler().addListener(PlayerPacketOutEvent.class, event -> {
@@ -119,20 +136,23 @@ public class PvpTest {
 			});
 		}});
 		
-//		LegacyKnockbackSettings settings = LegacyKnockbackSettings.builder()
-//				.horizontal(0.35)
-//				.vertical(0.4)
-//				.verticalLimit(0.4)
-//				.extraHorizontal(0.45)
-//				.extraVertical(0.1)
-//				.build();
-//		MinecraftServer.getGlobalEventHandler().addListener(LegacyKnockbackEvent.class,
-//				event -> event.setSettings(settings));
+		KnockbackSettings settings = KnockbackSettings.builder()
+				.horizontal(0.35)
+				.vertical(0.4)
+				.verticalLimit(0.4)
+				.extraHorizontal(0.45)
+				.extraVertical(0.1)
+				.build();
+		MinecraftServer.getGlobalEventHandler().addListener(EntityKnockbackEvent.class,
+				event -> event.setSettings(settings));
 		
 		instance.setExplosionSupplier(CombatFeatures.legacyVanilla().get(FeatureType.EXPLOSION).getExplosionSupplier());
 		
 		GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-		eventHandler.addChild(CombatFeatures.legacyVanilla().createNode());
+		eventHandler.addChild(CombatFeatures.getVanilla(CombatVersion.MODERN, DifficultyProvider.DEFAULT)
+						.remove(FeatureType.KNOCKBACK)
+						.add(CombatFeatures.FAIR_RISING_FALLING_KNOCKBACK)
+						.build().createNode());
 		//eventHandler.addChild(PvPConfig.defaultBuilder()
 		//		//.potion(PotionConfig.legacyBuilder().drinking(false))
 		//		.build().createNode()
@@ -156,8 +176,20 @@ public class PvpTest {
 			});
 		}});
 		
+		AtomicReference<Entity> sample = new AtomicReference<>();
+		
+		MinecraftServer.getCommandManager().register(new Command("sample") {{
+			ArgumentEntity sampleArg = new ArgumentEntity("sample").singleEntity(true);
+			addSyntax((sender, args) -> {
+				sample.set(args.get(sampleArg).findFirstEntity(sender));
+			}, sampleArg);
+		}});
+		
 		eventHandler.addListener(PlayerTickEvent.class, event -> {
-			event.getPlayer().sendActionBar(Component.text(event.getPlayer().getVelocity().toString()));
+			Vec velocity = (sample.get() == null ? event.getPlayer() : sample.get()).getVelocity();
+			event.getPlayer().sendActionBar(Component.text(
+					String.format("x=%.3f  ,  y=%.3f  ,  z=%.3f", velocity.x(), velocity.y(), velocity.z())
+			));
 		});
 		
 		Commands.init();

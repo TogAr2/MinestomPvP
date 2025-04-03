@@ -132,7 +132,7 @@ public class CombatPotionEffect {
 	}
 	
 	public boolean canApplyUpdateEffect(int duration, int amplifier) {
-		if (isInstant()) return duration >= 1;
+		if (isInstant() || potionEffect == PotionEffect.SATURATION) return duration >= 1;
 		
 		int applyInterval;
 		if (potionEffect == PotionEffect.REGENERATION) {
