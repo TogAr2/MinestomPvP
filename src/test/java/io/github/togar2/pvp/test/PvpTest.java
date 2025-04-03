@@ -1,11 +1,9 @@
 package io.github.togar2.pvp.test;
 
 import io.github.togar2.pvp.MinestomPvP;
-import io.github.togar2.pvp.events.EntityKnockbackEvent;
 import io.github.togar2.pvp.feature.CombatFeatures;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.provider.DifficultyProvider;
-import io.github.togar2.pvp.legacy.KnockbackSettings;
 import io.github.togar2.pvp.test.commands.Commands;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.kyori.adventure.key.Key;
@@ -136,22 +134,22 @@ public class PvpTest {
 			});
 		}});
 		
-		KnockbackSettings settings = KnockbackSettings.builder()
-				.horizontal(0.35)
-				.vertical(0.4)
-				.verticalLimit(0.4)
-				.extraHorizontal(0.45)
-				.extraVertical(0.1)
-				.build();
-		MinecraftServer.getGlobalEventHandler().addListener(EntityKnockbackEvent.class,
-				event -> event.setSettings(settings));
+//		KnockbackSettings settings = KnockbackSettings.builder()
+//				.horizontal(0.35)
+//				.vertical(0.4)
+//				.verticalLimit(0.4)
+//				.extraHorizontal(0.45)
+//				.extraVertical(0.1)
+//				.build();
+//		MinecraftServer.getGlobalEventHandler().addListener(EntityKnockbackEvent.class,
+//				event -> event.setSettings(settings));
 		
 		instance.setExplosionSupplier(CombatFeatures.legacyVanilla().get(FeatureType.EXPLOSION).getExplosionSupplier());
 		
 		GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
 		eventHandler.addChild(CombatFeatures.getVanilla(CombatVersion.MODERN, DifficultyProvider.DEFAULT)
-						.remove(FeatureType.KNOCKBACK)
-						.add(CombatFeatures.FAIR_RISING_FALLING_KNOCKBACK)
+						//.remove(FeatureType.KNOCKBACK)
+						//.add(CombatFeatures.FAIR_RISING_FALLING_KNOCKBACK)
 						.build().createNode());
 		//eventHandler.addChild(PvPConfig.defaultBuilder()
 		//		//.potion(PotionConfig.legacyBuilder().drinking(false))
