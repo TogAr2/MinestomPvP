@@ -34,6 +34,9 @@ import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * Vanilla implementation of {@link AttackFeature}
  * <p>
@@ -121,10 +124,14 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 
 		// Target is always living now, because the damage would not have succeeded if it wasn't
 		LivingEntity living = (LivingEntity) target;
+		Collection<LivingEntity> affectedEntities = List.of(living);
 
 		// Knockback and sweeping
 		knockbackFeature.applyAttackKnockback(attacker, living, attack.knockback());
-		if (attack.sweeping()) sweepingFeature.applySweeping(attacker, living, attack.damage());
+		if (attack.sweeping()) {
+			affectedEntities = sweepingFeature.applySweeping(attacker, living, attack.damage());
+			affectedEntities.add(living);
+		}
 
 		if (target instanceof CombatPlayer custom)
 			custom.sendImmediateVelocityUpdate();
@@ -168,17 +175,22 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 			EntityAnimationPacket.Animation.MAGICAL_CRITICAL_EFFECT
 		));
 
-		// Thorns
-		enchantmentFeature.onUserDamaged(living, attacker);
-		enchantmentFeature.onTargetDamaged(attacker, target);
+		for (LivingEntity affectedEntity : affectedEntities) {
+			// Thorns
+			enchantmentFeature.onUserDamaged(affectedEntity, attacker);
+			enchantmentFeature.onTargetDamaged(attacker, affectedEntity);
+
+			if (attack.fireAspect() > 0) {
+				for (LivingEntity entity : affectedEntities) {
+					entity.setFireTicks(attack.fireAspect() * 4 * ServerFlag.SERVER_TICKS_PER_SECOND);
+				}
+			}
+		}
 
 		// Damage item
 		Tool tool = Tool.fromMaterial(attacker.getItemInMainHand().material());
 		if (tool != null) itemDamageFeature.damageEquipment(attacker, EquipmentSlot.MAIN_HAND,
 			(tool.isSword() || tool == Tool.TRIDENT) ? 1 : 2);
-
-		if (attack.fireAspect() > 0)
-			living.setFireTicks(attack.fireAspect() * 4 * ServerFlag.SERVER_TICKS_PER_SECOND);
 
 		// Damage indicator particles
 		float damageDone = originalHealth - living.getHealth();

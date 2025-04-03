@@ -18,6 +18,10 @@ import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 /**
  * Vanilla implementation of {@link SweepingFeature}
  */
@@ -62,10 +66,11 @@ public class VanillaSweepingFeature implements SweepingFeature {
 	}
 	
 	@Override
-	public void applySweeping(LivingEntity attacker, LivingEntity target, float damage) {
+	public Collection<LivingEntity> applySweeping(LivingEntity attacker, LivingEntity target, float damage) {
 		float sweepingDamage = getSweepingDamage(attacker, damage);
 		
 		// Loop and check for colliding entities
+		List<LivingEntity> affectedEntities = new ArrayList<>();
 		BoundingBox boundingBox = target.getBoundingBox().expand(1.0, 0.25, 1.0);
 		assert target.getInstance() != null;
 		for (Entity nearbyEntity : target.getInstance().getNearbyEntities(target.getPosition(), 2)) {
@@ -76,6 +81,7 @@ public class VanillaSweepingFeature implements SweepingFeature {
 			
 			// Apply sweeping knockback and damage to the entity
 			if (attacker.getPosition().distanceSquared(nearbyEntity.getPosition()) < 9.0) {
+				affectedEntities.add(living);
 				knockbackFeature.applySweepingKnockback(attacker, target);
 				
 				living.damage(new Damage(
@@ -97,5 +103,7 @@ public class VanillaSweepingFeature implements SweepingFeature {
 				(float) x, 0, (float) z,
 				0, 0
 		));
+		
+		return affectedEntities;
 	}
 }

@@ -3,6 +3,9 @@ package io.github.togar2.pvp.feature.attack;
 import io.github.togar2.pvp.feature.CombatFeature;
 import net.minestom.server.entity.LivingEntity;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * Combat feature used to determine whether an attack is a sweeping attack and also used for applying the sweeping.
  */
@@ -19,12 +22,17 @@ public interface SweepingFeature extends CombatFeature {
 		}
 		
 		@Override
-		public void applySweeping(LivingEntity attacker, LivingEntity target, float damage) {}
+		public Collection<LivingEntity> applySweeping(LivingEntity attacker, LivingEntity target, float damage) {
+			return List.of();
+		}
 	};
 	
 	boolean shouldSweep(LivingEntity attacker, AttackValues.PreSweeping values);
 	
 	float getSweepingDamage(LivingEntity attacker, float damage);
 	
-	void applySweeping(LivingEntity attacker, LivingEntity target, float damage);
+	/**
+	 * Should return a collection of the affected entities.
+	 */
+	Collection<LivingEntity> applySweeping(LivingEntity attacker, LivingEntity target, float damage);
 }
