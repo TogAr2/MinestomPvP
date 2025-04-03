@@ -8,6 +8,7 @@ import io.github.togar2.pvp.feature.cooldown.ItemCooldownFeature;
 import io.github.togar2.pvp.utils.PotionFlags;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
+import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.PlayerHand;
@@ -34,6 +35,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -116,40 +118,7 @@ public class VanillaFoodFeature implements FoodFeature, RegistrableFeature {
 		List<ConsumeEffect> effectList = consumable.effects();
 		
 		for (ConsumeEffect effect : effectList) {
-			switch (effect) {
-				case ApplyEffects(List<CustomPotionEffect> effects, float probability) -> {
-					if (random.nextFloat() >= probability) continue;
-					for (CustomPotionEffect potionEffect : effects) {
-						player.addEffect(new Potion(
-								potionEffect.id(), (byte)potionEffect.amplifier(),
-								potionEffect.duration(),
-								PotionFlags.create(
-										potionEffect.isAmbient(),
-										potionEffect.showParticles(),
-										potionEffect.showIcon()
-								)
-						));
-					}
-					return;
-				}
-				case RemoveEffects(ObjectSet<PotionEffect> potionEffects) -> {
-					player.getActiveEffects().stream().map(TimedPotion::potion).map(Potion::effect).filter(potionEffects::contains).forEach(player::removeEffect);
-					return;
-				}
-				case ClearAllEffects ignored -> {
-					player.clearEffects();
-					return;
-				}
-				case TeleportRandomly(float diameter) -> {
-					ChorusFruitUtil.tryChorusTeleport(player, itemCooldownFeature, diameter);
-					return;
-				}
-				case PlaySound(SoundEvent sound) -> {
-					ViewUtil.viewersAndSelf(player).playSound(Sound.sound().type(sound).build(), player);
-					return;
-				}
-				default -> throw new IllegalArgumentException("Unexpected value: " + effect);
-			}
+			applyConsumeEffect(player, effect, random);
 		}
 		
 		if (stack.has(ItemComponent.SUSPICIOUS_STEW_EFFECTS)) {
@@ -223,5 +192,36 @@ public class VanillaFoodFeature implements FoodFeature, RegistrableFeature {
 				0.5f + 0.5f * random.nextInt(2),
 				(random.nextFloat() - random.nextFloat()) * 0.2f + 1.0f
 		), player);
+	}
+	
+	public static void applyConsumeEffect(Entity entity, ConsumeEffect effect, Random random) {
+		switch (effect) {
+			case ApplyEffects(List<CustomPotionEffect> effects, float probability) -> {
+				if (random.nextFloat() >= probability) return;
+				for (CustomPotionEffect potionEffect : effects) {
+					entity.addEffect(new Potion(
+							potionEffect.id(), (byte)potionEffect.amplifier(),
+							potionEffect.duration(),
+							PotionFlags.create(
+									potionEffect.isAmbient(),
+									potionEffect.showParticles(),
+									potionEffect.showIcon()
+							)
+					));
+				}
+			}
+			case RemoveEffects(ObjectSet<PotionEffect> potionEffects) -> entity.getActiveEffects().stream()
+					.map(TimedPotion::potion)
+					.map(Potion::effect)
+					.filter(potionEffects::contains)
+					.forEach(entity::removeEffect);
+			case ClearAllEffects ignored -> entity.clearEffects();
+			case TeleportRandomly(float diameter) -> ChorusFruitUtil.tryChorusTeleport(entity, diameter);
+			case PlaySound(SoundEvent sound) -> ViewUtil.viewersAndSelf(entity).playSound(Sound.sound(
+					sound, Sound.Source.PLAYER,
+					1.0f, 1.0f
+			), entity);
+			default -> throw new IllegalArgumentException("Unexpected value: " + effect);
+		}
 	}
 }

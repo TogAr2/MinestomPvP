@@ -4,16 +4,19 @@ import io.github.togar2.pvp.damage.DamageTypeInfo;
 import io.github.togar2.pvp.events.TotemUseEvent;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
-import io.github.togar2.pvp.utils.PotionFlags;
+import io.github.togar2.pvp.feature.food.VanillaFoodFeature;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.PlayerHand;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.EventDispatcher;
+import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
-import net.minestom.server.item.Material;
-import net.minestom.server.potion.Potion;
-import net.minestom.server.potion.PotionEffect;
+import net.minestom.server.item.component.ConsumeEffect;
+import net.minestom.server.item.component.DeathProtection;
+
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Vanilla implementation of {@link TotemFeature}
@@ -27,32 +30,33 @@ public class VanillaTotemFeature implements TotemFeature {
 	public boolean tryProtect(LivingEntity entity, DamageType type) {
 		if (DamageTypeInfo.of(MinecraftServer.getDamageTypeRegistry().getKey(type)).outOfWorld()) return false;
 		
-		boolean hasTotem = false;
+		DeathProtection deathProtection = null;
 		for (PlayerHand hand : PlayerHand.values()) {
 			ItemStack stack = entity.getItemInHand(hand);
-			if (stack.material() == Material.TOTEM_OF_UNDYING) {
+			if (stack.has(ItemComponent.DEATH_PROTECTION)) {
 				TotemUseEvent totemUseEvent = new TotemUseEvent(entity, hand);
 				EventDispatcher.call(totemUseEvent);
 				
 				if (totemUseEvent.isCancelled()) continue;
 				
-				hasTotem = true;
+				deathProtection = stack.get(ItemComponent.DEATH_PROTECTION);
 				entity.setItemInHand(hand, stack.withAmount(stack.amount() - 1));
 				break;
 			}
 		}
 		
-		if (hasTotem) {
+		if (deathProtection != null) {
 			entity.setHealth(1.0f);
-			entity.clearEffects();
-			entity.addEffect(new Potion(PotionEffect.REGENERATION, (byte) 1, 900, PotionFlags.defaultFlags()));
-			entity.addEffect(new Potion(PotionEffect.ABSORPTION, (byte) 1, 100, PotionFlags.defaultFlags()));
-			entity.addEffect(new Potion(PotionEffect.FIRE_RESISTANCE, (byte) 0, 800, PotionFlags.defaultFlags()));
+			
+			Random random = ThreadLocalRandom.current();
+			for (ConsumeEffect deathEffect : deathProtection.deathEffects()) {
+				VanillaFoodFeature.applyConsumeEffect(entity, deathEffect, random);
+			}
 			
 			// Totem particles
 			entity.triggerStatus((byte) 35);
 		}
 		
-		return hasTotem;
+		return deathProtection != null;
 	}
 }

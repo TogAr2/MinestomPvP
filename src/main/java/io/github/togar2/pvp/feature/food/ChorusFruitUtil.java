@@ -1,15 +1,12 @@
 package io.github.togar2.pvp.feature.food;
 
-import io.github.togar2.pvp.feature.cooldown.ItemCooldownFeature;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;
-import net.minestom.server.entity.Player;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
-import net.minestom.server.item.Material;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.utils.MathUtils;
 import net.minestom.server.world.DimensionType;
@@ -48,13 +45,13 @@ public class ChorusFruitUtil {
 		return true;
 	}
 	
-	public static void tryChorusTeleport(Player player, ItemCooldownFeature cooldownFeature, float diameter) {
+	public static void tryChorusTeleport(Entity entity, float diameter) {
 		ThreadLocalRandom random = ThreadLocalRandom.current();
-		Instance instance = player.getInstance();
+		Instance instance = entity.getInstance();
 		assert instance != null;
 		float radius = diameter / 2.0f;
 		
-		Pos prevPosition = player.getPosition();
+		Pos prevPosition = entity.getPosition();
 		double prevX = prevPosition.x();
 		double prevY = prevPosition.y();
 		double prevZ = prevPosition.z();
@@ -73,27 +70,25 @@ public class ChorusFruitUtil {
 							+ dimensionType.logicalHeight() - 1);
 			double z = prevZ + (random.nextDouble() - 0.5) * radius;
 			
-			if (player.getVehicle() != null) {
-				player.getVehicle().removePassenger(player);
+			if (entity.getVehicle() != null) {
+				entity.getVehicle().removePassenger(entity);
 			}
 			
-			if (randomTeleport(player, new Pos(x, y, z, yaw, pitch))) {
-				ViewUtil.packetGroup(player).playSound(Sound.sound(
+			if (randomTeleport(entity, new Pos(x, y, z, yaw, pitch))) {
+				ViewUtil.packetGroup(entity).playSound(Sound.sound(
 						SoundEvent.ITEM_CHORUS_FRUIT_TELEPORT, Sound.Source.PLAYER,
 						1.0f, 1.0f
 				), prevPosition);
 				
-				if (!player.isSilent()) {
-					player.getViewersAsAudience().playSound(Sound.sound(
+				if (!entity.isSilent()) {
+					entity.getViewersAsAudience().playSound(Sound.sound(
 							SoundEvent.ITEM_CHORUS_FRUIT_TELEPORT, Sound.Source.PLAYER,
 							1.0f, 1.0f
-					), player);
+					), entity);
 				}
 				
 				break;
 			}
 		}
-		
-		cooldownFeature.setCooldown(player, Material.CHORUS_FRUIT, 20);
 	}
 }

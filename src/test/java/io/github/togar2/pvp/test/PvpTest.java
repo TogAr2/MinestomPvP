@@ -104,7 +104,7 @@ public class PvpTest {
 			
 			event.getPlayer().setPermissionLevel(4);
 			event.getPlayer().addEffect(new Potion(PotionEffect.REGENERATION, (byte) 10, Potion.INFINITE_DURATION));
-			event.getPlayer().addEffect(new Potion(PotionEffect.RESISTANCE, (byte) 10, Potion.INFINITE_DURATION));
+			//event.getPlayer().addEffect(new Potion(PotionEffect.RESISTANCE, (byte) 10, Potion.INFINITE_DURATION));
 			event.getPlayer().addEffect(new Potion(PotionEffect.SATURATION, (byte) 10, Potion.INFINITE_DURATION));
 		});
 		
