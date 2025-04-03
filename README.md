@@ -18,6 +18,7 @@ The maven repository is available on [jitpack](https://jitpack.io/#TogAr2/Minest
 - [Usage](#usage)
 - [Customization](#customization)
 - [Legacy PvP](#legacy-pvp)
+- [Knockback](#knockback)
 - [Integration](#integration)
 - [Registries](#registries)
 - [Events](#events)
@@ -58,8 +59,11 @@ Currently, most vanilla PvP mechanics are supported.
 
 Before doing anything else, you should call `MinestomPvP.init()`. This will make sure everything is registered correctly.
 
+> [!NOTE]
+> `MinestomPvP.init() has a few side effects which may be unwanted and can be disabled: see [Integration](#integration)`.
+
 After you've initialized the library, you can start using combat features.
-For the most basic setup you can use the following:
+A very basic setup would be:
 ```java
 MinestomPvP.init();
 
@@ -119,16 +123,30 @@ You can get the `CombatFeatureSet` for legacy PvP using `CombatFeatures.legacyVa
 To disable attack cooldown for a player, use `MinestomPvP.setLegacyAttack(player, true)`.
 To enable the cooldown again, use `false` instead of `true`.
 
-#### Knockback
+### Knockback
 
-A lot of servers like to customize their 1.8 knockback. It is also possible to do so with this extension. In `EntityKnockbackEvent`, you can set a `LegacyKnockbackSettings` object. It contains information about how the knockback is calculated. A builder is obtainable by using `LegacyKnockbackSettings.builder()`. For more information, check the [config of BukkitOldCombatMechanics](https://github.com/kernitus/BukkitOldCombatMechanics/blob/d222286fd84fe983fdbdff79699182837871ab9b/src/main/resources/config.yml#L279).
+A lot of servers like to customize their knockback. It is also possible to do so with this library.
+In `EntityKnockbackEvent`, you can set a `KnockbackSettings` object. It contains information about how the knockback is calculated.
+A builder is obtainable by using `KnockbackSettings.builder()`. For more information, check the [config of BukkitOldCombatMechanics](https://github.com/kernitus/BukkitOldCombatMechanics/blob/d222286fd84fe983fdbdff79699182837871ab9b/src/main/resources/config.yml#L279).
+
+> [!NOTE]
+> Despite this config being designed for legacy combat, `KnockbackSettings` also works for modern combat.
 
 ### Integration
 
 To integrate this extension into your minestom server, you may have to tweak a little bit to make sure everything works correctly.
 
-The extension uses a custom player implementation, if you use one, it is recommended to extend `CombatPlayerImpl`. If you for some reason can't, make sure to implement `CombatPlayer` in a similar fashion to `CombatPlayerImpl`.
-The implementation of MinestomPvP is registered inside `MinestomPvP.init()`, so register yours after initializing the library.
+Among other things, the initialization method `MinestomPvP.init()` will:
+- register a custom player implementation
+- register a custom packet listener for `ClientKeepAlivePacket`
+
+These effects can be disabled by using `MinestomPvP.init(false, false)`.
+It is however **not** recommended to disable the custom player implementation, since it makes some important changes to handling of player movement.
+If you are using a custom player implementation yourself, it is recommended to extend `CombatPlayerImpl`, or implement `CombatPlayer` in a similar fashion.
+Your implementation needs to be registered after the call to `MinestomPvP.init()`.
+
+The custom packet listener increases the accuracy of latency measurements between server and clients, which is used in the latency-compensated `FairKnockbackFeature`.
+If you are using `FairKnockbackFeature`, you may also benefit from decreasing the keep-alive-delay server flag.
 
 To allow explosions, you have to register an explosion supplier to every instance in which they are used.
 Implementations of `ExplosionFeature` might provide an explosion supplier.
@@ -163,7 +181,7 @@ The library provides several events:
 - `AnchorExplodeEvent`: cancellable, called when a player clicks on a respawn anchor to explode it.
 - `CrystalPlaceEvent`: cancellable, called when a player places an end crystal.
 - `DamageBlockEvent`: cancellable, called when an entity blocks damage using a shield. This event can be used to set the remaining damage.
-- `EntityKnockbackEvent`: cancellable, called when an entity gets knocked back by another entity. Gets called twice for weapons with the knockback enchantment (once for default damage knockback, once for the extra knockback). This event can be used to set the knockback strength.
+- `EntityKnockbackEvent`: cancellable, called when an entity gets knocked back by another entity. Gets called twice for weapons with the knockback enchantment (once for default damage knockback, once for the extra knockback). This event can be used to change the knockback settings.
 - `EntityPreDeathEvent`: cancellable, a form of `EntityDeathEvent` but cancellable and with a damage type. Can be used to cancel the death while still applying after-damage effects, such as attack sounds.
 - `EquipmentDamageEvent`: cancellable, called when an item in an equipment slot gets damaged.
 - `ExplosionEvent`: cancellable, called when an explosion will take place. Can be used to modify the affected blocks.
@@ -171,7 +189,6 @@ The library provides several events:
 - `FinalAttackEvent`: cancellable, called when a player attacks an entity. Can be used to set a few variables like sprint, critical, sweeping, etc.
 - `FinalDamageEvent`: cancellable, called when the final damage calculation (including armor and effects) is completed. This event should be used instead of `EntityDamageEvent`, unless you want to detect how much damage was originally dealt.
 - `FishingBobberRetrieveEvent`: cancellable, called when a player retrieves a fishing bobber.
-- `LegacyKnockbackEvent`: cancellable, called when an entity gets knocked back by another entity using legacy pvp. Same applies as for `EntityKnockbackEvent`. This event can be used to change the knockback settings.
 - `PrepareAttackEvent`: cancellable, called before calculations for a given melee attack are done. Can be used to cancel the attack from happening in known situations where attacks shouldn't occur - ie; in a lobby/waiting phase.
 - `PickupEntityEvent`: cancellable, called when a player picks up an entity (arrow or trident).
 - `PlayerExhaustEvent`: cancellable, called when a players' exhaustion level changes.
