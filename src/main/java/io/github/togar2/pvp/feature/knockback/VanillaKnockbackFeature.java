@@ -1,11 +1,10 @@
 package io.github.togar2.pvp.feature.knockback;
 
 import io.github.togar2.pvp.events.EntityKnockbackEvent;
-import io.github.togar2.pvp.events.LegacyKnockbackEvent;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
-import io.github.togar2.pvp.legacy.LegacyKnockbackSettings;
+import io.github.togar2.pvp.legacy.KnockbackSettings;
 import io.github.togar2.pvp.player.CombatPlayer;
 import io.github.togar2.pvp.utils.CombatVersion;
 import net.minestom.server.coordinate.Vec;
@@ -58,12 +57,11 @@ public class VanillaKnockbackFeature implements KnockbackFeature {
 		}
 		
 		// Set the velocity
-		if (version.legacy()) {
-			if (!applyLegacyKnockback(target, attacker, source, false, 1, dx, dz)) return false;
-		} else {
-			if (!applyModernKnockback(target, attacker, source,
-					EntityKnockbackEvent.KnockbackType.DAMAGE, 0.4f, dx, dz)) return false;
-		}
+		if (!applyKnockback(
+				target, attacker, source,
+				EntityKnockbackEvent.KnockbackType.DAMAGE, 0,
+				dx, dz, version.legacy()
+		)) return false;
 		
 		// Send player a packet with its hurt direction
 		if (target instanceof Player player) {
@@ -74,42 +72,50 @@ public class VanillaKnockbackFeature implements KnockbackFeature {
 		return true;
 	}
 	
-	protected boolean applyModernKnockback(LivingEntity target, Entity attacker, @Nullable Entity source,
-	                                       EntityKnockbackEvent.KnockbackType type, float strength,
-	                                       double dx, double dz) {
-		EntityKnockbackEvent knockbackEvent = new EntityKnockbackEvent(
-				target, source == null ? attacker : source,
-				type, strength
-		);
+	protected boolean applyKnockback(LivingEntity target, Entity attacker, @Nullable Entity source,
+	                                 EntityKnockbackEvent.KnockbackType type, int extraKnockback,
+	                                 double dx, double dz, boolean legacy) {
+		EntityKnockbackEvent knockbackEvent = new EntityKnockbackEvent(target, source == null ? attacker : source, type);
 		EventDispatcher.call(knockbackEvent);
 		if (knockbackEvent.isCancelled()) return false;
 		
-		target.takeKnockback(knockbackEvent.getStrength(), dx, dz);
-		return true;
-	}
-	
-	protected boolean applyLegacyKnockback(LivingEntity target, Entity attacker, @Nullable Entity source,
-	                                       boolean extra, int knockback, double dx, double dz) {
-		LegacyKnockbackEvent legacyKnockbackEvent = new LegacyKnockbackEvent(
-				target, source == null ? attacker : source, extra);
-		EventDispatcher.call(legacyKnockbackEvent);
-		if (legacyKnockbackEvent.isCancelled()) return false;
-		
-		LegacyKnockbackSettings settings = legacyKnockbackEvent.getSettings();
+		KnockbackSettings settings = knockbackEvent.getSettings();
 		
 		double kbResistance = target.getAttributeValue(Attribute.KNOCKBACK_RESISTANCE);
-		double horizontal = settings.horizontal() * (1 - kbResistance) * knockback;
-		double vertical = settings.vertical() * (1 - kbResistance) * knockback;
+		double horizontal, vertical;
+		if (extraKnockback <= 0) {
+			// Default knockback
+			horizontal = settings.horizontal();
+			vertical = settings.vertical();
+		} else {
+			// Extra knockback
+			horizontal = settings.extraHorizontal() * extraKnockback;
+			vertical = settings.extraVertical() * extraKnockback;
+			if (!legacy) vertical += settings.vertical();
+		}
+		
+		horizontal *= (1 - kbResistance);
+		vertical *= (1 - kbResistance);
+		if (horizontal <= 0 && vertical <= 0) return false;
+		
 		Vec horizontalModifier = new Vec(dx, dz).normalize().mul(horizontal);
 		
 		Vec velocity = target.getVelocity();
-		//TODO divide by 2 at y component or not?
-		target.setVelocity(new Vec(
-				velocity.x() / 2d - horizontalModifier.x(),
-				target.isOnGround() ? Math.min(
-						settings.verticalLimit(), velocity.y() + vertical) : velocity.y(),
-				velocity.z() / 2d - horizontalModifier.z()
-		));
+		if (legacy && type == EntityKnockbackEvent.KnockbackType.ATTACK) {
+			// For legacy versions, extra knockback is added directly on top of the original velocity
+			target.setVelocity(target.getVelocity().add(
+					-horizontalModifier.x(),
+					vertical,
+					-horizontalModifier.z()
+			));
+		} else {
+			// For modern versions and legacy non-attack knockback, the velocity is first divided by 2
+			target.setVelocity(new Vec(
+					velocity.x() / 2d - horizontalModifier.x(),
+					target.isOnGround() ? Math.min(settings.verticalLimit(), velocity.y() / 2d + vertical) : velocity.y(),
+					velocity.z() / 2d - horizontalModifier.z()
+			));
+		}
 		
 		return true;
 	}
@@ -125,19 +131,11 @@ public class VanillaKnockbackFeature implements KnockbackFeature {
 		double dx = Math.sin(Math.toRadians(attacker.getPosition().yaw()));
 		double dz = -Math.cos(Math.toRadians(attacker.getPosition().yaw()));
 		
-		if (version.legacy()) {
-			if (!applyLegacyKnockback(
-					target, attacker, attacker,
-					true, knockback,
-					dx, dz
-			)) return false;
-		} else {
-			if (!applyModernKnockback(
-					target, attacker, attacker,
-					EntityKnockbackEvent.KnockbackType.ATTACK, knockback * 0.5f,
-					dx, dz
-			)) return false;
-		}
+		if (!applyKnockback(
+				target, attacker, attacker,
+				EntityKnockbackEvent.KnockbackType.ATTACK, knockback,
+				dx, dz, version.legacy()
+		)) return false;
 		
 		// If not legacy, attacker velocity is reduced after the knockback
 		if (version.modern() && attacker instanceof CombatPlayer custom)
@@ -152,10 +150,10 @@ public class VanillaKnockbackFeature implements KnockbackFeature {
 		double dx = Math.sin(Math.toRadians(attacker.getPosition().yaw()));
 		double dz = -Math.cos(Math.toRadians(attacker.getPosition().yaw()));
 		
-		return applyModernKnockback(
+		return applyKnockback(
 				target, attacker, null,
-				EntityKnockbackEvent.KnockbackType.SWEEPING,
-				0.4f, dx, dz
+				EntityKnockbackEvent.KnockbackType.SWEEPING, 0,
+				dx, dz, version.legacy()
 		);
 	}
 }

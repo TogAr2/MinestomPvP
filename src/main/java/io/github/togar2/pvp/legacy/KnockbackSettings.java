@@ -3,17 +3,19 @@ package io.github.togar2.pvp.legacy;
 import net.minestom.server.ServerFlag;
 
 /**
- * Class which contains settings for legacy knockback.
- * <br><br>
+ * Class which contains settings for knockback.
+ * <p>
  * For further documentation, see the <a href="https://github.com/kernitus/BukkitOldCombatMechanics/blob/d222286fd84fe983fdbdff79699182837871ab9b/src/main/resources/config.yml#L279">config of BukkitOldCombatMechanics</a>
+ * <p>
+ * (This class is also used for modern knockback)
  */
-public record LegacyKnockbackSettings(double horizontal, double vertical,
-                                      double verticalLimit,
-                                      double extraHorizontal, double extraVertical) {
-	public static final LegacyKnockbackSettings DEFAULT = builder().build();
+public record KnockbackSettings(double horizontal, double vertical,
+                                double verticalLimit,
+                                double extraHorizontal, double extraVertical) {
+	public static final KnockbackSettings DEFAULT = builder().build();
 	
-	public LegacyKnockbackSettings(double horizontal, double vertical, double verticalLimit,
-	                               double extraHorizontal, double extraVertical) {
+	public KnockbackSettings(double horizontal, double vertical, double verticalLimit,
+	                         double extraHorizontal, double extraVertical) {
 		double tps = ServerFlag.SERVER_TICKS_PER_SECOND;
 		this.horizontal = horizontal * tps;
 		this.vertical = vertical * tps;
@@ -56,8 +58,8 @@ public record LegacyKnockbackSettings(double horizontal, double vertical,
 			return this;
 		}
 		
-		public LegacyKnockbackSettings build() {
-			return new LegacyKnockbackSettings(horizontal, vertical, verticalLimit, extraHorizontal, extraVertical);
+		public KnockbackSettings build() {
+			return new KnockbackSettings(horizontal, vertical, verticalLimit, extraHorizontal, extraVertical);
 		}
 	}
 }
