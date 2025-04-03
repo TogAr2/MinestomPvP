@@ -49,7 +49,7 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 		FeatureType.ENCHANTMENT, FeatureType.CRITICAL, FeatureType.SWEEPING, FeatureType.KNOCKBACK, FeatureType.VERSION
 	);
 
-	private static final double MAX_DISTANCE_SQUARED = 36.0;
+	private static final double ATTACK_RANGE_MARGIN = 3.0;
 
 	private final FeatureConfiguration configuration;
 
@@ -83,11 +83,11 @@ public class VanillaAttackFeature implements AttackFeature, RegistrableFeature {
 	@Override
 	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(EntityAttackEvent.class, event -> {
-			if (event.getEntity() instanceof Player player
-				&& player.getGameMode() != GameMode.SPECTATOR
-				&& !player.isDead()
-				&& player.getDistanceSquared(event.getTarget()) < MAX_DISTANCE_SQUARED) {
-				performAttack(player, event.getTarget());
+			if (event.getEntity() instanceof Player player && player.getGameMode() != GameMode.SPECTATOR && !player.isDead()) {
+				Entity target = event.getTarget();
+				double maxDistanceSquared = Math.pow(player.getAttributeValue(Attribute.ENTITY_INTERACTION_RANGE) + ATTACK_RANGE_MARGIN, 2);
+				if (player.getPosition().distanceSquared(target.getPosition().add(0, target.getEyeHeight(), 0)) < maxDistanceSquared)
+					performAttack(player, target);
 			}
 		});
 	}
