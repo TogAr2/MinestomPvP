@@ -214,12 +214,12 @@ public class CustomEntityProjectile extends Entity {
 		if (!isStuck()) {
 			Vec diff = velocity.div(ServerFlag.SERVER_TICKS_PER_SECOND);
 			// Prevent entity infinitely in the void
-			if(instance.isInVoid(position)) {
+			if (instance.isInVoid(position)) {
 				scheduler().scheduleNextProcess(this::remove);
 				return;
 			}
-            ChunkCache blockGetter = new ChunkCache(instance, instance.getChunkAt(position), Block.AIR);
-
+			
+            ChunkCache blockGetter = new ChunkCache(instance, currentChunk, Block.AIR);
 			PhysicsResult physicsResult = ProjectileUtil.simulateMovement(position, diff, POINT_BOX,
 					instance.getWorldBorder(), blockGetter, hasPhysics, previousPhysicsResult, true);
 			this.previousPhysicsResult = physicsResult;
