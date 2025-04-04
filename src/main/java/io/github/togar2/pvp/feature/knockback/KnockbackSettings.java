@@ -1,4 +1,4 @@
-package io.github.togar2.pvp.legacy;
+package io.github.togar2.pvp.feature.knockback;
 
 import net.minestom.server.ServerFlag;
 

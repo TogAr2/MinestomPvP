@@ -1,6 +1,6 @@
 package io.github.togar2.pvp.events;
 
-import io.github.togar2.pvp.legacy.KnockbackSettings;
+import io.github.togar2.pvp.feature.knockback.KnockbackSettings;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.event.trait.CancellableEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
