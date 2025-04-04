@@ -1,5 +1,6 @@
 package io.github.togar2.pvp.events;
 
+import io.github.togar2.pvp.feature.knockback.KnockbackSettings;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.event.trait.CancellableEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
@@ -23,16 +24,14 @@ public class EntityKnockbackEvent implements EntityInstanceEvent, CancellableEve
 	private final Entity entity;
 	private final Entity attacker;
 	private final KnockbackType type;
-	private float strength;
+	private KnockbackSettings settings = KnockbackSettings.DEFAULT;
 	
 	private boolean cancelled;
 	
-	public EntityKnockbackEvent(@NotNull Entity entity, @NotNull Entity attacker,
-	                            KnockbackType type, float strength) {
+	public EntityKnockbackEvent(@NotNull Entity entity, @NotNull Entity attacker, KnockbackType type) {
 		this.entity = entity;
 		this.attacker = attacker;
 		this.type = type;
-		this.strength = strength;
 	}
 	
 	@NotNull
@@ -62,21 +61,21 @@ public class EntityKnockbackEvent implements EntityInstanceEvent, CancellableEve
 	}
 	
 	/**
-	 * Gets the strength of the knockback.
+	 * Gets the settings of the knockback.
 	 *
 	 * @return the strength
 	 */
-	public float getStrength() {
-		return strength;
+	public KnockbackSettings getSettings() {
+		return settings;
 	}
 	
 	/**
-	 * Sets the strength of the knockback.
+	 * Sets the settings of the knockback.
 	 *
-	 * @param strength the strength
+	 * @param settings the strength
 	 */
-	public void setStrength(float strength) {
-		this.strength = strength;
+	public void setSettings(KnockbackSettings settings) {
+		this.settings = settings;
 	}
 	
 	@Override

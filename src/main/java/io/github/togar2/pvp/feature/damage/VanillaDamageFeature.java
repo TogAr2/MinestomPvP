@@ -240,13 +240,15 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 			}
 		}
 		
-		// Play sound (copied from Minestom, because of complications with cancelling)
-		if (sound != null) entity.sendPacketToViewersAndSelf(new SoundEffectPacket(
-				sound, entity instanceof Player ? Sound.Source.PLAYER : Sound.Source.HOSTILE,
-				entity.getPosition(),
-				//TODO seed randomizing?
-				1.0f, 1.0f, 0
-		));
+		if (hurtSoundAndAnimation) {
+			// Play sound (copied from Minestom, because of complications with cancelling)
+			if (sound != null) entity.sendPacketToViewersAndSelf(new SoundEffectPacket(
+					sound, entity instanceof Player ? Sound.Source.PLAYER : Sound.Source.HOSTILE,
+					entity.getPosition(),
+					//TODO seed randomizing?
+					1.0f, 1.0f, 0
+			));
+		}
 		
 		damage.setAmount(amount);
 		

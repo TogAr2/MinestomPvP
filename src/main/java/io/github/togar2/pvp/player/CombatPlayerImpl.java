@@ -1,13 +1,10 @@
 package io.github.togar2.pvp.player;
 
-import java.util.function.Function;
-
-import org.jetbrains.annotations.NotNull;
-
 import net.minestom.server.ServerFlag;
 import net.minestom.server.collision.Aerodynamics;
 import net.minestom.server.collision.PhysicsResult;
 import net.minestom.server.collision.PhysicsUtils;
+import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.attribute.Attribute;
@@ -19,6 +16,9 @@ import net.minestom.server.network.player.PlayerConnection;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.TimedPotion;
 import net.minestom.server.utils.chunk.ChunkUtils;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Function;
 
 public class CombatPlayerImpl extends Player implements CombatPlayer {
 	private boolean velocityUpdate = false;
@@ -55,6 +55,42 @@ public class CombatPlayerImpl extends Player implements CombatPlayer {
 		}
 	}
 	
+	public boolean isOnGroundAfterTicks(int ticks) {
+		if (vehicle != null) return false;
+		
+		final double tps = ServerFlag.SERVER_TICKS_PER_SECOND;
+		Vec velocity = this.velocity.div(tps);
+		Pos position = this.position;
+		
+		// Slow falling effect
+		Aerodynamics aerodynamics = getAerodynamics();
+		if (velocity.y() < 0 && hasEffect(PotionEffect.SLOW_FALLING))
+			aerodynamics = aerodynamics.withGravity(0.01);
+		
+		// Do movementTick() calculations for the given amount of ticks
+		PhysicsResult prevPhysicsResult = previousPhysicsResult;
+		for (int i = 0; i < ticks; i++) {
+			PhysicsResult physicsResult = PhysicsUtils.simulateMovement(position, velocity, boundingBox,
+					instance.getWorldBorder(), instance, aerodynamics, hasNoGravity(), hasPhysics, onGround, isFlying(), prevPhysicsResult);
+			prevPhysicsResult = physicsResult;
+			
+			if (physicsResult.isOnGround()) return true;
+			
+			velocity = physicsResult.newVelocity();
+			position = physicsResult.newPosition();
+			
+			// Levitation effect
+			TimedPotion levitation = getEffect(PotionEffect.LEVITATION);
+			if (levitation != null) {
+				velocity = velocity.withY(
+						((0.05 * (double) (levitation.potion().amplifier() + 1) - (velocity.y())) * 0.2)
+				);
+			}
+		}
+		
+		return false;
+	}
+	
 	@Override
 	protected void movementTick() {
 		this.gravityTickCount = onGround ? 0 : gravityTickCount + 1;
@@ -67,7 +103,7 @@ public class CombatPlayerImpl extends Player implements CombatPlayer {
 		if (velocity.y() < 0 && hasEffect(PotionEffect.SLOW_FALLING))
 			aerodynamics = aerodynamics.withGravity(0.01);
 		
-		PhysicsResult physicsResult = PhysicsUtils.simulateMovement(position, velocity.div(ServerFlag.SERVER_TICKS_PER_SECOND), boundingBox,
+		PhysicsResult physicsResult = PhysicsUtils.simulateMovement(position, velocity.div(tps), boundingBox,
 				instance.getWorldBorder(), instance, aerodynamics, hasNoGravity(), hasPhysics, onGround, isFlying(), previousPhysicsResult);
 		this.previousPhysicsResult = physicsResult;
 		
@@ -75,7 +111,7 @@ public class CombatPlayerImpl extends Player implements CombatPlayer {
 		if (!ChunkUtils.isLoaded(finalChunk)) return;
 		
 		velocity = physicsResult.newVelocity().mul(tps);
-		onGround = physicsResult.isOnGround();
+		//onGround = physicsResult.isOnGround();
 		
 		// Levitation effect
 		TimedPotion levitation = getEffect(PotionEffect.LEVITATION);
