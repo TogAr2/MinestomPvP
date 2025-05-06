@@ -50,8 +50,16 @@ public class FeatureConfiguration {
 		return (T) combatFeatures.getOrDefault(type, type.defaultFeature());
 	}
 	
+	/**
+	 * Gets the feature which has been associated with the specified type in this configuration.
+	 * Will yield null if there is no associated feature.
+	 *
+	 * @param type the feature type
+	 * @return the feature associated with the feature type, or null if there is none present
+	 * @param <T> the feature class
+	 */
 	@SuppressWarnings("unchecked")
-	<T extends CombatFeature> @Nullable T getRaw(FeatureType<T> type) {
+	<T extends CombatFeature> @Nullable T getDirect(FeatureType<T> type) {
 		return (T) combatFeatures.get(type);
 	}
 	
@@ -67,7 +75,7 @@ public class FeatureConfiguration {
 		return combatFeatures.size();
 	}
 	
-	public void forEach(BiConsumer<FeatureType<?>, CombatFeature> consumer) {
+	void forEach(BiConsumer<FeatureType<?>, CombatFeature> consumer) {
 		combatFeatures.forEach(consumer);
 	}
 	
