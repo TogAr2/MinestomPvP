@@ -5,12 +5,12 @@ import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import io.github.togar2.pvp.utils.EntityUtil;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.ServerFlag;
+import net.minestom.server.component.DataComponents;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.entity.metadata.projectile.ThrownTridentMeta;
-import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.enchant.Enchantment;
 import net.minestom.server.sound.SoundEvent;
@@ -29,9 +29,9 @@ public class ThrownTrident extends AbstractArrow {
 		this.tridentItem = tridentItem;
 		
 		ThrownTridentMeta meta = ((ThrownTridentMeta) getEntityMeta());
-		meta.setLoyaltyLevel((byte) tridentItem.get(ItemComponent.ENCHANTMENTS).level(Enchantment.LOYALTY));
+		meta.setLoyaltyLevel((byte) tridentItem.get(DataComponents.ENCHANTMENTS).level(Enchantment.LOYALTY));
 		
-		meta.setHasEnchantmentGlint(!Objects.requireNonNull(tridentItem.get(ItemComponent.ENCHANTMENTS))
+		meta.setHasEnchantmentGlint(!Objects.requireNonNull(tridentItem.get(DataComponents.ENCHANTMENTS))
 				.enchantments().isEmpty());
 	}
 	
