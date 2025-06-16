@@ -19,7 +19,7 @@ import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.component.EnchantmentList;
 import net.minestom.server.item.enchant.Enchantment;
-import net.minestom.server.registry.DynamicRegistry;
+import net.minestom.server.registry.RegistryKey;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -55,9 +55,9 @@ public class VanillaEnchantmentFeature implements EnchantmentFeature, Registrabl
 	public static void forEachEnchantment(Iterable<ItemStack> stacks, BiConsumer<CombatEnchantment, Integer> consumer) {
 		for (ItemStack itemStack : stacks) {
 			EnchantmentList enchantmentList = itemStack.get(DataComponents.ENCHANTMENTS);
-			Set<DynamicRegistry.Key<Enchantment>> enchantments = enchantmentList.enchantments().keySet();
+			Set<RegistryKey<Enchantment>> enchantments = enchantmentList.enchantments().keySet();
 			
-			for (DynamicRegistry.Key<Enchantment> enchantment : enchantments) {
+			for (RegistryKey<Enchantment> enchantment : enchantments) {
 				CombatEnchantment combatEnchantment = CombatEnchantments.get(enchantment);
 				consumer.accept(combatEnchantment, enchantmentList.level(enchantment));
 			}
@@ -65,7 +65,7 @@ public class VanillaEnchantmentFeature implements EnchantmentFeature, Registrabl
 	}
 	
 	@Override
-	public int getEquipmentLevel(LivingEntity entity, DynamicRegistry.Key<Enchantment> enchantment) {
+	public int getEquipmentLevel(LivingEntity entity, RegistryKey<Enchantment> enchantment) {
 		Iterator<ItemStack> iterator = CombatEnchantments.get(enchantment).getEquipment(entity).values().iterator();
 		
 		int total = 0;
@@ -78,7 +78,7 @@ public class VanillaEnchantmentFeature implements EnchantmentFeature, Registrabl
 	}
 	
 	@Override
-	public Map.Entry<EquipmentSlot, ItemStack> pickRandom(LivingEntity entity, DynamicRegistry.Key<Enchantment> enchantment) {
+	public Map.Entry<EquipmentSlot, ItemStack> pickRandom(LivingEntity entity, RegistryKey<Enchantment> enchantment) {
 		Map<EquipmentSlot, ItemStack> equipmentMap = CombatEnchantments.get(enchantment).getEquipment(entity);
 		if (equipmentMap.isEmpty()) return null;
 		

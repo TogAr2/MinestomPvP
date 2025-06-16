@@ -5,6 +5,7 @@ import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.state.PlayerStateFeature;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Point;
@@ -18,12 +19,12 @@ import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntityTickEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
-import net.minestom.server.gamedata.tags.TagManager;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.potion.PotionEffect;
+import net.minestom.server.registry.Registries;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
 
@@ -189,18 +190,21 @@ public class VanillaFallFeature implements FallFeature, RegistrableFeature {
 		Point offsetDown = offset.add(0, -1, 0);
 		Block block = instance.getBlock(offsetDown);
 		
-		TagManager tagManager = MinecraftServer.getTagManager();
-		var fences = tagManager.getTag(net.minestom.server.gamedata.tags.Tag.BasicType.BLOCKS, "minecraft:fences");
-		var walls = tagManager.getTag(net.minestom.server.gamedata.tags.Tag.BasicType.BLOCKS, "minecraft:walls");
-		var fenceGates = tagManager.getTag(net.minestom.server.gamedata.tags.Tag.BasicType.BLOCKS, "minecraft:fence_gates");
+		Registries registries = MinecraftServer.process();
+		var fences = registries.blocks().getTag(Key.key("minecraft:fences"));
+		var walls = registries.blocks().getTag(Key.key("minecraft:walls"));
+		var fenceGates = registries.blocks().getTag(Key.key("minecraft:fence_gates"));
+
+		var key = block.asKey();
 		
 		assert fences != null;
 		assert walls != null;
 		assert fenceGates != null;
+		assert key != null;
 		
-		if (fences.contains(block.key())
-				|| walls.contains(block.key())
-				|| fenceGates.contains(block.key())) {
+		if (fences.contains(key)
+				|| walls.contains(key)
+				|| fenceGates.contains(key)) {
 			return offsetDown;
 		}
 		

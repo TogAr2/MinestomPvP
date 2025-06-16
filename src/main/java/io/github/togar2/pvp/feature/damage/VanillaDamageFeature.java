@@ -17,6 +17,7 @@ import io.github.togar2.pvp.feature.totem.TotemFeature;
 import io.github.togar2.pvp.feature.tracking.TrackingFeature;
 import io.github.togar2.pvp.utils.CombatVersion;
 import io.github.togar2.pvp.utils.EntityUtil;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
@@ -118,10 +119,10 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 		}
 		
 		float amount = damage.getAmount();
-		
-		if (typeInfo.freeze() && Objects.requireNonNull(MinecraftServer.getTagManager().getTag(
-						net.minestom.server.gamedata.tags.Tag.BasicType.ENTITY_TYPES, "minecraft:freeze_hurts_extra_types"))
-				.contains(entity.getEntityType().key())) {
+		var key = entity.getEntityType().asKey();
+		assert key != null;
+		if (typeInfo.freeze() && Objects.requireNonNull(MinecraftServer.process().entityType().getTag(Key.key("minecraft:freeze_hurts_extra_types")))
+				.contains(key)) {
 			amount *= 5.0F;
 		}
 		

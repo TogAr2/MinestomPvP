@@ -12,7 +12,7 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.item.enchant.Enchantment;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
-import net.minestom.server.registry.DynamicRegistry;
+import net.minestom.server.registry.RegistryKey;
 
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
@@ -20,7 +20,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class DamageEnchantment extends CombatEnchantment {
 	private final Type type;
 	
-	public DamageEnchantment(DynamicRegistry.Key<Enchantment> enchantment, Type type, EquipmentSlot... slotTypes) {
+	public DamageEnchantment(RegistryKey<Enchantment> enchantment, Type type, EquipmentSlot... slotTypes) {
 		super(enchantment, Set.of(FeatureType.VERSION), slotTypes);
 		this.type = type;
 	}

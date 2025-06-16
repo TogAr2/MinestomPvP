@@ -27,7 +27,7 @@ import net.minestom.server.network.packet.server.play.*;
 import net.minestom.server.network.player.GameProfile;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
-import net.minestom.server.registry.DynamicRegistry;
+import net.minestom.server.registry.RegistryKey;
 import net.minestom.server.utils.time.TimeUnit;
 import net.minestom.server.world.DimensionType;
 
@@ -43,7 +43,7 @@ public class PvpTest {
 		//VelocityProxy.enable("tj7MulOtnIDe");
 		
 		DimensionType fullbright = DimensionType.builder().ambientLight(1.0f).respawnAnchorWorks(true).build();
-		DynamicRegistry.Key<DimensionType> fullbrightKey =
+		RegistryKey<DimensionType> fullbrightKey =
 				MinecraftServer.getDimensionTypeRegistry().register(Key.key("idk"), fullbright);
 		
 		Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(fullbrightKey);

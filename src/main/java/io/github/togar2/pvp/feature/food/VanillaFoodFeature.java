@@ -7,6 +7,7 @@ import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.cooldown.ItemCooldownFeature;
 import io.github.togar2.pvp.utils.PotionFlags;
 import io.github.togar2.pvp.utils.ViewUtil;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.component.DataComponents;
 import net.minestom.server.entity.Entity;
@@ -29,7 +30,7 @@ import net.minestom.server.potion.CustomPotionEffect;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.TimedPotion;
-import net.minestom.server.registry.ObjectSet;
+import net.minestom.server.registry.RegistryTag;
 import net.minestom.server.sound.SoundEvent;
 import org.jetbrains.annotations.Nullable;
 
@@ -210,7 +211,7 @@ public class VanillaFoodFeature implements FoodFeature, RegistrableFeature {
 					));
 				}
 			}
-			case RemoveEffects(ObjectSet<PotionEffect> potionEffects) -> entity.getActiveEffects().stream()
+			case RemoveEffects(RegistryTag<PotionEffect> potionEffects) -> entity.getActiveEffects().stream()
 					.map(TimedPotion::potion)
 					.map(Potion::effect)
 					.filter(potionEffects::contains)
