@@ -109,8 +109,11 @@ public class VanillaKnockbackFeature implements KnockbackFeature {
 	protected @Nullable KnockbackValues prepareKnockback(LivingEntity target, Entity attacker, @Nullable Entity source,
 	                                                     EntityKnockbackEvent.KnockbackType type, int extraKnockback,
 	                                                     double dx, double dz, boolean legacy) {
-		var animationType = type == EntityKnockbackEvent.KnockbackType.DAMAGE ?
-				EntityKnockbackEvent.AnimationType.DIRECTIONAL : EntityKnockbackEvent.AnimationType.FIXED;
+		var animationType = legacy
+				? EntityKnockbackEvent.AnimationType.FIXED
+				: type == EntityKnockbackEvent.KnockbackType.DAMAGE
+						? EntityKnockbackEvent.AnimationType.DIRECTIONAL
+						: EntityKnockbackEvent.AnimationType.FIXED;
 		EntityKnockbackEvent knockbackEvent = new EntityKnockbackEvent(target, source == null ? attacker : source, type, animationType);
 		EventDispatcher.call(knockbackEvent);
 		if (knockbackEvent.isCancelled()) return null;
