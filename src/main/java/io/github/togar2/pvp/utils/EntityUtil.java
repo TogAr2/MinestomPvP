@@ -2,6 +2,7 @@ package io.github.togar2.pvp.utils;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.minestom.server.component.DataComponents;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.ItemEntity;
 import net.minestom.server.entity.LivingEntity;
@@ -24,8 +25,9 @@ public class EntityUtil {
 	
 	public static Component getName(Entity entity) {
 		HoverEvent<HoverEvent.ShowEntity> hoverEvent = HoverEvent.showEntity(entity.getEntityType().key(), entity.getUuid());
-		if (entity.getCustomName() != null) {
-			return entity.getCustomName().hoverEvent(hoverEvent);
+		var customName = entity.get(DataComponents.CUSTOM_NAME);
+		if (customName != null) {
+			return customName.hoverEvent(hoverEvent);
 		} else if (entity instanceof Player) {
 			return ((Player) entity).getName().hoverEvent(hoverEvent);
 		} else {

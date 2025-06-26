@@ -6,11 +6,11 @@ import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.food.VanillaFoodFeature;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.component.DataComponents;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.PlayerHand;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.EventDispatcher;
-import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.component.ConsumeEffect;
 import net.minestom.server.item.component.DeathProtection;
@@ -33,13 +33,13 @@ public class VanillaTotemFeature implements TotemFeature {
 		DeathProtection deathProtection = null;
 		for (PlayerHand hand : PlayerHand.values()) {
 			ItemStack stack = entity.getItemInHand(hand);
-			if (stack.has(ItemComponent.DEATH_PROTECTION)) {
+			if (stack.has(DataComponents.DEATH_PROTECTION)) {
 				TotemUseEvent totemUseEvent = new TotemUseEvent(entity, hand);
 				EventDispatcher.call(totemUseEvent);
 				
 				if (totemUseEvent.isCancelled()) continue;
 				
-				deathProtection = stack.get(ItemComponent.DEATH_PROTECTION);
+				deathProtection = stack.get(DataComponents.DEATH_PROTECTION);
 				entity.setItemInHand(hand, stack.withAmount(stack.amount() - 1));
 				break;
 			}

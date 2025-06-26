@@ -7,7 +7,9 @@ import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.cooldown.ItemCooldownFeature;
 import io.github.togar2.pvp.utils.PotionFlags;
 import io.github.togar2.pvp.utils.ViewUtil;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.kyori.adventure.sound.Sound;
+import net.minestom.server.component.DataComponents;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
@@ -17,7 +19,6 @@ import net.minestom.server.event.item.PlayerFinishItemUseEvent;
 import net.minestom.server.event.player.PlayerPreEatEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
-import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.item.component.Consumable;
@@ -29,7 +30,7 @@ import net.minestom.server.potion.CustomPotionEffect;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.TimedPotion;
-import net.minestom.server.registry.ObjectSet;
+import net.minestom.server.registry.RegistryTag;
 import net.minestom.server.sound.SoundEvent;
 import org.jetbrains.annotations.Nullable;
 
@@ -65,10 +66,10 @@ public class VanillaFoodFeature implements FoodFeature, RegistrableFeature {
 	@Override
 	public void init(EventNode<EntityInstanceEvent> node) {
 		node.addListener(PlayerPreEatEvent.class, event -> {
-			if (!event.getItemStack().has(ItemComponent.CONSUMABLE))
+			if (!event.getItemStack().has(DataComponents.CONSUMABLE))
 				return;
-			@Nullable Food foodComponent = event.getItemStack().get(ItemComponent.FOOD);
-			@Nullable Consumable consumableComponent = event.getItemStack().get(ItemComponent.CONSUMABLE);
+			@Nullable Food foodComponent = event.getItemStack().get(DataComponents.FOOD);
+			@Nullable Consumable consumableComponent = event.getItemStack().get(DataComponents.CONSUMABLE);
 			
 			// If the players hunger is full and the food is not always edible, cancel
 			// For some reason vanilla doesn't say honey is always edible but just overrides the method to always consume it
@@ -84,7 +85,7 @@ public class VanillaFoodFeature implements FoodFeature, RegistrableFeature {
 		
 		node.addListener(PlayerFinishItemUseEvent.class, event -> {
 			if (event.getItemStack().material() != Material.MILK_BUCKET
-					&& !(event.getItemStack().has(ItemComponent.FOOD) || event.getItemStack().has(ItemComponent.CONSUMABLE)))
+					&& !(event.getItemStack().has(DataComponents.FOOD) || event.getItemStack().has(DataComponents.CONSUMABLE)))
 				return;
 			
 			onFinishEating(event.getPlayer(), event.getItemStack(), event.getHand());
@@ -101,8 +102,8 @@ public class VanillaFoodFeature implements FoodFeature, RegistrableFeature {
 	protected void onFinishEating(Player player, ItemStack stack, PlayerHand hand) {
 		this.eat(player, stack);
 		
-		Food food = stack.get(ItemComponent.FOOD);
-		Consumable consumable = stack.get(ItemComponent.CONSUMABLE);
+		Food food = stack.get(DataComponents.FOOD);
+		Consumable consumable = stack.get(DataComponents.CONSUMABLE);
 		if (consumable == null) return;
 		ThreadLocalRandom random = ThreadLocalRandom.current();
 		
@@ -121,8 +122,8 @@ public class VanillaFoodFeature implements FoodFeature, RegistrableFeature {
 			applyConsumeEffect(player, effect, random);
 		}
 		
-		if (stack.has(ItemComponent.SUSPICIOUS_STEW_EFFECTS)) {
-			SuspiciousStewEffects effects = stack.get(ItemComponent.SUSPICIOUS_STEW_EFFECTS);
+		if (stack.has(DataComponents.SUSPICIOUS_STEW_EFFECTS)) {
+			SuspiciousStewEffects effects = stack.get(DataComponents.SUSPICIOUS_STEW_EFFECTS);
 			assert effects != null;
 			for (SuspiciousStewEffects.Effect effect : effects.effects()) {
 				player.addEffect(new Potion(effect.id(), (byte) 0, effect.durationTicks(), PotionFlags.defaultFlags()));
@@ -130,7 +131,7 @@ public class VanillaFoodFeature implements FoodFeature, RegistrableFeature {
 		}
 		
 		if (player.getGameMode() != GameMode.CREATIVE) {
-			ItemStack remainder = stack.get(ItemComponent.USE_REMAINDER);
+			ItemStack remainder = stack.get(DataComponents.USE_REMAINDER);
 			
 			if (remainder != null && !remainder.isAir()) {
 				if (stack.amount() == 1) {
@@ -158,7 +159,7 @@ public class VanillaFoodFeature implements FoodFeature, RegistrableFeature {
 	
 	@Override
 	public void eat(Player player, ItemStack stack) {
-		Food foodComponent = stack.get(ItemComponent.FOOD);
+		Food foodComponent = stack.get(DataComponents.FOOD);
 		if (foodComponent == null) return;
 		addFood(player, foodComponent.nutrition(), foodComponent.saturationModifier());
 	}
@@ -171,7 +172,7 @@ public class VanillaFoodFeature implements FoodFeature, RegistrableFeature {
 	protected void tickEatingSounds(Player player) {
 		ItemStack stack = player.getItemInHand(Objects.requireNonNull(player.getItemUseHand()));
 		
-		Consumable component = stack.get(ItemComponent.CONSUMABLE);
+		Consumable component = stack.get(DataComponents.CONSUMABLE);
 		if (component == null) return;
 		
 		long useTime = component.consumeTicks();
@@ -210,7 +211,7 @@ public class VanillaFoodFeature implements FoodFeature, RegistrableFeature {
 					));
 				}
 			}
-			case RemoveEffects(ObjectSet<PotionEffect> potionEffects) -> entity.getActiveEffects().stream()
+			case RemoveEffects(RegistryTag<PotionEffect> potionEffects) -> entity.getActiveEffects().stream()
 					.map(TimedPotion::potion)
 					.map(Potion::effect)
 					.filter(potionEffects::contains)

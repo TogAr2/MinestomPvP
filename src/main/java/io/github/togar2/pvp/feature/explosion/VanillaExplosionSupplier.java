@@ -79,8 +79,8 @@ public final class VanillaExplosionSupplier implements ExplosionSupplier {
 										Block block = instance.getBlock(position);
 										
 										if (!block.isAir()) {
-											double explosionResistance = block.registry().explosionResistance();
-											strengthLeft -= (float) ((explosionResistance + 0.3F) * 0.3F);
+											float explosionResistance = block.registry().explosionResistance();
+											strengthLeft -= (explosionResistance + 0.3F) * 0.3F;
 											
 											if (strengthLeft > 0.0F) {
 												Vec blockPosition = position.apply(Vec.Operator.FLOOR);

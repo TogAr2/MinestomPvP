@@ -9,30 +9,30 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.enchant.Enchantment;
-import net.minestom.server.registry.DynamicRegistry;
+import net.minestom.server.registry.RegistryKey;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 public class CombatEnchantment {
-	private final DynamicRegistry.Key<Enchantment> enchantment;
+	private final RegistryKey<Enchantment> enchantment;
 	private final EquipmentSlot[] slotTypes;
 	
 	private final Set<FeatureType<?>> dependencies;
 	
-	public CombatEnchantment(DynamicRegistry.Key<Enchantment> enchantment, EquipmentSlot... slotTypes) {
+	public CombatEnchantment(RegistryKey<Enchantment> enchantment, EquipmentSlot... slotTypes) {
 		this(enchantment, Set.of(), slotTypes);
 	}
 	
-	public CombatEnchantment(DynamicRegistry.Key<Enchantment> enchantment,
+	public CombatEnchantment(RegistryKey<Enchantment> enchantment,
 	                         Set<FeatureType<?>> dependencies, EquipmentSlot... slotTypes) {
 		this.enchantment = enchantment;
 		this.dependencies = dependencies;
 		this.slotTypes = slotTypes;
 	}
 	
-	public DynamicRegistry.Key<Enchantment> getEnchantment() {
+	public RegistryKey<Enchantment> getEnchantment() {
 		return enchantment;
 	}
 	

@@ -3,10 +3,10 @@ package io.github.togar2.pvp.entity.projectile;
 import io.github.togar2.pvp.feature.effect.EffectFeature;
 import io.github.togar2.pvp.utils.EffectUtil;
 import net.minestom.server.collision.BoundingBox;
+import net.minestom.server.component.DataComponents;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.*;
-import net.minestom.server.entity.metadata.item.ThrownPotionMeta;
-import net.minestom.server.item.ItemComponent;
+import net.minestom.server.entity.metadata.item.SplashPotionMeta;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.item.component.PotionContents;
@@ -23,7 +23,7 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 	private final EffectFeature effectFeature;
 	
 	public ThrownPotion(@Nullable Entity shooter, EffectFeature effectFeature) {
-		super(shooter, EntityType.POTION);
+		super(shooter, EntityType.SPLASH_POTION);
 		this.effectFeature = effectFeature;
 		
 		// Why does Minestom have the wrong value 0.03 in its registries?
@@ -45,7 +45,7 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 	public void splash(@Nullable Entity entity) {
 		ItemStack item = getItem();
 		
-		PotionContents potionContents = item.get(ItemComponent.POTION_CONTENTS);
+		PotionContents potionContents = item.get(DataComponents.POTION_CONTENTS);
 		List<Potion> potions = effectFeature.getAllPotions(potionContents);
 		
 		if (!potions.isEmpty()) {
@@ -99,11 +99,11 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 	
 	@NotNull
 	public ItemStack getItem() {
-		return ((ThrownPotionMeta) getEntityMeta()).getItem();
+		return ((SplashPotionMeta) getEntityMeta()).getItem();
 	}
 	
 	@Override
 	public void setItem(@NotNull ItemStack item) {
-		((ThrownPotionMeta) getEntityMeta()).setItem(item);
+		((SplashPotionMeta) getEntityMeta()).setItem(item);
 	}
 }

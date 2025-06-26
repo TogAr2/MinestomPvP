@@ -12,6 +12,7 @@ import io.github.togar2.pvp.utils.FluidUtil;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.ServerFlag;
+import net.minestom.server.component.DataComponents;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.*;
@@ -22,7 +23,6 @@ import net.minestom.server.event.item.PlayerCancelItemUseEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.instance.EntityTracker;
-import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.item.enchant.Enchantment;
@@ -68,7 +68,7 @@ public class VanillaTridentFeature implements TridentFeature, RegistrableFeature
 			long ticks = player.getCurrentItemUseTime();
 			if (ticks < 10) return;
 			
-			int riptide = stack.get(ItemComponent.ENCHANTMENTS).level(Enchantment.RIPTIDE);
+			int riptide = stack.get(DataComponents.ENCHANTMENTS).level(Enchantment.RIPTIDE);
 			if (riptide > 0 && !FluidUtil.isTouchingWater(player)) return;
 			
 			itemDamageFeature.damageEquipment(player, event.getHand() == PlayerHand.MAIN ?

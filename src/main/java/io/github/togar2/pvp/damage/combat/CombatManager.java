@@ -8,13 +8,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.component.DataComponents;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.instance.block.Block;
-import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.network.packet.server.play.EndCombatEventPacket;
 import net.minestom.server.network.packet.server.play.EnterCombatEventPacket;
@@ -125,15 +125,15 @@ public class CombatManager {
 		
 		if (firstAttacker != null && firstAttacker != lastAttacker) {
 			ItemStack weapon = firstAttacker instanceof LivingEntity ? ((LivingEntity) firstAttacker).getItemInMainHand() : ItemStack.AIR;
-			if (!weapon.isAir() && weapon.has(ItemComponent.CUSTOM_NAME)) {
-				return Component.translatable("death.fell.assist.item", getEntityName(), EntityUtil.getName(firstAttacker), weapon.get(ItemComponent.CUSTOM_NAME));
+			if (!weapon.isAir() && weapon.has(DataComponents.CUSTOM_NAME)) {
+				return Component.translatable("death.fell.assist.item", getEntityName(), EntityUtil.getName(firstAttacker), weapon.get(DataComponents.CUSTOM_NAME));
 			} else {
 				return Component.translatable("death.fell.assist", getEntityName(), EntityUtil.getName(firstAttacker));
 			}
 		} else if (lastAttacker != null) {
 			ItemStack weapon = lastAttacker instanceof LivingEntity ? ((LivingEntity) lastAttacker).getItemInMainHand() : ItemStack.AIR;
-			if (!weapon.isAir() && weapon.has(ItemComponent.CUSTOM_NAME)) {
-				return Component.translatable("death.fell.finish.item", getEntityName(), EntityUtil.getName(lastAttacker), weapon.get(ItemComponent.CUSTOM_NAME));
+			if (!weapon.isAir() && weapon.has(DataComponents.CUSTOM_NAME)) {
+				return Component.translatable("death.fell.finish.item", getEntityName(), EntityUtil.getName(lastAttacker), weapon.get(DataComponents.CUSTOM_NAME));
 			} else {
 				return Component.translatable("death.fell.finish", getEntityName(), EntityUtil.getName(lastAttacker));
 			}
@@ -157,8 +157,8 @@ public class CombatManager {
 		if (source != null) {
 			Component ownerName = attacker == null ? EntityUtil.getName(source) : EntityUtil.getName(attacker);
 			ItemStack weapon = source instanceof LivingEntity living ? living.getItemInMainHand() : ItemStack.AIR;
-			if (!weapon.isAir() && weapon.has(ItemComponent.CUSTOM_NAME)) {
-				return Component.translatable(id + ".item", EntityUtil.getName(player), ownerName, weapon.get(ItemComponent.CUSTOM_NAME));
+			if (!weapon.isAir() && weapon.has(DataComponents.CUSTOM_NAME)) {
+				return Component.translatable(id + ".item", EntityUtil.getName(player), ownerName, weapon.get(DataComponents.CUSTOM_NAME));
 			} else {
 				return Component.translatable(id, EntityUtil.getName(player), ownerName);
 			}

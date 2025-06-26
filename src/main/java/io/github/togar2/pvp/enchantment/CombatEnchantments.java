@@ -7,7 +7,7 @@ import io.github.togar2.pvp.enchantment.enchantments.ThornsEnchantment;
 import io.github.togar2.pvp.feature.FeatureType;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.item.enchant.Enchantment;
-import net.minestom.server.registry.DynamicRegistry;
+import net.minestom.server.registry.RegistryKey;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,9 +15,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class CombatEnchantments {
-	private static final Map<DynamicRegistry.Key<Enchantment>, CombatEnchantment> ENCHANTMENTS = new HashMap<>();
+	private static final Map<RegistryKey<Enchantment>, CombatEnchantment> ENCHANTMENTS = new HashMap<>();
 	
-	public static CombatEnchantment get(DynamicRegistry.Key<Enchantment> enchantment) {
+	public static CombatEnchantment get(RegistryKey<Enchantment> enchantment) {
 		return ENCHANTMENTS.get(enchantment);
 	}
 	
