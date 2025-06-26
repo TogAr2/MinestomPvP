@@ -56,80 +56,11 @@ public class VanillaKnockbackFeature implements KnockbackFeature {
 		}
 		
 		// Set the velocity
-		if (!applyKnockback(
+		return applyKnockback(
 				target, attacker, source,
 				EntityKnockbackEvent.KnockbackType.DAMAGE, 0,
 				dx, dz, version.legacy()
-		)) return false;
-		
-		// Send player a packet with its hurt direction
-		if (target instanceof Player player) {
-			float hurtDir = (float) (Math.toDegrees(Math.atan2(dz, dx)) - player.getPosition().yaw());
-			player.sendPacket(new HitAnimationPacket(player.getEntityId(), hurtDir));
-		}
-		
-		return true;
-	}
-	
-	public record KnockbackValues(Vec horizontalModifier, double vertical, double verticalLimit) {}
-	
-	protected @Nullable KnockbackValues prepareKnockback(LivingEntity target, Entity attacker, @Nullable Entity source,
-	                                EntityKnockbackEvent.KnockbackType type, int extraKnockback,
-	                                double dx, double dz, boolean legacy) {
-		EntityKnockbackEvent knockbackEvent = new EntityKnockbackEvent(target, source == null ? attacker : source, type);
-		EventDispatcher.call(knockbackEvent);
-		if (knockbackEvent.isCancelled()) return null;
-		
-		KnockbackSettings settings = knockbackEvent.getSettings();
-		
-		double kbResistance = target.getAttributeValue(Attribute.KNOCKBACK_RESISTANCE);
-		double horizontal, vertical;
-		if (extraKnockback <= 0) {
-			// Default knockback
-			horizontal = settings.horizontal();
-			vertical = settings.vertical();
-		} else {
-			// Extra knockback
-			double baseVertical = legacy ?
-					settings.extraVertical() : // Legacy: defaults to 0.1
-					settings.vertical() + settings.extraVertical(); // Modern: defaults to 0.1 + 0.4 = 0.5
-			
-			horizontal = settings.extraHorizontal() * extraKnockback;
-			vertical = baseVertical * extraKnockback;
-		}
-		
-		horizontal *= (1 - kbResistance);
-		vertical *= (1 - kbResistance);
-		if (horizontal <= 0 && vertical <= 0) return null;
-		
-		Vec horizontalModifier = new Vec(dx, dz).normalize().mul(horizontal);
-		return new KnockbackValues(horizontalModifier, vertical, settings.verticalLimit());
-	}
-	
-	protected boolean applyKnockback(LivingEntity target, Entity attacker, @Nullable Entity source,
-	                                 EntityKnockbackEvent.KnockbackType type, int extraKnockback,
-	                                 double dx, double dz, boolean legacy) {
-		KnockbackValues values = prepareKnockback(target, attacker, source, type, extraKnockback, dx, dz, legacy);
-		if (values == null) return false;
-		
-		Vec velocity = target.getVelocity();
-		if (legacy && type == EntityKnockbackEvent.KnockbackType.ATTACK) {
-			// For legacy versions, extra knockback is added directly on top of the original velocity
-			target.setVelocity(velocity.add(
-					-values.horizontalModifier().x(),
-					values.vertical(),
-					-values.horizontalModifier().z()
-			));
-		} else {
-			// For modern versions and legacy non-attack knockback, the velocity is first divided by 2
-			target.setVelocity(new Vec(
-					velocity.x() / 2d - values.horizontalModifier().x(),
-					target.isOnGround() ? Math.min(values.verticalLimit(), velocity.y() / 2d + values.vertical()) : velocity.y(),
-					velocity.z() / 2d - values.horizontalModifier().z()
-			));
-		}
-		
-		return true;
+		);
 	}
 	
 	@Override
@@ -167,5 +98,84 @@ public class VanillaKnockbackFeature implements KnockbackFeature {
 				EntityKnockbackEvent.KnockbackType.SWEEPING, 0,
 				dx, dz, version.legacy()
 		);
+	}
+	
+	public record KnockbackValues(
+			Vec horizontalModifier,
+			double vertical, double verticalLimit,
+			EntityKnockbackEvent.AnimationType animationType
+	) {}
+	
+	protected @Nullable KnockbackValues prepareKnockback(LivingEntity target, Entity attacker, @Nullable Entity source,
+	                                                     EntityKnockbackEvent.KnockbackType type, int extraKnockback,
+	                                                     double dx, double dz, boolean legacy) {
+		var animationType = type == EntityKnockbackEvent.KnockbackType.DAMAGE ?
+				EntityKnockbackEvent.AnimationType.DIRECTIONAL : EntityKnockbackEvent.AnimationType.FIXED;
+		EntityKnockbackEvent knockbackEvent = new EntityKnockbackEvent(target, source == null ? attacker : source, type, animationType);
+		EventDispatcher.call(knockbackEvent);
+		if (knockbackEvent.isCancelled()) return null;
+		
+		KnockbackSettings settings = knockbackEvent.getSettings();
+		
+		double kbResistance = target.getAttributeValue(Attribute.KNOCKBACK_RESISTANCE);
+		double horizontal, vertical;
+		if (extraKnockback <= 0) {
+			// Default knockback
+			horizontal = settings.horizontal();
+			vertical = settings.vertical();
+		} else {
+			// Extra knockback
+			double baseVertical = legacy ?
+					settings.extraVertical() : // Legacy: defaults to 0.1
+					settings.vertical() + settings.extraVertical(); // Modern: defaults to 0.1 + 0.4 = 0.5
+			
+			horizontal = settings.extraHorizontal() * extraKnockback;
+			vertical = baseVertical * extraKnockback;
+		}
+		
+		horizontal *= (1 - kbResistance);
+		vertical *= (1 - kbResistance);
+		if (horizontal <= 0 && vertical <= 0) return null;
+		
+		Vec horizontalModifier = new Vec(dx, dz).normalize().mul(horizontal);
+		return new KnockbackValues(horizontalModifier, vertical, settings.verticalLimit(), knockbackEvent.getAnimationType());
+	}
+	
+	protected boolean applyKnockback(LivingEntity target, Entity attacker, @Nullable Entity source,
+	                                 EntityKnockbackEvent.KnockbackType type, int extraKnockback,
+	                                 double dx, double dz, boolean legacy) {
+		KnockbackValues values = prepareKnockback(target, attacker, source, type, extraKnockback, dx, dz, legacy);
+		if (values == null) return false;
+		
+		Vec velocity = target.getVelocity();
+		if (legacy && type == EntityKnockbackEvent.KnockbackType.ATTACK) {
+			// For legacy versions, extra knockback is added directly on top of the original velocity
+			target.setVelocity(velocity.add(
+					-values.horizontalModifier().x(),
+					values.vertical(),
+					-values.horizontalModifier().z()
+			));
+		} else {
+			// For modern versions and legacy non-attack knockback, the velocity is first divided by 2
+			target.setVelocity(new Vec(
+					velocity.x() / 2d - values.horizontalModifier().x(),
+					target.isOnGround() ? Math.min(values.verticalLimit(), velocity.y() / 2d + values.vertical()) : velocity.y(),
+					velocity.z() / 2d - values.horizontalModifier().z()
+			));
+		}
+		
+		if (values.animationType() == EntityKnockbackEvent.AnimationType.DIRECTIONAL) {
+			// Send player a packet with its hurt direction
+			if (target instanceof Player player) {
+				sendDirectionalEvent(player, dx, dz);
+			}
+		}
+		
+		return true;
+	}
+	
+	protected void sendDirectionalEvent(Player player, double dx, double dz) {
+		float hurtDir = (float) (Math.toDegrees(Math.atan2(dz, dx)) - player.getPosition().yaw());
+		player.sendPacket(new HitAnimationPacket(player.getEntityId(), hurtDir));
 	}
 }

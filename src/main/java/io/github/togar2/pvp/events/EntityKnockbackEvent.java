@@ -17,21 +17,24 @@ import org.jetbrains.annotations.NotNull;
  * When the attack was a sweeping attack, this event is also called twice for the affected entities:
  * once for the extra sweeping knockback, once for the default knockback.
  * <br><br>
- * You can determine which type of knockback this is by using {@link #getType()}.
+ * You can determine which type of knockback this is by using {@link #getKnockbackType()}.
  */
 public class EntityKnockbackEvent implements EntityInstanceEvent, CancellableEvent {
 	
 	private final Entity entity;
 	private final Entity attacker;
-	private final KnockbackType type;
+	private final KnockbackType knockbackType;
+	private AnimationType animationType;
 	private KnockbackSettings settings = KnockbackSettings.DEFAULT;
 	
 	private boolean cancelled;
 	
-	public EntityKnockbackEvent(@NotNull Entity entity, @NotNull Entity attacker, KnockbackType type) {
+	public EntityKnockbackEvent(@NotNull Entity entity, @NotNull Entity attacker,
+	                            @NotNull KnockbackType knockbackType, @NotNull AnimationType animationType) {
 		this.entity = entity;
 		this.attacker = attacker;
-		this.type = type;
+		this.knockbackType = knockbackType;
+		this.animationType = animationType;
 	}
 	
 	@NotNull
@@ -55,9 +58,30 @@ public class EntityKnockbackEvent implements EntityInstanceEvent, CancellableEve
 	 * Gets the type of knockback. See the values of {@link KnockbackType} for more information.
 	 *
 	 * @return the knockback type
+	 * @see KnockbackType
 	 */
-	public KnockbackType getType() {
-		return type;
+	public KnockbackType getKnockbackType() {
+		return knockbackType;
+	}
+	
+	/**
+	 * Gets the animation type, which determines how the client tilts the camera on damage.
+	 *
+	 * @return the animation type
+	 * @see AnimationType
+	 */
+	public AnimationType getAnimationType() {
+		return animationType;
+	}
+	
+	/**
+	 * Sets the animation type, which determines how the client tilts the camera on damage.
+	 *
+	 * @param animationType the animation type
+	 * @see AnimationType
+	 */
+	public void setAnimationType(@NotNull AnimationType animationType) {
+		this.animationType = animationType;
 	}
 	
 	/**
@@ -101,5 +125,20 @@ public class EntityKnockbackEvent implements EntityInstanceEvent, CancellableEve
 		 * Sweeping knockback when an entity is close to an entity which was hit by a sweeping weapon
 		 */
 		SWEEPING
+	}
+	
+	/**
+	 * @see #DIRECTIONAL
+	 * @see #FIXED
+	 */
+	public enum AnimationType {
+		/**
+		 * Modern damage animation, which tilts the camera based on the location of the damage source
+		 */
+		DIRECTIONAL,
+		/**
+		 * Legacy damage animation, which always tilts the camera in the same way
+		 */
+		FIXED
 	}
 }

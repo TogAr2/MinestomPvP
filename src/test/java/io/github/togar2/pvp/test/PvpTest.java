@@ -1,6 +1,8 @@
 package io.github.togar2.pvp.test;
 
 import io.github.togar2.pvp.MinestomPvP;
+import io.github.togar2.pvp.events.EntityKnockbackEvent;
+import io.github.togar2.pvp.events.FinalDamageEvent;
 import io.github.togar2.pvp.feature.CombatFeatures;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.provider.DifficultyProvider;
@@ -141,8 +143,10 @@ public class PvpTest {
 //				.extraHorizontal(0.45)
 //				.extraVertical(0.1)
 //				.build();
-//		MinecraftServer.getGlobalEventHandler().addListener(EntityKnockbackEvent.class,
-//				event -> event.setSettings(settings));
+		MinecraftServer.getGlobalEventHandler().addListener(EntityKnockbackEvent.class,
+				event -> event.setAnimationType(EntityKnockbackEvent.AnimationType.FIXED));
+		MinecraftServer.getGlobalEventHandler().addListener(FinalDamageEvent.class,
+				event -> event.setAnimate(false));
 		
 		instance.setExplosionSupplier(CombatFeatures.legacyVanilla().get(FeatureType.EXPLOSION).getExplosionSupplier());
 		

@@ -90,6 +90,11 @@ public class FairKnockbackFeature extends VanillaKnockbackFeature {
 			));
 		}
 		
+		if (values.animationType() == EntityKnockbackEvent.AnimationType.DIRECTIONAL) {
+			// Send player a packet with its hurt direction
+			sendDirectionalEvent(player, dx, dz);
+		}
+		
 		return true;
 	}
 	
