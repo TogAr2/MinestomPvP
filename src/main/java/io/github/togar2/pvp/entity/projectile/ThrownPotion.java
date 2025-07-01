@@ -6,9 +6,9 @@ import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.component.DataComponents;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.*;
+import net.minestom.server.entity.metadata.item.LingeringPotionMeta;
 import net.minestom.server.entity.metadata.item.SplashPotionMeta;
 import net.minestom.server.item.ItemStack;
-import net.minestom.server.item.Material;
 import net.minestom.server.item.component.PotionContents;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.worldevent.WorldEvent;
@@ -21,10 +21,12 @@ import java.util.stream.Collectors;
 
 public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingProjectile {
 	private final EffectFeature effectFeature;
+	private final boolean lingering;
 	
-	public ThrownPotion(@Nullable Entity shooter, EffectFeature effectFeature) {
-		super(shooter, EntityType.SPLASH_POTION);
+	public ThrownPotion(@Nullable Entity shooter, EffectFeature effectFeature, boolean lingering) {
+		super(shooter, lingering ? EntityType.LINGERING_POTION : EntityType.SPLASH_POTION);
 		this.effectFeature = effectFeature;
+		this.lingering = lingering;
 		
 		// Why does Minestom have the wrong value 0.03 in its registries?
 		setAerodynamics(getAerodynamics().withGravity(0.05));
@@ -49,7 +51,7 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 		List<Potion> potions = effectFeature.getAllPotions(potionContents);
 		
 		if (!potions.isEmpty()) {
-			if (item.material() == Material.LINGERING_POTION) {
+			if (lingering) {
 				//TODO lingering
 			} else {
 				applySplash(potionContents, entity);
@@ -99,11 +101,18 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 	
 	@NotNull
 	public ItemStack getItem() {
+		if (lingering) {
+			return ((LingeringPotionMeta) getEntityMeta()).getItem();
+		}
 		return ((SplashPotionMeta) getEntityMeta()).getItem();
 	}
 	
 	@Override
 	public void setItem(@NotNull ItemStack item) {
-		((SplashPotionMeta) getEntityMeta()).setItem(item);
+		if (lingering) {
+			((LingeringPotionMeta) getEntityMeta()).setItem(item);
+		} else {
+			((SplashPotionMeta) getEntityMeta()).setItem(item);
+		}
 	}
 }

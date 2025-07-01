@@ -16,8 +16,8 @@ java {
 }
 
 dependencies {
-    compileOnly 'net.minestom:minestom-snapshots:e94aaed297'
-    testImplementation 'net.minestom:minestom-snapshots:e94aaed297'
+    compileOnly 'net.minestom:minestom-snapshots:4fe2993057'
+    testImplementation 'net.minestom:minestom-snapshots:4fe2993057'
 }
 
 publishing {
