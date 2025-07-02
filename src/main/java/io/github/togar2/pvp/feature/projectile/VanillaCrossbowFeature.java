@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
+import net.minestom.server.component.DataComponents;
 import net.minestom.server.event.item.PlayerFinishItemUseEvent;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +31,6 @@ import net.minestom.server.event.EventNode;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
-import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.item.enchant.Enchantment;
@@ -102,7 +102,7 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 			PlayerHand hand = player.getPlayerMeta().getActiveHand();
 			ItemStack stack = player.getItemInHand(hand);
 			
-			int quickCharge = stack.get(ItemComponent.ENCHANTMENTS).level(Enchantment.QUICK_CHARGE);
+			int quickCharge = stack.get(DataComponents.ENCHANTMENTS).level(Enchantment.QUICK_CHARGE);
 			
 			long useTicks = player.getCurrentItemUseTime();
 			double progress = (getCrossbowUseDuration(stack) - useTicks) / (double) getCrossbowChargeDuration(stack);
@@ -140,7 +140,7 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 			ItemStack stack = event.getItemStack();
 			if (stack.material() != Material.CROSSBOW) return;
 			
-			int quickCharge = stack.get(ItemComponent.ENCHANTMENTS).level(Enchantment.QUICK_CHARGE);
+			int quickCharge = stack.get(DataComponents.ENCHANTMENTS).level(Enchantment.QUICK_CHARGE);
 			
 			if (quickCharge < 6) {
 				long useTicks = player.getCurrentItemUseTime();
@@ -186,21 +186,21 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 	}
 	
 	protected boolean isCrossbowCharged(ItemStack stack) {
-		return stack.has(ItemComponent.CHARGED_PROJECTILES) &&
-				!Objects.requireNonNull(stack.get(ItemComponent.CHARGED_PROJECTILES)).isEmpty();
+		return stack.has(DataComponents.CHARGED_PROJECTILES) &&
+				!Objects.requireNonNull(stack.get(DataComponents.CHARGED_PROJECTILES)).isEmpty();
 	}
 	
 	protected ItemStack setCrossbowProjectile(ItemStack stack, @Nullable ItemStack projectile) {
-		return stack.with(ItemComponent.CHARGED_PROJECTILES, projectile == null ? List.of() : List.of(projectile));
+		return stack.with(DataComponents.CHARGED_PROJECTILES, projectile == null ? List.of() : List.of(projectile));
 	}
 	
 	protected ItemStack setCrossbowProjectiles(ItemStack stack, ItemStack projectile1,
 	                                           ItemStack projectile2, ItemStack projectile3) {
-		return stack.with(ItemComponent.CHARGED_PROJECTILES, List.of(projectile1, projectile2, projectile3));
+		return stack.with(DataComponents.CHARGED_PROJECTILES, List.of(projectile1, projectile2, projectile3));
 	}
 	
 	protected boolean crossbowContainsProjectile(ItemStack stack, Material projectile) {
-		List<ItemStack> projectiles = stack.get(ItemComponent.CHARGED_PROJECTILES);
+		List<ItemStack> projectiles = stack.get(DataComponents.CHARGED_PROJECTILES);
 		if (projectiles == null) return false;
 		
 		for (ItemStack itemStack : projectiles) {
@@ -215,7 +215,7 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 	}
 	
 	protected int getCrossbowChargeDuration(ItemStack stack) {
-		int quickCharge = stack.get(ItemComponent.ENCHANTMENTS).level(Enchantment.QUICK_CHARGE);
+		int quickCharge = stack.get(DataComponents.ENCHANTMENTS).level(Enchantment.QUICK_CHARGE);
 		return quickCharge == 0 ? 25 : 25 - 5 * quickCharge;
 	}
 	
@@ -229,7 +229,7 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 	}
 	
 	protected ItemStack loadCrossbowProjectiles(Player player, ItemStack stack) {
-		boolean multiShot = stack.get(ItemComponent.ENCHANTMENTS).level(Enchantment.MULTISHOT) > 0;
+		boolean multiShot = stack.get(DataComponents.ENCHANTMENTS).level(Enchantment.MULTISHOT) > 0;
 		
 		ItemStack projectileItem;
 		int projectileSlot;
@@ -261,7 +261,7 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 	
 	protected ItemStack performCrossbowShooting(Player player, PlayerHand hand, ItemStack stack,
 	                                            double power, double spread) {
-		List<ItemStack> projectiles = stack.get(ItemComponent.CHARGED_PROJECTILES);
+		List<ItemStack> projectiles = stack.get(DataComponents.CHARGED_PROJECTILES);
 		if (projectiles == null || projectiles.isEmpty()) return ItemStack.AIR;
 		
 		ItemStack projectile = projectiles.getFirst();
@@ -324,7 +324,7 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 		arrow.setCritical(true); // Player shooter is always critical
 		arrow.setSound(SoundEvent.ITEM_CROSSBOW_HIT);
 		
-		int piercing = crossbowStack.get(ItemComponent.ENCHANTMENTS).level(Enchantment.PIERCING);
+		int piercing = crossbowStack.get(DataComponents.ENCHANTMENTS).level(Enchantment.PIERCING);
 		if (piercing > 0) {
 			arrow.setPiercingLevel((byte) piercing);
 		}

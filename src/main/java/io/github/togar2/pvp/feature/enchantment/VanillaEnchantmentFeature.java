@@ -8,6 +8,7 @@ import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
+import net.minestom.server.component.DataComponents;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
@@ -15,11 +16,10 @@ import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.EntitySetFireEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
-import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.component.EnchantmentList;
 import net.minestom.server.item.enchant.Enchantment;
-import net.minestom.server.registry.DynamicRegistry;
+import net.minestom.server.registry.RegistryKey;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -54,10 +54,10 @@ public class VanillaEnchantmentFeature implements EnchantmentFeature, Registrabl
 	
 	public static void forEachEnchantment(Iterable<ItemStack> stacks, BiConsumer<CombatEnchantment, Integer> consumer) {
 		for (ItemStack itemStack : stacks) {
-			EnchantmentList enchantmentList = itemStack.get(ItemComponent.ENCHANTMENTS);
-			Set<DynamicRegistry.Key<Enchantment>> enchantments = enchantmentList.enchantments().keySet();
+			EnchantmentList enchantmentList = itemStack.get(DataComponents.ENCHANTMENTS);
+			Set<RegistryKey<Enchantment>> enchantments = enchantmentList.enchantments().keySet();
 			
-			for (DynamicRegistry.Key<Enchantment> enchantment : enchantments) {
+			for (RegistryKey<Enchantment> enchantment : enchantments) {
 				CombatEnchantment combatEnchantment = CombatEnchantments.get(enchantment);
 				consumer.accept(combatEnchantment, enchantmentList.level(enchantment));
 			}
@@ -65,20 +65,20 @@ public class VanillaEnchantmentFeature implements EnchantmentFeature, Registrabl
 	}
 	
 	@Override
-	public int getEquipmentLevel(LivingEntity entity, DynamicRegistry.Key<Enchantment> enchantment) {
+	public int getEquipmentLevel(LivingEntity entity, RegistryKey<Enchantment> enchantment) {
 		Iterator<ItemStack> iterator = CombatEnchantments.get(enchantment).getEquipment(entity).values().iterator();
 		
 		int total = 0;
 		while (iterator.hasNext()) {
 			ItemStack itemStack = iterator.next();
-			total += itemStack.get(ItemComponent.ENCHANTMENTS).level(enchantment);
+			total += itemStack.get(DataComponents.ENCHANTMENTS).level(enchantment);
 		}
 		
 		return total;
 	}
 	
 	@Override
-	public Map.Entry<EquipmentSlot, ItemStack> pickRandom(LivingEntity entity, DynamicRegistry.Key<Enchantment> enchantment) {
+	public Map.Entry<EquipmentSlot, ItemStack> pickRandom(LivingEntity entity, RegistryKey<Enchantment> enchantment) {
 		Map<EquipmentSlot, ItemStack> equipmentMap = CombatEnchantments.get(enchantment).getEquipment(entity);
 		if (equipmentMap.isEmpty()) return null;
 		
@@ -87,7 +87,7 @@ public class VanillaEnchantmentFeature implements EnchantmentFeature, Registrabl
 		for (Map.Entry<EquipmentSlot, ItemStack> entry : equipmentMap.entrySet()) {
 			ItemStack itemStack = entry.getValue();
 			
-			if (!itemStack.isAir() && itemStack.get(ItemComponent.ENCHANTMENTS).level(enchantment) > 0) {
+			if (!itemStack.isAir() && itemStack.get(DataComponents.ENCHANTMENTS).level(enchantment) > 0) {
 				possibleStacks.add(entry);
 			}
 		}
@@ -115,7 +115,7 @@ public class VanillaEnchantmentFeature implements EnchantmentFeature, Registrabl
 	@Override
 	public float getAttackDamage(ItemStack stack, EntityGroup group) {
 		AtomicReference<Float> result = new AtomicReference<>((float) 0);
-		stack.get(ItemComponent.ENCHANTMENTS).enchantments().forEach((enchantment, level) -> {
+		stack.get(DataComponents.ENCHANTMENTS).enchantments().forEach((enchantment, level) -> {
 			CombatEnchantment combatEnchantment = CombatEnchantments.get(enchantment);
 			result.updateAndGet(v -> v + combatEnchantment.getAttackDamage(level, group, this, configuration));
 		});
@@ -154,7 +154,7 @@ public class VanillaEnchantmentFeature implements EnchantmentFeature, Registrabl
 	
 	@Override
 	public boolean shouldUnbreakingPreventDamage(ItemStack stack) {
-		int unbreakingLevel = stack.get(ItemComponent.ENCHANTMENTS).level(Enchantment.UNBREAKING);
+		int unbreakingLevel = stack.get(DataComponents.ENCHANTMENTS).level(Enchantment.UNBREAKING);
 		if (unbreakingLevel <= 0) return false;
 		
 		ThreadLocalRandom random = ThreadLocalRandom.current();

@@ -8,7 +8,7 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.enchant.Enchantment;
-import net.minestom.server.registry.DynamicRegistry;
+import net.minestom.server.registry.RegistryKey;
 
 import java.util.Map;
 
@@ -21,12 +21,12 @@ import java.util.Map;
 public interface EnchantmentFeature extends CombatFeature {
 	EnchantmentFeature NO_OP = new EnchantmentFeature() {
 		@Override
-		public int getEquipmentLevel(LivingEntity entity, DynamicRegistry.Key<Enchantment> enchantment) {
+		public int getEquipmentLevel(LivingEntity entity, RegistryKey<Enchantment> enchantment) {
 			return 0;
 		}
 		
 		@Override
-		public Map.Entry<EquipmentSlot, ItemStack> pickRandom(LivingEntity entity, DynamicRegistry.Key<Enchantment> enchantment) {
+		public Map.Entry<EquipmentSlot, ItemStack> pickRandom(LivingEntity entity, RegistryKey<Enchantment> enchantment) {
 			return null;
 		}
 		
@@ -84,7 +84,7 @@ public interface EnchantmentFeature extends CombatFeature {
 	 * @param enchantment the enchantment for which to determine the equipment level
 	 * @return the equipment level
 	 */
-	int getEquipmentLevel(LivingEntity entity, DynamicRegistry.Key<Enchantment> enchantment);
+	int getEquipmentLevel(LivingEntity entity, RegistryKey<Enchantment> enchantment);
 	
 	/**
 	 * Picks a random equipment piece which has the specified enchantment.
@@ -93,7 +93,7 @@ public interface EnchantmentFeature extends CombatFeature {
 	 * @param enchantment the enchantment which the equipment should have
 	 * @return a map entry containing both the equipment slot and the item stack of the equipment piece
 	 */
-	Map.Entry<EquipmentSlot, ItemStack> pickRandom(LivingEntity entity, DynamicRegistry.Key<Enchantment> enchantment);
+	Map.Entry<EquipmentSlot, ItemStack> pickRandom(LivingEntity entity, RegistryKey<Enchantment> enchantment);
 	
 	int getProtectionAmount(LivingEntity entity, DamageType damageType);
 	
