@@ -1,6 +1,6 @@
 # MinestomPvP
 
-[![license](https://img.shields.io/github/license/TogAr2/MinestomPvP.svg?style=for-the-badge)](LICENSE)
+[![license](https://img.shields.io/github/license/TogAr2/MinestomPvP.svg?style=for-the-badge)](../LICENSE)
 [![platform](https://img.shields.io/badge/platform-Minestom-ff69b4?style=for-the-badge)](https://github.com/Minestom/Minestom)
 
 MinestomPvP is a combat library for Minestom.
@@ -135,7 +135,7 @@ A builder is obtainable by using `KnockbackSettings.builder()`. For more informa
 
 Some servers also use latency-compensated knockback to improve the experience fighting against and playing with high ping.
 MinestomPvP provides `FairKnockbackFeature` for this purpose. It has two modes: `ONLY_RISING` and `RISING_AND_FALLING`.
-For more information, see the documentation of [`FairKnockbackFeature`](src/main/java/io/github/togar2/pvp/feature/knockback/FairKnockbackFeature.java).
+For more information, see the documentation of [`FairKnockbackFeature`](../src/main/java/io/github/togar2/pvp/feature/knockback/FairKnockbackFeature.java).
 
 ### Integration
 
