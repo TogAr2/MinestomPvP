@@ -19,8 +19,8 @@ public class TntEntity extends Entity {
 	public TntEntity(@Nullable Entity causingEntity) {
 		super(EntityType.TNT);
 		this.causingEntity = causingEntity;
-		
-		double angle = ThreadLocalRandom.current().nextDouble() * 6.2831854820251465;
+
+		double angle = ThreadLocalRandom.current().nextDouble() * 2 * Math.PI;
 		setVelocity(new Vec(-Math.sin(angle) * 0.02, 0.2f, -Math.cos(angle) * 0.02)
 				.mul(ServerFlag.SERVER_TICKS_PER_SECOND));
 	}
@@ -51,8 +51,8 @@ public class TntEntity extends Entity {
 					4.0f,
 					causingEntity == null ? null
 							: CompoundBinaryTag.builder()
-							.putString("causingEntity", causingEntity.getUuid().toString())
-							.build()
+								.putString("causingEntity", causingEntity.getUuid().toString())
+								.build()
 			);
 		}
 	}
