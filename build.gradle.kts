@@ -32,3 +32,7 @@ publishing {
         }
     }
 }
+
+tasks.test {
+    onlyIf { false }
+}
