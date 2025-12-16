@@ -38,7 +38,7 @@ public final class VanillaExplosionSupplier implements ExplosionSupplier {
 
 	private final EnchantmentFeature enchantmentFeature;
 
-    private final List<ExplosionPacket.BlockParticleInfo> _particles = List.of(
+    private final List<ExplosionPacket.BlockParticleInfo> PARTICLES = List.of(
             new ExplosionPacket.BlockParticleInfo(Particle.POOF, 0.5f, 1.0f, 1),
             new ExplosionPacket.BlockParticleInfo(Particle.SMOKE, 1.0f, 1.0f, 1)
     );
@@ -232,7 +232,7 @@ public final class VanillaExplosionSupplier implements ExplosionSupplier {
 								        knockbackVec,
                                         Particle.EXPLOSION,
                                         SoundEvent.ENTITY_GENERIC_EXPLODE,
-                                        _particles
+                                        PARTICLES
                                 )
                         );
 					}
