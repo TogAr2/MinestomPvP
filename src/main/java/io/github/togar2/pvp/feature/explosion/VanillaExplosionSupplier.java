@@ -222,12 +222,15 @@ public final class VanillaExplosionSupplier implements ExplosionSupplier {
 						player.sendPacket(
                                 new ExplosionPacket(
                                         new BlockVec(centerX, centerY, centerZ),
-                                        10, // falta
-                                        15, // falta
+                                        getStrength(),
+                                        blocks.size(),
 								        knockbackVec,
                                         Particle.EXPLOSION,
                                         SoundEvent.ENTITY_GENERIC_EXPLODE,
-                                        List.of() // falta
+                                        List.of(
+                                                new ExplosionPacket.BlockParticleInfo(Particle.POOF, 0.5f, 1.0f, 1),
+                                                new ExplosionPacket.BlockParticleInfo(Particle.SMOKE, 1.0f, 1.0f, 1)
+                                        )
                                 )
                         );
 					}
