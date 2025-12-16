@@ -38,6 +38,11 @@ public final class VanillaExplosionSupplier implements ExplosionSupplier {
 
 	private final EnchantmentFeature enchantmentFeature;
 
+    private final List<ExplosionPacket.BlockParticleInfo> _particles = List.of(
+            new ExplosionPacket.BlockParticleInfo(Particle.POOF, 0.5f, 1.0f, 1),
+            new ExplosionPacket.BlockParticleInfo(Particle.SMOKE, 1.0f, 1.0f, 1)
+    );
+
 	VanillaExplosionSupplier(ExplosionFeature feature, EnchantmentFeature enchantmentFeature) {
 		this.feature = feature;
 		this.enchantmentFeature = enchantmentFeature;
@@ -227,10 +232,7 @@ public final class VanillaExplosionSupplier implements ExplosionSupplier {
 								        knockbackVec,
                                         Particle.EXPLOSION,
                                         SoundEvent.ENTITY_GENERIC_EXPLODE,
-                                        List.of(
-                                                new ExplosionPacket.BlockParticleInfo(Particle.POOF, 0.5f, 1.0f, 1),
-                                                new ExplosionPacket.BlockParticleInfo(Particle.SMOKE, 1.0f, 1.0f, 1)
-                                        )
+                                        _particles
                                 )
                         );
 					}
