@@ -1,9 +1,13 @@
+import com.vanniktech.maven.publish.tasks.JavadocJar
+
 plugins {
     java
-    `maven-publish`
+    id("com.vanniktech.maven.publish") version "0.35.0"
 }
 
 group = "io.github.togar2"
+description = "Minecraft combat library for Minestom, with support for both 1.9+ and 1.8 combat"
+version = "1.0"
 
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(25)
@@ -25,14 +29,39 @@ tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            from(components["java"])
+tasks.test {
+    onlyIf { false }
+}
+
+mavenPublishing {
+    publishToMavenCentral()
+    signAllPublications()
+
+    coordinates(project.group.toString(), project.name, project.version.toString())
+    pom {
+        description = project.description
+        url = "https://github.com/TogAr2/MinestomPvP/"
+        licenses {
+            license {
+                name = "The Apache License, Version 2.0"
+                url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+            }
+        }
+        developers {
+            developer {
+                id = "TogAr2"
+                name = "TogAr2"
+                url = "https://github.com/TogAr2/"
+            }
+        }
+        scm {
+            url = "https://github.com/TogAr2/MinestomPvP/"
+            connection = "scm:git:git://github.com/TogAr2/MinestomPvP.git"
+            developerConnection = "scm:git:ssh://git@github.com/TogAr2/MinestomPvP.git"
         }
     }
 }
 
-tasks.test {
-    onlyIf { false }
+tasks.withType<GenerateModuleMetadata>().configureEach {
+    dependsOn(tasks.withType<JavadocJar>())
 }
