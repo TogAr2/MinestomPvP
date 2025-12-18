@@ -12,8 +12,6 @@ description = "Minecraft combat library for Minestom, with support for both 1.9+
 
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(25)
-    withSourcesJar()
-    withJavadocJar()
 }
 
 repositories {
@@ -44,6 +42,7 @@ mavenPublishing {
     coordinates(project.group.toString(), project.name, version)
 
     pom {
+        name = project.name
         description = project.description
         url = "https://github.com/TogAr2/MinestomPvP/"
         licenses {
