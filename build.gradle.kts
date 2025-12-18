@@ -1,4 +1,6 @@
 import com.vanniktech.maven.publish.tasks.JavadocJar
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 plugins {
     java
@@ -7,7 +9,6 @@ plugins {
 
 group = "io.github.togar2"
 description = "Minecraft combat library for Minestom, with support for both 1.9+ and 1.8 combat"
-version = "1.0"
 
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(25)
@@ -20,9 +21,9 @@ repositories {
 }
 
 dependencies {
-    compileOnly("net.minestom:minestom:2025.10.31-1.21.10")
-    testImplementation("net.minestom:minestom:2025.10.31-1.21.10")
-    implementation("it.unimi.dsi:fastutil:8.5.12")
+    compileOnly(libs.minestom)
+    testImplementation(libs.minestom)
+    implementation(libs.fastutil)
 }
 
 tasks.withType<JavaCompile> {
@@ -37,7 +38,11 @@ mavenPublishing {
     publishToMavenCentral()
     signAllPublications()
 
-    coordinates(project.group.toString(), project.name, project.version.toString())
+    val mcVersion = libs.versions.minestom.get().split("-")[1]
+    val date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
+    val version = "$date-$mcVersion"
+    coordinates(project.group.toString(), project.name, version)
+
     pom {
         description = project.description
         url = "https://github.com/TogAr2/MinestomPvP/"

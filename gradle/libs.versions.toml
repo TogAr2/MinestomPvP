@@ -1,0 +1,7 @@
+[versions]
+minestom = "2025.10.31-1.21.10"
+fastutil = "8.5.12"
+
+[libraries]
+minestom = { group = "net.minestom", name = "minestom", version.ref = "minestom" }
+fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil" }
