@@ -33,7 +33,7 @@ tasks.test {
 }
 
 mavenPublishing {
-    publishToMavenCentral()
+    publishToMavenCentral(automaticRelease = true)
     signAllPublications()
 
     val mcVersion = libs.versions.minestom.get().split("-")[1]
