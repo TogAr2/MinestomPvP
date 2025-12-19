@@ -21,7 +21,7 @@ repositories {
 dependencies {
     compileOnly(libs.minestom)
     testImplementation(libs.minestom)
-    implementation(libs.fastutil)
+    compileOnly(libs.fastutil)
 }
 
 tasks.withType<JavaCompile> {
