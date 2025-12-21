@@ -169,8 +169,6 @@ public class VanillaExplosiveFeature implements ExplosiveFeature, RegistrableFea
                  respawnAnchorWorks = worksInDimension;
              }
 
-
-
 			if (instance.getExplosionSupplier() != null && !respawnAnchorWorks) {
 				var anchorExplodeEvent = new AnchorExplodeEvent(player, event.getBlockPosition());
 				EventDispatcher.callCancellable(anchorExplodeEvent, () -> {
