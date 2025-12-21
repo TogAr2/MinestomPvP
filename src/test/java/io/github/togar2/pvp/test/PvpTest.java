@@ -32,6 +32,7 @@ import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.registry.RegistryKey;
 import net.minestom.server.utils.time.TimeUnit;
 import net.minestom.server.world.DimensionType;
+import net.minestom.server.world.attribute.EnvironmentAttribute;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -44,7 +45,10 @@ public class PvpTest {
 		//MinestomFluids.init();
 		//VelocityProxy.enable("tj7MulOtnIDe");
 		
-		DimensionType fullbright = DimensionType.builder().ambientLight(1.0f).respawnAnchorWorks(true).build();
+		DimensionType fullbright = DimensionType.builder()
+			.ambientLight(1.0f)
+			.setAttribute(EnvironmentAttribute.RESPAWN_ANCHOR_WORKS, true) // respawn anchors won't explode
+			.build();
 		RegistryKey<DimensionType> fullbrightKey =
 				MinecraftServer.getDimensionTypeRegistry().register(Key.key("idk"), fullbright);
 		
