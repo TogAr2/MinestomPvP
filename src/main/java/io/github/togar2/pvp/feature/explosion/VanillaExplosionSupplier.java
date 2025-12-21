@@ -27,6 +27,8 @@ import net.minestom.server.network.packet.server.play.ExplosionPacket;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
 
+import net.minestom.server.utils.WeightedList;
+import net.minestom.server.utils.WeightedList.Entry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,9 +40,9 @@ public final class VanillaExplosionSupplier implements ExplosionSupplier {
 
 	private final EnchantmentFeature enchantmentFeature;
 
-    private final List<ExplosionPacket.BlockParticleInfo> PARTICLES = List.of(
-            new ExplosionPacket.BlockParticleInfo(Particle.POOF, 0.5f, 1.0f, 1),
-            new ExplosionPacket.BlockParticleInfo(Particle.SMOKE, 1.0f, 1.0f, 1)
+    private final WeightedList<ExplosionPacket.BlockParticleInfo> PARTICLES = WeightedList.of(
+            new Entry<>(new ExplosionPacket.BlockParticleInfo(Particle.POOF, 0.5f, 1.0f), 1),
+            new Entry<>(new ExplosionPacket.BlockParticleInfo(Particle.SMOKE, 1.0f, 1.0f), 1)
     );
 
 	VanillaExplosionSupplier(ExplosionFeature feature, EnchantmentFeature enchantmentFeature) {
