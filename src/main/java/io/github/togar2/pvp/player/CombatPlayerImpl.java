@@ -11,10 +11,12 @@ import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.entity.EntityVelocityEvent;
 import net.minestom.server.instance.Chunk;
+import net.minestom.server.instance.block.Block;
 import net.minestom.server.network.player.GameProfile;
 import net.minestom.server.network.player.PlayerConnection;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.potion.TimedPotion;
+import net.minestom.server.utils.chunk.ChunkCache;
 import net.minestom.server.utils.chunk.ChunkUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -70,8 +72,9 @@ public class CombatPlayerImpl extends Player implements CombatPlayer {
 		// Do movementTick() calculations for the given amount of ticks
 		PhysicsResult prevPhysicsResult = previousPhysicsResult;
 		for (int i = 0; i < ticks; i++) {
+	        final Block.Getter chunkCache = new ChunkCache(instance, currentChunk, Block.STONE);
 			PhysicsResult physicsResult = PhysicsUtils.simulateMovement(position, velocity, boundingBox,
-					instance.getWorldBorder(), instance, aerodynamics, hasNoGravity(), hasPhysics, onGround, isFlying(), prevPhysicsResult);
+					instance.getWorldBorder(), chunkCache, aerodynamics, hasNoGravity(), hasPhysics, onGround, isFlying(), prevPhysicsResult);
 			prevPhysicsResult = physicsResult;
 			
 			if (physicsResult.isOnGround()) return true;
@@ -103,8 +106,9 @@ public class CombatPlayerImpl extends Player implements CombatPlayer {
 		if (velocity.y() < 0 && hasEffect(PotionEffect.SLOW_FALLING))
 			aerodynamics = aerodynamics.withGravity(0.01);
 		
+        final Block.Getter chunkCache = new ChunkCache(instance, currentChunk, Block.STONE);
 		PhysicsResult physicsResult = PhysicsUtils.simulateMovement(position, velocity.div(tps), boundingBox,
-				instance.getWorldBorder(), instance, aerodynamics, hasNoGravity(), hasPhysics, onGround, isFlying(), previousPhysicsResult);
+				instance.getWorldBorder(), chunkCache, aerodynamics, hasNoGravity(), hasPhysics, onGround, isFlying(), previousPhysicsResult);
 		this.previousPhysicsResult = physicsResult;
 		
 		Chunk finalChunk = ChunkUtils.retrieve(instance, currentChunk, physicsResult.newPosition());
