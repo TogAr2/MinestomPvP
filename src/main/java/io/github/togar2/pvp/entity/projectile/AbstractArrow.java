@@ -236,7 +236,7 @@ public abstract class AbstractArrow extends CustomEntityProjectile {
 			getViewersAsAudience().playSound(Sound.sound(
 					getSound(), Sound.Source.NEUTRAL,
 					1.0f, 1.2f / (random.nextFloat() * 0.2f + 0.9f)
-			), this);
+			), position.x(), position.y(), position.z());
 		}
 		
 		pickupDelay = 7;
