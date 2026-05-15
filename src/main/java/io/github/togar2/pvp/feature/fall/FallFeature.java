@@ -20,7 +20,7 @@ public interface FallFeature extends CombatFeature {
 		}
 		
 		@Override
-		public void resetFallDistance(LivingEntity entity) {}
+		public void resetFallDistance(LivingEntity entity, double newPeakY) {}
 		
 		@Override
 		public void setExtraFallParticles(LivingEntity entity, boolean extraFallParticles) {}
@@ -29,8 +29,12 @@ public interface FallFeature extends CombatFeature {
 	int getFallDamage(LivingEntity entity, double fallDistance);
 	
 	double getFallDistance(LivingEntity entity);
-	
-	void resetFallDistance(LivingEntity entity);
+
+	default void resetFallDistance(LivingEntity entity) {
+		resetFallDistance(entity, entity.getPosition().y());
+	}
+
+	void resetFallDistance(LivingEntity entity, double newPeakY);
 	
 	void setExtraFallParticles(LivingEntity entity, boolean extraFallParticles);
 }

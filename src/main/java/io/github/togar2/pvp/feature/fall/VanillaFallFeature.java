@@ -37,7 +37,8 @@ public class VanillaFallFeature implements FallFeature, RegistrableFeature {
 			VanillaFallFeature::initPlayer,
 			FeatureType.PLAYER_STATE
 	);
-	
+
+	public static final Tag<Double> PEAK_Y = Tag.Transient("peakY");
 	public static final Tag<Double> FALL_DISTANCE = Tag.Transient("fallDistance");
 	public static final Tag<Boolean> EXTRA_FALL_PARTICLES = Tag.Transient("extraFallParticles");
 	
@@ -72,8 +73,7 @@ public class VanillaFallFeature implements FallFeature, RegistrableFeature {
 		// For players, handle fall damage on move event
 		node.addListener(PlayerMoveEvent.class, event -> {
 			Player player = event.getPlayer();
-			if (playerStateFeature.isClimbing(player)) player.setTag(FALL_DISTANCE, 0.0);
-			
+			if (playerStateFeature.isClimbing(player)) resetFallDistance(player);
 			handleFallDamage(
 					player, player.getPosition(),
 					event.getNewPosition(), event.isOnGround()
@@ -82,50 +82,59 @@ public class VanillaFallFeature implements FallFeature, RegistrableFeature {
 	}
 	
 	public void handleFallDamage(LivingEntity entity, Pos currPos, Pos newPos, boolean onGround) {
+		double newY = newPos.y();
+		Double currentPeak = entity.getTag(PEAK_Y);
+		if (currentPeak == null) currentPeak = Double.MIN_VALUE;
+		if (newY > currentPeak) entity.setTag(PEAK_Y, newY);
 		double dy = newPos.y() - currPos.y();
 		double fallDistance = getFallDistance(entity);
-		
+
 		if ((entity instanceof Player player && player.isFlying())
 				|| entity.hasEffect(PotionEffect.LEVITATION)
 				|| entity.hasEffect(PotionEffect.SLOW_FALLING) || dy > 0) {
-			entity.setTag(FALL_DISTANCE, 0.0);
+			resetFallDistance(entity, newY);
 			return;
 		}
-		
+
 		if (entity.isFlyingWithElytra() && entity.getVelocity().y() > -0.5) {
 			entity.setTag(FALL_DISTANCE, 1.0);
 			return;
 		}
-		
+
 		if (!onGround) {
 			if (dy < 0) entity.setTag(FALL_DISTANCE, fallDistance - dy);
 			return;
 		}
-		
+
+		double peakY = entity.getTag(PEAK_Y);
+		resetFallDistance(entity, newY); // hit the ground reset
+
+		if (peakY-newY < 4) return;
+
 		Point landingPos = getLandingPos(entity, newPos);
 		Block block = entity.getInstance().getBlock(landingPos);
-		
+
 		if (entity.hasTag(EXTRA_FALL_PARTICLES) && entity.getTag(EXTRA_FALL_PARTICLES) && fallDistance > 0.0) {
-			Vec position = Vec.fromPoint(landingPos).apply(Vec.Operator.FLOOR).add(0.5, 1, 0.5);
+			Vec position = landingPos.asVec().apply(Vec.Operator.FLOOR).add(0.5, 1, 0.5);
 			int particleCount = (int) Math.max(0, Math.min(200, 50 * fallDistance));
-			
+
 			entity.sendPacketToViewersAndSelf(new ParticlePacket(
 					Particle.BLOCK.withBlock(block),
 					position.x(), position.y(), position.z(),
 					0.3f, 0.3f, 0.3f,
 					0.15f, particleCount
 			));
-			
+
 			entity.removeTag(EXTRA_FALL_PARTICLES);
 		}
-		
+
 		double safeFallDistance = entity.getAttributeValue(Attribute.SAFE_FALL_DISTANCE);
 		if (fallDistance > safeFallDistance) {
 			if (!block.isAir()) {
 				double damageDistance = Math.ceil(fallDistance - safeFallDistance);
 				double particleMultiplier = Math.min(0.2 + damageDistance / 15.0, 2.5);
 				int particleCount = (int) (150 * particleMultiplier);
-				
+
 				entity.sendPacketToViewersAndSelf(new ParticlePacket(
 						Particle.BLOCK.withBlock(block), false,
 						false,
@@ -135,9 +144,7 @@ public class VanillaFallFeature implements FallFeature, RegistrableFeature {
 				));
 			}
 		}
-		
-		entity.setTag(FALL_DISTANCE, 0.0);
-		
+
 		if (entity instanceof Player player && player.getGameMode().invulnerable()) return;
 		int damage = getFallDamage(entity, fallDistance);
 		if (damage > 0) {
@@ -145,10 +152,10 @@ public class VanillaFallFeature implements FallFeature, RegistrableFeature {
 			entity.damage(DamageType.FALL, damage);
 		}
 	}
-	
+
 	public void playFallSound(LivingEntity entity, int damage) {
 		boolean bigFall = damage > 4;
-		
+
 		entity.getViewersAsAudience().playSound(Sound.sound(
 				bigFall ?
 						SoundEvent.ENTITY_PLAYER_BIG_FALL :
@@ -157,21 +164,22 @@ public class VanillaFallFeature implements FallFeature, RegistrableFeature {
 				1.0f, 1.0f
 		), entity);
 	}
-	
+
 	@Override
 	public int getFallDamage(LivingEntity entity, double fallDistance) {
 		double safeFallDistance = entity.getAttributeValue(Attribute.SAFE_FALL_DISTANCE);
-		return (int) Math.ceil((fallDistance - safeFallDistance) * entity.getAttributeValue(Attribute.FALL_DAMAGE_MULTIPLIER));
+		return (int) Math.round((fallDistance - safeFallDistance) * entity.getAttributeValue(Attribute.FALL_DAMAGE_MULTIPLIER));
 	}
-	
+
 	@Override
 	public double getFallDistance(LivingEntity entity) {
 		return entity.hasTag(FALL_DISTANCE) ? entity.getTag(FALL_DISTANCE) : 0.0;
 	}
 	
 	@Override
-	public void resetFallDistance(LivingEntity entity) {
+	public void resetFallDistance(LivingEntity entity, double newPeakY) {
 		entity.setTag(FALL_DISTANCE, 0.0);
+		entity.setTag(PEAK_Y, newPeakY);
 	}
 	
 	@Override

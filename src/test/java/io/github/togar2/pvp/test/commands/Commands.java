@@ -10,5 +10,6 @@ public class Commands {
 		commandManager.register(new GameModeCommand());
 		commandManager.register(new DamageCommand());
 		commandManager.register(new ClearCommand());
+		commandManager.register(new HealCommand());
 	}
 }

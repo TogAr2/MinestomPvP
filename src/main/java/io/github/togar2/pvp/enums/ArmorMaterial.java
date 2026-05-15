@@ -3,7 +3,6 @@ package io.github.togar2.pvp.enums;
 import io.github.togar2.pvp.utils.CombatVersion;
 import io.github.togar2.pvp.utils.ModifierId;
 import net.kyori.adventure.key.Key;
-import net.kyori.adventure.sound.Sound;
 import net.minestom.server.component.DataComponents;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
@@ -26,14 +25,14 @@ public enum ArmorMaterial {
 	DIAMOND(new int[]{3, 6, 8, 3}, new int[]{3, 8, 6, 3}, SoundEvent.ITEM_ARMOR_EQUIP_DIAMOND, 2.0F, 0.0F, Material.DIAMOND_BOOTS, Material.DIAMOND_LEGGINGS, Material.DIAMOND_CHESTPLATE, Material.DIAMOND_HELMET),
 	TURTLE(new int[]{2, 5, 6, 2}, new int[]{2, 6, 5, 2}, SoundEvent.ITEM_ARMOR_EQUIP_TURTLE, 0.0F, 0.0F, Material.TURTLE_HELMET),
 	NETHERITE(new int[]{3, 6, 8, 3}, new int[]{3, 8, 6, 3}, SoundEvent.ITEM_ARMOR_EQUIP_NETHERITE, 3.0F, 0.1F, Material.NETHERITE_BOOTS, Material.NETHERITE_LEGGINGS, Material.NETHERITE_CHESTPLATE, Material.NETHERITE_HELMET);
-	
+
 	private final int[] protectionAmounts;
 	private final int[] legacyProtectionAmounts;
 	private final SoundEvent equipSound;
 	private final float toughness;
 	private final float knockbackResistance;
 	private final Material[] items;
-	
+
 	ArmorMaterial(int[] protectionAmounts, int[] legacyProtectionAmounts, SoundEvent equipSound, float toughness, float knockbackResistance, Material... items) {
 		this.protectionAmounts = protectionAmounts;
 		this.legacyProtectionAmounts = legacyProtectionAmounts;
@@ -42,7 +41,7 @@ public enum ArmorMaterial {
 		this.knockbackResistance = knockbackResistance;
 		this.items = items;
 	}
-	
+
 	public int getProtectionAmount(EquipmentSlot slot, CombatVersion version) {
 		int id;
 		switch (slot) {
@@ -54,29 +53,29 @@ public enum ArmorMaterial {
 				return 0;
 			}
 		}
-		
+
 		return version.legacy() ? this.legacyProtectionAmounts[id] : this.protectionAmounts[id];
 	}
-	
+
 	public SoundEvent getEquipSound() {
 		return this.equipSound;
 	}
-	
+
 	public float getToughness() {
 		return this.toughness;
 	}
-	
+
 	public float getKnockbackResistance() {
 		return this.knockbackResistance;
 	}
-	
+
 	public static void updateEquipmentAttributes(LivingEntity entity, ItemStack oldStack, ItemStack newStack,
-	                                             EquipmentSlot slot, CombatVersion version) {
+												 EquipmentSlot slot, CombatVersion version) {
 		ArmorMaterial oldMaterial = fromMaterial(oldStack.material());
 		ArmorMaterial newMaterial = fromMaterial(newStack.material());
-		
+
 		Key modifierId = getModifierId(slot);
-		
+
 		// Remove attributes from previous armor
 		if (oldMaterial != null && hasDefaultAttributes(oldStack)) {
 			if (slot == getRequiredSlot(oldStack.material())) {
@@ -85,7 +84,7 @@ public enum ArmorMaterial {
 				entity.getAttribute(Attribute.KNOCKBACK_RESISTANCE).removeModifier(modifierId);
 			}
 		}
-		
+
 		// Add attributes from new armor
 		if (newMaterial != null && hasDefaultAttributes(newStack)) {
 			if (slot == getRequiredSlot(newStack.material())) {
@@ -96,35 +95,29 @@ public enum ArmorMaterial {
 				}
 			}
 		}
-
-		if (version.modern()) {
-			ArmorMaterial armorMaterial = fromMaterial(newStack.material());
-			if (armorMaterial == null) return;
-			entity.getInstance().playSound(Sound.sound(armorMaterial.equipSound, Sound.Source.PLAYER, 1f, 1f));
-		}
 	}
-	
+
 	private static boolean hasDefaultAttributes(ItemStack stack) {
 		// When modifiers tag is not empty, default modifiers are not
 		return !stack.has(DataComponents.ATTRIBUTE_MODIFIERS)
-				|| Objects.requireNonNull(stack.get(DataComponents.ATTRIBUTE_MODIFIERS)).modifiers().isEmpty();
+			|| Objects.requireNonNull(stack.get(DataComponents.ATTRIBUTE_MODIFIERS)).modifiers().isEmpty();
 	}
-	
+
 	public static EquipmentSlot getRequiredSlot(Material material) {
 		EquipmentSlot slot = material.registry().equipmentSlot();
 		return slot == null ? EquipmentSlot.HELMET : slot;
 	}
-	
+
 	private static final Map<Material, ArmorMaterial> MATERIAL_TO_ARMOR_MATERIAL = new HashMap<>();
-	
+
 	public static ArmorMaterial fromMaterial(Material material) {
 		return MATERIAL_TO_ARMOR_MATERIAL.get(material);
 	}
-	
+
 	public static Key getModifierId(EquipmentSlot slot) {
 		return ModifierId.ARMOR_MODIFIERS[slot.ordinal() - 2];
 	}
-	
+
 	static {
 		for (ArmorMaterial armorMaterial : values()) {
 			for (Material material : armorMaterial.items) {
