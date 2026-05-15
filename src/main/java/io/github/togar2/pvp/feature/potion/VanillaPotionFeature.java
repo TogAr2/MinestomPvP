@@ -122,7 +122,7 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 					0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f)
 			), event.getPlayer());
 
-			throwPotion(event.getPlayer(), event.getItemStack(), event.getHand());
+			throwPotion(event.getPlayer(), event.getItemStack(), event.getHand(), false);
 		});
 
 		node.addListener(PlayerUseItemEvent.class, event -> {
@@ -134,12 +134,12 @@ public class VanillaPotionFeature implements PotionFeature, RegistrableFeature {
 					0.5f, 0.4f / (random.nextFloat() * 0.4f + 0.8f)
 			), event.getPlayer());
 
-			throwPotion(event.getPlayer(), event.getItemStack(), event.getHand());
+			throwPotion(event.getPlayer(), event.getItemStack(), event.getHand(), true);
 		});
 	}
 
-	protected void throwPotion(Player player, ItemStack stack, PlayerHand hand) {
-		ThrownPotion thrownPotion = new ThrownPotion(player, effectFeature, false);
+	protected void throwPotion(Player player, ItemStack stack, PlayerHand hand, boolean lingering) {
+		ThrownPotion thrownPotion = new ThrownPotion(player, effectFeature, lingering);
 		thrownPotion.setItem(stack);
 
 		Pos position = player.getPosition().add(0, player.getEyeHeight(), 0);
