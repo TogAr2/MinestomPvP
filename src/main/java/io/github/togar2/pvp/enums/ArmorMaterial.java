@@ -20,6 +20,7 @@ import java.util.Objects;
 public enum ArmorMaterial {
 	LEATHER(new int[]{1, 2, 3, 1}, new int[]{1, 3, 2, 1}, SoundEvent.ITEM_ARMOR_EQUIP_LEATHER, 0.0F, 0.0F, Material.LEATHER_BOOTS, Material.LEATHER_LEGGINGS, Material.LEATHER_CHESTPLATE, Material.LEATHER_HELMET),
 	CHAIN(new int[]{1, 4, 5, 2}, new int[]{2, 5, 4, 1}, SoundEvent.ITEM_ARMOR_EQUIP_CHAIN, 0.0F, 0.0F, Material.CHAINMAIL_BOOTS, Material.CHAINMAIL_LEGGINGS, Material.CHAINMAIL_CHESTPLATE, Material.CHAINMAIL_HELMET),
+	COPPER(new int[]{1, 3, 4, 2}, new int[]{1, 3, 4, 2}, SoundEvent.ITEM_ARMOR_EQUIP_COPPER, 0.0F, 0.0F, Material.COPPER_BOOTS, Material.COPPER_LEGGINGS, Material.COPPER_CHESTPLATE, Material.COPPER_HELMET),
 	IRON(new int[]{2, 5, 6, 2}, new int[]{2, 6, 5, 2}, SoundEvent.ITEM_ARMOR_EQUIP_IRON, 0.0F, 0.0F, Material.IRON_BOOTS, Material.IRON_LEGGINGS, Material.IRON_CHESTPLATE, Material.IRON_HELMET),
 	GOLD(new int[]{1, 3, 5, 2}, new int[]{2, 5, 3, 1}, SoundEvent.ITEM_ARMOR_EQUIP_GOLD, 0.0F, 0.0F, Material.GOLDEN_BOOTS, Material.GOLDEN_LEGGINGS, Material.GOLDEN_CHESTPLATE, Material.GOLDEN_HELMET),
 	DIAMOND(new int[]{3, 6, 8, 3}, new int[]{3, 8, 6, 3}, SoundEvent.ITEM_ARMOR_EQUIP_DIAMOND, 2.0F, 0.0F, Material.DIAMOND_BOOTS, Material.DIAMOND_LEGGINGS, Material.DIAMOND_CHESTPLATE, Material.DIAMOND_HELMET),
