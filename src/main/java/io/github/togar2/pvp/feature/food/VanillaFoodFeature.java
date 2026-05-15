@@ -14,8 +14,8 @@ import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.PlayerHand;
 import net.minestom.server.event.EventNode;
+import net.minestom.server.event.item.PlayerBeginItemUseEvent;
 import net.minestom.server.event.item.PlayerFinishItemUseEvent;
-import net.minestom.server.event.player.PlayerPreEatEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.item.ItemStack;
@@ -64,12 +64,12 @@ public class VanillaFoodFeature implements FoodFeature, RegistrableFeature {
 	
 	@Override
 	public void init(EventNode<EntityInstanceEvent> node) {
-		node.addListener(PlayerPreEatEvent.class, event -> {
+		node.addListener(PlayerBeginItemUseEvent.class, event -> {
 			if (!event.getItemStack().has(DataComponents.CONSUMABLE))
 				return;
 			@Nullable Food foodComponent = event.getItemStack().get(DataComponents.FOOD);
 			@Nullable Consumable consumableComponent = event.getItemStack().get(DataComponents.CONSUMABLE);
-			
+
 			// If the players hunger is full and the food is not always edible, cancel
 			// For some reason vanilla doesn't say honey is always edible but just overrides the method to always consume it
 			boolean alwaysEat = foodComponent == null || foodComponent.canAlwaysEat() || event.getItemStack().material() == Material.HONEY_BOTTLE;
@@ -78,8 +78,8 @@ public class VanillaFoodFeature implements FoodFeature, RegistrableFeature {
 				event.setCancelled(true);
 				return;
 			}
-			
-			if (consumableComponent != null) event.setEatingTime(consumableComponent.consumeTicks());
+
+			if (consumableComponent != null) event.setItemUseDuration(consumableComponent.consumeTicks());
 		});
 		
 		node.addListener(PlayerFinishItemUseEvent.class, event -> {
