@@ -84,7 +84,7 @@ public class VanillaMiscProjectileFeature implements MiscProjectileFeature, Regi
 			), player);
 			
 			if (enderpearl) {
-				itemCooldownFeature.setCooldown(player, Material.ENDER_PEARL, 20);
+				itemCooldownFeature.setCooldown(player, Material.ENDER_PEARL.name(), 20);
 			}
 			
 			Pos position = player.getPosition().add(0, player.getEyeHeight(), 0);
