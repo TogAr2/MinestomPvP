@@ -254,8 +254,9 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 						combatPotionEffect.applyInstantEffect(arrow, null,
 								entity, potion.amplifier(), 1.0, exhaustionFeature, foodFeature);
 					} else {
+                        int duration = Math.max(potion.duration() / 8, 1);
 						entity.addEffect(new Potion(potion.effect(), potion.amplifier(),
-								potion.duration(), potion.flags()));
+								duration, potion.flags()));
 					}
 				});
 	}
