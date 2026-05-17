@@ -1,28 +1,12 @@
 package io.github.togar2.pvp.feature.projectile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.ThreadLocalRandom;
-
-import io.github.togar2.pvp.entity.projectile.FireworkRocketEntity;
-import io.github.togar2.pvp.feature.block.BlockFeature;
-import net.kyori.adventure.text.Component;
-import net.minestom.server.MinecraftServer;
-import net.minestom.server.component.DataComponents;
-import net.minestom.server.coordinate.Vec;
-import net.minestom.server.entity.metadata.LivingEntityMeta;
-import net.minestom.server.event.item.PlayerBeginItemUseEvent;
-import net.minestom.server.event.item.PlayerCancelItemUseEvent;
-import net.minestom.server.event.item.PlayerFinishItemUseEvent;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import io.github.togar2.pvp.entity.projectile.AbstractArrow;
 import io.github.togar2.pvp.entity.projectile.Arrow;
+import io.github.togar2.pvp.entity.projectile.FireworkRocketEntity;
 import io.github.togar2.pvp.entity.projectile.SpectralArrow;
 import io.github.togar2.pvp.feature.FeatureType;
 import io.github.togar2.pvp.feature.RegistrableFeature;
+import io.github.togar2.pvp.feature.block.BlockFeature;
 import io.github.togar2.pvp.feature.config.DefinedFeature;
 import io.github.togar2.pvp.feature.config.FeatureConfiguration;
 import io.github.togar2.pvp.feature.effect.EffectFeature;
@@ -30,13 +14,15 @@ import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
+import net.minestom.server.component.DataComponents;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.entity.Entity;
-import net.minestom.server.entity.EquipmentSlot;
-import net.minestom.server.entity.GameMode;
-import net.minestom.server.entity.Player;
-import net.minestom.server.entity.PlayerHand;
+import net.minestom.server.coordinate.Vec;
+import net.minestom.server.entity.*;
+import net.minestom.server.entity.metadata.LivingEntityMeta;
 import net.minestom.server.event.EventNode;
+import net.minestom.server.event.item.PlayerBeginItemUseEvent;
+import net.minestom.server.event.item.PlayerCancelItemUseEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.event.trait.EntityInstanceEvent;
@@ -45,6 +31,13 @@ import net.minestom.server.item.Material;
 import net.minestom.server.item.enchant.Enchantment;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Vanilla implementation of {@link CrossbowFeature}
@@ -57,8 +50,6 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 
     private static final Tag<@NotNull Boolean> START_SOUND_PLAYED = Tag.Transient("StartSoundPlayed");
     private static final Tag<@NotNull Boolean> MID_LOAD_SOUND_PLAYED = Tag.Transient("MidLoadSoundPlayed");
-    private static final Tag<@NotNull Boolean> JUST_FINISHED_LOADING = Tag.Boolean("JustFinishedLoading");
-    private static final Tag<@NotNull Boolean> JUST_SHOT = Tag.Boolean("JustShot");
 
     private static final double DEFAULT_POWER = 3.15;
     private static final double FIREWORK_POWER = 1.6;
@@ -90,26 +81,13 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 
         // Player Loading the crossbow
         node.addListener(PlayerBeginItemUseEvent.class, event -> {
-
-            var itemStack = event.getItemStack();
+            var itemStack = event.getPlayer().getItemInHand(event.getHand());
             var player = event.getPlayer();
             if (itemStack.material() != Material.CROSSBOW) return;
 
             if (!isCrossbowCharged(itemStack) && projectileItemFeature.getCrossbowProjectile(player) == null && player.getGameMode() != GameMode.CREATIVE) {
                 event.setCancelled(true);
-                return;
             }
-
-            if (player.getTag(JUST_SHOT) != null && player.getTag(JUST_SHOT) == true) {
-                itemStack = setCrossbowProjectile(itemStack, List.of());
-                player.setItemInHand(event.getHand(), itemStack);
-                event.setCancelled(true);
-            }
-
-            if (!isCrossbowCharged(itemStack)) {
-                event.setItemUseDuration(getCrossbowUseDuration(itemStack));
-            }
-            event.getPlayer().setTag(JUST_SHOT, false);
         });
 
         node.addListener(PlayerTickEvent.class, event -> {
@@ -151,17 +129,10 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
                 ), player);
                 player.setTag(MID_LOAD_SOUND_PLAYED, true);
             }
-        });
 
-        // Loading crossbow with projectile
-        node.addListener(PlayerFinishItemUseEvent.class, event -> {
-            var player = event.getPlayer();
-            var itemStack = event.getItemStack();
-            if (itemStack.material() != Material.CROSSBOW) return;
-            if (!isCrossbowCharged(itemStack)) {
-                var chargedCrossbow = loadCrossbowProjectiles(player, itemStack);
-                player.setTag(JUST_FINISHED_LOADING, true);
-                player.setItemInHand(event.getHand(), chargedCrossbow);
+            if (progress >= 1) {
+                var chargedCrossbow = loadCrossbowProjectiles(player, stack);
+                player.setItemInHand(hand, chargedCrossbow);
                 event.getInstance().playSound(Sound.sound()
                                 .type(SoundEvent.ITEM_CROSSBOW_LOADING_END)
                                 .build(),
@@ -184,21 +155,10 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
 
         node.addListener(PlayerCancelItemUseEvent.class, event -> {
             var player = event.getPlayer();
-            var itemStack = event.getItemStack();
 
             // Removes these tags so it plays the sound again if the player stopped loading the crossbow mid-load
             player.removeTag(START_SOUND_PLAYED);
             player.removeTag(MID_LOAD_SOUND_PLAYED);
-
-            if (itemStack.material() != Material.CROSSBOW) return;
-            if (player.getTag(JUST_FINISHED_LOADING) == null || player.getTag(JUST_FINISHED_LOADING) == false) {
-                MinecraftServer.getSchedulerManager().scheduleNextTick(() -> {
-                    if (player.getTag(JUST_FINISHED_LOADING) != null && player.getTag(JUST_FINISHED_LOADING) == false) {
-                        player.setTag(JUST_FINISHED_LOADING, false);
-                    }
-                });
-            }
-            player.setTag(JUST_FINISHED_LOADING, false);
         });
 
         // Shooting projectile from crossbow
@@ -206,14 +166,12 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
             var player = event.getPlayer();
             var itemStack = event.getItemStack();
             if (itemStack.material() != Material.CROSSBOW) return;
-            if (!isCrossbowCharged(itemStack) || player.getTag(JUST_FINISHED_LOADING) == true) return;
+            if (!isCrossbowCharged(itemStack)) return;
 
             performCrossbowShooting(player, event.getHand(), itemStack);
-            player.setTag(JUST_SHOT, true);
 
             var unchargedCrossbow = setCrossbowProjectile(itemStack, List.of());
             player.setItemInHand(event.getHand(), unchargedCrossbow);
-            player.clearItemUse();
         });
     }
 
@@ -249,10 +207,6 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
         }
 
         return false;
-    }
-
-    protected int getCrossbowUseDuration(ItemStack stack) {
-        return getCrossbowChargeDuration(stack) + 3;
     }
 
     protected int getCrossbowChargeDuration(ItemStack stack) {
