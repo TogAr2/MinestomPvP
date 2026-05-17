@@ -169,9 +169,6 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
             if (!isCrossbowCharged(itemStack)) return;
 
             performCrossbowShooting(player, event.getHand(), itemStack);
-
-            var unchargedCrossbow = setCrossbowProjectile(itemStack, List.of());
-            player.setItemInHand(event.getHand(), unchargedCrossbow);
         });
     }
 
@@ -282,7 +279,8 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
             }
         }
 
-        setCrossbowProjectile(stack, List.of());
+        // Item is changed by shootCrossbowProjectile, we cannot reuse it
+        player.setItemInHand(hand, setCrossbowProjectile(player.getItemInHand(hand), List.of()));
     }
 
     protected void shootCrossbowProjectile(Player player, PlayerHand hand, ItemStack crossbowStack,
