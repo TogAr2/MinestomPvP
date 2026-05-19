@@ -80,7 +80,7 @@ public class VanillaTridentFeature implements TridentFeature, RegistrableFeature
 				ThrownTrident trident = new ThrownTrident(player, stack, enchantmentFeature);
 				
 				Pos position = player.getPosition().add(0, player.getEyeHeight() - 0.1, 0);
-				trident.shootFromRotation(position.pitch(), position.yaw(), 0, 2.5, 1.0);
+				trident.shootFromRotation(position.pitch(), position.yaw(), 0, 2.5, 1.0, 0.0);
 				trident.setInstance(Objects.requireNonNull(player.getInstance()), position.withView(trident.getPosition()));
 				
 				Vec playerVel = player.getVelocity();

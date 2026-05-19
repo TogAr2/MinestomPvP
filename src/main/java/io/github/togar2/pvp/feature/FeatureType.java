@@ -70,6 +70,7 @@ public record FeatureType<F extends CombatFeature>(String name, F defaultFeature
 	public static final FeatureType<PlayerStateFeature> PLAYER_STATE = of("PLAYER_STATE", PlayerStateFeature.NO_OP);
 	public static final FeatureType<TotemFeature> TOTEM = of("TOTEM", TotemFeature.NO_OP);
 	public static final FeatureType<TrackingFeature> TRACKING = of("TRACKING", TrackingFeature.NO_OP);
+    public static final FeatureType<FireworkRocketFeature> FIREWORK = of("FIREWORK", FireworkRocketFeature.NO_OP);
 	
 	public static <F extends CombatFeature> FeatureType<F> of(String name, F noopFeature) {
 		return new FeatureType<>(name, noopFeature);
