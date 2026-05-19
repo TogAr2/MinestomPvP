@@ -3,6 +3,7 @@ package io.github.togar2.pvp.enums;
 import io.github.togar2.pvp.utils.CombatVersion;
 import io.github.togar2.pvp.utils.ModifierId;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.minestom.server.component.DataComponents;
 import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
@@ -94,6 +95,12 @@ public enum ArmorMaterial {
 					entity.getAttribute(Attribute.KNOCKBACK_RESISTANCE).addModifier(new AttributeModifier(modifierId, newMaterial.getKnockbackResistance(), AttributeOperation.ADD_VALUE));
 				}
 			}
+		}
+
+		if (version.modern()) {
+			ArmorMaterial armorMaterial = fromMaterial(newStack.material());
+			if (armorMaterial == null) return;
+			entity.getInstance().playSound(Sound.sound(armorMaterial.equipSound, Sound.Source.PLAYER, 1f, 1f));
 		}
 	}
 	

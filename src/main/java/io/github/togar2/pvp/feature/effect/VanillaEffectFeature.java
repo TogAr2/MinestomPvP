@@ -254,8 +254,9 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 						combatPotionEffect.applyInstantEffect(arrow, null,
 								entity, potion.amplifier(), 1.0, exhaustionFeature, foodFeature);
 					} else {
+                        int duration = Math.max(potion.duration() / 8, 1);
 						entity.addEffect(new Potion(potion.effect(), potion.amplifier(),
-								potion.duration(), potion.flags()));
+								duration, potion.flags()));
 					}
 				});
 	}
@@ -279,4 +280,18 @@ public class VanillaEffectFeature implements EffectFeature, RegistrableFeature {
 			}
 		}
 	}
+
+    @Override
+    public void addLingeringPotionEffects(LivingEntity entity, PotionContents potionContents, @Nullable Entity source, @Nullable Entity attacker) {
+        for (Potion potion: getAllPotions(potionContents)) {
+            CombatPotionEffect combatPotionEffect = CombatPotionEffects.get(potion.effect());
+            if (combatPotionEffect.isInstant()) {
+                combatPotionEffect.applyInstantEffect(source, attacker,
+                        entity, potion.amplifier(), 0.5, exhaustionFeature, foodFeature);
+            } else {
+                int duration = potion.duration() / 4;
+                entity.addEffect(new Potion(potion.effect(), potion.amplifier(), duration, potion.flags()));
+            }
+        }
+    }
 }

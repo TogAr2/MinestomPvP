@@ -183,6 +183,11 @@ public class VanillaExplosiveFeature implements ExplosiveFeature, RegistrableFea
 									.putBoolean("anchor", true)
 									.build()
 					);
+					if (event.getHand() == PlayerHand.MAIN) {
+						player.swingMainHand();
+					} else {
+						player.swingOffHand();
+					}
 				});
 			}
 

@@ -50,6 +50,7 @@ Currently, most vanilla PvP mechanics are supported.
 ## Plans
 
 - Lingering potions
+- Fireworks (for crossbows)
 - Support for (some) water mechanics (e.g. slowing projectiles down)
 - 1.21 features (the library is already 1.21 compatible, just doesn't support its combat features)
 - Rework of the tool & armor registry to allow for customization

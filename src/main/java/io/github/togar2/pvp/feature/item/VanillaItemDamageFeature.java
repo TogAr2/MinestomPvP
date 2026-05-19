@@ -10,7 +10,9 @@ import io.github.togar2.pvp.feature.enchantment.EnchantmentFeature;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.component.DataComponents;
 import net.minestom.server.entity.EquipmentSlot;
+import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.LivingEntity;
+import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.item.ItemStack;
@@ -76,6 +78,7 @@ public class VanillaItemDamageFeature implements ItemDamageFeature {
 	
 	@Override
 	public void damageEquipment(LivingEntity entity, EquipmentSlot slot, int amount) {
+		if (entity instanceof Player player && player.getGameMode() == GameMode.CREATIVE) return;
 		EquipmentDamageEvent equipmentDamageEvent = new EquipmentDamageEvent(entity, slot, amount);
 		EventDispatcher.callCancellable(equipmentDamageEvent, () ->
 				entity.setEquipment(slot, damage(entity.getEquipment(slot), amount, entity,

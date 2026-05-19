@@ -32,7 +32,9 @@ public interface EffectFeature extends CombatFeature {
 		@Override public void addArrowEffects(LivingEntity entity, Arrow arrow) {}
 		@Override public void addSplashPotionEffects(LivingEntity entity, PotionContents potionContents, double proximity,
 		                                             @Nullable Entity source, @Nullable Entity attacker) {}
-	};
+        @Override public void addLingeringPotionEffects(LivingEntity entity, PotionContents potionContents,
+                                                        @Nullable Entity source, @Nullable Entity attacker) {}
+    };
 	
 	int getPotionColor(PotionContents contents);
 	
@@ -70,4 +72,15 @@ public interface EffectFeature extends CombatFeature {
 	 */
 	void addSplashPotionEffects(LivingEntity entity, PotionContents potionContents, double proximity,
 	                            @Nullable Entity source, @Nullable Entity attacker);
+
+    /**
+     * Applies the effects of a lingering potion to an entity.
+     *
+     * @param entity         the entity which is in the area effect cloud
+     * @param potionContents the potion contents of the lingering potion
+     * @param source         the direct source of the area effect cloud (usually the area effect cloud)
+     * @param attacker       the attacker of the area effect cloud (usually the thrower)
+     */
+    void addLingeringPotionEffects(LivingEntity entity, PotionContents potionContents, @Nullable Entity source,
+                                   @Nullable Entity attacker);
 }

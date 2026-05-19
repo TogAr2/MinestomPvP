@@ -1,5 +1,6 @@
 package io.github.togar2.pvp.entity.projectile;
 
+import io.github.togar2.pvp.entity.AreaEffectCloud;
 import io.github.togar2.pvp.feature.effect.EffectFeature;
 import io.github.togar2.pvp.utils.EffectUtil;
 import net.minestom.server.collision.BoundingBox;
@@ -10,6 +11,7 @@ import net.minestom.server.entity.metadata.item.LingeringPotionMeta;
 import net.minestom.server.entity.metadata.item.SplashPotionMeta;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.component.PotionContents;
+import net.minestom.server.particle.Particle;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.worldevent.WorldEvent;
 import org.jetbrains.annotations.NotNull;
@@ -49,17 +51,19 @@ public class ThrownPotion extends CustomEntityProjectile implements ItemHoldingP
 		
 		PotionContents potionContents = item.get(DataComponents.POTION_CONTENTS);
 		List<Potion> potions = effectFeature.getAllPotions(potionContents);
-		
+
+        Pos position = getPosition();
+
 		if (!potions.isEmpty()) {
 			if (lingering) {
-				//TODO lingering
+				AreaEffectCloud areaEffectCloud = new AreaEffectCloud(600, 3.0f, Particle.ENTITY_EFFECT, -0.005f, -0.5f,
+                        20, 0, 10, potionContents, null, effectFeature);
+                areaEffectCloud.setInstance(getInstance(), position);
 			} else {
 				applySplash(potionContents, entity);
 			}
 		}
-		
-		Pos position = getPosition();
-		
+
 		boolean instantEffect = false;
 		for (Potion potion : potions) {
 			if (potion.effect().registry().isInstantaneous()) {
