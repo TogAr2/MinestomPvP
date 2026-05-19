@@ -142,21 +142,9 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
             }
         });
 
-        /*
-        Forces you to let go of RMB to shoot the crossbow
-
-        TODO - Fix bug where you can't shoot the crossbow in the same tick as when you let go of RMB.
-        This bug has plagued me for a very long while, due to the fact that detecting if the player has released RMB
-        is in an event listener, which runs in the server tick loop (Maybe this needs to be async somehow?).
-        A 1 tick delay doesn't seem that bad, but in-game, a quick charge 3 crossbow or even just being fast
-        with your crossbow oftentimes causes your crossbow to just not fire when you right click with it.
-        Not only is this unintuitive, but inaccurate as per vanilla crossbows.
-         */
-
+        // Removes these tags so it plays the sound again if the player stopped loading the crossbow mid-load
         node.addListener(PlayerCancelItemUseEvent.class, event -> {
             var player = event.getPlayer();
-
-            // Removes these tags so it plays the sound again if the player stopped loading the crossbow mid-load
             player.removeTag(START_SOUND_PLAYED);
             player.removeTag(MID_LOAD_SOUND_PLAYED);
         });
@@ -235,8 +223,7 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
             projectileSlot = projectile.slot();
         } else {
             // Should not happen
-            return ItemStack.of(Material.PUMPKIN)
-                    .withCustomName(Component.text("Debug pumpkin"));
+            return ItemStack.AIR;
         }
 
         ArrayList<ItemStack> projectiles = new ArrayList<>(List.of(projectileItem));
@@ -296,9 +283,7 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
             firework.setInstance(Objects.requireNonNull(player.getInstance()), position);
 
             firework.shootFromRotation(position.pitch(), position.yaw(), 0, FIREWORK_POWER, DEFAULT_SPREAD, yaw);
-            Vec playerVel = player.getVelocity();
             firework.setVelocity(firework.getVelocity()
-                    .add(playerVel.x(), player.isOnGround() ? 0.00 : playerVel.y(), playerVel.z())
                     .add(getRandomOffset(), getRandomOffset(), getRandomOffset())
             );
         } else {
@@ -362,6 +347,4 @@ public class VanillaCrossbowFeature implements CrossbowFeature, RegistrableFeatu
     protected FireworkRocketEntity getFireworkRocket(Player player, ItemStack projectile) {
         return new FireworkRocketEntity(player, projectile, true, blockFeature);
     }
-
 }
-
