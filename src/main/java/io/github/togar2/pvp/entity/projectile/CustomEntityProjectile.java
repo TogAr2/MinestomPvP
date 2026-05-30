@@ -3,7 +3,6 @@ package io.github.togar2.pvp.entity.projectile;
 import io.github.togar2.pvp.utils.ProjectileUtil;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.collision.*;
-import net.minestom.server.coordinate.BlockVec;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -184,7 +183,7 @@ public class CustomEntityProjectile extends Entity {
 
     private boolean shouldUnstuck() {
         Point collidedPoint = position.add(collisionDirection.mul(0.003)); // Move slightly inside the collided block
-        Point collidedBlockVec = new BlockVec(collidedPoint);
+        Point collidedBlockVec = collidedPoint.asBlockVec();
         Block block = instance.getBlock(collidedPoint);
 
         return !block.registry().collisionShape().intersectBox(collidedPoint.sub(collidedBlockVec).sub(0, 0.6, 0), UNSTUCK_BOX);
@@ -242,7 +241,7 @@ public class CustomEntityProjectile extends Entity {
                     Vec prevVelocity = velocity;
                     EntityCollisionResult collided = entityResult.stream().findFirst().orElse(null);
 
-                    var event = new ProjectileCollideWithEntityEvent(this, Pos.fromPoint(collided.collisionPoint()), collided.entity());
+                    var event = new ProjectileCollideWithEntityEvent(this, collided.collisionPoint().asPos(), collided.entity());
                     EventDispatcher.call(event);
                     if (!event.isCancelled()) {
                         if (onHit(collided.entity())) {

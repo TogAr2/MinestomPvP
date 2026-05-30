@@ -22,6 +22,7 @@ import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.*;
 import net.minestom.server.extras.lan.OpenToLAN;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.instance.LightingChunk;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.common.KeepAlivePacket;
@@ -53,6 +54,7 @@ public class PvpTest {
 				MinecraftServer.getDimensionTypeRegistry().register(Key.key("idk"), fullbright);
 		
 		Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(fullbrightKey);
+		instance.setChunkSupplier(LightingChunk::new);
 		instance.setGenerator(new DemoGenerator());
 		instance.enableAutoChunkLoad(true);
 		
@@ -117,7 +119,6 @@ public class PvpTest {
 		MinecraftServer.getGlobalEventHandler().addListener(PlayerPacketOutEvent.class, event -> {
 			if (event.getPacket() instanceof ActionBarPacket) return;
 			if (event.getPacket() instanceof UpdateHealthPacket) return;
-			if (event.getPacket() instanceof TimeUpdatePacket) return;
 			if (event.getPacket() instanceof PlayerInfoUpdatePacket) return;
 			if (event.getPacket() instanceof ChunkDataPacket) return;
 			if (event.getPacket() instanceof KeepAlivePacket) return;
