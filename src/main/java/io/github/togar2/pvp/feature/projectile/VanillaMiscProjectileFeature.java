@@ -88,7 +88,7 @@ public class VanillaMiscProjectileFeature implements MiscProjectileFeature, Regi
 			}
 			
 			Pos position = player.getPosition().add(0, player.getEyeHeight(), 0);
-			projectile.shootFromRotation(position.pitch(), position.yaw(), 0, 1.5, 1.0);
+			projectile.shootFromRotation(position.pitch(), position.yaw(), 0, 1.5, 1.0, 0.0);
 			projectile.setInstance(Objects.requireNonNull(player.getInstance()), position.withView(projectile.getPosition()));
 			
 			Vec playerVel = player.getVelocity();

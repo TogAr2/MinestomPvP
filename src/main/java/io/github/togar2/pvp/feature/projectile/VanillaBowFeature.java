@@ -126,7 +126,7 @@ public class VanillaBowFeature implements BowFeature, RegistrableFeature {
 			
 			// Arrow shooting
 			Pos position = player.getPosition().add(0D, player.getEyeHeight() - 0.1, 0D);
-			arrow.shootFromRotation(position.pitch(), position.yaw(), 0 , power * 3, 1.0);
+			arrow.shootFromRotation(position.pitch(), position.yaw(), 0 , power * 3, 1.0, 0.0);
 			Vec playerVel = player.getVelocity();
 			arrow.setVelocity(arrow.getVelocity().add(playerVel.x(),
 					player.isOnGround() ? 0.0D : playerVel.y(), playerVel.z()));
