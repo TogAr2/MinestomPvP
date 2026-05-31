@@ -181,10 +181,12 @@ public class VanillaBlockFeature implements BlockFeature, RegistrableFeature {
 				((LivingEntityMeta) entity.getEntityMeta()).setHandActive(false);
 
 				if (blocksAttacks != null && blocksAttacks.disableSound() != null) {
+                    Pos pos = entity.getPosition();
 					entity.getViewersAsAudience().playSound(Sound.sound(
 							blocksAttacks.disableSound(), Sound.Source.PLAYER, 1.0f,
-							0.8f + ThreadLocalRandom.current().nextFloat(0.4f)
-					));
+                                    0.8f + ThreadLocalRandom.current().nextFloat(0.4f)),
+                            pos.x(), pos.y(), pos.z()
+                    );
 				}
 			}
 		}
