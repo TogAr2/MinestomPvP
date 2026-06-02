@@ -20,6 +20,7 @@ import io.github.togar2.pvp.feature.food.FoodFeature;
 import io.github.togar2.pvp.feature.food.RegenerationFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.feature.knockback.KnockbackFeature;
+import io.github.togar2.pvp.feature.mace.MaceFeature;
 import io.github.togar2.pvp.feature.potion.PotionFeature;
 import io.github.togar2.pvp.feature.projectile.*;
 import io.github.togar2.pvp.feature.provider.DifficultyProvider;
@@ -71,6 +72,7 @@ public record FeatureType<F extends CombatFeature>(String name, F defaultFeature
 	public static final FeatureType<TotemFeature> TOTEM = of("TOTEM", TotemFeature.NO_OP);
 	public static final FeatureType<TrackingFeature> TRACKING = of("TRACKING", TrackingFeature.NO_OP);
     public static final FeatureType<FireworkRocketFeature> FIREWORK = of("FIREWORK", FireworkRocketFeature.NO_OP);
+    public static final FeatureType<MaceFeature> MACE = of("MACE", MaceFeature.NO_OP);
 	
 	public static <F extends CombatFeature> FeatureType<F> of(String name, F noopFeature) {
 		return new FeatureType<>(name, noopFeature);
