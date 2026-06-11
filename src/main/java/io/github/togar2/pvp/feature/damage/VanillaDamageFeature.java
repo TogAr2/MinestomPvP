@@ -151,7 +151,7 @@ public class VanillaDamageFeature implements DamageFeature, RegistrableFeature {
 		}
 		
 		// Process armor and effects
-		amount = armorFeature.getDamageWithProtection(entity, damageType, amount);
+		amount = armorFeature.getDamageWithProtection(entity, damage, amount);
 		
 		damage.setAmount(amount);
 		FinalDamageEvent finalDamageEvent = new FinalDamageEvent(entity, damage, 10, shouldAnimate);

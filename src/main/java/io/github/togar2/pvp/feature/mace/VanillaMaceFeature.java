@@ -10,6 +10,7 @@ import io.github.togar2.pvp.feature.fall.VanillaFallFeature;
 import io.github.togar2.pvp.feature.item.ItemDamageFeature;
 import io.github.togar2.pvp.utils.ViewUtil;
 import net.kyori.adventure.sound.Sound;
+import net.minestom.server.component.DataComponents;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
@@ -21,6 +22,8 @@ import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.EntityInstanceEvent;
 import net.minestom.server.instance.EntityTracker;
 import net.minestom.server.item.Material;
+import net.minestom.server.item.component.EnchantmentList;
+import net.minestom.server.item.enchant.Enchantment;
 import net.minestom.server.network.packet.server.play.EntityVelocityPacket;
 import net.minestom.server.network.packet.server.play.WorldEventPacket;
 import net.minestom.server.sound.SoundEvent;
@@ -30,7 +33,7 @@ public class VanillaMaceFeature implements MaceFeature, RegistrableFeature {
 
     public static final DefinedFeature<VanillaMaceFeature> DEFINED = new DefinedFeature<>(
             FeatureType.MACE, VanillaMaceFeature::new,
-            FeatureType.FALL, FeatureType.ATTACK_COOLDOWN
+            FeatureType.FALL, FeatureType.ATTACK_COOLDOWN, FeatureType.ENCHANTMENT
     );
 
     private final FeatureConfiguration featureConfiguration;
@@ -59,26 +62,29 @@ public class VanillaMaceFeature implements MaceFeature, RegistrableFeature {
                 event -> event.getEntity() instanceof LivingEntity entity && entity.getItemInMainHand().material() == Material.MACE
         );
 
+        // Initial attack
         maceNode.addListener(FinalAttackEvent.class, event -> {
-           LivingEntity entity = (LivingEntity) event.getEntity();
-           Entity target = event.getTarget();
-           itemDamageFeature.damageEquipment(entity, EquipmentSlot.MAIN_HAND, 1);
+            LivingEntity entity = (LivingEntity) event.getEntity();
+            Entity target = event.getTarget();
+            itemDamageFeature.damageEquipment(entity, EquipmentSlot.MAIN_HAND, 1);
 
-           if (canSmashAttack(entity)) {
-               event.setAttackSounds(false);
-               entity.setTag(VanillaFallFeature.EXTRA_FALL_PARTICLES, true); // TODO Doesn't look right in-game
+            if (canSmashAttack(entity)) {
+                event.setAttackSounds(false);
+                entity.setTag(VanillaFallFeature.EXTRA_FALL_PARTICLES, true); // TODO Doesn't look right in-game
 
-               float amount = event.getBaseDamage();
-               event.setBaseDamage(amount + calculateSmashDamageBonus(entity));
+                float amount = event.getBaseDamage();
+                float smashDamageBonus = getSmashDamageBonus(entity);
+                float densityDamageBonus = getDensityDamageBonus(entity);
+                event.setBaseDamage(amount + smashDamageBonus + densityDamageBonus);
 
-               Vec currentVel = entity.getVelocity();
-               Vec newVel = currentVel.withY(0.01);
-               entity.setVelocity(newVel);
-               entity.sendPacketToViewersAndSelf(new EntityVelocityPacket(entity.getEntityId(), newVel));
+                Vec currentVel = entity.getVelocity();
+                Vec newVel = currentVel.withY(0.01);
+                entity.setVelocity(newVel);
+                entity.sendPacketToViewersAndSelf(new EntityVelocityPacket(entity.getEntityId(), newVel));
 
-               playMaceSmashFX(entity, target);
-               areaKnockback(entity, target);
-           }
+                playMaceSmashFX(entity, target);
+                areaKnockback(entity, target);
+            }
         });
 
         node.addChild(maceNode);
@@ -88,16 +94,23 @@ public class VanillaMaceFeature implements MaceFeature, RegistrableFeature {
         return fallFeature.getFallDistance(entity) > 1.5 && !entity.isFlyingWithElytra();
     }
 
-    protected float calculateSmashDamageBonus(@NotNull LivingEntity entity) {
-         float fallDistance = (float) fallFeature.getFallDistance(entity);
-         float damage;
-         if (fallDistance <= 3.0f)
-             damage = 4.0f * fallDistance;
-         else if (fallDistance <= 8.0f)
-             damage = 12.0f + 2.0f * (fallDistance - 3.0f);
-         else
-             damage = 22.0f + fallDistance - 8.0f;
-         return damage;
+    protected float getSmashDamageBonus(@NotNull LivingEntity entity) {
+        float fallDistance = (float) fallFeature.getFallDistance(entity);
+        float damage;
+        if (fallDistance <= 3.0f)
+            damage = 4.0f * fallDistance;
+        else if (fallDistance <= 8.0f)
+            damage = 12.0f + 2.0f * (fallDistance - 3.0f);
+        else
+            damage = 22.0f + fallDistance - 8.0f;
+        return damage;
+    }
+
+    protected float getDensityDamageBonus(@NotNull LivingEntity entity) {
+        EnchantmentList enchantments = entity.getItemInMainHand().get(DataComponents.ENCHANTMENTS);
+        return (float) ((enchantments != null && enchantments.has(Enchantment.DENSITY) ?
+                (float) enchantments.level(Enchantment.DENSITY) / 2 : 0)
+                * fallFeature.getFallDistance(entity));
     }
 
     protected void playMaceSmashFX(@NotNull LivingEntity entity, @NotNull Entity target) {
